@@ -4,12 +4,22 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ExampleSubsystem extends SubsystemBase {
+public class IntakeVisionSubsystem extends SubsystemBase {
+  NetworkTable tippedConeTable;
+  NetworkTable uprightConeTable;
+  NetworkTable cubeTable;
   /** Creates a new ExampleSubsystem. */
-  public ExampleSubsystem() {}
+  public IntakeVisionSubsystem() {
+    tippedConeTable = NetworkTableInstance.getDefault().getTable("Tipped_Cone_Pipeline");
+    uprightConeTable = NetworkTableInstance.getDefault().getTable("Upright_Cone_Pipeline");
+    cubeTable = NetworkTableInstance.getDefault().getTable("Cube_Pipeline");
+    tippedConeTable.getEntry("pipeline").setNumber(0);
+  }
 
   /**
    * Example command factory method.
