@@ -60,15 +60,6 @@ public class ArmCosineSubsystem extends SubsystemBase {
 
 
 
-
-  public double calculateBaseAngleAnsh() {
-    return Math.asin(Math.sin(calculateTopAngleAnsh())/distance*Constants.ArmConstants.TOP_ARM);
-  }
-
-  public double calculateTopAngleAnsh() {
-    return topAngle = Math.acos((Math.pow(Constants.ArmConstants.BASE_ARM,2) + Math.pow(Constants.ArmConstants.TOP_ARM,2) - Math.pow(distance,2))/2/Constants.ArmConstants.TOP_ARM/Constants.ArmConstants.BASE_ARM);
-  }
-
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
