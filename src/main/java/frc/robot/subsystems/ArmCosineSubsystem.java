@@ -6,12 +6,19 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.lang. Math;
+import frc.robot.Constants;
 
-public class ExampleSubsystem extends SubsystemBase {
+public class ArmCosineSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
 
+  double topAngle;
+  double baseAngle;
+  double distance;
 
-  public ExampleSubsystem() {}
+  public ArmCosineSubsystem(double distance) {
+    this.distance = distance;
+  }
 
   /**
    * Example command factory method.
@@ -40,6 +47,26 @@ public class ExampleSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  public double calculateBaseAngleShaan() {
+    baseAngle = Math.acos((Math.pow(Constants.ArmConstants.BASE_ARM,2) + Math.pow(distance,2) - Math.pow(Constants.ArmConstants.TOP_ARM,2))/2/Constants.ArmConstants.BASE_ARM/distance);
+    return baseAngle;
+  }
+
+  public double calculateTopAngleShaan() {
+    return Math.asin(Math.sin(calculateBaseAngleShaan())/Constants.ArmConstants.TOP_ARM*distance);
+  }
+
+
+
+
+  public double calculateBaseAngleAnsh() {
+    return Math.asin(Math.sin(calculateTopAngleAnsh())/distance*Constants.ArmConstants.TOP_ARM);
+  }
+
+  public double calculateTopAngleAnsh() {
+    return topAngle = Math.acos((Math.pow(Constants.ArmConstants.BASE_ARM,2) + Math.pow(Constants.ArmConstants.TOP_ARM,2) - Math.pow(distance,2))/2/Constants.ArmConstants.TOP_ARM/Constants.ArmConstants.BASE_ARM);
   }
 
   @Override
