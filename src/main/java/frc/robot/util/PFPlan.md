@@ -11,4 +11,3 @@
 - [ ] Resolve the issue of coprocessor threads not necessarily being in-sync with command scheduler loop (20 Hz vs way more)
 - [ ] Related to the above (and possible solution): figure out how to update particle filter only on NT updates
 - [ ] (?) Profile robot code to optimize particle filter (dubiously possible)
-- [ ] (for unchecked checkbox)
