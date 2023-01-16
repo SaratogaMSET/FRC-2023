@@ -16,4 +16,9 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+
+  public static class IntakeConstants {
+    public static final int INTAKE_MOTOR = 20;
+    public static final int LIMIT_SWITCH = 0;
+  }
 }
