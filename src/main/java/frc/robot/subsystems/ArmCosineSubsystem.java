@@ -15,6 +15,9 @@ public class ArmCosineSubsystem extends SubsystemBase {
   double topAngle;
   double baseAngle;
   double distance;
+  //double initialAngle;
+  double velocity; 
+
 
   public ArmCosineSubsystem(double distance) {
     this.distance = distance;
@@ -49,13 +52,26 @@ public class ArmCosineSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public double calculateBaseAngleShaan() {
+  public double calcBaseAngle() {
     baseAngle = Math.acos((Math.pow(Constants.ArmConstants.BASE_ARM,2) + Math.pow(distance,2) - Math.pow(Constants.ArmConstants.TOP_ARM,2))/2/Constants.ArmConstants.BASE_ARM/distance);
     return baseAngle;
   }
+  public double AngleDistance(double initialAngle) {
+    baseAngle = calcBaseAngle();
+    double baseAngleDist = Math.abs(baseAngle -initialAngle);
+    return baseAngleDist;
 
-  public double calculateTopAngleShaan() {
-    return Math.asin(Math.sin(calculateBaseAngleShaan())/Constants.ArmConstants.TOP_ARM*distance);
+  }
+
+  public double timeToAng(double velocity, double radius, double initialAngle){
+    double BAD = AngleDistance(initialAngle);
+    double result = (Math.pow(radius, 2) * BAD)/(velocity);
+    return result;
+
+  }
+
+  public double calcTopAngle() {
+    return Math.asin(Math.sin(calcBaseAngle())/Constants.ArmConstants.TOP_ARM*distance);
   }
 
 
