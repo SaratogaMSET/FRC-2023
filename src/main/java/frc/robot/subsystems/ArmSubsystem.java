@@ -11,13 +11,15 @@ import frc.robot.Constants;
 
 public class ArmSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-    public ArmSubsystem() {}
+    public ArmSubsystem() {
+        motorDistal.setInverted(true);
+    }
 
     ArmKinematics Arm = new ArmKinematics(0, 0);
     public CANSparkMax motorProximal = new CANSparkMax(Constants.Arm.proximalMotorID, MotorType.kBrushless);
     public CANSparkMax motorDistal = new CANSparkMax(Constants.Arm.distalMotorID, MotorType.kBrushless);
-    SparkMaxAbsoluteEncoder encoderProximal = motorProximal.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.fromId(Constants.Arm.proximalEncoderID));
-    SparkMaxAbsoluteEncoder encoderDistal = motorProximal.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.fromId(Constants.Arm.distalEncoderID));
+    SparkMaxAbsoluteEncoder encoderProximal = motorProximal.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.fromId(0));
+    SparkMaxAbsoluteEncoder encoderDistal = motorProximal.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.fromId(0));
 
     public void calibrateArm(){
         double convertRotRad = 2 * Math.PI;
@@ -36,8 +38,8 @@ public class ArmSubsystem extends SubsystemBase {
         motorProximal.setVoltage(voltageProximal);
         motorDistal.setVoltage(voltageDistal);
     }
-    public void armControl(double px, double py, double vx, double vy){
-        double[] torques = Arm.torquePID(px, py, vx, vy);
+    public void armControl(double px, double py){
+        double[] torques = Arm.torquePID(px, py, 0, 0);
 
         double voltageProximal = VoltageControl.GearedNEOVoltage(torques[0], encoderProximal.getVelocity(), 0.1, Constants.Arm.gearProximalReduction);
         double voltageDistal = VoltageControl.GearedNEOVoltage(torques[0], encoderDistal.getVelocity(), 0.1, Constants.Arm.gearDistalReduction);
