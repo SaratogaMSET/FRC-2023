@@ -10,7 +10,7 @@ public final class Constants {
       public static final double gearProximalReduction = 45;
       public static final double gearDistalReduction = 50;
 
-      public static final double initialAngleProximal = Math.PI / 180 * (150);
-      public static final double initialAngleDistal = Math.PI / 180 * (-170);
+      public static final double initialAngleProximal = Math.PI / 180 * (0);
+      public static final double initialAngleDistal = Math.PI / 180 * (0);
   }
 }

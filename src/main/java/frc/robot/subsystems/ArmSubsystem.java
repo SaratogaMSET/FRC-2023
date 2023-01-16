@@ -3,7 +3,10 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -18,17 +21,21 @@ public class ArmSubsystem extends SubsystemBase {
     ArmKinematics Arm = new ArmKinematics(0, 0);
     public CANSparkMax motorProximal = new CANSparkMax(Constants.Arm.proximalMotorID, MotorType.kBrushless);
     public CANSparkMax motorDistal = new CANSparkMax(Constants.Arm.distalMotorID, MotorType.kBrushless);
-    SparkMaxAbsoluteEncoder encoderProximal = motorProximal.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.fromId(0));
-    SparkMaxAbsoluteEncoder encoderDistal = motorProximal.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.fromId(0));
+    RelativeEncoder encoderProximal = motorProximal.getEncoder();
+    RelativeEncoder encoderDistal = motorDistal.getEncoder();
 
+    double convertRotRad = 2 * Math.PI;
+
+    private double positionProximal(){
+        return  0;//encoderProximal();
+    }
     public void calibrateArm(){
-        double convertRotRad = 2 * Math.PI;
-        encoderProximal.setPositionConversionFactor(convertRotRad/Constants.Arm.gearProximalReduction);
-        encoderProximal.setVelocityConversionFactor(convertRotRad/Constants.Arm.gearProximalReduction);
-        encoderDistal.setPositionConversionFactor(convertRotRad/Constants.Arm.gearProximalReduction);
-        encoderDistal.setVelocityConversionFactor(convertRotRad/Constants.Arm.gearProximalReduction);
-        encoderProximal.setZeroOffset(Units.degreesToRadians(Constants.Arm.initialAngleProximal));
-        encoderDistal.setZeroOffset(Units.degreesToRadians(Constants.Arm.initialAngleDistal));
+        // encoderProximal.setPositionConversionFactor(convertRotRad/Constants.Arm.gearProximalReduction);
+        // encoderProximal.setVelocityConversionFactor(convertRotRad/Constants.Arm.gearProximalReduction);
+        // encoderDistal.setPositionConversionFactor(convertRotRad/Constants.Arm.gearDistalReduction);
+        // encoderDistal.setVelocityConversionFactor(convertRotRad/Constants.Arm.gearDistalReduction);
+        encoderProximal.setPosition(Units.degreesToRadians(Constants.Arm.initialAngleProximal));
+        encoderDistal.setPosition(Units.degreesToRadians(Constants.Arm.initialAngleDistal));
     }
     public void updateState(){
         Arm.setAngles(encoderProximal.getPosition(), encoderDistal.getPosition());
@@ -49,8 +56,8 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
     public void periodic() {
-        SmartDashboard.putNumber("Angle Proxima", 180 / Math.PI * encoderProximal.getPosition());
-        SmartDashboard.putNumber("Angle Distal", 180 / Math.PI * encoderDistal.getPosition());
+        SmartDashboard.putNumber("Angle Proxima", encoderProximal.getPosition());
+        SmartDashboard.putNumber("Angle Distal", encoderDistal.getPosition());
     }
 
 @Override
