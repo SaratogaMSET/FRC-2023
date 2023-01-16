@@ -41,6 +41,12 @@ public class ArmSubsystem extends SubsystemBase {
         Arm.setAngles(encoderProximal.getPosition(), encoderDistal.getPosition());
         Arm.setOmegas(encoderProximal.getVelocity(), encoderDistal.getVelocity());
     }
+    public double getVoltageProximal(){
+      return motorProximal.get();
+    }
+    public double getVoltageDistal(){
+        return motorDistal.get();
+      }
     public void voltageMotors(double voltageProximal, double voltageDistal){
         motorProximal.setVoltage(voltageProximal);
         motorDistal.setVoltage(voltageDistal);

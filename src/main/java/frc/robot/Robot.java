@@ -7,7 +7,15 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.Arm;
+import frc.robot.subsystems.ArmSubsystem;
 
+import javax.xml.crypto.Data;
+
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -16,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-
+  DoubleLogEntry myDoubleLog;
   private RobotContainer m_robotContainer;
 
   /**
@@ -28,6 +36,10 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    DataLogManager.start();
+    DriverStation.startDataLog(DataLogManager.getLog(), true);
+    DataLog log = DataLogManager.getLog();
+    myDoubleLog = new DoubleLogEntry(log, "/my/armSubsystem/Proximal");
   }
 
   /**
@@ -81,7 +93,11 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    if(m_robotContainer.armSubsystem.getVoltageProximal() > 0.5){
+      myDoubleLog.append(m_robotContainer.armSubsystem.getVoltageProximal());
+    }
+  }
 
   @Override
   public void testInit() {
