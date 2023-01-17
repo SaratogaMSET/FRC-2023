@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.Arm;
@@ -26,7 +27,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   DoubleLogEntry myDoubleLog;
   private RobotContainer m_robotContainer;
-
+  private Command m_testCommand;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -102,7 +103,10 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     // Cancels all running commands at the start of test mode.
+    LiveWindow.setEnabled(false);
     CommandScheduler.getInstance().cancelAll();
+    m_testCommand = m_robotContainer.getTestCommand();
+    m_testCommand.schedule();
   }
 
   /** This function is called periodically during test mode. */

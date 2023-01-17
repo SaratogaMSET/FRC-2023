@@ -7,9 +7,11 @@ package frc.robot;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ArmVoltageCommand;
+import frc.robot.commands.TestCommands.sampleTestArmCommand;
 import frc.robot.subsystems.ArmSubsystem;
 
 
@@ -91,5 +93,16 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return null;
+  }
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   * 
+   * @return the command to run in Test
+   */
+  public Command getTestCommand() {
+
+    return new SequentialCommandGroup(
+      new sampleTestArmCommand(armSubsystem)
+      );
   }
 }
