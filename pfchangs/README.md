@@ -7,7 +7,7 @@
 - [x] Get robot distance from landmarks using estimated pose from LL <-- for PF - DONE
 - [ ] Tune forward, turn, and senseNoise values
 - [ ] Decouple translational motion from rotational motion in the particle filter for holonomic drivetrains
-- [ ] Set up NetworkTables on this PC to communicate and send/receive values from the RIO and from LL
+- [ ] Send raw/filtered positional data between the coprocessor and the RIO
 - [ ] Resolve the issue of coprocessor threads not necessarily being in-sync with command scheduler loop (20 Hz vs way more)
 - [ ] Related to the above (and possible solution): Update particle filter only on NT updates
 - [ ] Convert Euler angles (from botpose) to rotation around a single, fixed axis in a 2D plane (around Z-axis only)
