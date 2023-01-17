@@ -1,4 +1,4 @@
-# The "PF" stands for Particle Filter.
+# The "PF" stands for Particle Filter
 
 ## Todo list, in no particular order of priority
 
