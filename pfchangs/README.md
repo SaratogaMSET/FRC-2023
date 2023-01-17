@@ -12,5 +12,5 @@
 - [ ] Related to the above (and possible solution): Update particle filter only on NT updates
 - [ ] Convert Euler angles (from botpose) to rotation around a single, fixed axis in a 2D plane (around Z-axis only)
 - [ ] Generate paths on-the-fly using PathPlanner to align with the nearest scoring location
-- [ ] Automatically resample particle filter if (filtered - raw) > 2 and time elapsed from last resample > 2
+- [ ] Automatically resample particle filter if (filtered - raw) > 2 and time elapsed from last resample > 2 <-- IGNORE THIS
 - [ ] (?) Profile robot code to optimize particle filter (dubiously possible)
