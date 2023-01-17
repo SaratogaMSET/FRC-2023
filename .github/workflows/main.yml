@@ -22,7 +22,7 @@ jobs:
       
       # Grant execute permission for client/particle filter gradlew
       - name: Grant execute permission for client/particle filter gradlew
-        run: chmod +x ./testclient/gradlew
+        run: chmod +x ./pfchangs/gradlew
       
       # Runs a single command using the runners shell
       - name: Compile and run tests on robot code
