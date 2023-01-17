@@ -92,6 +92,6 @@ public final class Constants {
   }
 
   public static class FilterConstants {
-    public static final int NUM_PARTICLES = 1000;
+    public static final int NUM_PARTICLES = 1;
   }
 }

@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.Date;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,6 +19,11 @@ public class FishServer implements Runnable {
 
     public int getPort() {
         return port;
+    }
+
+    private void sendPoseData() {
+        // TODO send drivetrain odometry data and botpose data from LL every time LL NetworkTables updates
+        // ie. listen for updates from LL's NetworkTables, then send encoder and botpose data
     }
 
     @Override
