@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.filter;
 
 import java.util.Random;
 
@@ -49,7 +49,7 @@ public class ParticleFilter {
             new_particles[i].setNoise(particles[index].forwardNoise, particles[index].turnNoise, particles[index].senseNoise);
         }
 
-        particles = new_particles;        
+        particles = new_particles;
     }
 
     private int circle(int num, int length) {

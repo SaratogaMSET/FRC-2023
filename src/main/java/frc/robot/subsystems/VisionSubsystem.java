@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.util.Particle;
-import frc.robot.util.ParticleFilter;
+import frc.robot.util.filter.Particle;
+import frc.robot.util.filter.ParticleFilter;
 
 public class VisionSubsystem extends SubsystemBase {
     private final NetworkTable table;
@@ -70,7 +70,7 @@ public class VisionSubsystem extends SubsystemBase {
             float x = (float) tempPose[0];
             float y = (float) tempPose[1];
 
-            filter.setNoise(0.05f, 0.05f, 5f);
+            filter.setNoise(0.05f, 0.05f, 5f); // TODO tune
             robotParticle.set(x, y, 0, 0); // TODO convert Euler angles to radians --> orientation
             filter.resample(robotParticle.sense());
         }
