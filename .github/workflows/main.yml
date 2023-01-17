@@ -20,6 +20,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       
+      # Grant execute permission for client/particle filter gradlew
+      - name: Grant execute permission for client/particle filter gradlew
+        run: chmod +x ./testclient/gradlew
+      
       # Runs a single command using the runners shell
       - name: Compile and run tests on robot code
         run: ./gradlew build
+        
+      - name: Compile and run tests on client/particle filter code
+        run: ./testclient/gradlew build
