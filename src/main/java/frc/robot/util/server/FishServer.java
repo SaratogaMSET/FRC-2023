@@ -37,7 +37,7 @@ public class FishServer implements Runnable {
             while (true) {
                 Socket socket = serverSocket.accept();
 
-                System.out.println("New client connected.");
+                System.out.println("New client connected. Client IP: " + socket.getRemoteSocketAddress());
                 SmartDashboard.putString("client test", "client good");
                 SmartDashboard.putString("client IP: ", socket.getRemoteSocketAddress().toString());
 

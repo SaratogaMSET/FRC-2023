@@ -70,15 +70,13 @@ public class VisionSubsystem extends SubsystemBase {
             float x = (float) tempPose[0];
             float y = (float) tempPose[1];
 
-            filter.setNoise(0.05f, 0.05f, 5f); // TODO tune
+            filter.setNoise(0.5f, 0.5f, 5f); // TODO tune
             robotParticle.set(x, y, 0, 0); // TODO convert Euler angles to radians --> orientation
             filter.resample(robotParticle.sense());
         }
     }
 
     private void updateFilter() {
-        // filter.move(0, 1); // TODO - RECTANGULAR TO POLAR!!
-        
         double[] tempPose = getBotPose();
         if (tempPose.length > 1) {
             float x = (float) tempPose[0];

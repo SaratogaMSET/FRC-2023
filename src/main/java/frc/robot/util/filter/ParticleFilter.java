@@ -28,6 +28,12 @@ public class ParticleFilter {
         }
     }
 
+    public void move(float xTrans, float yTrans, float turn) {
+        for (int i = 0; i < numParticles; ++i) {
+            particles[i].move(xTrans, yTrans, turn);
+        }
+    }
+
     public void resample(float[] measurement) {
         Particle[] new_particles = new Particle[numParticles];
 

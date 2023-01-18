@@ -92,6 +92,13 @@ public class Particle {
         y = circle(y, worldHeight); 
     }
 
+    public void move(float xTrans, float yTrans, float turn) {
+        orientation = orientation + turn + (float) random.nextGaussian() * turnNoise;
+        orientation = circle(orientation, 2f * (float) Math.PI);
+        x += xTrans + random.nextGaussian() * forwardNoise;
+        y += yTrans + random.nextGaussian() * forwardNoise;
+    }
+
     /**
      * Calculates the probability of particle based on another particle's sense()
      * 
@@ -113,7 +120,7 @@ public class Particle {
     private float circle(float num, float length) {         
         while (num > length - 1) num -= length;
         while (num < 0) num += length;
-        return num;       
+        return num;
     }
     
     @Override

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="testclient.AppTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-01-17T02:51:53" hostname="DESKTOP-RSB4QMG" time="0.02">
+<testsuite name="testclient.AppTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-01-18T02:56:16" hostname="DESKTOP-RSB4QMG" time="0.028">
   <properties/>
-  <testcase name="appHasAGreeting()" classname="testclient.AppTest" time="0.02"/>
+  <testcase name="appHasAGreeting()" classname="testclient.AppTest" time="0.028"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
