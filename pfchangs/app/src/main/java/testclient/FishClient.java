@@ -21,7 +21,7 @@ public class FishClient {
                 while (reconnect) {
                     try {
                         socket.getOutputStream().write(649);
-                        sleep(heartbeatDelay);
+                        Thread.sleep(heartbeatDelay);
                     } catch (InterruptedException e) {
                         // reconnect = false;
                     } catch (IOException e) {
@@ -54,8 +54,10 @@ public class FishClient {
             InputStream stream = socket.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
-            String fpgaTime = reader.readLine();
-            System.out.println(fpgaTime);
+            while (true) {
+                String fpgaTime = reader.readLine();
+                System.out.println(fpgaTime);
+            }
         } catch (IOException e) {
             System.out.println("I/O Error: " + e.getMessage());
         }

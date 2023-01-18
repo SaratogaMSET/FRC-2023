@@ -44,11 +44,17 @@ public class FishServer implements Runnable {
                 OutputStream output = socket.getOutputStream();
                 PrintWriter writer = new PrintWriter(output, true);
 
-                writer.println("Current RIO FPGA timestamp: " + Timer.getFPGATimestamp());
+                while (true) {
+                    writer.println("Current RIO FPGA timestamp: " + Timer.getFPGATimestamp());
+                    Thread.sleep(500);
+                }
             }
         } catch (IOException e) {
             System.out.println("Server exception: " + e);
             SmartDashboard.putString("test", "server bad");
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

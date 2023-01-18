@@ -8,14 +8,14 @@
             "type": "java",
             "name": "Launch Current File",
             "request": "launch",
-            "args": ["localhost", "5802"],
+            "args": ["roborio-649-frc.local", "5802"],
             "mainClass": "${file}"
         },
         {
             "type": "java",
             "name": "Launch App",
             "request": "launch",
-            "args": ["localhost", "5802"],
+            "args": ["roborio-649-frc.local", "5802"],
             "mainClass": "testclient.App",
             "projectName": "app"
         }

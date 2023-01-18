@@ -20,10 +20,10 @@ public class VisionSubsystem extends SubsystemBase {
     private final NetworkTable table;
     private final Field2d rawField;
     private final Field2d filterField;
-    private final ParticleFilter filter;
-    private final Particle robotParticle;
-    private final Runnable resampler;
-    private final ScheduledExecutorService executor;
+    // private final ParticleFilter filter;
+    // private final Particle robotParticle;
+    // private final Runnable resampler;
+    // private final ScheduledExecutorService executor;
 
     private Pose2d rawPose;
 
@@ -31,61 +31,61 @@ public class VisionSubsystem extends SubsystemBase {
         table = NetworkTableInstance.getDefault().getTable("limelight");
         rawField = new Field2d();
         filterField = new Field2d();
-        filter = new ParticleFilter(
-            Constants.FilterConstants.NUM_PARTICLES, 
-            Constants.VisionConstants.Field.TAGS, 
-            Constants.VisionConstants.Field.FIELD_WIDTH, 
-            Constants.VisionConstants.Field.FIELD_HEIGHT
-        );
-        robotParticle = new Particle(
-            Constants.VisionConstants.Field.TAGS,
-            Constants.VisionConstants.Field.FIELD_WIDTH, 
-            Constants.VisionConstants.Field.FIELD_HEIGHT
-        );
+        // filter = new ParticleFilter(
+        //     Constants.FilterConstants.NUM_PARTICLES, 
+        //     Constants.VisionConstants.Field.TAGS, 
+        //     Constants.VisionConstants.Field.FIELD_WIDTH, 
+        //     Constants.VisionConstants.Field.FIELD_HEIGHT
+        // );
+        // robotParticle = new Particle(
+        //     Constants.VisionConstants.Field.TAGS,
+        //     Constants.VisionConstants.Field.FIELD_WIDTH, 
+        //     Constants.VisionConstants.Field.FIELD_HEIGHT
+        // );
 
-        initFilter();
+        // initFilter();
 
         SmartDashboard.putData("Raw Robot Position", rawField);
         SmartDashboard.putData("Filtered Robot Position", filterField);
 
-        resampler = new Runnable() {
-            public void run() {
-                double[] tempPose = getBotPose();
-                if (tempPose.length > 1) {
-                    float x = (float) tempPose[0];
-                    float y = (float) tempPose[1];
+        // resampler = new Runnable() {
+        //     public void run() {
+        //         double[] tempPose = getBotPose();
+        //         if (tempPose.length > 1) {
+        //             float x = (float) tempPose[0];
+        //             float y = (float) tempPose[1];
         
-                    robotParticle.set(x, y, 0, 0); // TODO convert Euler angles to radians --> orientation
-                    filter.resample(robotParticle.sense());
-                }
-            }
-        };
-        executor = Executors.newScheduledThreadPool(1);
-        executor.scheduleAtFixedRate(resampler, 0, 2, TimeUnit.SECONDS);
+        //             robotParticle.set(x, y, 0, 0); // TODO convert Euler angles to radians --> orientation
+        //             filter.resample(robotParticle.sense());
+        //         }
+        //     }
+        // };
+        // executor = Executors.newScheduledThreadPool(1);
+        // executor.scheduleAtFixedRate(resampler, 0, 2, TimeUnit.SECONDS);
     }
 
-    private final void initFilter() {
-        double[] tempPose = getBotPose();
-        if (tempPose.length > 1) {
-            float x = (float) tempPose[0];
-            float y = (float) tempPose[1];
+    // private final void initFilter() {
+    //     double[] tempPose = getBotPose();
+    //     if (tempPose.length > 1) {
+    //         float x = (float) tempPose[0];
+    //         float y = (float) tempPose[1];
 
-            filter.setNoise(0.5f, 0.5f, 5f); // TODO tune
-            robotParticle.set(x, y, 0, 0); // TODO convert Euler angles to radians --> orientation
-            filter.resample(robotParticle.sense());
-        }
-    }
+    //         filter.setNoise(0.5f, 0.5f, 5f); // TODO tune
+    //         robotParticle.set(x, y, 0, 0); // TODO convert Euler angles to radians --> orientation
+    //         filter.resample(robotParticle.sense());
+    //     }
+    // }
 
-    private void updateFilter() {
-        double[] tempPose = getBotPose();
-        if (tempPose.length > 1) {
-            float x = (float) tempPose[0];
-            float y = (float) tempPose[1];
+    // private void updateFilter() {
+    //     double[] tempPose = getBotPose();
+    //     if (tempPose.length > 1) {
+    //         float x = (float) tempPose[0];
+    //         float y = (float) tempPose[1];
 
-            robotParticle.set(x, y, 0, 0);
-            filter.resample(robotParticle.sense());
-        }
-    }
+    //         robotParticle.set(x, y, 0, 0);
+    //         filter.resample(robotParticle.sense());
+    //     }
+    // }
 
     private double[] getCamTran() {
         return table.getEntry("camtran").getDoubleArray(new double[10]);
@@ -111,18 +111,16 @@ public class VisionSubsystem extends SubsystemBase {
             rawField.setRobotPose(rawPose);
         }
 
-        // TODO resample every 2s if botpose.length > 1
-
-        updateFilter();
+        // updateFilter();
         
-        if (getTV() == 1) {
-            filterField.setRobotPose(
-                new Pose2d(
-                    new Translation2d(filter.getAverageParticle().x, filter.getAverageParticle().y),
-                    new Rotation2d()
-                )
-            );
-        }
+        // if (getTV() == 1) {
+        //     filterField.setRobotPose(
+        //         new Pose2d(
+        //             new Translation2d(filter.getAverageParticle().x, filter.getAverageParticle().y),
+        //             new Rotation2d()
+        //         )
+        //     );
+        // }
     }
 
     @Override
