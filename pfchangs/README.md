@@ -16,6 +16,7 @@
 - [ ] Related to the above: start server on robot enable, rather than on robot startup
 - [ ] Fix resampling to use raw distance data
 - [ ] Move particle filter from util to pfchangs
+- [ ] Consider switching from Limelight software to PhotonVision for multiple-targeting--most particle filter implementations online use distance computations from multiple targets for highest accuracy, and with Limelight, you can only look at one target per limelight update cycle, whereas PhotonVision has methods that return a List of PhotonTrackedTargets
 - [ ] Automatically resample particle filter if (filtered - raw) > 2 and time elapsed from last resample > 2 <-- IGNORE THIS
 - [ ] (?) Profile robot code to optimize particle filter (dubiously possible)
 
