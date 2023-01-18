@@ -29,7 +29,7 @@ length--to our resample method)
 code like it's inlined into the server thread's code, stopping the server thread from proceeding until
 after it receives filtered data from the localizer.)
 * What do we return when the robot is first initialized? (This may be a non-issue in Quixilver's
-implementation, but my believe is that when the match starts, there will be a delay between when
+implementation, but my belief is that when the match starts, there will be a delay between when
 the raw data is sent to the filter and when we get a measurement back from the filter. In the past,
 since everything was on the robot, this delay was so small as to be a non-issue. Now, however, there
 is a chance we might want to use pose data before it's actually initialized, eg. for auto pathing. What
