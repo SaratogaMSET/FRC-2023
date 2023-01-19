@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import frc.robot.util.filter.Point;
-
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -20,7 +18,7 @@ public final class Constants {
   }
 
   public static class VisionConstants {
-    public static class Field {
+    /* public static class Field {
       public static final float FIELD_WIDTH = 16.54175f;
       public static final float FIELD_HEIGHT = 8.0137f;
       public static final int NUM_TAGS = 8;
@@ -34,7 +32,7 @@ public final class Constants {
         new Point(Tags.ID_7.x, Tags.ID_7.y),
         new Point(Tags.ID_8.x, Tags.ID_8.y)
       };
-    }
+    } */
 
     public static enum Tags {
       // TODO find tag coordinates
