@@ -9,14 +9,19 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class FishClient {
+    private final String hostname;
+    private final int port;
     private Socket socket;
     private boolean reconnect = true;
     private final int heartbeatDelay = 500; // Send test signal every 500ms
     private final Thread heartbeat;
 
-    public FishClient(final String hostname, final int port) {
-        connect(hostname, port);
+    private Object receivedData;
 
+    public FishClient(final String hostname, final int port) {
+        this.hostname = hostname;
+        this.port = port;
+        
         heartbeat = new Thread() {
             public void run() {
                 while (reconnect) {
@@ -35,6 +40,10 @@ public class FishClient {
                 }
             }
         };
+    }
+
+    public void start() {
+        connect(hostname, port);
         heartbeat.start();
     }
 
@@ -52,12 +61,6 @@ public class FishClient {
 
     private void testDoAThing() {
         try {
-            /* InputStream stream = socket.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-
-            OutputStream oStream = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(oStream, true); */
-
             OutputStream output = socket.getOutputStream();
             ObjectOutputStream objOut = new ObjectOutputStream(output);
 
@@ -65,26 +68,15 @@ public class FishClient {
             ObjectInputStream objIn = new ObjectInputStream(input);
 
             while (true) {
-                var s = objIn.readObject();
-                System.out.println(s);
-                objOut.writeObject("Received data: " + s);
+                receivedData = objIn.readObject();
+                System.out.println(receivedData);
+                objOut.writeObject("Received data: " + receivedData);
             }
-
-            /* while (true) {
-                String fpgaTime = reader.readLine();
-                System.out.println("Client checkpoint 1");
-                System.out.println(fpgaTime);
-                System.out.println("Client checkpoint 2");
-                Thread.sleep(500);
-                writer.println("Received fpgaTime " + fpgaTime + " from RIO.");
-            } */
         } catch (IOException e) {
             System.out.println("I/O Error: " + e.getMessage());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        }/* catch (InterruptedException e) {
-            e.printStackTrace();
-        } */
+        }
     }
 
     public void shutdown() {

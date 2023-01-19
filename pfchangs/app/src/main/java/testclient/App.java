@@ -14,5 +14,6 @@ public class App {
         int port = Integer.parseInt(args[1]);
 
         FishClient c = new FishClient(hostname, port);
+        c.start();
     }
 }
