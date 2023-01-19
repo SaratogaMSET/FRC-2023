@@ -1,6 +1,11 @@
 package frc.robot.util.server;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -42,16 +47,53 @@ public class FishServer implements Runnable {
                 SmartDashboard.putString("client IP: ", socket.getRemoteSocketAddress().toString());
 
                 OutputStream output = socket.getOutputStream();
-                PrintWriter writer = new PrintWriter(output, true);
+                ObjectOutputStream objOut = new ObjectOutputStream(output);
+                // PrintWriter writer = new PrintWriter(objOut, true);
+
+                InputStream input = socket.getInputStream();
+                ObjectInputStream objIn = new ObjectInputStream(input);
 
                 while (true) {
-                    writer.println("Current RIO FPGA timestamp: " + Timer.getFPGATimestamp());
+                    objOut.writeObject("Current RIO FPGA timestamp: " + Timer.getFPGATimestamp());
+                    System.out.println(objIn.readObject());
                     Thread.sleep(500);
                 }
+
+                /* Thread t1 = new Thread() {
+                    public void run() {
+                        while (true) {
+                            writer.println("Current RIO FPGA timestamp: " + Timer.getFPGATimestamp());
+                            try {
+                                this.wait();
+                            } catch (InterruptedException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                };
+                t1.start();
+
+                Thread t2 = new Thread() {
+                    public void run() {
+                        try {
+                            while (true) {
+                                String received = reader.readLine();
+                                System.out.println("Received message from client: " + received);
+                                notifyAll();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                t2.start(); */
             }
         } catch (IOException e) {
             System.out.println("Server exception: " + e);
             SmartDashboard.putString("test", "server bad");
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block

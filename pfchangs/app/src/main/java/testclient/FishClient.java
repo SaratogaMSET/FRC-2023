@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -51,16 +55,39 @@ public class FishClient {
 
     private void testDoAThing() {
         try {
-            InputStream stream = socket.getInputStream();
+            /* InputStream stream = socket.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
+            OutputStream oStream = socket.getOutputStream();
+            PrintWriter writer = new PrintWriter(oStream, true); */
+
+            OutputStream output = socket.getOutputStream();
+            ObjectOutputStream objOut = new ObjectOutputStream(output);
+
+            InputStream input = socket.getInputStream();
+            ObjectInputStream objIn = new ObjectInputStream(input);
+
             while (true) {
-                String fpgaTime = reader.readLine();
-                System.out.println(fpgaTime);
+                var s = objIn.readObject();
+                System.out.println(s);
+                objOut.writeObject("Received data: " + s);
             }
+
+            /* while (true) {
+                String fpgaTime = reader.readLine();
+                System.out.println("Client checkpoint 1");
+                System.out.println(fpgaTime);
+                System.out.println("Client checkpoint 2");
+                Thread.sleep(500);
+                writer.println("Received fpgaTime " + fpgaTime + " from RIO.");
+            } */
         } catch (IOException e) {
             System.out.println("I/O Error: " + e.getMessage());
-        }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }/* catch (InterruptedException e) {
+            e.printStackTrace();
+        } */
     }
 
     public void shutdown() {
