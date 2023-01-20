@@ -18,7 +18,7 @@ public class FishClientNT {
     public FishClientNT() {
         inst = NetworkTableInstance.getDefault();
         inst.startClient4("localizer");
-        inst.setServer("localhost");
+        inst.setServer("localhost"); // "localhost" for simulation
 
         rawTable = inst.getTable("rawRobotData");
         measurementID = rawTable.getIntegerTopic("id").subscribe(0);

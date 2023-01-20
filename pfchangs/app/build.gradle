@@ -10,7 +10,7 @@ import org.gradle.internal.os.OperatingSystem
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
-    id "edu.wpi.first.GradleRIO" version "2023.1.1"
+    id "edu.wpi.first.GradleRIO" version "2023.2.1"
 }
 
 repositories {
@@ -37,6 +37,9 @@ repositories {
         name 'frcHome'
         url frcHomeMaven
     }
+    maven {
+        url "https://frcmaven.wpi.edu/artifactory/release/"
+    }
 }
 
 dependencies {
@@ -48,6 +51,18 @@ dependencies {
 
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
+    implementation "edu.wpi.first.cscore:cscore-java:2023.2.1"
+    implementation group: 'edu.wpi.first.ntcore', name: 'ntcore-java', version: '2023.2.1'
+    implementation "edu.wpi.first.ntcore:ntcore-java:2023.2.1"
+    implementation "edu.wpi.first.ntcore:ntcore-jni:2023.2.1"
+    implementation "edu.wpi.first.ntcore:ntcore-jni:2023.2.1:${wpi.platforms.desktop}"
+    implementation "edu.wpi.first.wpilibj:wpilibj-java:2023.2.1"
+    implementation "edu.wpi.first.wpiutil:wpiutil-java:2023.2.1"
+    implementation "edu.wpi.first.cscore:cscore-java:2023.2.1"
+    implementation "edu.wpi.first.hal:hal-java:2023.2.1"
+    implementation "edu.wpi.first.hal:hal-jni:2023.2.1"
+    implementation "edu.wpi.first.hal:hal-jni:2023.2.1:${wpi.platforms.desktop}"
+
 }
 
 application {
@@ -61,7 +76,9 @@ tasks.named('test') {
 }
 
 jar {
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     manifest {
         attributes 'Main-Class': 'testclient.App'
     }
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
