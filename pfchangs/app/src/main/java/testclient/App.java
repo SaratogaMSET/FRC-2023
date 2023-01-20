@@ -5,15 +5,7 @@ package testclient;
 
 public class App {
     public static void main(String[] args) {
-        if (args.length < 2) {
-            System.out.println("Please provide a hostname and a port to connect to.");
-            return;
-        }
-
-        String hostname = args[0];
-        int port = Integer.parseInt(args[1]);
-
-        FishClient c = new FishClient(hostname, port);
+        FishClientNT c = new FishClientNT();
         c.start();
     }
 }

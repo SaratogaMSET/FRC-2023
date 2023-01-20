@@ -94,15 +94,15 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        double[] camtran = getCamTran();
-        SmartDashboard.putNumberArray("camtran", camtran);
-        double[] botpose = getBotPose();
-        SmartDashboard.putNumberArray("botpose", botpose);
+        // double[] camtran = getCamTran();
+        // SmartDashboard.putNumberArray("camtran", camtran);
+        // double[] botpose = getBotPose();
+        // SmartDashboard.putNumberArray("botpose", botpose);
         
-        if (botpose.length > 1) {
-            rawPose = new Pose2d(new Translation2d(botpose[0], botpose[1]), new Rotation2d());
-            rawField.setRobotPose(rawPose);
-        }
+        // if (botpose.length > 1) {
+        //     rawPose = new Pose2d(new Translation2d(botpose[0], botpose[1]), new Rotation2d());
+        //     rawField.setRobotPose(rawPose);
+        // }
 
         // updateFilter();
         
@@ -118,6 +118,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        rawField.setRobotPose(new Pose2d());
+        // rawField.setRobotPose(new Pose2d());
     }
 }
