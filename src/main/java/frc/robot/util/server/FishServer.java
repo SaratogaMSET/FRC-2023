@@ -51,17 +51,18 @@ public class FishServer implements Runnable {
 
                 while (true) {
                     objOut.writeObject("Current RIO FPGA timestamp: " + Timer.getFPGATimestamp());
-                    System.out.println(objIn.readObject());
-                    // Thread.sleep(500);
+                    System.out.println(Timer.getFPGATimestamp());
+                    // System.out.println(objIn.readObject());
+                    // Thread.sleep(5);
                 }
             }
         } catch (IOException e) {
             System.out.println("Server exception: " + e);
             SmartDashboard.putBoolean("Server Online: ", false);
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } /* catch (ClassNotFoundException e) {
             e.printStackTrace();
-        } /* catch (InterruptedException e) {
+        } */ /* catch (InterruptedException e) {
             e.printStackTrace();
         } */
 

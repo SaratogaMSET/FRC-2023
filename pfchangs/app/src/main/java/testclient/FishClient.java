@@ -71,6 +71,12 @@ public class FishClient {
                 receivedData = objIn.readObject();
                 System.out.println(receivedData);
                 objOut.writeObject("Received data: " + receivedData);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         } catch (IOException e) {
             System.out.println("I/O Error: " + e.getMessage());
