@@ -27,6 +27,8 @@ public class FishClientNT {
 
         cookedTable = inst.getTable("localized");
         xPub = cookedTable.getDoubleTopic("x").publish();
+
+        System.out.println("Finshed server init.");
     }
 
     double x = 0;
