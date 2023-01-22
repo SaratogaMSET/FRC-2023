@@ -4,7 +4,7 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.IntakeSubsystem.*;
+import frc.robot.subsystems.IntakeSubsystemWheel.*;
 import frc.robot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public final class Autos {
   /** Example static factory for an autonomous command. */
-  public static CommandBase intakeAuto(IntakeSubsystem m_intake) {
-    return Commands.sequence(new InstantCommand(() -> m_intake.runIntake(Direction.INTAKE)));
+  public static CommandBase intakeAuto(IntakeSubsystemWheel m_intake, Direction direction) {
+    return Commands.sequence(new InstantCommand(() -> m_intake.runIntake(direction)));
   }
 
   private Autos() {

@@ -5,6 +5,8 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+// import com.revrobotics.CANSparkMax.IdleMode;
+// import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -13,24 +15,23 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 
-public class IntakeSubsystem extends SubsystemBase {
-  private static CANSparkMax m_intake;
+// @Deprecated
+public class IntakeSubsystemWheel extends SubsystemBase {
+  private CANSparkMax m_intake;
   private static DigitalInput limitSwitch;
   private static double INTAKE_SPEED = 0.0;
 
   /** Creates a new ExampleSubsystem. */
-  public IntakeSubsystem() {
+  public IntakeSubsystemWheel() {
     m_intake = new CANSparkMax(Constants.IntakeConstants.INTAKE_MOTOR, MotorType.kBrushless);
     m_intake.setIdleMode(IdleMode.kBrake);
     limitSwitch = new DigitalInput(Constants.IntakeConstants.LIMIT_SWITCH);
   }
-
   public static enum Direction {
     INTAKE,
     OUTTAKE,
-    IDLE,
+    IDLE
   }
 
   /**
@@ -60,30 +61,34 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void runIntake(Direction direction) {
-    INTAKE_SPEED = SmartDashboard.getNumber("Intake Speed", INTAKE_SPEED);
-    // if(!limitSwitch.get()){
-    switch (direction) {
-      case INTAKE:
-        m_intake.set(INTAKE_SPEED);
-        break;
-      case OUTTAKE:
-        m_intake.set(-INTAKE_SPEED);
-        break;
-      case IDLE:
-        m_intake.set(0.0);
-        break;
-      default:
-        SmartDashboard.putNumber("Intake Speed", 649);
+    INTAKE_SPEED = 0.5;  //
+    if (limitSwitch.get()) {  // default limit switch state
+      switch (direction) {
+        case INTAKE:
+          m_intake.set(INTAKE_SPEED);
+          break;
+        case OUTTAKE:
+          m_intake.set(-0.1);
+          break;
+        case IDLE:
+          m_intake.set(0.0);
+          break;
+        default:
+          SmartDashboard.putNumber("Intake Speed", 649);
+      }
     }
   }
 
-  public void updateIntakeState(){
-      // SmartDashboard.putBoolean("Intake Limit Switch", limitSwitch.get());
+  public boolean updateIntakeState() {
+    return limitSwitch.get();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    updateIntakeState();
+    SmartDashboard.putBoolean("LS", updateIntakeState());
+
   }
 
   @Override

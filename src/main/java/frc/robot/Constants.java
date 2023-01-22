@@ -19,6 +19,7 @@ public final class Constants {
 
   public static class IntakeConstants {
     public static final int INTAKE_MOTOR = 20;
-    public static final int LIMIT_SWITCH = 0;
+    public static final int LIMIT_SWITCH = 4;
+    public static final double TARGET_VELOCITY = 0.2;
   }
 }
