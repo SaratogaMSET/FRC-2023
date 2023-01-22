@@ -60,7 +60,6 @@ public class ArmCosineSubsystem extends SubsystemBase {
     baseAngle = calcBaseAngle();
     double baseAngleDist = Math.abs(baseAngle -initialAngle);
     return baseAngleDist;
-
   }
 
   public double timeToAng(double velocity, double radius, double initialAngle){
