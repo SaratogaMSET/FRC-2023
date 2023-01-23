@@ -4,10 +4,16 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.drive.RobotDriveBase.MotorType;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.lang. Math;
 import frc.robot.Constants;
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxAbsoluteEncoder;
 
 public class ArmCosineSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
@@ -17,6 +23,10 @@ public class ArmCosineSubsystem extends SubsystemBase {
   double distance;
   //double initialAngle;
   double velocity; 
+  public CANSparkMax baseMotor = new CANSparkMax(Constants.ArmConstants.baseMotorID, MotorType.kBrushless);
+  public CANSparkMax topMotor = new CANSparkMax(Constants.ArmConstants.topMotorID, MotorType.kBrushless);
+  public RelativeEncoder baseMotorEncoder = baseMotor.getEncoder();
+  public RelativeEncoder topMotorEncoder = topMotor.getEncoder();
 
 
   public ArmCosineSubsystem(double distance) {
@@ -72,6 +82,10 @@ public class ArmCosineSubsystem extends SubsystemBase {
 
   public double calcTopAngle() {
     return Math.asin(Math.sin(calcBaseAngle())/Constants.ArmConstants.TOP_ARM*distance);
+  }
+
+  public void setTopAngle(){
+
   }
 
 

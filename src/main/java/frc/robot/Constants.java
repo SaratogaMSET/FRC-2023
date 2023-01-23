@@ -20,8 +20,10 @@ public final class Constants {
   public static class ArmConstants {
     public static final double BASE_ARM = 20;
     public static final double TOP_ARM = 15;
-    public static final double RADIUS = 20; //might be the same as base arm but I'm not sure yet
-
+    public static final double RADIUS = 22; //might be the same as base arm but I'm not sure yet
+    
+    public static final int topMotorID = 6;
+    public static final int baseMotorID = 13;
   }
 
 
