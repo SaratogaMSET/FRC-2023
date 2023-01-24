@@ -47,6 +47,11 @@ public class ArmKinematics {
     private double cos(double x){
         return Math.cos(x);
     }
+    private double angleBound(double x){
+        while(x > Math.PI) x -= 2*Math.PI;
+        while(x < -Math.PI) x += 2*Math.PI;
+        return x;
+    }
     private SimpleMatrix jointMass(Joint J){
         double[][] kronck = {
             {J.m, 0},
@@ -58,13 +63,13 @@ public class ArmKinematics {
     public double[] forwardKinematics(double angProxi, double angleDistal){
         double L1 = proxima.tX;
         double L2 = dista.tX;
-        double O1 = proxima.tY;
-        double O2 = dista.tY;
+        //double O1 = proxima.tY;
+        //double O2 = dista.tY;
         double t1 = angleProxima;
         double t2 = angleDista;
         return new double[]{
-            L1*cos(t1) - O1*sin(t1) + x0 - (L2*sin(t2) + O2*cos(t2))*sin(t1) + (L2*cos(t2) - O2*sin(t2))*cos(t1),
-            L1*sin(t1) + O1*cos(t1) + y0 + (L2*sin(t2) + O2*cos(t2))*cos(t1) + (L2*cos(t2) - O2*sin(t2))*sin(t1)
+            L1*cos(t1) + L2*cos(t2),
+            L1*sin(t1) + L2*sin(t2)
         }; 
     }
     public double[] forwardKinematicsJ1(double angProxi) {
@@ -112,7 +117,9 @@ public class ArmKinematics {
  
         double angleProximal = Math.atan2(pY, pX) + signAngle * Math.acos((positionDistance * positionDistance + lenProxi * lenProxi - lenDista * lenDista)/(2 * lenProxi * positionDistance)) - angleOffsetProxi;
         double angleDistal = signAngle * (-Math.PI + Math.acos((lenProxi * lenProxi + lenDista * lenDista - positionDistance * positionDistance)/(2 * lenDista * lenProxi))) + angleOffsetProxi - angleOffsetDista;
-        return new double[]{angleProximal, angleDistal};
+        angleDistal = angleBound(angleDistal + angleProximal);
+        if(angleDistal > Math.PI/2) angleDistal -= 2 * Math.PI;
+        return new double[]{angleBound(angleProximal), angleDistal};
     }
     private SimpleMatrix inverseKinematics(SimpleMatrix Q) {
         double[] Xraw = inverseKinematics(Q.get(0), Q.get(1));

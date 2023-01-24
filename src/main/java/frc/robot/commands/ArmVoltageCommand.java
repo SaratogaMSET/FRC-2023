@@ -22,6 +22,6 @@ public class ArmVoltageCommand extends CommandBase{
     public void execute(){
         pMotorVoltage = pMotorVoltageSupplier.getAsDouble();
         dMotorVoltage = dMotorVoltageSupplier.getAsDouble();
-        armSubsystem.voltageMotors(pMotorVoltage, dMotorVoltage);
+        armSubsystem.voltageMotors(pMotorVoltage, dMotorVoltage, armSubsystem.gravityVoltageProxima(), armSubsystem.gravityVoltageDistal());
     }         
 }
