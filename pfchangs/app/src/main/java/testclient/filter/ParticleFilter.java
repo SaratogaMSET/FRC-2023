@@ -37,6 +37,7 @@ public class ParticleFilter {
     public void resample(float[] measurement) {
         Particle[] new_particles = new Particle[numParticles];
 
+        // Update each particle's probability
         for (int i = 0; i < numParticles; i++) {
             particles[i].measurementProb(measurement);
         }

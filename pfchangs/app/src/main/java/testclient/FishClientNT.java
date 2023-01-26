@@ -1,47 +1,27 @@
 package testclient;
 
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleSubscriber;
-import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class FishClientNT {
-    private final NetworkTableInstance inst;
-    private final NetworkTable rawTable;
-    private final IntegerSubscriber measurementID;
-    private final DoubleSubscriber fpgaTimeSub;
-    private final DoubleSubscriber xSub;
-    private final NetworkTable cookedTable;
-    private final DoublePublisher xPub;
+    private final NetworkTableInstance inst = NetworkTableInstance.getDefault();;
+    private final NetworkTable visionTable = inst.getTable("vision");
+    private final NetworkTable odomTable = inst.getTable("odom");
+    private final NetworkTable estimateTable = inst.getTable("estimated");
 
     public FishClientNT() {
-        inst = NetworkTableInstance.getDefault();
-        inst.startClient4("localizer");
-        inst.setServer("localhost"); // "localhost" for simulation
+        inst.startClient4("estimator");
+        inst.setServer("localhost"); // "localhost" for simulation - FIXME change to actual robot
+        // https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html
 
-        rawTable = inst.getTable("rawRobotData");
-        measurementID = rawTable.getIntegerTopic("id").subscribe(0);
-        fpgaTimeSub = rawTable.getDoubleTopic("fpgaTime").subscribe(0d);
-        xSub = rawTable.getDoubleTopic("x").subscribe(0d);
-
-        cookedTable = inst.getTable("localized");
-        xPub = cookedTable.getDoubleTopic("x").publish();
-
-        System.out.println("Finshed server init.");
+        System.out.println("Finshed client init.");
     }
 
     double x = 0;
 
     public void start() {
-        System.out.println("Received values: " + measurementID.get() + ", " + fpgaTimeSub + ", " + xSub.get());
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return;
+        while (true) {
+            
         }
-        xPub.set(x++);
-        inst.flush();
     }
 }

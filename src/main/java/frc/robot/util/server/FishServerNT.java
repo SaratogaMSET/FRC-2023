@@ -1,37 +1,14 @@
 package frc.robot.util.server;
 
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.IntegerPublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Timer;
-
-public class FishServerNT implements Runnable {
-    private final NetworkTableInstance inst;
-    private final NetworkTable table;
-    private final IntegerPublisher measurementID;
-    private final DoublePublisher fpgaTimePub;
-    private final DoublePublisher xPub;
+public class FishServerNT implements Runnable {    
     private Thread t;
 
-    public FishServerNT() {
-        inst = NetworkTableInstance.getDefault();
-        table = inst.getTable("rawRobotData");
-        measurementID = table.getIntegerTopic("id").publish();
-        fpgaTimePub = table.getDoubleTopic("fpgaTime").publish();
-        xPub = table.getDoubleTopic("x").publish();
-    }
-
-    int id = 0;
-    double x = 0;
+    public FishServerNT() {}
 
     @Override
     public void run() {
         while (true) {
-            measurementID.set(id);
-            fpgaTimePub.set(Timer.getFPGATimestamp());
-            xPub.set(x++);
-            inst.flush();
+            
         }
 
     }
