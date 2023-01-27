@@ -13,7 +13,7 @@
 - [ ] Convert Euler angles (from botpose) to rotation around a single, fixed axis in a 2D plane (around Z-axis only)
 - [ ] Generate paths on-the-fly to align with the nearest scoring location
 - [X] Refactor server to be a singleton + to start only once, even if start() is called multiple times
-- [ ] Related to the above: start server on robot enable, rather than on robot startup
+- [X] Related to the above: start server on robot enable, rather than on robot startup
 - [ ] Fix resampling to use raw distance data
 - [ ] Move particle filter from util to pfchangs
 - [ ] Consider switching from Limelight software to PhotonVision for multiple-targeting--most particle filter implementations online use distance computations from multiple targets for highest accuracy, and with Limelight, you can only look at one target per limelight update cycle, whereas PhotonVision has methods that return a List of PhotonTrackedTargets
