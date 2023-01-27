@@ -26,7 +26,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     private double getLatency() {
-        return table.getEntry("tl").getDouble(-1);
+        return table.getEntry("tl").getDouble(-1) + 11;
     }
 
     private int getTagID() {
