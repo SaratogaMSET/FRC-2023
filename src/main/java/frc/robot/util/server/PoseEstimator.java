@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.util.wrappers.FilterEstimate;
@@ -70,10 +71,12 @@ public class PoseEstimator implements Runnable {
         } else {
             update(odomMeasurement);
         }
+
+        periodic();
     }
 
     private void update(SwerveOdomMeasurement odometry, VisionMeasurement vision) {
-
+        double currentTime = Timer.getFPGATimestamp();
     }
 
     private void update(SwerveOdomMeasurement odometry) {
@@ -87,7 +90,7 @@ public class PoseEstimator implements Runnable {
     @Override
     public void run() {
         while (true) {
-
+            poseEstimatorPeriodic();
         }
     }
 }
