@@ -46,8 +46,12 @@ public class VisionSubsystem extends SubsystemBase {
             -1,
             -1
         };
-         // TODO check distance calc (are we using the right values from camtran, should we even be using camtran, etc.)
-        distances[getTagID()] = Math.sqrt(Math.pow(getCamTran()[0], 2) + Math.pow(getCamTran()[2], 2));
+        int tagID = getTagID();
+        if (tagID > 0) {
+            // TODO check distance calc (are we using the right values from camtran, should we even be using camtran, etc.)
+            // TODO also change to Math.hypot eventually
+            distances[tagID - 1] = Math.sqrt(Math.pow(getCamTran()[0], 2) + Math.pow(getCamTran()[2], 2));
+        }
 
         return distances;
     }
