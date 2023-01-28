@@ -45,10 +45,8 @@ public class PoseEstimator implements Runnable {
     public PoseEstimator(
         VisionSubsystem vision,
         DrivetrainSubsystem drivetrain,
-        String name, 
         SwerveDriveKinematics kinematics, 
         Rotation2d initGyroAngle, 
-        SwerveModulePosition[] modulePositions, 
         Pose2d prior
     ) {
         this.vision = vision;
