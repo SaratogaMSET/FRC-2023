@@ -81,8 +81,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
             new Translation2d(-Drivetrain.DRIVETRAIN_TRACKWIDTH_METERS / 2.0,
                     -Drivetrain.DRIVETRAIN_WHEELBASE_METERS / 2.0));
 
-    private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(m_kinematics,
-            new Rotation2d(0), getPosition());
+    
 
     // By default we use a Pigeon for our gyroscope. But if you use another
     // gyroscope, like a NavX, you can change this.
@@ -94,10 +93,51 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public double offset = 0;
 
     // These are our modules. We initialize them in the constructor.
-    public final SwerveModule m_frontLeftModule;
-    public final SwerveModule m_frontRightModule;
-    public final SwerveModule m_backLeftModule;
-    public final SwerveModule m_backRightModule;
+    public final SwerveModule m_frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(
+        // tab.getLayout("Front Right Module", BuiltInLayouts.kList)
+        // .withSize(2, 4)
+        // .withPosition(2, 0),
+        Mk4SwerveModuleHelper.GearRatio.L2,
+        // This is the ID of the drive motor
+        Drivetrain.FRONT_LEFT_MODULE_DRIVE_MOTOR,
+        // This is the ID of the steer motor
+        Drivetrain.FRONT_LEFT_MODULE_STEER_MOTOR,
+        // This is the ID of the steer encoder
+        Drivetrain.FRONT_LEFT_MODULE_STEER_ENCODER,
+        // This is how much the steer encoder is offset from true zero (In our case,
+        // zero is facing straight forward)
+        Drivetrain.FRONT_LEFT_MODULE_STEER_OFFSET
+    );
+    public final SwerveModule m_frontRightModule = Mk4SwerveModuleHelper.createFalcon500(
+        // tab.getLayout("Front Right Module", BuiltInLayouts.kList)
+        // .withSize(2, 4)
+        // .withPosition(2, 0),
+        Mk4SwerveModuleHelper.GearRatio.L2,
+        Drivetrain.FRONT_RIGHT_MODULE_DRIVE_MOTOR,
+        Drivetrain.FRONT_RIGHT_MODULE_STEER_MOTOR,
+        Drivetrain.FRONT_RIGHT_MODULE_STEER_ENCODER,
+        Drivetrain.FRONT_RIGHT_MODULE_STEER_OFFSET
+    );
+    public final SwerveModule m_backLeftModule = Mk4SwerveModuleHelper.createFalcon500(
+        // tab.getLayout("Back Left Module", BuiltInLayouts.kList)
+        // .withSize(2, 4)
+        // .withPosition(4, 0),
+        Mk4SwerveModuleHelper.GearRatio.L2,
+        Drivetrain.BACK_LEFT_MODULE_DRIVE_MOTOR,
+        Drivetrain.BACK_LEFT_MODULE_STEER_MOTOR,
+        Drivetrain.BACK_LEFT_MODULE_STEER_ENCODER,
+        Drivetrain.BACK_LEFT_MODULE_STEER_OFFSET
+    );
+    public final SwerveModule m_backRightModule = Mk4SwerveModuleHelper.createFalcon500(
+        // tab.getLayout("Back Right Module", BuiltInLayouts.kList)
+        // .withSize(2, 4)
+        // .withPosition(6, 0),
+        Mk4SwerveModuleHelper.GearRatio.L2,
+        Drivetrain.BACK_RIGHT_MODULE_DRIVE_MOTOR,
+        Drivetrain.BACK_RIGHT_MODULE_STEER_MOTOR,
+        Drivetrain.BACK_RIGHT_MODULE_STEER_ENCODER,
+        Drivetrain.BACK_RIGHT_MODULE_STEER_OFFSET
+    );
 
     public final double frontLeftEncoderOffset = Constants.Drivetrain.FRONT_LEFT_MODULE_STEER_OFFSET;
     public final double backLeftEncoderOffset = Constants.Drivetrain.BACK_LEFT_MODULE_STEER_OFFSET;
@@ -108,76 +148,23 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private SwerveModuleState[] previousState = new SwerveModuleState[4];
 
     private LoggableChassisSpeeds SimvSpeeds = new LoggableChassisSpeeds("/SwerveDriveSubsystem/Velocity",
-            new ChassisSpeeds(0.0, 0.0, 0.0));
+        new ChassisSpeeds(0.0, 0.0, 0.0));
     private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
-    private TalonFX m_frontLeftSteer;
-    private TalonFX m_frontRightSteer;
-    private TalonFX m_backLeftSteer;
-    private TalonFX m_backRightSteer;
+    private TalonFX m_frontLeftSteer = new TalonFX(Drivetrain.FRONT_LEFT_MODULE_STEER_MOTOR);
+    private TalonFX m_frontRightSteer = new TalonFX(Drivetrain.FRONT_RIGHT_MODULE_STEER_MOTOR);
+    private TalonFX m_backLeftSteer = new TalonFX(Drivetrain.BACK_LEFT_MODULE_STEER_MOTOR);
+    private TalonFX m_backRightSteer = new TalonFX(Drivetrain.BACK_RIGHT_MODULE_STEER_MOTOR);
 
-    private LazyTalonFX m_frontLeftDrive;
-    private LazyTalonFX m_frontRightDrive;
-    private LazyTalonFX m_backLeftDrive;
-    private LazyTalonFX m_backRightDrive;
+    private LazyTalonFX m_frontLeftDrive = new LazyTalonFX(Drivetrain.FRONT_LEFT_MODULE_DRIVE_MOTOR);
+    private LazyTalonFX m_frontRightDrive = new LazyTalonFX(Drivetrain.FRONT_RIGHT_MODULE_DRIVE_MOTOR);
+    private LazyTalonFX m_backLeftDrive = new LazyTalonFX(Drivetrain.BACK_LEFT_MODULE_DRIVE_MOTOR);
+    private LazyTalonFX m_backRightDrive = new LazyTalonFX(Drivetrain.BACK_RIGHT_MODULE_DRIVE_MOTOR);
 
-    public DrivetrainSubsystem() {
+    private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(m_kinematics,
+        new Rotation2d(0), getPosition());
 
-        m_frontLeftDrive = new LazyTalonFX(Drivetrain.FRONT_LEFT_MODULE_DRIVE_MOTOR);
-        m_frontRightDrive = new LazyTalonFX(Drivetrain.FRONT_RIGHT_MODULE_DRIVE_MOTOR);
-        m_backLeftDrive = new LazyTalonFX(Drivetrain.BACK_LEFT_MODULE_DRIVE_MOTOR);
-        m_backRightDrive = new LazyTalonFX(Drivetrain.BACK_RIGHT_MODULE_DRIVE_MOTOR);
-        m_frontLeftSteer = new TalonFX(Drivetrain.FRONT_LEFT_MODULE_STEER_MOTOR);
-        m_frontRightSteer = new TalonFX(Drivetrain.FRONT_RIGHT_MODULE_STEER_MOTOR);
-        m_backLeftSteer = new TalonFX(Drivetrain.BACK_LEFT_MODULE_STEER_MOTOR);
-        m_backRightSteer = new TalonFX(Drivetrain.BACK_RIGHT_MODULE_STEER_MOTOR);
-
-        m_frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(
-                // tab.getLayout("Front Right Module", BuiltInLayouts.kList)
-                // .withSize(2, 4)
-                // .withPosition(2, 0),
-                Mk4SwerveModuleHelper.GearRatio.L2,
-                // This is the ID of the drive motor
-                Drivetrain.FRONT_LEFT_MODULE_DRIVE_MOTOR,
-                // This is the ID of the steer motor
-                Drivetrain.FRONT_LEFT_MODULE_STEER_MOTOR,
-                // This is the ID of the steer encoder
-                Drivetrain.FRONT_LEFT_MODULE_STEER_ENCODER,
-                // This is how much the steer encoder is offset from true zero (In our case,
-                // zero is facing straight forward)
-                Drivetrain.FRONT_LEFT_MODULE_STEER_OFFSET);
-
-        // We will do the same for the other modules
-        m_frontRightModule = Mk4SwerveModuleHelper.createFalcon500(
-                // tab.getLayout("Front Right Module", BuiltInLayouts.kList)
-                // .withSize(2, 4)
-                // .withPosition(2, 0),
-                Mk4SwerveModuleHelper.GearRatio.L2,
-                Drivetrain.FRONT_RIGHT_MODULE_DRIVE_MOTOR,
-                Drivetrain.FRONT_RIGHT_MODULE_STEER_MOTOR,
-                Drivetrain.FRONT_RIGHT_MODULE_STEER_ENCODER,
-                Drivetrain.FRONT_RIGHT_MODULE_STEER_OFFSET);
-
-        m_backLeftModule = Mk4SwerveModuleHelper.createFalcon500(
-                // tab.getLayout("Back Left Module", BuiltInLayouts.kList)
-                // .withSize(2, 4)
-                // .withPosition(4, 0),
-                Mk4SwerveModuleHelper.GearRatio.L2,
-                Drivetrain.BACK_LEFT_MODULE_DRIVE_MOTOR,
-                Drivetrain.BACK_LEFT_MODULE_STEER_MOTOR,
-                Drivetrain.BACK_LEFT_MODULE_STEER_ENCODER,
-                Drivetrain.BACK_LEFT_MODULE_STEER_OFFSET);
-
-        m_backRightModule = Mk4SwerveModuleHelper.createFalcon500(
-                // tab.getLayout("Back Right Module", BuiltInLayouts.kList)
-                // .withSize(2, 4)
-                // .withPosition(6, 0),
-                Mk4SwerveModuleHelper.GearRatio.L2,
-                Drivetrain.BACK_RIGHT_MODULE_DRIVE_MOTOR,
-                Drivetrain.BACK_RIGHT_MODULE_STEER_MOTOR,
-                Drivetrain.BACK_RIGHT_MODULE_STEER_ENCODER,
-                Drivetrain.BACK_RIGHT_MODULE_STEER_OFFSET);
-    }
+    public DrivetrainSubsystem() {}
 
     /**
      * Sets the gyroscope angle to zero. This can be used to set the direction the
