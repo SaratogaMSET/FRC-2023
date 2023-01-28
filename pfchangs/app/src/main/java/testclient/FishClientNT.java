@@ -83,29 +83,31 @@ public class FishClientNT {
 
     public void start() {
         System.out.println("Starting particle filter.");
-        while (odomIDSub.get() == -1 || visionIDSub.get() == -1) {} // scuffed thread blocking TODO make better
-        System.out.println("Received first values from robot!");
+        while (odomIDSub.get() == -1) {} // scuffed thread blocking TODO make better
+        System.out.println("Received first measurement!");
         while (true) {
-            RobotData latestData = readNTData();
-            prevOdomPose = currentOdomPose; // TODO we can probably optimize this
-            currentOdomPose = new Pose2d(
-                latestData.odom.x, 
-                latestData.odom.y, 
-                new Rotation2d(latestData.odom.w)
-            );
-            poseDeltas = new Pose2d(
-                currentOdomPose.getX() - prevOdomPose.getX(),
-                currentOdomPose.getY() - prevOdomPose.getY(),
-                currentOdomPose.getRotation().minus(prevOdomPose.getRotation())
-            );
-
-            if (latestData.vision.hasTargets) {
-                filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
-                filter.resample(latestData.vision.distances);
-                publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d());
-            } else {
-                filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
-                publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d());
+            if (odomIDSub.get() != -1) {
+                RobotData latestData = readNTData();
+                prevOdomPose = currentOdomPose; // TODO we can probably optimize this
+                currentOdomPose = new Pose2d(
+                    latestData.odom.x, 
+                    latestData.odom.y, 
+                    new Rotation2d(latestData.odom.w)
+                );
+                poseDeltas = new Pose2d(
+                    currentOdomPose.getX() - prevOdomPose.getX(),
+                    currentOdomPose.getY() - prevOdomPose.getY(),
+                    currentOdomPose.getRotation().minus(prevOdomPose.getRotation())
+                );
+    
+                if (latestData.vision.hasTargets) {
+                    filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
+                    filter.resample(latestData.vision.distances);
+                    publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d());
+                } else {
+                    filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
+                    publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d());
+                }
             }
         }
     }

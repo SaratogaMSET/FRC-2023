@@ -20,9 +20,7 @@ import frc.robot.util.wrappers.SwerveOdomMeasurement;
 import frc.robot.util.wrappers.TimestampedSwerveOdometry;
 import frc.robot.util.wrappers.VisionMeasurement;
 
-public class PoseEstimator implements Runnable {
-    private Thread t;
-
+public class PoseEstimator {
     private final VisionSubsystem vision;
     private final DrivetrainSubsystem drivetrain;
 
@@ -173,18 +171,15 @@ public class PoseEstimator implements Runnable {
         }
     }
 
-    @Override
-    public void run() {
-        while (true) {
-            poseEstimatorPeriodic();
-        }
-    }
-
     public void start() {
         System.out.println("Starting FishServer.");
-        if (t == null) {
-            t = new Thread("fishserver");
-            t.start();
-        }
+        new Thread() {
+            public void run() {
+                while (true) {
+                    poseEstimatorPeriodic();
+                }
+            }
+        }.start();
+        System.out.println("FishServer started.");
     }
 }

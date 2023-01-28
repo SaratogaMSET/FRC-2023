@@ -40,6 +40,9 @@
           "open": true
         }
       },
+      "odom": {
+        "open": true
+      },
       "vision": {
         "open": true
       }
@@ -66,7 +69,6 @@
         "open": true
       },
       "open": true
-    },
-    "visible": true
+    }
   }
 }
