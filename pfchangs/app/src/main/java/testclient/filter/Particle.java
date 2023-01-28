@@ -13,8 +13,8 @@ public class Particle {
     /**
      * Default constructor for a particle
      * 
-     * @param landmarks Point array of landmark points for the particle
-     * @param worldWidth2 width of the particle's world in pixels
+     * @param landmarks    Point array of landmark points for the particle
+     * @param worldWidth2  width of the particle's world in pixels
      * @param worldHeight2 height of the particle's world in pixels
      */
     public Particle(Point[] landmarks, float worldWidth2, float worldHeight2) {
@@ -24,7 +24,7 @@ public class Particle {
         random = new Random();
         x = random.nextFloat() * worldWidth2;
         y = random.nextFloat() * worldHeight2;
-        orientation = random.nextFloat() * 2f * ((float)Math.PI);
+        orientation = random.nextFloat() * 2f * ((float) Math.PI);
         forwardNoise = 0f;
         turnNoise = 0f;
         senseNoise = 0f;
@@ -33,10 +33,10 @@ public class Particle {
     /**
      * Sets the position of the particle and its relative probability
      * 
-     * @param x new x position of the particle
-     * @param y new y position of the particle
+     * @param x           new x position of the particle
+     * @param y           new y position of the particle
      * @param orientation new orientation of the particle, in radians
-     * @param prob new probability of the particle between 0 and 1
+     * @param prob        new probability of the particle between 0 and 1
      */
     public void set(float x, float y, float orientation, double prob) {
         this.x = x;
@@ -65,11 +65,11 @@ public class Particle {
      */
     public float[] sense() {
         float[] ret = new float[landmarks.length];
-        
-        for (int i = 0; i < landmarks.length; ++i){
+
+        for (int i = 0; i < landmarks.length; ++i) {
             float dist = (float) Maths.distance(x, y, landmarks[i].x, landmarks[i].y);
             ret[i] = dist + (float) random.nextGaussian() * senseNoise;
-        } 
+        }
 
         return ret;
     }
@@ -77,19 +77,19 @@ public class Particle {
     /**
      * Moves the particle's position
      * 
-     * @param turn turn value, in degrees
+     * @param turn    turn value, in degrees
      * @param forward move value, must be >= 0
      */
     public void move(float turn, float forward) {
         orientation = orientation + turn + (float) random.nextGaussian() * turnNoise;
         orientation = circle(orientation, 2f * (float) Math.PI);
-        
+
         double dist = forward + random.nextGaussian() * forwardNoise;
-        
+
         x += Math.cos(orientation) * dist;
         y += Math.sin(orientation) * dist;
         x = circle(x, worldWidth);
-        y = circle(y, worldHeight); 
+        y = circle(y, worldHeight);
     }
 
     public void move(float xTrans, float yTrans, float turn) {
@@ -107,24 +107,26 @@ public class Particle {
      */
     public double measurementProb(float[] measurement) {
         double prob = 1.0;
-        for(int i = 0; i < landmarks.length; i++) {
-            float dist = (float) Maths.distance(x, y, landmarks[i].x, landmarks[i].y);            
-            prob *= Maths.Gaussian(dist, senseNoise, measurement[i]);            
-        }      
-        
+        for (int i = 0; i < landmarks.length; i++) {
+            float dist = (float) Maths.distance(x, y, landmarks[i].x, landmarks[i].y);
+            prob *= Maths.Gaussian(dist, senseNoise, measurement[i]);
+        }
+
         probability = prob;
-        
+
         return prob;
     }
 
-    private float circle(float num, float length) {         
-        while (num > length - 1) num -= length;
-        while (num < 0) num += length;
+    private float circle(float num, float length) {
+        while (num > length - 1)
+            num -= length;
+        while (num < 0)
+            num += length;
         return num;
     }
-    
+
     @Override
     public String toString() {
-        return "[x=" + x + " y=" + y + " orient=" + Math.toDegrees(orientation) + " prob=" +probability +  "]";
+        return "[x=" + x + " y=" + y + " orient=" + Math.toDegrees(orientation) + " prob=" + probability + "]";
     }
 }
