@@ -1,0 +1,37 @@
+Directions for creating a path:
+
+1) Create a new scope in the main method of Main.java
+2) Set the configuration constants, such as in the example below:
+	
+	config.dt = 2;
+	config.max_vel = 7;
+	config.max_acc = 9;
+	config.max_vel = 1;
+
+    *Note that certain paths that depend on turning will need to run at lower speeds and accelerations
+3) Set the path name, which should be a valid Java Class name, such as in the example below:
+
+	final String path_name = "CheesyBisons";
+
+4) Now it's time to create the path. Do so by creating a WaypoitSequence (sending it the maximum amount of points) and adding Waypoints to is. Waypoints are physical points on the Cartisian Graph where you want to center of the robot to pass through. Waypoints also have a theta, which is the angle you want the robot to be heading. Angles are absoulte, so once you turn Pi/4 radians, to turn another Pi/4 radians, you would have to send Pi/2. See the example below:
+
+	WaypointSequence p = new WaypointSequence(10);
+	p.addWaypoint(new WaypointSequence.Waypoint(0,0,0));
+	p.addWaypoint(new WaypointSequence.Waypoint(2,5,Math.Pi/4));
+
+4b) If you have a position that you know you will need in many paths, you can store it in the Positions class under the util package as an array of 3 points. Then, when adding the Waypoint, you can send that array instead of the 3 double parameters.
+	class Positions{
+		public static double kPos = [2,5,Math.Pi/4];
+	} 
+		... 
+
+	class Main{
+		p.addWaypoint(new WaypointSequence.Waypoint(Positions.kPos));
+	}
+
+5) Make new scopes in the same way for each path you make 
+5) Run the Main Method, the console will show you the progress of all of the paths being written. If there is an error, you path may not be a differentiable that the robot can follow.
+6) The paths will be written to ../TrajectoryLib/paths in txt files
+7)Using the NI Web Utility or the File Explorer, connect to your rio, ftp in. Create a folder in there called "paths"
+8) In your robot code, in AutoPaths.java, redefine the kPathNames and kPathDescriptions arrays to accurately portray all the path files that you added
+9) Set the autonomousCommand to FollowPath("PathName", Color.RED, Direction.FORWARD), the color and direction can differ if you want to change your parameters  

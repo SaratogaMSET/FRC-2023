@@ -58,7 +58,7 @@ public class PoseEstimator implements Runnable {
         VisionMeasurement latestMeasurement = vision.getLatestMeasurement();
         SwerveOdomMeasurement odomMeasurement = new SwerveOdomMeasurement( // potential FIXME pending DT finalization
             drivetrain.getRotation2d(), 
-            drivetrain.getCurrentStates() // TODO check if the order is same as 604: FL --> FR --> BL --> BR
+            drivetrain.getModuleStates() // TODO check if the order is same as 604: FL --> FR --> BL --> BR
         );
 
         if (latestMeasurement.hasTargets()) {
