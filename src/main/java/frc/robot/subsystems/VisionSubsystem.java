@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.wrappers.VisionMeasurement;
 
@@ -34,6 +35,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     private double[] getDistances() {
+        // TODO check if we can get number of tags in view, if we can, switch between this method and botpose-->all 8 tag distances
         double[] distances = new double[]{
             -1,
             -1,
@@ -66,7 +68,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        
+        SmartDashboard.putNumberArray("Distances", getDistances());
     }
 
     @Override
