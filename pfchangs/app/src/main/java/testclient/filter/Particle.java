@@ -2,6 +2,10 @@ package testclient.filter;
 
 import java.util.Random;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+
 public class Particle {
     public double forwardNoise, turnNoise, senseNoise;
     public double x, y, orientation;
@@ -117,6 +121,13 @@ public class Particle {
         probability = prob;
 
         return prob;
+    }
+
+    public Pose2d toPose2d() {
+        return new Pose2d(
+            new Translation2d(x, y),
+            new Rotation2d(orientation)
+        );
     }
 
     private double circle(double num, double length) {

@@ -58,6 +58,7 @@ public class FishClientNT {
             Constants.FilterConstants.TNOISE, 
             Constants.FilterConstants.SNOISE
         );
+        System.out.println("Finished filter init.");
     }
 
     private RobotData readNTData() {
@@ -73,7 +74,17 @@ public class FishClientNT {
         );
     }
 
+    private void publishEstimate(int id, Pose2d pose) {
+        estimateIDPub.set(id);
+        estimateXPub.set(pose.getX());
+        estimateYPub.set(pose.getY());
+        estimateWPub.set(pose.getRotation().getRadians());
+    }
+
     public void start() {
+        System.out.println("Starting particle filter.");
+        while (odomIDSub.get() == -1 || visionIDSub.get() == -1) {} // scuffed thread blocking TODO make better
+        System.out.println("Received first values from robot!");
         while (true) {
             RobotData latestData = readNTData();
             prevOdomPose = currentOdomPose; // TODO we can probably optimize this
@@ -91,8 +102,10 @@ public class FishClientNT {
             if (latestData.vision.hasTargets) {
                 filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                 filter.resample(latestData.vision.distances);
+                publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d());
             } else {
                 filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
+                publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d());
             }
         }
     }

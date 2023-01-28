@@ -38,7 +38,9 @@
       "SmartDashboard": {
         "Field": {
           "open": true
-        },
+        }
+      },
+      "vision": {
         "open": true
       }
     }
@@ -51,6 +53,12 @@
       "open": true
     },
     "Server": {
+      "Subscribers": {
+        "open": true
+      },
+      "open": true
+    },
+    "estimator": {
       "Publishers": {
         "open": true
       },
