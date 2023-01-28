@@ -7,7 +7,7 @@ public class ParticleFilter {
     int numParticles = 0;
     Random gen = new Random();
 
-    public ParticleFilter(int numParticles, Point[] landmarks, float width, float height) {
+    public ParticleFilter(int numParticles, Point[] landmarks, double width, double height) {
         this.numParticles = numParticles;
 
         particles = new Particle[numParticles];
@@ -16,37 +16,37 @@ public class ParticleFilter {
         }
     }
 
-    public void setNoise(float Fnoise, float Tnoise, float Snoise) {
+    public void setNoise(double Fnoise, double Tnoise, double Snoise) {
         for (int i = 0; i < numParticles; i++) {
             particles[i].setNoise(Fnoise, Tnoise, Snoise);
         }
     }
 
-    public void move(float turn, float forward) {
+    public void move(double turn, double forward) {
         for (int i = 0; i < numParticles; i++) {
             particles[i].move(turn, forward);
         }
     }
 
-    public void move(float xTrans, float yTrans, float turn) {
+    public void move(double xTrans, double yTrans, double turn) {
         for (int i = 0; i < numParticles; ++i) {
             particles[i].move(xTrans, yTrans, turn);
         }
     }
 
-    public void resample(float[] measurement) {
+    public void resample(double[] measurement) {
         Particle[] new_particles = new Particle[numParticles];
 
         // Update each particle's probability
         for (int i = 0; i < numParticles; i++) {
             particles[i].measurementProb(measurement);
         }
-        
-        float B = 0f;
+
+        double B = 0f;
         Particle best = getBestParticle();
-        int index = (int) gen.nextFloat() * numParticles;
+        int index = (int) gen.nextDouble() * numParticles;
         for (int i = 0; i < numParticles; i++) {
-            B += gen.nextFloat() * 2f * best.probability;
+            B += gen.nextDouble() * 2f * best.probability;
             while (B > particles[index].probability) {
                 B -= particles[index].probability;
                 index = circle(index + 1, numParticles);
@@ -84,7 +84,7 @@ public class ParticleFilter {
     
     public Particle getAverageParticle() {
         Particle p = new Particle(particles[0].landmarks, particles[0].worldWidth, particles[0].worldHeight);
-        float x = 0, y = 0, orient = 0, prob = 0;
+        double x = 0, y = 0, orient = 0, prob = 0;
         for(int i = 0; i < numParticles; i++) {
             x += particles[i].x;
             y += particles[i].y;

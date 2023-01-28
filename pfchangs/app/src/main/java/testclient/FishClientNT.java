@@ -1,5 +1,7 @@
 package testclient;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoublePublisher;
@@ -12,7 +14,12 @@ import testclient.filter.ParticleFilter;
 import testclient.wrappers.RobotData;
 
 public class FishClientNT {
-    private final ParticleFilter filter = new ParticleFilter(0, null, 0, 0);
+    private final ParticleFilter filter = new ParticleFilter(
+        Constants.FilterConstants.NUM_PARTICLES, 
+        Constants.VisionConstants.Field.TAGS, 
+        Constants.VisionConstants.Field.FIELD_WIDTH, 
+        Constants.VisionConstants.Field.FIELD_HEIGHT
+    );
 
     private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
@@ -34,6 +41,10 @@ public class FishClientNT {
     private final DoublePublisher estimateYPub = estimateTable.getDoubleTopic("y").publish();
     private final DoublePublisher estimateWPub = estimateTable.getDoubleTopic("w").publish();
 
+    private Pose2d prevOdomPose = new Pose2d();
+    private Pose2d currentOdomPose = new Pose2d();
+    private Pose2d poseDeltas = new Pose2d();
+
     public FishClientNT() {
         inst.startClient4("estimator");
         inst.setServer("localhost"); // "localhost" for simulation - FIXME change to actual robot
@@ -41,9 +52,12 @@ public class FishClientNT {
 
         System.out.println("Finshed client init.");
 
-        System.out.println("Initializing particle filter.");
-
-        System.out.println("Finished particle filter init.");
+        System.out.println("Starting filter init.");
+        filter.setNoise(
+            Constants.FilterConstants.FNOISE, 
+            Constants.FilterConstants.TNOISE, 
+            Constants.FilterConstants.SNOISE
+        );
     }
 
     private RobotData readNTData() {
@@ -62,6 +76,24 @@ public class FishClientNT {
     public void start() {
         while (true) {
             RobotData latestData = readNTData();
+            prevOdomPose = currentOdomPose; // TODO we can probably optimize this
+            currentOdomPose = new Pose2d(
+                latestData.odom.x, 
+                latestData.odom.y, 
+                new Rotation2d(latestData.odom.w)
+            );
+            poseDeltas = new Pose2d(
+                currentOdomPose.getX() - prevOdomPose.getX(),
+                currentOdomPose.getY() - prevOdomPose.getY(),
+                currentOdomPose.getRotation().minus(prevOdomPose.getRotation())
+            );
+
+            if (latestData.vision.hasTargets) {
+                filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
+                filter.resample(latestData.vision.distances);
+            } else {
+                filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
+            }
         }
     }
 }

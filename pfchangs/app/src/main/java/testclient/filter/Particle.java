@@ -3,9 +3,9 @@ package testclient.filter;
 import java.util.Random;
 
 public class Particle {
-    public float forwardNoise, turnNoise, senseNoise;
-    public float x, y, orientation;
-    public float worldWidth, worldHeight;
+    public double forwardNoise, turnNoise, senseNoise;
+    public double x, y, orientation;
+    public double worldWidth, worldHeight;
     public double probability = 0;
     public Point[] landmarks;
     Random random;
@@ -17,14 +17,14 @@ public class Particle {
      * @param worldWidth2  width of the particle's world in pixels
      * @param worldHeight2 height of the particle's world in pixels
      */
-    public Particle(Point[] landmarks, float worldWidth2, float worldHeight2) {
+    public Particle(Point[] landmarks, double worldWidth2, double worldHeight2) {
         this.landmarks = landmarks;
         this.worldWidth = worldWidth2;
         this.worldHeight = worldHeight2;
         random = new Random();
-        x = random.nextFloat() * worldWidth2;
-        y = random.nextFloat() * worldHeight2;
-        orientation = random.nextFloat() * 2f * ((float) Math.PI);
+        x = random.nextDouble() * worldWidth2;
+        y = random.nextDouble() * worldHeight2;
+        orientation = random.nextDouble() * 2f * ((double) Math.PI);
         forwardNoise = 0f;
         turnNoise = 0f;
         senseNoise = 0f;
@@ -38,7 +38,7 @@ public class Particle {
      * @param orientation new orientation of the particle, in radians
      * @param prob        new probability of the particle between 0 and 1
      */
-    public void set(float x, float y, float orientation, double prob) {
+    public void set(double x, double y, double orientation, double prob) {
         this.x = x;
         this.y = y;
         this.orientation = orientation;
@@ -52,7 +52,7 @@ public class Particle {
      * @param Tnoise noise of particle in turning
      * @param Snoise noise of particle in sensing position
      */
-    public void setNoise(float Fnoise, float Tnoise, float Snoise) {
+    public void setNoise(double Fnoise, double Tnoise, double Snoise) {
         this.forwardNoise = Fnoise;
         this.turnNoise = Tnoise;
         this.senseNoise = Snoise;
@@ -61,14 +61,14 @@ public class Particle {
     /**
      * Senses the distance of the particle to each of its landmarks
      * 
-     * @return a float array of distances to landmarks
+     * @return a double array of distances to landmarks
      */
-    public float[] sense() {
-        float[] ret = new float[landmarks.length];
+    public double[] sense() {
+        double[] ret = new double[landmarks.length];
 
         for (int i = 0; i < landmarks.length; ++i) {
-            float dist = (float) Maths.distance(x, y, landmarks[i].x, landmarks[i].y);
-            ret[i] = dist + (float) random.nextGaussian() * senseNoise;
+            double dist = (double) Maths.distance(x, y, landmarks[i].x, landmarks[i].y);
+            ret[i] = dist + (double) random.nextGaussian() * senseNoise;
         }
 
         return ret;
@@ -80,9 +80,9 @@ public class Particle {
      * @param turn    turn value, in degrees
      * @param forward move value, must be >= 0
      */
-    public void move(float turn, float forward) {
-        orientation = orientation + turn + (float) random.nextGaussian() * turnNoise;
-        orientation = circle(orientation, 2f * (float) Math.PI);
+    public void move(double turn, double forward) {
+        orientation = orientation + turn + (double) random.nextGaussian() * turnNoise;
+        orientation = circle(orientation, 2f * (double) Math.PI);
 
         double dist = forward + random.nextGaussian() * forwardNoise;
 
@@ -92,9 +92,9 @@ public class Particle {
         y = circle(y, worldHeight);
     }
 
-    public void move(float xTrans, float yTrans, float turn) {
-        orientation = orientation + turn + (float) random.nextGaussian() * turnNoise;
-        orientation = circle(orientation, 2f * (float) Math.PI);
+    public void move(double xTrans, double yTrans, double turn) {
+        orientation = orientation + turn + (double) random.nextGaussian() * turnNoise;
+        orientation = circle(orientation, 2f * (double) Math.PI);
         x += xTrans + random.nextGaussian() * forwardNoise;
         y += yTrans + random.nextGaussian() * forwardNoise;
     }
@@ -105,11 +105,13 @@ public class Particle {
      * @param measurement distance measurements from another particle's sense()
      * @return the probability of the particle being correct, between 0 and 1
      */
-    public double measurementProb(float[] measurement) {
+    public double measurementProb(double[] measurement) {
         double prob = 1.0;
         for (int i = 0; i < landmarks.length; i++) {
-            float dist = (float) Maths.distance(x, y, landmarks[i].x, landmarks[i].y);
-            prob *= Maths.Gaussian(dist, senseNoise, measurement[i]);
+            if (measurement[i] > 0) {
+                double dist = (double) Maths.distance(x, y, landmarks[i].x, landmarks[i].y);
+                prob *= Maths.Gaussian(dist, senseNoise, measurement[i]);
+            }
         }
 
         probability = prob;
@@ -117,7 +119,7 @@ public class Particle {
         return prob;
     }
 
-    private float circle(float num, float length) {
+    private double circle(double num, double length) {
         while (num > length - 1)
             num -= length;
         while (num < 0)

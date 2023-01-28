@@ -63,7 +63,7 @@ ul.tabLinks {
 }
 
 ul.tabLinks li {
-    float: left;
+    double: left;
     height: 100%;
     list-style: none;
     padding-left: 10px;

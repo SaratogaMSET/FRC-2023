@@ -5,8 +5,8 @@ import testclient.filter.Point;
 public class Constants {
     public static class VisionConstants {
         public static class Field {
-            public static final float FIELD_WIDTH = 16.54175f;
-            public static final float FIELD_HEIGHT = 8.0137f;
+            public static final double FIELD_WIDTH = 16.54175f;
+            public static final double FIELD_HEIGHT = 8.0137f;
             public static final int NUM_TAGS = 8;
             public static final Point[] TAGS = {
                 new Point(Tags.ID_1.x, Tags.ID_1.y),
@@ -31,11 +31,11 @@ public class Constants {
             ID_7(1.02743f, 2.748026f, 0.462788f),
             ID_8(1.02743f, 1.071626f, 0.462788f);
 
-            public final float x;
-            public final float y;
-            public final float z;
+            public final double x;
+            public final double y;
+            public final double z;
 
-            Tags(float x, float y, float z) {
+            Tags(double x, double y, double z) {
                 this.x = x;
                 this.y = y;
                 this.z = z;
@@ -45,5 +45,8 @@ public class Constants {
 
     public static class FilterConstants {
         public static final int NUM_PARTICLES = 5000;
+        public static final double FNOISE = 2;
+        public static final double TNOISE = 2;
+        public static final double SNOISE = 2;
     }
 }

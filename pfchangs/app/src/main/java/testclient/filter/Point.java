@@ -1,14 +1,14 @@
 package testclient.filter;
 
 public class Point {
-    public float x, y;
+    public double x, y;
 
     public Point() {
         x = 0;
         y = 0;
     }
 
-    public Point(float x, float y) {
+    public Point(double x, double y) {
         this.x = x;
         this.y = y;
     }
