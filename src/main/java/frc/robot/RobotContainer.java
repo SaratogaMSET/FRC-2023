@@ -7,13 +7,18 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
@@ -56,9 +61,44 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    new SequentialCommandGroup(
+      new WaitCommand(1),
+      new InstantCommand(() -> drivetrain.drive(new ChassisSpeeds(0, 0, 0))),
+      new InstantCommand(() -> drivetrain.resetOdometry(new Pose2d()))
+    );
+
+    drivetrain.setDefaultCommand(new DefaultDriveCommand(
+            drivetrain,
+            ()-> modifyAxis(-m_driverController.getLeftX())/2 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> -modifyAxis(-m_driverController.getLeftY())/2 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> -modifyAxis(-m_driverController.getRightX()) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+    ));
+
     // Configure the trigger bindings
     configureBindings();
     localizer.start();
+  }
+
+  private static double deadband(double value, double deadband) {
+    if (Math.abs(value) > deadband) {
+      if (value > 0.0) {
+        return (value - deadband) / (1.0 - deadband);
+      } else {
+        return (value + deadband) / (1.0 - deadband);
+      }
+    } else {
+      return 0.0;
+    }
+  }
+
+  private static double modifyAxis(double value) {
+    // Deadband
+    value = deadband(value, 0.05);
+
+    // Square the axis
+    value = Math.copySign(value * value, value);
+
+    return value;
   }
 
   /**
