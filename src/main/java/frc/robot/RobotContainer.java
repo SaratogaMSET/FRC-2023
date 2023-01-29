@@ -7,8 +7,10 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Drivetrain;
@@ -19,6 +21,9 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.util.server.PoseEstimator;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -41,10 +46,10 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final VisionSubsystem vision = new VisionSubsystem();
-  private final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
+  private final DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
   private final PoseEstimator localizer = new PoseEstimator(
     vision, 
-    drivetrain, 
+    m_drivetrainSubsystem, 
     kinematics, 
     new Rotation2d(), 
     new Pose2d()
@@ -57,6 +62,19 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
+    new SequentialCommandGroup( 
+      new WaitCommand(1),
+      new InstantCommand(() -> m_drivetrainSubsystem.drive(new ChassisSpeeds(0.0, 0.0, 0.0))),
+      new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(new Pose2d()))
+  ).schedule();
+
+    m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
+    m_drivetrainSubsystem,
+    ()-> modifyAxis(-m_controller.getLeftX())/2 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+    () -> -modifyAxis(-m_controller.getLeftY())/2 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+    () -> -modifyAxis(-m_controller.getRightX()) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+));
+
     configureBindings();
     localizer.start();
   }
