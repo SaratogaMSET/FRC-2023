@@ -69,12 +69,10 @@ public class FishServerNT {
     public void publishAll(SendableOdomMeasurement odometry, SendableVisionMeasurement vision) {
         // "I don't trust like that!"
         if (odometry.getId() == vision.getMeasID()) {
-            // odomIDPub.set(odometry.getId());
-            odomIDPub.set(100);
+            odomIDPub.set(odometry.getId());
             visionIDPub.set(vision.getMeasID());
         } else {
-            // odomIDPub.set(odometry.getId());
-            odomIDPub.set(100);
+            odomIDPub.set(odometry.getId());
             visionIDPub.set(odometry.getId());
         }
         odomXPub.set(odometry.getPose().getX());
