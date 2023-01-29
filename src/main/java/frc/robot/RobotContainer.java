@@ -93,6 +93,10 @@ public class RobotContainer {
     }.start();
   }
 
+  public void addOne() {
+    localizer.addOne();
+  }
+
   private static double deadband(double value, double deadband) {
     if (Math.abs(value) > deadband) {
       if (value > 0.0) {

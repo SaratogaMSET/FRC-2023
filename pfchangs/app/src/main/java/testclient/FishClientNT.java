@@ -14,7 +14,7 @@ import testclient.filter.ParticleFilter;
 import testclient.wrappers.RobotData;
 
 public class FishClientNT {
-    private final ParticleFilter filter = new ParticleFilter(
+    private ParticleFilter filter = new ParticleFilter(
         Constants.FilterConstants.NUM_PARTICLES, 
         Constants.VisionConstants.Field.TAGS, 
         Constants.VisionConstants.Field.FIELD_WIDTH, 
@@ -40,6 +40,10 @@ public class FishClientNT {
     private final DoublePublisher estimateXPub = estimateTable.getDoubleTopic("x").publish();
     private final DoublePublisher estimateYPub = estimateTable.getDoubleTopic("y").publish();
     private final DoublePublisher estimateWPub = estimateTable.getDoubleTopic("w").publish();
+
+    private final IntegerSubscriber resetFlagSub = odomTable.getIntegerTopic("flag").subscribe(0);
+    private int resetFlag = 0;
+    private int prevFlag = resetFlag;
 
     private Pose2d prevOdomPose = new Pose2d();
     private Pose2d currentOdomPose = new Pose2d();
@@ -86,9 +90,22 @@ public class FishClientNT {
         while (odomIDSub.get() == -1) {} // scuffed thread blocking TODO make better
         System.out.println("Received first measurement!");
         while (true) {
+            prevFlag = resetFlag;
+            resetFlag = (int) resetFlagSub.get();
+            if (prevFlag != resetFlag) {
+                System.out.println("REINITIALIZING FILTER!!!!!!!!!!!");
+                filter = new ParticleFilter(
+                    Constants.FilterConstants.NUM_PARTICLES, 
+                    Constants.VisionConstants.Field.TAGS, 
+                    Constants.VisionConstants.Field.FIELD_WIDTH, 
+                    Constants.VisionConstants.Field.FIELD_HEIGHT
+                );
+            } 
+
             if (odomIDSub.get() != -1) {
+                // FIXME check if deltas are field-relative or robot-relative
                 RobotData latestData = readNTData();
-                prevOdomPose = currentOdomPose; // TODO we can probably optimize this
+                prevOdomPose = currentOdomPose; // TODO we can definitely optimize this (but do we need to?)
                 currentOdomPose = new Pose2d(
                     latestData.odom.x, 
                     latestData.odom.y, 

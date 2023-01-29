@@ -171,6 +171,10 @@ public class PoseEstimator {
         }
     }
 
+    public void addOne() {
+        ntServer.addOne();
+    }
+
     public void start() {
         System.out.println("Starting FishServer.");
         new Thread() {
