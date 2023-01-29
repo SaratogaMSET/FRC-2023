@@ -65,12 +65,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    new SequentialCommandGroup(
-      new WaitCommand(1),
-      new InstantCommand(() -> m_drivetrainSubsystem.drive(new ChassisSpeeds(0, 0, 0))),
-      new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(new Pose2d()))
-    );
-
     // Configure the trigger bindings
     new SequentialCommandGroup( 
       new WaitCommand(1),
@@ -92,7 +86,9 @@ public class RobotContainer {
 
     new Thread() {
       public void run() {
-        field.setRobotPose(localizer.getPose());
+        while (true) {
+          field.setRobotPose(localizer.getPose());
+        }
       }
     }.start();
   }
