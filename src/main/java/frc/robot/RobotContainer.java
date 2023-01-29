@@ -9,8 +9,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Drivetrain;
@@ -18,14 +22,10 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.ExampleCommand;
-import frc.robot.commands.ZeroGyroCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.util.server.PoseEstimator;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -61,6 +61,8 @@ public class RobotContainer {
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
+  private Field2d field = new Field2d();
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     new SequentialCommandGroup(
@@ -69,16 +71,30 @@ public class RobotContainer {
       new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(new Pose2d()))
     );
 
-    m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
-      m_drivetrainSubsystem,
-            ()-> -modifyAxis(-m_driverController.getLeftX())/2 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> modifyAxis(-m_driverController.getLeftY())/2 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> -modifyAxis(-m_driverController.getRightX()) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
-    ));
-
     // Configure the trigger bindings
+    new SequentialCommandGroup( 
+      new WaitCommand(1),
+      new InstantCommand(() -> m_drivetrainSubsystem.drive(new ChassisSpeeds(0.0, 0.0, 0.0))),
+      new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(new Pose2d()))
+  ).schedule();
+
+  m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
+    m_drivetrainSubsystem,
+    ()-> -modifyAxis(-m_driverController.getLeftX())/2 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+    () -> modifyAxis(-m_driverController.getLeftY())/2 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+    () -> -modifyAxis(-m_driverController.getRightX()) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+));
+
     configureBindings();
     localizer.start();
+
+    SmartDashboard.putData("Localized robot", field);
+
+    new Thread() {
+      public void run() {
+        field.setRobotPose(localizer.getPose());
+      }
+    }.start();
   }
 
   private static double deadband(double value, double deadband) {
@@ -114,16 +130,12 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
+    new Trigger(m_exampleSubsystem::exampleCondition)
+        .onTrue(new ExampleCommand(m_exampleSubsystem));
 
-    m_driverController.leftBumper().whileTrue(
-      new DefaultDriveCommand(
-            m_drivetrainSubsystem,
-            () -> modifyAxis(-m_driverController.getLeftX())/3 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> -modifyAxis(-m_driverController.getLeftY())/3 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> -modifyAxis(-m_driverController.getRightX()) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
-    )
-    );
+    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
+    // cancelling on release.
+    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
   }
 
   /**
