@@ -8,17 +8,17 @@ import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /** An example command that uses an example subsystem. */
-public class ExampleCommand extends CommandBase {
+public class ArmCosineCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final ExampleSubsystem m_subsystem;
+  private final ArmCosineSubsystem m_armCosineSubsystem;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public ExampleCommand(ExampleSubsystem subsystem) {
-    m_subsystem = subsystem;
+  public ArmCosineCommand(ArmCosineSubsystem subsystem) {
+    m_armCosineSubsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
@@ -37,10 +37,10 @@ public class ExampleCommand extends CommandBase {
 
   
   public void getBaseAngle() {
-    return ArmCosineSubsystem.calcBaseAngle;
+    return m_armCosineSubsystem.calcBaseAngle;
   }
   public void getTopAngle() {
-    return ArmCosineSubsystem.calcBaseAngle;
+    return m_armCosineSubsystem.calcBaseAngle;
   }
 
   

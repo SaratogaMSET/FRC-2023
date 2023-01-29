@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,19 +18,27 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 public class ArmCosineSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
 
-  double topAngle;
-  double baseAngle;
-  double distance;
+ 
+  PIDController controller;
   //double initialAngle;
-  double velocity; 
-  public CANSparkMax baseMotor = new CANSparkMax(Constants.ArmConstants.baseMotorID, MotorType.kBrushless);
-  public CANSparkMax topMotor = new CANSparkMax(Constants.ArmConstants.topMotorID, MotorType.kBrushless);
-  public RelativeEncoder baseMotorEncoder = baseMotor.getEncoder();
-  public RelativeEncoder topMotorEncoder = topMotor.getEncoder();
+  double targetVelocity;
+
+  public CANSparkMax baseMotor;
+  public CANSparkMax topMotor;
+  public RelativeEncoder baseMotorEncoder;
+  public RelativeEncoder topMotorEncoder;
 
 
-  public ArmCosineSubsystem(double distance) {
-    this.distance = distance;
+  public ArmCosineSubsystem(double targetVelocity) {
+    this.targetVelocity = targetVelocity;
+    
+    controller = new PIDController(0.3, 0, 0);
+    baseMotor = new CANSparkMax(Constants.ArmConstants.baseMotorID, MotorType.kBrushless);
+    topMotor = new CANSparkMax(Constants.ArmConstants.topMotorID, MotorType.kBrushless);
+    baseMotorEncoder = baseMotor.getEncoder();
+    topMotorEncoder = topMotor.getEncoder();
+
+
   }
 
   /**
@@ -61,32 +70,23 @@ public class ArmCosineSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public double calcBaseAngle() {
-    baseAngle = Math.acos((Math.pow(Constants.ArmConstants.BASE_ARM,2) + Math.pow(distance,2) - Math.pow(Constants.ArmConstants.TOP_ARM,2))/2/Constants.ArmConstants.BASE_ARM/distance);
-    return baseAngle;
-  }
-  public double AngleDistance(double initialAngle) {
-    baseAngle = calcBaseAngle();
-    double baseAngleDist = Math.abs(baseAngle -initialAngle);
-    return baseAngleDist;
-  }
 
-  public double timeToAng(double velocity, double radius, double initialAngle){
-    double BAD = AngleDistance(initialAngle);
-    double result = (Math.pow(radius, 2) * BAD)/(velocity);
-    return result;
+  public void moveToAngle(double distance){
 
-  }
+    double baseAngle = Math.acos((Math.pow(Constants.ArmConstants.BASE_ARM,2) + Math.pow(distance,2) - Math.pow(Constants.ArmConstants.TOP_ARM,2))/2/Constants.ArmConstants.BASE_ARM/distance); //in radians
 
-  public double calcTopAngle() {
-    return Math.asin(Math.sin(calcBaseAngle())/Constants.ArmConstants.TOP_ARM*distance);
-  }
+    double topAngle = Math.asin(Math.sin(baseAngle)/Constants.ArmConstants.TOP_ARM*distance); //in radians
 
-  public void setTopAngle(){
-    
+    controller.setTolerance(0.1); /*CHANGE NUMBER*/
+    double baseOutput = controller.calculate(baseMotorEncoder.getPosition(), baseAngle); // change angleRadians to rotations via doc
+    double topOutput = controller.calculate(topMotorEncoder.getPosition(), topAngle); // change angleRadians to rotations via doc
+
+    baseMotor.set(baseOutput * targetVelocity);
+    topMotor.set(topOutput * targetVelocity);
 
   }
-    
+
+
 
   @Override
   public void simulationPeriodic() {
