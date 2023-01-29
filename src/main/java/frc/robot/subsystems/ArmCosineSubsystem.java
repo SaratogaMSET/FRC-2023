@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.drive.RobotDriveBase.MotorType;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.lang. Math;
@@ -14,7 +13,7 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
-
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 public class ArmCosineSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
 
@@ -85,10 +84,10 @@ public class ArmCosineSubsystem extends SubsystemBase {
   }
 
   public void setTopAngle(){
+    
 
   }
-
-
+    
 
   @Override
   public void simulationPeriodic() {
