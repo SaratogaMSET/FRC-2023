@@ -5,8 +5,17 @@
 package frc.robot;
 
 import frc.robot.subsystems.IntakeSubsystemWheel.*;
+
+import java.nio.ByteBuffer;
+
+import com.revrobotics.ColorSensorV3;
+
+// import com.revrobotics.Rev2mDistanceSensor.*;
+
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,58 +23,91 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.IntakeSubsystemWheel;
+import frc.robot.subsystems.LidarSubsystem;
 
 /**
- * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the name of this class or
- * the package after creating this project, you must also update the build.gradle file in the
+ * The VM is configured to automatically run this class, and to call the
+ * functions corresponding to
+ * each mode, as described in the TimedRobot documentation. If you change the
+ * name of this class or
+ * the package after creating this project, you must also update the
+ * build.gradle file in the
  * project.
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-  // private ClawSubsystem claw;
+  // private Rev2mDistanceSensor m_lidar;
+  private ClawSubsystem claw;
   // private IntakeSubsystemWheel m_intake;
+  // private LidarSubsystem m_lidar;
 
   /**
-   * This function is run when the robot is first started up and should be used for any
+   * This function is run when the robot is first started up and should be used
+   * for any
    * initialization code.
    */
   @Override
   public void robotInit() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
+    // Instantiate our RobotContainer. This will perform all our button bindings,
+    // and put our
     // autonomous chooser on the dashboard.
-    // claw = new ClawSubsystem();
+    claw = new ClawSubsystem();
     // m_intake = new IntakeSubsystemWheel();
+    // m_lidar = new Rev2mDistanceSensor(Port.kOnboard, Unit.kInches,
+    // RangeProfile.kDefault);
     m_robotContainer = new RobotContainer();
+    // m_lidar = new LidarSubsystem(Port.kOnboard);
+
+    // m_lidar.start();
+    // m_lidar.setAutomaticMode(true);
   }
 
   /**
-   * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
+   * This function is called every 20 ms, no matter the mode. Use this for items
+   * like diagnostics
    * that you want ran during disabled, autonomous, teleoperated and test.
    *
-   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
+   * <p>
+   * This runs after the mode specific periodic functions, but before LiveWindow
+   * and
    * SmartDashboard integrated updating.
    */
   @Override
   public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
+    // Runs the Scheduler. This is responsible for polling buttons, adding
+    // newly-scheduled
+    // commands, running already-scheduled commands, removing finished or
+    // interrupted commands,
+    // and running subsystem periodic() methods. This must be called from the
+    // robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    // new InstantCommand(() -> m_intake.runIntake(Direction.INTAKE)).schedule(); // For instant running
+    // m_lidar.update();
+    // SmartDashboard.putNumber("Lidar Distance", m_lidar.getDistance()); // For
+    // instant running
+    // if(m_lidar.isRangeValid()) {
+    // SmartDashboard.putNumber("Range Onboard", m_lidar.getRange());
+    // SmartDashboard.putNumber("Timestamp Onboard", m_lidar.getTimestamp());
+    // }
+    // else
+    // SmartDashboard.putBoolean("Range Valid", false);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+  }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+  }
 
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
+  /**
+   * This autonomous runs the autonomous command selected by your
+   * {@link RobotContainer} class.
+   */
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
@@ -78,7 +120,8 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+  }
 
   @Override
   public void teleopInit() {
@@ -93,7 +136,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    new InstantCommand(() -> claw.closeIntake()).schedule();
+  }
 
   @Override
   public void testInit() {
@@ -103,13 +148,16 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+  }
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+  }
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+  }
 }

@@ -10,6 +10,8 @@ public class LidarSubsystem  {
 	private I2C i2c;
 	private byte[] distance;
 	private java.util.Timer updater;
+	// private VL53L0XJNI sensor;
+
 	
 	private final int LIDAR_ADDR = 0x52; // laser address
 	private final int LIDAR_CONFIG_REGISTER = 0x00;
@@ -19,6 +21,8 @@ public class LidarSubsystem  {
     	i2c = new I2C(port, LIDAR_ADDR);
 		distance = new byte[2];
 		updater = new java.util.Timer();
+		// sensor = new VL53L0XJNI();
+		// VL53L0XJNI.Init(0, LIDAR_ADDR);
     }
     
     public void initDefaultCommand() {
@@ -52,10 +56,13 @@ public class LidarSubsystem  {
  	
  	// Update distance variable
  	public void update() {
- 		i2c.write(LIDAR_CONFIG_REGISTER, 0x04);
+ 		i2c.write(LIDAR_CONFIG_REGISTER, 0x52);
  		Timer.delay(0.04); // Delay for measurement to be taken
  		i2c.read(LIDAR_DISTANCE_REGISTER, 2, distance); // Read in measurement
  		Timer.delay(0.005); // Delay to prevent over polling
+		//  / 25.4
+
+		
  	}
  	
  	public void write(){

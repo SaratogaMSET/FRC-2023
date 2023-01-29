@@ -18,15 +18,15 @@ import frc.robot.Constants;
 
 // @Deprecated
 public class IntakeSubsystemWheel extends SubsystemBase {
-  private CANSparkMax m_intake;
-  private static DigitalInput limitSwitch;
-  private static double INTAKE_SPEED = 0.0;
+  // private CANSparkMax m_intake;
+  // private static DigitalInput limitSwitch;
+  // private static double INTAKE_SPEED = 0.0;
 
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystemWheel() {
-    m_intake = new CANSparkMax(Constants.IntakeConstants.INTAKE_MOTOR, MotorType.kBrushless);
-    m_intake.setIdleMode(IdleMode.kBrake);
-    limitSwitch = new DigitalInput(Constants.IntakeConstants.LIMIT_SWITCH);
+    // m_intake = new CANSparkMax(Constants.IntakeConstants.INTAKE_MOTOR, MotorType.kBrushless);
+    // m_intake.setIdleMode(IdleMode.kBrake);
+    // limitSwitch = new DigitalInput(Constants.IntakeConstants.LIMIT_SWITCH);
   }
   public static enum Direction {
     INTAKE,
@@ -61,33 +61,33 @@ public class IntakeSubsystemWheel extends SubsystemBase {
   }
 
   public void runIntake(Direction direction) {
-    INTAKE_SPEED = 0.5;  //
-    if (limitSwitch.get()) {  // default limit switch state
-      switch (direction) {
-        case INTAKE:
-          m_intake.set(INTAKE_SPEED);
-          break;
-        case OUTTAKE:
-          m_intake.set(-0.1);
-          break;
-        case IDLE:
-          m_intake.set(0.0);
-          break;
-        default:
-          SmartDashboard.putNumber("Intake Speed", 649);
-      }
-    }
+    // INTAKE_SPEED = 0.5;  //
+    // if (limitSwitch.get()) {  // default limit switch state
+    //   switch (direction) {
+    //     case INTAKE:
+    //       m_intake.set(INTAKE_SPEED);
+    //       break;
+    //     case OUTTAKE:
+    //       m_intake.set(-0.1);
+    //       break;
+    //     case IDLE:
+    //       m_intake.set(0.0);
+    //       break;
+    //     default:
+    //       SmartDashboard.putNumber("Intake Speed", 649);
+    //   }
+    // }
   }
 
-  public boolean updateIntakeState() {
-    return limitSwitch.get();
-  }
+  // public boolean updateIntakeState() {
+  //   return limitSwitch.get();
+  // }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    updateIntakeState();
-    SmartDashboard.putBoolean("LS", updateIntakeState());
+    // updateIntakeState();
+    // SmartDashboard.putBoolean("LS", updateIntakeState());
 
   }
 
