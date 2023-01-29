@@ -10,14 +10,14 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.logging.LoggableChassisSpeeds;
 import frc.lib.logging.LoggablePose;
 import frc.robot.Constants;
 
-public class DrivetrainSubsystem extends SubsystemBase {
-    
+public class DrivetrainSubsystem extends SubsystemBase {    
     private SwerveModuleState[] currentState = new SwerveModuleState[4];
     private SwerveModuleState[] previousState = new SwerveModuleState[4];
     
@@ -39,7 +39,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
         resetModulesToAbsolute();     
         swerveOdometry = new SwerveDriveOdometry(Constants.Drivetrain.m_kinematics, getRotation2d(), getModulePositions());  
         logPose = new LoggablePose("/SwerveDriveSubsystem/Pose", swerveOdometry.getPoseMeters(),true); 
-        
     }
     
     public Rotation2d getRotation2d() {

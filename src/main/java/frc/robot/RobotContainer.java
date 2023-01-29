@@ -9,6 +9,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -59,6 +61,8 @@ public class RobotContainer {
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
+  private Field2d field = new Field2d();
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     new SequentialCommandGroup(
@@ -66,13 +70,6 @@ public class RobotContainer {
       new InstantCommand(() -> m_drivetrainSubsystem.drive(new ChassisSpeeds(0, 0, 0))),
       new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(new Pose2d()))
     );
-
-    m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
-      m_drivetrainSubsystem,
-            ()-> modifyAxis(-m_driverController.getLeftX())/2 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> -modifyAxis(-m_driverController.getLeftY())/2 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> -modifyAxis(-m_driverController.getRightX()) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
-    ));
 
     // Configure the trigger bindings
     new SequentialCommandGroup( 
@@ -90,6 +87,14 @@ public class RobotContainer {
 
     configureBindings();
     localizer.start();
+
+    SmartDashboard.putData("Localized robot", field);
+
+    new Thread() {
+      public void run() {
+        field.setRobotPose(localizer.getPose());
+      }
+    }.start();
   }
 
   private static double deadband(double value, double deadband) {
