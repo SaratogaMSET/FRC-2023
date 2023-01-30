@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -73,6 +74,20 @@ public class PoseEstimator {
     private void update(SwerveOdomMeasurement odometryMeas, VisionMeasurement visionMeas) {
         double currentTime = Timer.getFPGATimestamp();
 
+        /* DEBUG TODO REMOVE */odometryMeas = new SwerveOdomMeasurement(new Rotation2d(new Random().nextDouble()), 
+            new SwerveModuleState[]{
+                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
+                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
+                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
+                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble()))
+            }
+        );
+        /* DEBUG TODO REMOVE */visionMeas = new VisionMeasurement(true, new Random().nextDouble() * 100, 
+        new Random().nextInt(), new Pose2d(new Translation2d(new Random().nextDouble(), new Random().nextDouble()), 
+        new Rotation2d(new Random().nextDouble())), 
+        new double[]{new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(),
+            new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble()});
+
         rawOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());
         cookedOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());
         odomMap.put(currentTime, odometryMeas);
@@ -86,25 +101,27 @@ public class PoseEstimator {
         SendableVisionMeasurement sendableVision = null;
 
         if (visionMeas.hasTargets()) {
-            // sendableVision = new SendableVisionMeasurement(0, true, visionMeas.getTagID(), visionMeas.getDistance());
-            // sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);
-            // buffer.put(visionTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(sendableOdom, sendableVision));
-            sendableVision = new SendableVisionMeasurement(0, true, new Random().nextInt(), 
-                new double[]{new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(),
-                    new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble()}
-            );
-            sendableOdom = new SendableOdomMeasurement(0, new Pose2d(new Translation2d(new Random().nextDouble(), new Random().nextDouble()), new Rotation2d(new Random().nextDouble())));
+            sendableVision = new SendableVisionMeasurement(0, true, visionMeas.getTagID(), visionMeas.getDistance());
+            sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);
             buffer.put(visionTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(sendableOdom, sendableVision));
         } else {
-            // sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);
-            // buffer.put(visionTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(sendableOdom, sendableVision));
-            sendableOdom = new SendableOdomMeasurement(0, new Pose2d(new Translation2d(new Random().nextDouble(), new Random().nextDouble()), new Rotation2d(new Random().nextDouble())));
+            /* DEBUG TODO REMOVE */sendableVision = new SendableVisionMeasurement(0, visionMeas.hasTargets(), visionMeas.getTagID(), visionMeas.getDistance());
+            sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);
             buffer.put(visionTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(sendableOdom, sendableVision));
         }
     }
 
     private void update(SwerveOdomMeasurement odometryMeas) {
         double currentTime = Timer.getFPGATimestamp();
+
+        /* DEBUG TODO REMOVE */odometryMeas = new SwerveOdomMeasurement(new Rotation2d(new Random().nextDouble()), 
+            new SwerveModuleState[]{
+                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
+                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
+                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
+                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble()))
+            }
+        );
 
         rawOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());
         cookedOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());
@@ -119,6 +136,7 @@ public class PoseEstimator {
     }
 
     private void computeEstimate(FilterEstimate estimate) {
+        System.out.println("Latency compensation."); // DEBUG TODO REMOVE
         currentEstimate = estimate;
 
         int estimateID = estimate.getID();
@@ -165,7 +183,7 @@ public class PoseEstimator {
                 idMap.put(currentID, key);
 
                 if (buffer.get(key).getSecond() != null) {
-                    System.out.println("Publishing vision and odometry.");
+                    System.out.println("Publishing vision and odometry."); // DEBUG TODO REMOVE
                     buffer.get(key).getFirst().setID(currentID);
                     buffer.get(key).getSecond().setMeasID(currentID);
                     ntServer.publishAll(
@@ -173,7 +191,7 @@ public class PoseEstimator {
                         buffer.get(key).getSecond()
                     );
                 } else {
-                    System.out.println("Publishing odometry.");
+                    System.out.println("Publishing odometry."); // DEBUG TODO REMOVE
                     buffer.get(key).getFirst().setID(currentID);
                     System.out.println(buffer.get(key).getFirst());
                     ntServer.publishOdometry(buffer.get(key).getFirst());
