@@ -53,37 +53,34 @@ public class ClawSubsystem extends SubsystemBase {
     colorSensor = new ColorSensorV3(Port.kOnboard);
   }
 
-  public void updateProximitySensor() {
-    proximityBuffer[bufferIndex] = colorSensor.getProximity();
-    bufferIndex++;
-    bufferIndex = bufferIndex % proximityBuffer.length;
-  }
-
-  public double proximityValue() {
-    double sum = 0;
-    for (double x : proximityBuffer)
-      sum += x;
-    return sum / proximityBuffer.length;
-  }
-
-  public boolean objectInRange() {
-    return proximityValue() > 35;
-  }
-
   public void openIntake() {
     double velocitySetpoint = limitSwitch.get() ? 0.0
         : TARGET_VELOCITY;
     motor.set(-velocitySetpoint);
   }
+  
+  public void closeIntake() {
+    updateProximitySensor();
+    objectSecuredVar = objectSecured() && objectInRange();
+    boolean objectBeingSecuredVar = objectBeingSecured() && objectInRange();
+    if (objectSecuredVar) {
+      double holdVoltage = 0.5;
+      appliedVoltage = holdVoltage;
+      intakeVoltage(holdVoltage);
+    } else if (objectBeingSecuredVar){
+      appliedVoltage = 0.5;
+      intakeVoltage(0.5);
+    } else if (objectInRange()) {
+      intakeVoltage(ffVoltage);
+    // } else {
+    //   intakeVoltage(-ffVoltage);
+    }
+  }
 
   public void setIdle() {
     motor.set(0.0);
   }
-
-  public void resetEncoder() {
-    encoder.setPosition(0.0);
-  }
-
+  
   public void intakeVoltage(double voltage) {
     if (getLimitSwitch())
       resetEncoder();
@@ -129,23 +126,7 @@ public class ClawSubsystem extends SubsystemBase {
     return torque / gearRatio;
   }
 
-  public void closeIntake() {
-    updateProximitySensor();
-    objectSecuredVar = objectSecured() && objectInRange();
-    boolean objectBeingSecuredVar = objectBeingSecured() && objectInRange();
-    if (objectSecuredVar) {
-      double holdVoltage = 0.5;
-      appliedVoltage = holdVoltage;
-      intakeVoltage(holdVoltage);
-    } else if (objectBeingSecuredVar){
-      appliedVoltage = 0.5;
-      intakeVoltage(0.5);
-    } else if (objectInRange()) {
-      intakeVoltage(ffVoltage);
-    } else {
-      intakeVoltage(-ffVoltage);
-    }
-  }
+  
 
   public boolean objectSecured() {
     return getTorqueBuffer(getTorque(encoder.getVelocity(), appliedVoltage, IntakeConstants.GEAR_RATIO), torqueThreshold);
@@ -155,6 +136,31 @@ public class ClawSubsystem extends SubsystemBase {
     return getTorqueBuffer(getTorque(encoder.getVelocity(), appliedVoltage, IntakeConstants.GEAR_RATIO), closingTorqueThreshold);
   }
 
+  public void updateProximitySensor() {
+    proximityBuffer[bufferIndex] = colorSensor.getProximity();
+    bufferIndex++;
+    bufferIndex = bufferIndex % proximityBuffer.length;
+  }
+
+  public double proximityValue() {
+    double sum = 0;
+    for (double x : proximityBuffer)
+      sum += x;
+    return sum / proximityBuffer.length;
+  }
+
+  public boolean objectInRange() {
+    return proximityValue() > 35;
+  }
+
+
+  
+
+  public void resetEncoder() {
+    encoder.setPosition(0.0);
+  }
+
+  
   public boolean getLimitSwitch() {
     return limitSwitch.get();
   }
