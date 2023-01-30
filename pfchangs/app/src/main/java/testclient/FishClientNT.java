@@ -92,6 +92,12 @@ public class FishClientNT {
         System.out.println("Starting particle filter.");
         while (odomIDSub.get() == -1) {} // scuffed thread blocking TODO make better
         System.out.println("Received first measurement!");
+        filter = new ParticleFilterOLD(
+            Constants.FilterConstants.NUM_PARTICLES, 
+            Constants.VisionConstants.Field.TAGS, 
+            Constants.VisionConstants.Field.FIELD_WIDTH, 
+            Constants.VisionConstants.Field.FIELD_HEIGHT
+        );
         while (true) {
             prevFlag = resetFlag;
             resetFlag = (int) resetFlagSub.get();

@@ -62,7 +62,7 @@ public class PoseEstimator {
             drivetrain.getModuleStates() // TODO check if the order is same as 604: FL --> FR --> BL --> BR
         );
 
-        if (latestMeasurement.hasTargets()) {
+        if (/* latestMeasurement.hasTargets() DEBUG TODO REMOVE*/true) {
             update(odomMeasurement, latestMeasurement);
         } else {
             update(odomMeasurement);
@@ -82,7 +82,7 @@ public class PoseEstimator {
                 new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble()))
             }
         );
-        /* DEBUG TODO REMOVE */visionMeas = new VisionMeasurement(true, new Random().nextDouble() * 100, 
+        /* DEBUG TODO REMOVE */visionMeas = new VisionMeasurement(new Random().nextBoolean(), new Random().nextDouble() * 100, 
         new Random().nextInt(), new Pose2d(new Translation2d(new Random().nextDouble(), new Random().nextDouble()), 
         new Rotation2d(new Random().nextDouble())), 
         new double[]{new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(),
@@ -105,7 +105,7 @@ public class PoseEstimator {
             sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);
             buffer.put(visionTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(sendableOdom, sendableVision));
         } else {
-            /* DEBUG TODO REMOVE */sendableVision = new SendableVisionMeasurement(0, visionMeas.hasTargets(), visionMeas.getTagID(), visionMeas.getDistance());
+            // /* DEBUG TODO REMOVE */sendableVision = new SendableVisionMeasurement(0, visionMeas.hasTargets(), visionMeas.getTagID(), visionMeas.getDistance());
             sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);
             buffer.put(visionTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(sendableOdom, sendableVision));
         }
