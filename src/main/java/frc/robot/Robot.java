@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import frc.robot.subsystems.IntakeSubsystemWheel.*;
+// import frc.robot.subsystems.IntakeSubsystemWheel.*;
 
 import java.nio.ByteBuffer;
 
@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ClawSubsystem;
-import frc.robot.subsystems.IntakeSubsystemWheel;
+// import frc.robot.subsystems.IntakeSubsystemWheel;
 import frc.robot.subsystems.LidarSubsystem;
 
 /**

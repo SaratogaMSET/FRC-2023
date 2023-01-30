@@ -19,8 +19,9 @@ public final class Constants {
 
   public static class IntakeConstants {
     public static final int INTAKE_MOTOR = 20;
+    public static final int WHEEL_INTAKE_MOTOR = 6;
     public static final double GEAR_RATIO = 3.0 / 320.0;
-    public static final int LIMIT_SWITCH = 4;
+    public static final int LIMIT_SWITCH = 0;
     public static final double TARGET_VELOCITY = 0.2;
     public static final int INTAKE_DISTANCE_THRESHOLD = 50;
     public static final double TORQUE_CONSTANT = 0.01042;

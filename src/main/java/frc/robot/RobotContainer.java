@@ -5,16 +5,14 @@
 package frc.robot;
 
 // import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
-import frc.robot.subsystems.ClawSubsystem;
+// import frc.robot.commands.Autos;
+// import frc.robot.subsystems.ClawSubsystem;
 // import frc.robot.commands.IntakeCommand;
-import frc.robot.subsystems.IntakeSubsystemWheel;
-import frc.robot.subsystems.IntakeSubsystemWheel.Direction;
+// import frc.robot.subsystems.IntakeSubsystemWheel;
+// import frc.robot.subsystems.IntakeSubsystemWheel.Direction;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.Button;
 // import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -27,13 +25,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  final IntakeSubsystemWheel m_intake;
+  // final IntakeSubsystemWheel m_intake;
   private final XboxController m_driverController =
       new XboxController(0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    m_intake = new IntakeSubsystemWheel();
+    // m_intake = new IntakeSubsystemWheel();
     SmartDashboard.putNumber("Intake Speed", 0.0);
     // Configure the trigger bindings
     configureBindings();
@@ -57,10 +55,10 @@ public class RobotContainer {
     // cancelling on release.
     // m_driverController.
 
-    new Trigger(m_driverController::getRightBumper).whileTrue(new InstantCommand(() -> m_intake.runIntake(Direction.INTAKE)));
-    new Trigger(m_driverController::getRightBumper).whileFalse(new InstantCommand(() -> m_intake.runIntake(Direction.IDLE)));
-    new Trigger(m_driverController::getLeftBumper).whileTrue(new InstantCommand(() -> m_intake.runIntake(Direction.OUTTAKE)));
-    new Trigger(m_driverController::getLeftBumper).whileFalse(new InstantCommand(() -> m_intake.runIntake(Direction.IDLE)));
+    // new Trigger(m_driverController::getRightBumper).whileTrue(new InstantCommand(() -> m_intake.runIntake(Direction.INTAKE)));
+    // new Trigger(m_driverController::getRightBumper).whileFalse(new InstantCommand(() -> m_intake.runIntake(Direction.IDLE)));
+    // new Trigger(m_driverController::getLeftBumper).whileTrue(new InstantCommand(() -> m_intake.runIntake(Direction.OUTTAKE)));
+    // new Trigger(m_driverController::getLeftBumper).whileFalse(new InstantCommand(() -> m_intake.runIntake(Direction.IDLE)));
   }
 
   /**

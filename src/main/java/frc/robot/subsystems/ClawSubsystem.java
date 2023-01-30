@@ -11,7 +11,6 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,21 +24,23 @@ public class ClawSubsystem extends SubsystemBase {
 
   private double[] proximityBuffer = new double[3];
   private int bufferIndex = 0;
-  private double ffVoltage = 1.5;
+  private double ffVoltage = 5;
   private double torque = 0;
   private final double RPM_TO_RADPERSEC = 2 * Math.PI / 60;
   private double appliedVoltage;
   private double[] torqueBuffer = new double[5];
   private int torqueCounter = 0;
   private boolean objectSecuredVar;
-  private double torqueThreshold = 75;
+  private double torqueThreshold = 175;
+  private double closingTorqueThreshold = 125;
+  private int[] redRange = new int[2];
+  private int[] greenRange = new int[2];
+  private int[] blueRange = new int[2];
 
   public static ColorSensorV3 colorSensor;
 
   /** Creates a new ExampleSubsystem. */
   public ClawSubsystem() {
-    // lastTime = 0.0;
-    // time = 0.0;
     limitSwitch = new DigitalInput(IntakeConstants.LIMIT_SWITCH);
     motor = new CANSparkMax(IntakeConstants.INTAKE_MOTOR, MotorType.kBrushless);
     motor.setIdleMode(IdleMode.kBrake);
@@ -79,29 +80,41 @@ public class ClawSubsystem extends SubsystemBase {
     motor.set(0.0);
   }
 
+  public void resetEncoder() {
+    encoder.setPosition(0.0);
+  }
+
   public void intakeVoltage(double voltage) {
-    boolean lowerBound = encoder.getPosition() < 0 && Math.signum(voltage) == -1;
+    if (getLimitSwitch())
+      resetEncoder();
+
+    boolean lowerBound = encoder.getPosition() < 10 && Math.signum(voltage) == -1;
+    boolean coneMediumBound = encoder.getPosition() > 35 && Math.signum(voltage) == 1;
+    boolean cubeMediumBound = encoder.getPosition() > 14 && Math.signum(voltage) == 1;
     boolean higherBound = encoder.getPosition() > 45 && Math.signum(voltage) == 1;
 
-    if (!lowerBound) { //!higherBound && 
+    if(cubeMediumBound){
+      appliedVoltage = 1;
+      motor.setVoltage(appliedVoltage);
+    }
+    else if (Math.signum(voltage) == -1 && !getLimitSwitch()) {
+      appliedVoltage = voltage;
+      motor.setVoltage(voltage);
+    } else if (!lowerBound && !higherBound) { // !higherBound &&
       appliedVoltage = voltage;
       motor.setVoltage(voltage);
     } else {
       motor.setVoltage(0.0);
       appliedVoltage = 0.0;
     }
-
-    SmartDashboard.putBoolean("Upper", higherBound);
-    SmartDashboard.putBoolean("Lower", lowerBound);
-    SmartDashboard.putBoolean("Object Secured", objectSecured());
   }
 
-  public boolean getTorqueBuffer(double torque) {
+  public boolean getTorqueBuffer(double torque, double threshold) {
     torqueBuffer[torqueCounter] = torque;
     torqueCounter++;
     torqueCounter = torqueCounter % torqueBuffer.length;
     for (double tq : torqueBuffer) {
-      if (tq < torqueThreshold * Math.abs(appliedVoltage / ffVoltage))
+      if (tq < threshold * Math.abs(appliedVoltage / ffVoltage))
         return false;
     }
     return true;
@@ -109,11 +122,6 @@ public class ClawSubsystem extends SubsystemBase {
 
   public double getTorque(double rpm, double appliedVoltage, double gearRatio) {
     double radpersec = rpm * RPM_TO_RADPERSEC;
-    SmartDashboard.putNumber("radpersec", rpm * RPM_TO_RADPERSEC);
-    SmartDashboard.putNumber("rpm", rpm);
-    SmartDashboard.putNumber("RPM_TO_RADPERSEC", RPM_TO_RADPERSEC);
-    SmartDashboard.putNumber("applied voltage", appliedVoltage);
-
     torque = (Math.abs(appliedVoltage) - IntakeConstants.TORQUE_CONSTANT * Math.abs(radpersec))
         * IntakeConstants.TORQUE_CONSTANT
         / IntakeConstants.RESISTANCE;
@@ -123,11 +131,15 @@ public class ClawSubsystem extends SubsystemBase {
 
   public void closeIntake() {
     updateProximitySensor();
-    objectSecuredVar = objectSecured();
+    objectSecuredVar = objectSecured() && objectInRange();
+    boolean objectBeingSecuredVar = objectBeingSecured() && objectInRange();
     if (objectSecuredVar) {
-      double holdVoltage = 0.25;
-      this.appliedVoltage = holdVoltage;
+      double holdVoltage = 0.5;
+      appliedVoltage = holdVoltage;
       intakeVoltage(holdVoltage);
+    } else if (objectBeingSecuredVar){
+      appliedVoltage = 0.5;
+      intakeVoltage(0.5);
     } else if (objectInRange()) {
       intakeVoltage(ffVoltage);
     } else {
@@ -136,19 +148,21 @@ public class ClawSubsystem extends SubsystemBase {
   }
 
   public boolean objectSecured() {
-    objectSecuredVar = getTorqueBuffer(getTorque(encoder.getVelocity(), appliedVoltage, IntakeConstants.GEAR_RATIO));
-    SmartDashboard.putNumber("Torque", getTorque(encoder.getVelocity(), appliedVoltage, IntakeConstants.GEAR_RATIO));
+    return getTorqueBuffer(getTorque(encoder.getVelocity(), appliedVoltage, IntakeConstants.GEAR_RATIO), torqueThreshold);
+  }
 
-    return objectSecuredVar;
+  public boolean objectBeingSecured() {
+    return getTorqueBuffer(getTorque(encoder.getVelocity(), appliedVoltage, IntakeConstants.GEAR_RATIO), closingTorqueThreshold);
+  }
+
+  public boolean getLimitSwitch() {
+    return limitSwitch.get();
   }
 
   public void updateObject() {
   } // Do I need to actually identify the object?
 
-  @Override
-  public void periodic() {
-    updateProximitySensor();
-    // This method will be called once per scheduler run
+  public void updateIntake(){
     SmartDashboard.putNumber("ClawPos", encoder.getPosition());
     SmartDashboard.putBoolean("Limit Switch", limitSwitch.get());
     SmartDashboard.putNumber("Lidar (from 0-2047)", colorSensor.getProximity()); // 1-10 cm range, should be good enough
@@ -160,7 +174,16 @@ public class ClawSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Green value", colorSensor.getGreen());
     SmartDashboard.putNumber("Blue value", colorSensor.getBlue());
     SmartDashboard.putNumber("applied voltage", appliedVoltage);
+    SmartDashboard.putBoolean("Limit Switch", getLimitSwitch());
+    SmartDashboard.putBoolean("Object Secured", objectSecured());
+    SmartDashboard.putNumber("Torque", getTorque(encoder.getVelocity(), appliedVoltage, IntakeConstants.GEAR_RATIO));
+  }
 
+  @Override
+  public void periodic() {
+    updateProximitySensor();
+    // This method will be called once per scheduler run
+    updateIntake();
   }
 
   @Override
