@@ -2,12 +2,14 @@ package frc.robot.util.server;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.Timer;
@@ -84,11 +86,19 @@ public class PoseEstimator {
         SendableVisionMeasurement sendableVision = null;
 
         if (visionMeas.hasTargets()) {
-            sendableVision = new SendableVisionMeasurement(0, true, visionMeas.getTagID(), visionMeas.getDistance());
-            sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);
+            // sendableVision = new SendableVisionMeasurement(0, true, visionMeas.getTagID(), visionMeas.getDistance());
+            // sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);
+            // buffer.put(visionTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(sendableOdom, sendableVision));
+            sendableVision = new SendableVisionMeasurement(0, true, new Random().nextInt(), 
+                new double[]{new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(),
+                    new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble()}
+            );
+            sendableOdom = new SendableOdomMeasurement(0, new Pose2d(new Translation2d(new Random().nextDouble(), new Random().nextDouble()), new Rotation2d(new Random().nextDouble())));
             buffer.put(visionTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(sendableOdom, sendableVision));
         } else {
-            sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);
+            // sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);
+            // buffer.put(visionTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(sendableOdom, sendableVision));
+            sendableOdom = new SendableOdomMeasurement(0, new Pose2d(new Translation2d(new Random().nextDouble(), new Random().nextDouble()), new Rotation2d(new Random().nextDouble())));
             buffer.put(visionTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(sendableOdom, sendableVision));
         }
     }
@@ -155,6 +165,7 @@ public class PoseEstimator {
                 idMap.put(currentID, key);
 
                 if (buffer.get(key).getSecond() != null) {
+                    System.out.println("Publishing vision and odometry.");
                     buffer.get(key).getFirst().setID(currentID);
                     buffer.get(key).getSecond().setMeasID(currentID);
                     ntServer.publishAll(
@@ -162,7 +173,9 @@ public class PoseEstimator {
                         buffer.get(key).getSecond()
                     );
                 } else {
+                    System.out.println("Publishing odometry.");
                     buffer.get(key).getFirst().setID(currentID);
+                    System.out.println(buffer.get(key).getFirst());
                     ntServer.publishOdometry(buffer.get(key).getFirst());
                 }
 

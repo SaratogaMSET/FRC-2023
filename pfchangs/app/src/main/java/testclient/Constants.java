@@ -1,6 +1,6 @@
 package testclient;
 
-import testclient.filter.Point;
+import org.opencv.core.Point;
 
 public class Constants {
     public static class VisionConstants {
@@ -22,14 +22,14 @@ public class Constants {
 
         public static enum Tags {
             // TODO find tag coordinates
-            ID_1(15.513558f, 1.071626f, 0.462788f),
-            ID_2(15.513558f, 2.748026f, 0.462788f),
-            ID_3(15.513558f, 4.424426f, 0.462788f),
-            ID_4(16.178784f, 6.749796f, 0.695452f),
-            ID_5(0.36195f, 6.749796f, 0.695452f),
-            ID_6(1.02743f, 4.424426f, 0.462788f),
-            ID_7(1.02743f, 2.748026f, 0.462788f),
-            ID_8(1.02743f, 1.071626f, 0.462788f);
+            ID_1(15.513558, 1.071626, 0.462788),
+            ID_2(15.513558, 2.748026, 0.462788),
+            ID_3(15.513558, 4.424426, 0.462788),
+            ID_4(16.178784, 6.749796, 0.695452),
+            ID_5(0.36195, 6.749796, 0.695452),
+            ID_6(1.02743, 4.424426, 0.462788),
+            ID_7(1.02743, 2.748026, 0.462788),
+            ID_8(1.02743, 1.071626, 0.462788);
 
             public final double x;
             public final double y;
@@ -44,7 +44,7 @@ public class Constants {
     }
 
     public static class FilterConstants {
-        public static final int NUM_PARTICLES = 5000;
+        public static final int NUM_PARTICLES = 2000;
         public static final double FNOISE = 2;
         public static final double TNOISE = 2;
         public static final double SNOISE = 2;

@@ -10,11 +10,11 @@ import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import testclient.filter.ParticleFilter;
+import testclient.filterOLD.ParticleFilterOLD;
 import testclient.wrappers.RobotData;
 
 public class FishClientNT {
-    private ParticleFilter filter = new ParticleFilter(
+    private ParticleFilterOLD filter = new ParticleFilterOLD(
         Constants.FilterConstants.NUM_PARTICLES, 
         Constants.VisionConstants.Field.TAGS, 
         Constants.VisionConstants.Field.FIELD_WIDTH, 
@@ -22,6 +22,8 @@ public class FishClientNT {
     );
 
     private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
+
+    public final NetworkTable limelightTable = inst.getTable("limelight"); // this is so scuffed aaaaaaa
 
     private final NetworkTable visionTable = inst.getTable("vision");
     private final IntegerSubscriber visionIDSub = visionTable.getIntegerTopic("id").subscribe(-1);
@@ -51,6 +53,7 @@ public class FishClientNT {
 
     public FishClientNT() {
         inst.startClient4("estimator");
+        // inst.startDSClient();
         inst.setServer("localhost"); // "localhost" for simulation - FIXME change to actual robot
         // https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html
 
@@ -94,7 +97,7 @@ public class FishClientNT {
             resetFlag = (int) resetFlagSub.get();
             if (prevFlag != resetFlag) {
                 System.out.println("REINITIALIZING FILTER!!!!!!!!!!!");
-                filter = new ParticleFilter(
+                filter = new ParticleFilterOLD(
                     Constants.FilterConstants.NUM_PARTICLES, 
                     Constants.VisionConstants.Field.TAGS, 
                     Constants.VisionConstants.Field.FIELD_WIDTH, 

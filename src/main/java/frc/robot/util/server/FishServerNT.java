@@ -1,6 +1,7 @@
 package frc.robot.util.server;
 
 import java.util.EnumSet;
+import java.util.Random;
 import java.util.function.Consumer;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -64,6 +65,7 @@ public class FishServerNT {
     }
 
     public void publishOdometry(SendableOdomMeasurement odometry) {
+        System.out.println("Publishing odometry 2.");
         odomIDPub.set(odometry.getId());
         odomXPub.set(odometry.getPose().getX());
         odomYPub.set(odometry.getPose().getY());
@@ -71,6 +73,7 @@ public class FishServerNT {
     }
 
     public void publishAll(SendableOdomMeasurement odometry, SendableVisionMeasurement vision) {
+        System.out.println("Publishing vision and odometry 2.");
         resetFlagPub.set(resetFlag);
         // "I don't trust like that!"
         if (odometry.getId() == vision.getMeasID()) {
@@ -86,6 +89,12 @@ public class FishServerNT {
         hasTargetsPub.set(vision.hasTargets());
         tagIDPub.set(vision.getTagID());
         distancePub.set(vision.getDistance());
+        // odomXPub.set(new Random().nextDouble());
+        // odomYPub.set(new Random().nextDouble());
+        // odomWPub.set(new Random().nextDouble());
+        // hasTargetsPub.set(false);
+        // tagIDPub.set(new Random().nextInt());
+        // distancePub.set(new double[]{new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble()});
     }
 
     public void addOne() {

@@ -41,6 +41,9 @@
           "open": true
         }
       },
+      "estimated": {
+        "open": true
+      },
       "odom": {
         "open": true
       },

@@ -22,4 +22,9 @@ public class SendableOdomMeasurement {
     public Pose2d getPose() {
         return pose;
     }
+
+    @Override
+    public String toString() {
+        return id + " " + pose;
+    }
 }
