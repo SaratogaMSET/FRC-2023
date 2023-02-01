@@ -1,10 +1,9 @@
 package frc.robot.TrajectoryLib.src.com.team254.lib.trajectory.io;
 
-import frc.robot.TrajectoryLib.src.com.team254.lib.trajectory.Path;
 import java.util.StringTokenizer;
-import frc.robot.TrajectoryLib.src.com.team254.lib.trajectory.Trajectory;
 
-import java.util.StringTokenizer;
+import frc.robot.TrajectoryLib.src.com.team254.lib.trajectory.Path;
+import frc.robot.TrajectoryLib.src.com.team254.lib.trajectory.Trajectory;
 
 
 //import com.sun.squawk.util.StringTokenizer;
