@@ -2,17 +2,14 @@ package frc.robot.util.server;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -62,33 +59,13 @@ public class PoseEstimator {
             drivetrain.getModuleStates() // TODO check if the order is same as 604: FL --> FR --> BL --> BR
         );
 
-        update(odomMeasurement, latestMeasurement); // FIXME, potentially
-
-        /* if (/* latestMeasurement.hasTargets() DEBUG TODO REMOVEtrue) {
-            update(odomMeasurement, latestMeasurement);
-        } else {
-            update(odomMeasurement);
-        } */
+        update(odomMeasurement, latestMeasurement);
 
         periodic();
     }
 
     private void update(SwerveOdomMeasurement odometryMeas, VisionMeasurement visionMeas) {
         double currentTime = Timer.getFPGATimestamp();
-
-        odometryMeas = new SwerveOdomMeasurement(new Rotation2d(new Random().nextDouble()), 
-            new SwerveModuleState[]{
-                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
-                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
-                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
-                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble()))
-            }
-        ); // DEBUG TODO REMOVE
-        visionMeas = new VisionMeasurement(new Random().nextBoolean(), new Random().nextDouble() * 100, // DEBUG TODO REMOVE
-        new Random().nextInt(), new Pose2d(new Translation2d(new Random().nextDouble(), new Random().nextDouble()), 
-        new Rotation2d(new Random().nextDouble())), 
-        new double[]{new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(),
-            new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble()});
 
         rawOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());
         cookedOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());
@@ -113,7 +90,6 @@ public class PoseEstimator {
     }
 
     private void computeEstimate(FilterEstimate estimate) {
-        System.out.println("Latency compensation."); // DEBUG TODO REMOVE
         currentEstimate = estimate;
 
         int estimateID = estimate.getID();
@@ -160,7 +136,6 @@ public class PoseEstimator {
                 idMap.put(currentID, key);
 
                 if (buffer.get(key).getSecond() != null) {
-                    System.out.println("Publishing vision and odometry."); // DEBUG TODO REMOVE
                     buffer.get(key).getFirst().setID(currentID);
                     buffer.get(key).getSecond().setMeasID(currentID);
                     ntServer.publishAll(
@@ -168,7 +143,6 @@ public class PoseEstimator {
                         buffer.get(key).getSecond()
                     );
                 } else {
-                    System.out.println("Publishing odometry."); // DEBUG TODO REMOVE
                     buffer.get(key).getFirst().setID(currentID);
                     System.out.println(buffer.get(key).getFirst());
                     ntServer.publishOdometry(buffer.get(key).getFirst());

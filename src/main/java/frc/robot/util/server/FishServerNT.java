@@ -64,7 +64,6 @@ public class FishServerNT {
     }
 
     public void publishOdometry(SendableOdomMeasurement odometry) {
-        System.out.println("Publishing odometry 2."); // DEBUG TODO REMOVE
         odomIDPub.set(odometry.getId());
         odomXPub.set(odometry.getPose().getX());
         odomYPub.set(odometry.getPose().getY());
@@ -72,7 +71,6 @@ public class FishServerNT {
     }
 
     public void publishAll(SendableOdomMeasurement odometry, SendableVisionMeasurement vision) {
-        System.out.println("Publishing vision and odometry 2."); // DEBUG TODO REMOVE
         resetFlagPub.set(resetFlag);
         // "I don't trust like that!"
         if (odometry.getId() == vision.getMeasID()) {
