@@ -62,11 +62,13 @@ public class PoseEstimator {
             drivetrain.getModuleStates() // TODO check if the order is same as 604: FL --> FR --> BL --> BR
         );
 
-        if (/* latestMeasurement.hasTargets() DEBUG TODO REMOVE*/true) {
+        update(odomMeasurement, latestMeasurement); // FIXME, potentially
+
+        /* if (/* latestMeasurement.hasTargets() DEBUG TODO REMOVEtrue) {
             update(odomMeasurement, latestMeasurement);
         } else {
             update(odomMeasurement);
-        }
+        } */
 
         periodic();
     }
@@ -74,15 +76,15 @@ public class PoseEstimator {
     private void update(SwerveOdomMeasurement odometryMeas, VisionMeasurement visionMeas) {
         double currentTime = Timer.getFPGATimestamp();
 
-        /* DEBUG TODO REMOVE */odometryMeas = new SwerveOdomMeasurement(new Rotation2d(new Random().nextDouble()), 
+        odometryMeas = new SwerveOdomMeasurement(new Rotation2d(new Random().nextDouble()), 
             new SwerveModuleState[]{
                 new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
                 new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
                 new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
                 new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble()))
             }
-        );
-        /* DEBUG TODO REMOVE */visionMeas = new VisionMeasurement(new Random().nextBoolean(), new Random().nextDouble() * 100, 
+        ); // DEBUG TODO REMOVE
+        visionMeas = new VisionMeasurement(new Random().nextBoolean(), new Random().nextDouble() * 100, // DEBUG TODO REMOVE
         new Random().nextInt(), new Pose2d(new Translation2d(new Random().nextDouble(), new Random().nextDouble()), 
         new Rotation2d(new Random().nextDouble())), 
         new double[]{new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(),
@@ -105,34 +107,9 @@ public class PoseEstimator {
             sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);
             buffer.put(visionTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(sendableOdom, sendableVision));
         } else {
-            // /* DEBUG TODO REMOVE */sendableVision = new SendableVisionMeasurement(0, visionMeas.hasTargets(), visionMeas.getTagID(), visionMeas.getDistance());
             sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);
             buffer.put(visionTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(sendableOdom, sendableVision));
         }
-    }
-
-    private void update(SwerveOdomMeasurement odometryMeas) {
-        double currentTime = Timer.getFPGATimestamp();
-
-        /* DEBUG TODO REMOVE */odometryMeas = new SwerveOdomMeasurement(new Rotation2d(new Random().nextDouble()), 
-            new SwerveModuleState[]{
-                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
-                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
-                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
-                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble()))
-            }
-        );
-
-        rawOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());
-        cookedOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());
-        odomMap.put(currentTime, odometryMeas);
-
-        poseMap.addSample(currentTime, rawOdometry.getPoseMeters());
-
-        buffer.put(currentTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(
-            new SendableOdomMeasurement(0, rawOdometry.getPoseMeters()),
-            null
-        ));
     }
 
     private void computeEstimate(FilterEstimate estimate) {
