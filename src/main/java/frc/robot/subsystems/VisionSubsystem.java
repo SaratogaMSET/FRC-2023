@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import org.apache.commons.collections4.map.PassiveExpiringMap.ConstantTimeToLiveExpirationPolicy;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -8,6 +10,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.wrappers.VisionMeasurement;
+import frc.robot.Constants;
 
 public class VisionSubsystem extends SubsystemBase {
     private final NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -30,9 +33,24 @@ public class VisionSubsystem extends SubsystemBase {
         return table.getEntry("tl").getDouble(-1) + 11;
     }
 
+    /* Retroreflective(NOT USEFUL) */
+
+    private double getTX(){
+        return table.getEntry("tx").getDouble(0.0);
+    }
+
+    private double getTY(){
+        return table.getEntry("ty").getDouble(0.0);
+    }
+
+    private double getDistanceFromRetro(){
+        return (Constants.VisionConstants.H2 - Constants.VisionConstants.H1) / Math.tan(Math.toRadians(Constants.VisionConstants.A1 + getTY()));
+    }
+
     private int getTagID() {
         return (int) table.getEntry("tid").getInteger(-1);
     }
+
 
     private double[] getDistances() {
         // TODO check if we can get number of tags in view, if we can, switch between this method and botpose-->all 8 tag distances
@@ -56,6 +74,22 @@ public class VisionSubsystem extends SubsystemBase {
         return distances;
     }
 
+    /* Returns [x, y, theta] */
+    public double[] getOffsetTo2DOFBase(){        
+
+        double d1 = getDistanceFromRetro();
+        double tx = getTX();
+
+        double a = Math.sin(tx) * d1;  // x val 
+        double b = Math.cos(tx) * d1;  // y val
+
+        double angle = Math.atan((a + Constants.VisionConstants.C2) / (b + Constants.VisionConstants.C1));
+
+        double[] x = {a + Constants.VisionConstants.C2, b + Constants.VisionConstants.C1, angle};
+
+        return x;
+    }
+
     public VisionMeasurement getLatestMeasurement() {
         double[] botpose = getBotPose();
         return new VisionMeasurement(
@@ -73,6 +107,7 @@ public class VisionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumberArray("Distances", getDistances());
+        SmartDashboard.putNumberArray("Pose to target(arm base)", getOffsetTo2DOFBase());
     }
 
     @Override
