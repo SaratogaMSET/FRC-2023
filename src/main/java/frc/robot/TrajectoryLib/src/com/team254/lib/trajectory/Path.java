@@ -1,7 +1,5 @@
 package frc.robot.TrajectoryLib.src.com.team254.lib.trajectory;
 
-import frc.robot.TrajectoryLib.src.com.team254.lib.trajectory.Trajectory.Segment;
-
 /**
  * Base class for an autonomous path.
  * 

@@ -20,9 +20,7 @@ import frc.robot.util.wrappers.SwerveOdomMeasurement;
 import frc.robot.util.wrappers.TimestampedSwerveOdometry;
 import frc.robot.util.wrappers.VisionMeasurement;
 
-public class PoseEstimator implements Runnable {
-    private Thread t;
-
+public class PoseEstimator {
     private final VisionSubsystem vision;
     private final DrivetrainSubsystem drivetrain;
 
@@ -61,11 +59,7 @@ public class PoseEstimator implements Runnable {
             drivetrain.getModuleStates() // TODO check if the order is same as 604: FL --> FR --> BL --> BR
         );
 
-        if (latestMeasurement.hasTargets()) {
-            update(odomMeasurement, latestMeasurement);
-        } else {
-            update(odomMeasurement);
-        }
+        update(odomMeasurement, latestMeasurement);
 
         periodic();
     }
@@ -93,21 +87,6 @@ public class PoseEstimator implements Runnable {
             sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);
             buffer.put(visionTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(sendableOdom, sendableVision));
         }
-    }
-
-    private void update(SwerveOdomMeasurement odometryMeas) {
-        double currentTime = Timer.getFPGATimestamp();
-
-        rawOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());
-        cookedOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());
-        odomMap.put(currentTime, odometryMeas);
-
-        poseMap.addSample(currentTime, rawOdometry.getPoseMeters());
-
-        buffer.put(currentTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(
-            new SendableOdomMeasurement(0, rawOdometry.getPoseMeters()),
-            null
-        ));
     }
 
     private void computeEstimate(FilterEstimate estimate) {
@@ -165,6 +144,7 @@ public class PoseEstimator implements Runnable {
                     );
                 } else {
                     buffer.get(key).getFirst().setID(currentID);
+                    System.out.println(buffer.get(key).getFirst());
                     ntServer.publishOdometry(buffer.get(key).getFirst());
                 }
 
@@ -173,18 +153,19 @@ public class PoseEstimator implements Runnable {
         }
     }
 
-    @Override
-    public void run() {
-        while (true) {
-            poseEstimatorPeriodic();
-        }
+    public void addOne() {
+        ntServer.addOne();
     }
 
     public void start() {
         System.out.println("Starting FishServer.");
-        if (t == null) {
-            t = new Thread("fishserver");
-            t.start();
-        }
+        new Thread() {
+            public void run() {
+                while (true) {
+                    poseEstimatorPeriodic();
+                }
+            }
+        }.start();
+        System.out.println("FishServer started.");
     }
 }

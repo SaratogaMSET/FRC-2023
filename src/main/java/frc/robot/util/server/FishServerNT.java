@@ -39,6 +39,10 @@ public class FishServerNT {
     private final DoubleSubscriber estimateXSub = estimateTable.getDoubleTopic("x").subscribe(-1);
     private final DoubleSubscriber estimateYSub = estimateTable.getDoubleTopic("y").subscribe(-1);
     private final DoubleSubscriber estimateWSub = estimateTable.getDoubleTopic("w").subscribe(-1);
+
+    private int resetFlag = 0;
+    private final IntegerPublisher resetFlagPub = odomTable.getIntegerTopic("flag").publish();
+
     int estimateListenerHandle;
 
     public FishServerNT(
@@ -52,7 +56,7 @@ public class FishServerNT {
                     (int) estimateIDSub.get(), // FIXME IDs might not be aligned but whatever
                     new Pose2d(
                         new Translation2d(estimateXSub.get(), estimateYSub.get()), // FIXME hopefully x and y are in meters
-                        new Rotation2d(estimateWSub.get()) // FIXME something something unit conversions hopefully not though
+                        new Rotation2d(estimateWSub.get()) // FIXME radian-degree or vice versa unit conversions hopefully not though
                     )
                 ));
             }
@@ -67,6 +71,7 @@ public class FishServerNT {
     }
 
     public void publishAll(SendableOdomMeasurement odometry, SendableVisionMeasurement vision) {
+        resetFlagPub.set(resetFlag);
         // "I don't trust like that!"
         if (odometry.getId() == vision.getMeasID()) {
             odomIDPub.set(odometry.getId());
@@ -81,5 +86,9 @@ public class FishServerNT {
         hasTargetsPub.set(vision.hasTargets());
         tagIDPub.set(vision.getTagID());
         distancePub.set(vision.getDistance());
+    }
+
+    public void addOne() {
+        ++resetFlag;
     }
 }

@@ -8,6 +8,13 @@
       "type": "java",
       "name": "Launch Main",
       "request": "launch",
+      "mainClass": "frc.robot.TrajectoryLib.src.com.team254.lib.trajectory.Main",
+      "projectName": "FRC-2023"
+    },
+    {
+      "type": "java",
+      "name": "Launch Main",
+      "request": "launch",
       "mainClass": "frc.robot.Main",
       "projectName": "FRC-2023"
     },

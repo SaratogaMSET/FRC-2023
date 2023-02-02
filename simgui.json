@@ -23,6 +23,7 @@
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Filtered Robot Position": "Field2d",
+      "/SmartDashboard/Localized robot": "Field2d",
       "/SmartDashboard/Raw Robot Position": "Field2d"
     },
     "windows": {
@@ -39,6 +40,12 @@
         "Field": {
           "open": true
         }
+      },
+      "estimated": {
+        "open": true
+      },
+      "odom": {
+        "open": true
       },
       "vision": {
         "open": true
@@ -66,7 +73,6 @@
         "open": true
       },
       "open": true
-    },
-    "visible": true
+    }
   }
 }

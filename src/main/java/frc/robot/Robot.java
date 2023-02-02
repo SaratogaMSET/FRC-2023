@@ -4,7 +4,11 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -14,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
   public static CTREConfigs ctreConfigs;
   private RobotContainer m_robotContainer;
@@ -25,6 +29,20 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    Logger.getInstance().recordMetadata("Flounder", "Flounder"); // Set a metadata value
+
+    if (isReal()) {
+        Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
+        Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+    } /* 
+    else {
+    setUseTiming(false); // Run as fast as possible
+    String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+    Logger.getInstance().setReplaySource(new WPILOGReader(logPath)); // Read replay log
+    Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+}  */
+
+    Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
     ctreConfigs = new CTREConfigs();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
@@ -49,7 +67,10 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    // FIXME add one to filter status flag
+    m_robotContainer.addOne();
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -57,6 +78,8 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    // FIXME add one to filter status flag
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -71,6 +94,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    // FIXME add one to filter status flag
+
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -86,6 +111,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    // FIXME add one to filter status flag
+
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
   }
