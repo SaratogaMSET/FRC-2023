@@ -97,8 +97,6 @@ public class PoseEstimator {
     }
 
     private void computeEstimate(FilterEstimate estimate) {
-        System.out.println("Latency compensation.");
-
         currentEstimate = estimate;
 
         int estimateID = estimate.getID();

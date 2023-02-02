@@ -18,6 +18,13 @@
             "args": ["roborio-649-frc.local", "5802"],
             "mainClass": "testclient.App",
             "projectName": "app"
+        },
+        {
+            "type": "java",
+            "name": "Launch Client",
+            "request": "launch",
+            "mainClass": "testclient.App",
+            "projectName": "app"
         }
     ]
 }

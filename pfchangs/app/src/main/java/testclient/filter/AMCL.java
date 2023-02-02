@@ -18,7 +18,6 @@ public class AMCL {
 
     private ArrayList<TagDistance> tagDistances = new ArrayList<>();
 
-    private Point3 robotPose = new Point3(); // original robot pose
     private Point3 motionDelta = new Point3(); // robot frame motion odometry <-- maybe not?
 
     private Particle[] particles;
@@ -42,8 +41,6 @@ public class AMCL {
     }
 
     public void init() {
-        robotPose = new Point3(0, 0, 0);
-
         cf = 0;
 
         Random xrd = new Random();
@@ -70,28 +67,6 @@ public class AMCL {
         useAdaptiveParticles = true;
         mclAFast = 0.1;
         vGaussX = 5;
-    }
-
-    /**
-     * DO NOT USE THIS METHOD!!!!!!
-     * @param angle
-     * @param radians Whether or not angle is in radians
-     * @return Particle's heading error w.r.t. average particle's heading
-     */
-    private double headingErr(double angle, boolean radians) {
-        // FIXME use "botpose_targetspace" LL NT key as setpoint? absolute values of particle and botpose_targetspace thetas
-        // to compute deltas instead of using robotPose because using "known robot position" is BS and stupid and such a
-        // lazy cop-out and defeats the entire point of a particle filter????????????
-        if (radians) {
-            while (angle >= 2 * Math.PI) angle -= 2 * Math.PI;
-            while (angle <= 0) angle += 2 * Math.PI;
-            return Math.exp(Math.abs(angle - robotPose.z) / 2 * mclHeadingVar * mclHeadingVar);
-        } else {
-            while (angle >= 360) angle -= 360;
-            while (angle <= 0) angle += 360;
-            double res = Math.toRadians(angle);
-            return Math.exp(Math.abs(res - robotPose.z) / 2 * mclHeadingVar * mclHeadingVar);
-        }
     }
 
     /**
@@ -129,12 +104,6 @@ public class AMCL {
         motionDelta.z = w;
 
         updateMotion();
-    }
-
-    public void updatePose(double x, double y, double w) {
-        robotPose.x = x;
-        robotPose.y = y;
-        robotPose.z = w;
     }
 
     public void setNoise(

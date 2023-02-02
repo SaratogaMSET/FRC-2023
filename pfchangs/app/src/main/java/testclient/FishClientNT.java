@@ -180,10 +180,10 @@ public class FishClientNT {
                 if (latestData.vision.hasTargets) {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     amcl.tagScanning(latestData.vision.distances);
-                    publishEstimate(latestData.odom.id, amcl.getBestEstimate().toPose2d()); // TODO check average vs. best
+                    publishEstimate(latestData.odom.id, amcl.getAverageEstimate().toPose2d());
                 } else {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
-                    publishEstimate(latestData.odom.id, amcl.getBestEstimate().toPose2d()); // TODO check average vs. best
+                    publishEstimate(latestData.odom.id, amcl.getAverageEstimate().toPose2d());
                 }
             }
         }
