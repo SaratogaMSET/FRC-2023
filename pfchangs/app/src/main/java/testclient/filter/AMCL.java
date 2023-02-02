@@ -246,7 +246,8 @@ public class AMCL {
 
                 if (useHeading && limelightTable.getEntry("tv").getInteger(0) == 1) {
                     cmpsProb = 1 / headingErr(p.w, 
-                        limelightTable.getEntry("campose").getDoubleArray(new double[6])[4],
+                        limelightTable.getEntry("campose").getDoubleArray(new double[6])[4] + 
+                            Maths.normalDistribution(0, 5),
                         false,
                         true
                     );
@@ -335,7 +336,7 @@ public class AMCL {
         meanEstimate.w = orient;
 
         if (useAdaptiveParticles) {
-            cf = (dist / nParticles) / 1;
+            cf = (dist / nParticles) / 18.38067;
             if (cf >= 0.08) nParticles = cf * Constants.FilterConstants.NUM_PARTICLES;
             else nParticles = Constants.FilterConstants.MIN_PARTICLES;
         } else {
