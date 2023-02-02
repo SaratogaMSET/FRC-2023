@@ -25,7 +25,7 @@ public class AMCL {
     private Particle meanEstimate = new Particle(0, 0, 0, 0);
 
     private double mGaussX, mGaussY, mGaussW;
-    private double vGaussX, vGaussY;
+    private double vGaussX, vGaussY, vGaussW;
 
     private double mclFieldptsVar, mclHeadingVar; // vision and heading variance
     private double mclASlow, mclAFast, mclWFast, mclWSlow; // AMCL vars
@@ -58,15 +58,16 @@ public class AMCL {
         }
 
         mclFieldptsVar = 0.3;
-        mGaussX = 2.5; // 2
-        mGaussW = 2;
+        mGaussX = 1.5; // meters, 2
+        mGaussW = 1.25; // radians, 2
         mclHeadingVar = 0.323;
-        vGaussY = 4; // 3
-        mGaussY =  2.5; // 3
+        vGaussW = 5; // degrees, 5
+        vGaussY = 0.75; // meters, 3
+        mGaussY =  1.5; // meters, 3
         mclASlow = 0.01;
         useAdaptiveParticles = true;
         mclAFast = 0.1;
-        vGaussX = 4; // 5
+        vGaussX = 0.75; // meters, 5
     }
 
     /**
@@ -222,7 +223,7 @@ public class AMCL {
                 if (useHeading && limelightTable.getEntry("tv").getInteger(0) == 1) {
                     cmpsProb = 1 / headingErr(p.w, 
                         limelightTable.getEntry("campose").getDoubleArray(new double[6])[4] + 
-                            Maths.normalDistribution(0, 5),
+                            Maths.normalDistribution(0, vGaussW),
                         false,
                         true
                     );
