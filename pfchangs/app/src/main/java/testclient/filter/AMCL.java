@@ -58,15 +58,15 @@ public class AMCL {
         }
 
         mclFieldptsVar = 0.3;
-        mGaussX = 2;
+        mGaussX = 2.5; // 2
         mGaussW = 2;
         mclHeadingVar = 0.323;
-        vGaussY = 3;
-        mGaussY =  3;
+        vGaussY = 4; // 3
+        mGaussY =  2.5; // 3
         mclASlow = 0.01;
         useAdaptiveParticles = true;
         mclAFast = 0.1;
-        vGaussX = 5;
+        vGaussX = 4; // 5
     }
 
     /**
