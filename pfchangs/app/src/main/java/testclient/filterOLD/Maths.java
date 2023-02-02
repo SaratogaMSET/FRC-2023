@@ -1,6 +1,10 @@
 package testclient.filterOLD;
 
+import java.util.Random;
+
 public class Maths {
+    private static final Random r = new Random();
+
     /**
      * @param x1
      * @param y1
@@ -20,5 +24,13 @@ public class Maths {
      */
     public static double Gaussian(double mu, double sigma, double x) {       
         return Math.exp(-(Math.pow(mu - x, 2)) / Math.pow(sigma, 2) / 2.0) / Math.sqrt(2.0 * Math.PI * Math.pow(sigma, 2));
+    }
+
+    public static double normalDistribution(Random r, double mean, double stddev) {
+        return r.nextGaussian() * stddev + mean;
+    }
+
+    public static double normalDistribution(double mean, double stddev) {
+        return r.nextGaussian() * stddev + mean;
     }
 }

@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import org.apache.commons.collections4.map.PassiveExpiringMap.ConstantTimeToLiveExpirationPolicy;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -24,7 +22,7 @@ public class VisionSubsystem extends SubsystemBase {
     private double[] getBotPose() {
         double[] pose = table.getEntry("botpose").getDoubleArray(new double[10]);
         if (pose.length > 0) return pose;
-        else return new double[8];
+        else return new double[6];
     }
 
     private int getTV() {
@@ -69,7 +67,7 @@ public class VisionSubsystem extends SubsystemBase {
         int tagID = getTagID();
         if (tagID > 0) {
             // TODO check distance calc (are we using the right values from camtran, should we even be using camtran, etc.)
-            distances[tagID -1 ] = Math.hypot(getCamTran()[0], getCamTran()[2]);
+            distances[tagID - 1] = Math.hypot(getCamTran()[0], getCamTran()[2]);
             // distances[tagID - 1] = Math.sqrt(Math.pow(getCamTran()[0], 2) + Math.pow(getCamTran()[2], 2));
         }
 
