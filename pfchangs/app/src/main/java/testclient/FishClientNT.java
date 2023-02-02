@@ -10,16 +10,20 @@ import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import testclient.filter.AMCL;
 import testclient.filterOLD.ParticleFilterOLD;
 import testclient.wrappers.RobotData;
 
 public class FishClientNT {
+    public static final boolean USE_AMCL = true;
+
     private ParticleFilterOLD filter = new ParticleFilterOLD(
         Constants.FilterConstants.NUM_PARTICLES, 
         Constants.VisionConstants.Field.TAGS, 
         Constants.VisionConstants.Field.FIELD_WIDTH, 
         Constants.VisionConstants.Field.FIELD_HEIGHT
     );
+    private AMCL amcl = new AMCL();
 
     private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
@@ -53,19 +57,24 @@ public class FishClientNT {
 
     public FishClientNT() {
         inst.startClient4("estimator");
-        inst.startDSClient();
-        // inst.setServer("localhost"); // "localhost" for simulation
+        // inst.startDSClient();
+        inst.setServer("localhost"); // "localhost" for simulation
         // https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html
-
         System.out.println("Finshed client init.");
 
-        System.out.println("Starting filter init.");
-        filter.setNoise(
-            Constants.FilterConstants.FNOISE, 
-            Constants.FilterConstants.TNOISE, 
-            Constants.FilterConstants.SNOISE
-        );
-        System.out.println("Finished filter init.");
+        if (USE_AMCL) {
+            System.out.println("Initializing AMCL.");
+            amcl.init();
+            System.out.println("Finished initializing AMCL.");
+        } else {
+            System.out.println("Starting filter init.");
+            filter.setNoise(
+                Constants.FilterConstants.FNOISE, 
+                Constants.FilterConstants.TNOISE, 
+                Constants.FilterConstants.SNOISE
+            );
+            System.out.println("Finished filter init.");
+        }
     }
 
     private RobotData readNTData() {
@@ -133,6 +142,48 @@ public class FishClientNT {
                 } else {
                     filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d());
+                }
+            }
+        }
+    }
+
+    public void startAMCL() {
+        System.out.println("Starting AMCL.");
+        while (odomIDSub.get() == -1) {} // scuffed thread blocking TODO make better
+        System.out.println("Received first measurement!");
+
+        amcl.resetMCL();
+        while (true) {
+            prevFlag = resetFlag;
+            resetFlag = (int) resetFlagSub.get();
+            if (prevFlag != resetFlag) {
+                System.out.println("REINITIALIZING FILTER!!!!!!!!!!!");
+                amcl.resetMCL();
+            }
+
+            if (odomIDSub.get() != -1) {
+                // FIXME check if deltas are field-relative or robot-relative
+                RobotData latestData = readNTData();
+                prevOdomPose = currentOdomPose; // TODO we can definitely optimize this (but do we need to?)
+                currentOdomPose = new Pose2d(
+                    latestData.odom.x, 
+                    latestData.odom.y, 
+                    new Rotation2d(latestData.odom.w)
+                );
+                poseDeltas = new Pose2d(
+                    currentOdomPose.getX() - prevOdomPose.getX(),
+                    currentOdomPose.getY() - prevOdomPose.getY(),
+                    currentOdomPose.getRotation().minus(prevOdomPose.getRotation())
+                );
+
+                // TODO check if poseDeltas are robot-relative or field-relative
+                if (latestData.vision.hasTargets) {
+                    amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
+                    amcl.tagScanning(latestData.vision.distances);
+                    publishEstimate(latestData.odom.id, amcl.getBestEstimate().toPose2d()); // TODO check average vs. best
+                } else {
+                    amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
+                    publishEstimate(latestData.odom.id, amcl.getBestEstimate().toPose2d()); // TODO check average vs. best
                 }
             }
         }

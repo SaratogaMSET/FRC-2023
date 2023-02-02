@@ -18,12 +18,12 @@ public class AMCL {
 
     private ArrayList<TagDistance> tagDistances = new ArrayList<>();
 
-    private Point3 robotPose; // original robot pose
-    private Point3 motionDelta; // robot frame motion odometry <-- maybe not?
+    private Point3 robotPose = new Point3(); // original robot pose
+    private Point3 motionDelta = new Point3(); // robot frame motion odometry <-- maybe not?
 
     private Particle[] particles;
-    private Particle bestEstimate;
-    private Particle meanEstimate;
+    private Particle bestEstimate = new Particle(0, 0, 0, 0);
+    private Particle meanEstimate = new Particle(0, 0, 0, 0);
 
     private double mGaussX, mGaussY, mGaussW;
     private double vGaussX, vGaussY;
@@ -52,11 +52,12 @@ public class AMCL {
         
         nParticles = Constants.FilterConstants.NUM_PARTICLES;
         particles = new Particle[(int) nParticles];
-        for (Particle p : particles) {
-            p.x = xrd.nextDouble() * Constants.VisionConstants.Field.FIELD_WIDTH;
-            p.y = yrd.nextDouble() * Constants.VisionConstants.Field.FIELD_HEIGHT;
-            p.w = wrd.nextDouble() * Math.PI * 2;
-            p.weight = 1 / nParticles;
+        for (int i = 0; i < nParticles; ++i) {
+            particles[i] = new Particle(0, 0, 0, 0);
+            particles[i].x = xrd.nextDouble() * Constants.VisionConstants.Field.FIELD_WIDTH;
+            particles[i].y = yrd.nextDouble() * Constants.VisionConstants.Field.FIELD_HEIGHT;
+            particles[i].w = wrd.nextDouble() * Math.PI * 2;
+            particles[i].weight = 1 / nParticles;
         }
 
         mclFieldptsVar = 0.3;
@@ -117,6 +118,11 @@ public class AMCL {
         return Math.exp(Math.abs(angle - setpoint) / 2 * mclHeadingVar * mclHeadingVar);
     }
 
+    /**
+     * @param x Robot-relative x translation
+     * @param y Robot-relative y translation
+     * @param w Rotation in radians
+     */
     public void updateOdometry(double x, double y, double w) {
         motionDelta.x = x;
         motionDelta.y = y;
@@ -165,11 +171,13 @@ public class AMCL {
         Random wrd = new Random();
         
         nParticles = Constants.FilterConstants.NUM_PARTICLES;
-        for (Particle p : particles) {
-            p.x = xrd.nextDouble() * Constants.VisionConstants.Field.FIELD_WIDTH;
-            p.y = yrd.nextDouble() * Constants.VisionConstants.Field.FIELD_HEIGHT;
-            p.w = wrd.nextDouble() * Math.PI * 2;
-            p.weight = 1 / nParticles;
+        particles = new Particle[(int) nParticles];
+        for (int i = 0; i < nParticles; ++i) {
+            particles[i] = new Particle(0, 0, 0, 0);
+            particles[i].x = xrd.nextDouble() * Constants.VisionConstants.Field.FIELD_WIDTH;
+            particles[i].y = yrd.nextDouble() * Constants.VisionConstants.Field.FIELD_HEIGHT;
+            particles[i].w = wrd.nextDouble() * Math.PI * 2;
+            particles[i].weight = 1 / nParticles;
         }
     }
 
@@ -226,10 +234,12 @@ public class AMCL {
                 resetParticles = false;
 
                 for (var d : tagDistances) {
-                    double tagDist = d.distance + Maths.normalDistribution(0, Math.hypot(vGaussX, vGaussY));
-                    double particleDistance = Math.hypot(p.x - d.x, p.y - d.y);
-                    double distanceDiff = Math.abs(particleDistance - tagDist);
-                    prob *= Math.exp((-distanceDiff * distanceDiff) / (2 * mclFieldptsVar * mclFieldptsVar));
+                    if (d.distance > 0) {
+                        double tagDist = d.distance + Maths.normalDistribution(0, Math.hypot(vGaussX, vGaussY));
+                        double particleDistance = Math.hypot(p.x - d.x, p.y - d.y);
+                        double distanceDiff = Math.abs(particleDistance - tagDist);
+                        prob *= Math.exp((-distanceDiff * distanceDiff) / (2 * mclFieldptsVar * mclFieldptsVar));
+                    }
                 }
 
                 p.weight = prob;
