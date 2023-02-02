@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.Timer;
+import frc.lib.logging.LoggablePose;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.util.wrappers.FilterEstimate;
@@ -39,6 +40,8 @@ public class PoseEstimator {
 
     private FishServerNT ntServer = new FishServerNT(this::computeEstimate);
 
+    private LoggablePose logPose;
+
     public PoseEstimator(
         VisionSubsystem vision,
         DrivetrainSubsystem drivetrain,
@@ -50,6 +53,8 @@ public class PoseEstimator {
         this.drivetrain = drivetrain;
         rawOdometry = new TimestampedSwerveOdometry(kinematics, initGyroAngle, prior);
         cookedOdometry = new TimestampedSwerveOdometry(kinematics, initGyroAngle, prior);
+
+        logPose = new LoggablePose("/Localizer/Pose", cookedOdometry.getPoseMeters(), true);
     }
 
     private void poseEstimatorPeriodic() {
@@ -62,6 +67,8 @@ public class PoseEstimator {
         update(odomMeasurement, latestMeasurement);
 
         periodic();
+
+        logPose.set(getPose());
     }
 
     private void update(SwerveOdomMeasurement odometryMeas, VisionMeasurement visionMeas) {
@@ -160,7 +167,7 @@ public class PoseEstimator {
 
     public void start() {
         System.out.println("Starting FishServer.");
-        new Thread() {
+        new Thread("FishServer") {
             public void run() {
                 while (true) {
                     poseEstimatorPeriodic();

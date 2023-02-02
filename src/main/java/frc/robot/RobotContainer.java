@@ -84,7 +84,7 @@ public class RobotContainer {
 
     SmartDashboard.putData("Localized robot", field);
 
-    new Thread() {
+    new Thread("Field2D Updater") {
       public void run() {
         while (true) {
           field.setRobotPose(localizer.getPose());
