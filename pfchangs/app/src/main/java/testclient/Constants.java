@@ -21,7 +21,6 @@ public class Constants {
         }
 
         public static enum Tags {
-            // TODO find tag coordinates
             ID_1(15.513558, 1.071626, 0.462788),
             ID_2(15.513558, 2.748026, 0.462788),
             ID_3(15.513558, 4.424426, 0.462788),

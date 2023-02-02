@@ -54,7 +54,7 @@ public class FishClientNT {
     public FishClientNT() {
         inst.startClient4("estimator");
         inst.startDSClient();
-        // inst.setServer("localhost"); // "localhost" for simulation - FIXME change to actual robot
+        // inst.setServer("localhost"); // "localhost" for simulation
         // https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html
 
         System.out.println("Finshed client init.");
