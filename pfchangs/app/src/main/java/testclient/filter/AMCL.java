@@ -78,7 +78,7 @@ public class AMCL {
      * @param radians Whether or not angle is in radians
      * @return Particle's heading error w.r.t. average particle's heading
      */
-    public double headingErr(double angle, boolean radians) {
+    private double headingErr(double angle, boolean radians) {
         // FIXME use "botpose_targetspace" LL NT key as setpoint? absolute values of particle and botpose_targetspace thetas
         // to compute deltas instead of using robotPose because using "known robot position" is BS and stupid and such a
         // lazy cop-out and defeats the entire point of a particle filter????????????
@@ -101,7 +101,7 @@ public class AMCL {
      * @param setpointIsRadians Whether or not <code>setpoint</code> is in radians
      * @return
      */
-    public double headingErr(double angle, double setpoint, boolean angleIsRadians, boolean setpointIsRadians) {
+    private double headingErr(double angle, double setpoint, boolean angleIsRadians, boolean setpointIsRadians) {
         if (!angleIsRadians) {
             angle = Math.toRadians(angle);
         }
@@ -275,7 +275,7 @@ public class AMCL {
         Random random = new Random();
         double resetProb = Math.max(0, 1 - (mclWFast / mclWSlow));
         double r = random.nextDouble() * (1 / nParticles);
-        double c = particles[0].w;
+        double c = particles[0].weight;
         bestEstimate = particles[0];
         int id = 0;
 
@@ -345,10 +345,33 @@ public class AMCL {
     }
 
     public Particle getBestEstimate() {
+        bestEstimate = particles[0];
+
+        for (int j = 0; j < nParticles; ++j) {
+            if (particles[j].weight > bestEstimate.weight) {
+                bestEstimate = particles[j];
+            }
+
+        }
+
         return bestEstimate;
     }
 
     public Particle getAverageEstimate() {
+        meanEstimate = new Particle(0, 0, 0, 0);
+
+        double meanX = 0, meanY = 0, meanW = 0;
+        for (var p : particles) {
+            meanX += p.x;
+            meanY += p.y;
+            meanW += p.w;
+        }
+
+        meanEstimate.x = meanX / particles.length;
+        meanEstimate.y = meanY / particles.length;
+        meanEstimate.w = meanW / particles.length;
+        meanEstimate.weight = 1 / particles.length;
+
         return meanEstimate;
     }
 }
