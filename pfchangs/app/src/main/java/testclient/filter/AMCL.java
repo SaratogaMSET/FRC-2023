@@ -169,6 +169,12 @@ public class AMCL {
 
             while (p.w >= Math.PI * 2) p.w -= Math.PI * 2;
             while (p.w < 0) p.w += Math.PI * 2;
+
+            if (p.x > Constants.VisionConstants.Field.FIELD_WIDTH) p.x = Constants.VisionConstants.Field.FIELD_WIDTH;
+            else if (p.x < 0) p.x = 0;
+
+            if (p.y > Constants.VisionConstants.Field.FIELD_HEIGHT) p.y = Constants.VisionConstants.Field.FIELD_HEIGHT;
+            else if (p.y < 0) p.y = 0;
         }
     }
 
@@ -306,7 +312,7 @@ public class AMCL {
 
         if (useAdaptiveParticles) {
             cf = (dist / nParticles) / 18.38067;
-            if (cf >= 0.08) nParticles = cf * Constants.FilterConstants.NUM_PARTICLES;
+            if (cf >= 0.04) nParticles = cf * Constants.FilterConstants.NUM_PARTICLES;
             else nParticles = Constants.FilterConstants.MIN_PARTICLES;
         } else {
             nParticles = Constants.FilterConstants.NUM_PARTICLES;
