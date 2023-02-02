@@ -19,7 +19,9 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     private double[] getBotPose() {
-        return table.getEntry("botpose").getDoubleArray(new double[10]);
+        double[] pose = table.getEntry("botpose").getDoubleArray(new double[10]);
+        if (pose.length > 0) return pose;
+        else return new double[8];
     }
 
     private int getTV() {

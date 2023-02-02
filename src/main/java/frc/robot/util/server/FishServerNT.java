@@ -48,12 +48,12 @@ public class FishServerNT {
     public FishServerNT(
         Consumer<FilterEstimate> estimateListener
     ) {
-        estimateListenerHandle = inst.addListener( // FIXME pls work
+        estimateListenerHandle = inst.addListener(
             estimateIDSub, 
             EnumSet.of(NetworkTableEvent.Kind.kValueAll),
             event -> {
                 estimateListener.accept(new FilterEstimate(
-                    (int) estimateIDSub.get(), // FIXME IDs might not be aligned but whatever
+                    (int) estimateIDSub.get(),
                     new Pose2d(
                         new Translation2d(estimateXSub.get(), estimateYSub.get()), // FIXME hopefully x and y are in meters
                         new Rotation2d(estimateWSub.get()) // FIXME radian-degree or vice versa unit conversions hopefully not though

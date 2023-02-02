@@ -47,6 +47,8 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+
+    m_robotContainer.addOne();
   }
 
   /**
@@ -68,7 +70,6 @@ public class Robot extends LoggedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    // FIXME add one to filter status flag
     m_robotContainer.addOne();
   }
 
@@ -78,7 +79,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    // FIXME add one to filter status flag
+    m_robotContainer.addOne();
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -94,7 +95,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
-    // FIXME add one to filter status flag
+    m_robotContainer.addOne();
 
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
@@ -111,7 +112,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void testInit() {
-    // FIXME add one to filter status flag
+    m_robotContainer.addOne();
 
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();

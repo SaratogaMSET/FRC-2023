@@ -205,5 +205,7 @@ public class AMCL {
      * Our equivalent of LineScanning():
      * Get the IDs of all visible tags
      * The end result: push_back all visible tags x, y, and distance into tagDistances
+     * Or maybe create a new arraylist, then assign that to tagDistances at the end of the method?
      */
+    
 }

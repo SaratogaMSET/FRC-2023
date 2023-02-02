@@ -25,8 +25,8 @@ public class PoseEstimator {
     private final DrivetrainSubsystem drivetrain;
 
     private int currentID = 0;
-    private HashMap<Integer, Double> idMap = new HashMap<>(); // Convert measurement IDs to timestamps
-    private ConcurrentSkipListMap<Double, SwerveOdomMeasurement> odomMap = new ConcurrentSkipListMap<>(); // FIXME potentially: see 604's code
+    private HashMap<Integer, Double> idMap = new HashMap<>();
+    private ConcurrentSkipListMap<Double, SwerveOdomMeasurement> odomMap = new ConcurrentSkipListMap<>();
     private TimeInterpolatableBuffer<Pose2d> poseMap = TimeInterpolatableBuffer.createBuffer(10);
     private TreeMap<Double, Pair<SendableOdomMeasurement, SendableVisionMeasurement>> buffer = new TreeMap<>();
 
@@ -54,9 +54,9 @@ public class PoseEstimator {
 
     private void poseEstimatorPeriodic() {
         VisionMeasurement latestMeasurement = vision.getLatestMeasurement();
-        SwerveOdomMeasurement odomMeasurement = new SwerveOdomMeasurement( // potential FIXME pending DT finalization
+        SwerveOdomMeasurement odomMeasurement = new SwerveOdomMeasurement(
             drivetrain.getRotation2d(), 
-            drivetrain.getModuleStates() // TODO check if the order is same as 604: FL --> FR --> BL --> BR
+            drivetrain.getModuleStates()
         );
 
         update(odomMeasurement, latestMeasurement);
@@ -90,6 +90,8 @@ public class PoseEstimator {
     }
 
     private void computeEstimate(FilterEstimate estimate) {
+        System.out.println("Latency compensation.");
+
         currentEstimate = estimate;
 
         int estimateID = estimate.getID();
@@ -144,7 +146,6 @@ public class PoseEstimator {
                     );
                 } else {
                     buffer.get(key).getFirst().setID(currentID);
-                    System.out.println(buffer.get(key).getFirst());
                     ntServer.publishOdometry(buffer.get(key).getFirst());
                 }
 
