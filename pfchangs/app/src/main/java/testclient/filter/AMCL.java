@@ -61,7 +61,7 @@ public class AMCL {
         mGaussX = 1.5; // meters, 2
         mGaussW = 1.25; // radians, 2
         mclHeadingVar = 0.323;
-        vGaussW = 5; // degrees, 5
+        vGaussW = 15; // degrees, 5
         vGaussY = 0.75; // meters, 3
         mGaussY =  1.5; // meters, 3
         mclASlow = 0.01;
