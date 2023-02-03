@@ -182,7 +182,7 @@ public class FishClientNT {
 
                 if (latestData.vision.hasTargets) {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
-                    amcl.tagScanning(latestData.vision.distances, latestData.vision.campose);
+                    amcl.tagScanning(latestData.vision.hasTargets, latestData.vision.tagID, latestData.vision.distances, latestData.vision.campose);
                     publishEstimate(latestData.odom.id, amcl.getAverageEstimate().toPose2d());
                     amcl.outputNParticles();
                 } else {
