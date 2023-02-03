@@ -180,7 +180,7 @@ public class AMCL {
         }
     }
 
-    public void tagScanning(double[] dists) {
+    public void tagScanning(double[] dists, double[] campose) {
         TagDistance[] distances = new TagDistance[8];
 
         assert dists.length == 8;
@@ -195,10 +195,10 @@ public class AMCL {
 
         tagDistances = (ArrayList<TagDistance>) Arrays.asList(distances);
 
-        updatePerceptionPoints();
+        updatePerceptionPoints(campose);
     }
 
-    private void updatePerceptionPoints() {
+    private void updatePerceptionPoints(double[] campose) {
         int numPoints = tagDistances.size();
         double sumWeight = 0;
         double wAvg = 0;
@@ -224,9 +224,10 @@ public class AMCL {
                 if (useHeading && limelightTable.getEntry("tv").getInteger(0) == 1) {
                     // FIXME - the heading of the particle != the heading given by campose
                     // Use quaternion rotations of tags to normalize particle headings?
+                    // campose rotation + tag rotation
                     cmpsProb = 1 / headingErr(p.w, 
                         // FIXME - don't forget about LL --> DS latency. Send thru server NT interface instead
-                        limelightTable.getEntry("campose").getDoubleArray(new double[6])[4] + 
+                        campose[2] + 
                             Maths.normalDistribution(0, vGaussW),
                         false,
                         true

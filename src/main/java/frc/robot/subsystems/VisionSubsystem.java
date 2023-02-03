@@ -16,7 +16,9 @@ public class VisionSubsystem extends SubsystemBase {
     public VisionSubsystem() {}
 
     private double[] getCamTran() {
-        return table.getEntry("campose").getDoubleArray(new double[10]);
+        double[] pose = table.getEntry("campose").getDoubleArray(new double[10]);
+        if (pose.length > 0) return pose;
+        else return new double[6];
     }
 
     private double[] getBotPose() {
@@ -92,6 +94,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     public VisionMeasurement getLatestMeasurement() {
         double[] botpose = getBotPose();
+        double[] campose = getCamTran();
         return new VisionMeasurement(
             getTV() != 0,
             getLatency(),
@@ -99,6 +102,10 @@ public class VisionSubsystem extends SubsystemBase {
             new Pose2d(
                 new Translation2d(botpose[0], botpose[2]),
                 new Rotation2d(botpose[5])
+            ),
+            new Pose2d(
+                new Translation2d(campose[0], campose[2]),
+                new Rotation2d(campose[5])
             ),
             getDistances()
         );

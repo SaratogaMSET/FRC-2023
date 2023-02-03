@@ -27,6 +27,7 @@ public class FishServerNT {
     private final BooleanPublisher hasTargetsPub = visionTable.getBooleanTopic("hasTargets").publish();
     private final IntegerPublisher tagIDPub = visionTable.getIntegerTopic("tagID").publish();
     private final DoubleArrayPublisher distancePub = visionTable.getDoubleArrayTopic("distances").publish();
+    private final DoubleArrayPublisher camposePub = visionTable.getDoubleArrayTopic("campose").publish();
 
     private final NetworkTable odomTable = inst.getTable("odom");
     private final IntegerPublisher odomIDPub = odomTable.getIntegerTopic("id").publish();
@@ -86,6 +87,7 @@ public class FishServerNT {
         hasTargetsPub.set(vision.hasTargets());
         tagIDPub.set(vision.getTagID());
         distancePub.set(vision.getDistance());
+        camposePub.set(vision.getCamPose());
     }
 
     public void addOne() {
