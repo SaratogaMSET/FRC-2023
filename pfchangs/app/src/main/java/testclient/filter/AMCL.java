@@ -38,7 +38,7 @@ public class AMCL {
     private boolean useHeading;
 
     public AMCL() {
-        useHeading = true;
+        useHeading = false;
     }
 
     public void init() {
@@ -222,7 +222,10 @@ public class AMCL {
                 p.weight = prob;
 
                 if (useHeading && limelightTable.getEntry("tv").getInteger(0) == 1) {
+                    // FIXME - the heading of the particle != the heading given by campose
+                    // Use quaternion rotations of tags to normalize particle headings?
                     cmpsProb = 1 / headingErr(p.w, 
+                        // FIXME - don't forget about LL --> DS latency. Send thru server NT interface instead
                         limelightTable.getEntry("campose").getDoubleArray(new double[6])[4] + 
                             Maths.normalDistribution(0, vGaussW),
                         false,
