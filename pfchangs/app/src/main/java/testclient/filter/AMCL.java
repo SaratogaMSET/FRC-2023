@@ -8,6 +8,7 @@ import org.opencv.core.Point3;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import testclient.Constants;
 import testclient.filterOLD.Maths;
 import testclient.wrappers.TagDistance;
@@ -58,16 +59,16 @@ public class AMCL {
         }
 
         mclFieldptsVar = 0.3;
-        mGaussX = 1.5; // meters, 2
-        mGaussW = 1.25; // radians, 2
+        mGaussX = 0.25; // meters, 2
+        mGaussW = 0.25; // radians, 2
         mclHeadingVar = 0.323;
-        vGaussW = 15; // degrees, 5
-        vGaussY = 0.75; // meters, 3
-        mGaussY =  1.5; // meters, 3
+        vGaussW = 10; // degrees, 5
+        vGaussY = 0.1; // meters, 3
+        mGaussY =  0.25; // meters, 3
         mclASlow = 0.01;
         useAdaptiveParticles = true;
         mclAFast = 0.1;
-        vGaussX = 0.75; // meters, 5
+        vGaussX = 0.1; // meters, 5
     }
 
     /**
@@ -349,5 +350,9 @@ public class AMCL {
         meanEstimate.weight = 1 / particles.length;
 
         return meanEstimate;
+    }
+
+    public void outputNParticles() {
+        SmartDashboard.putNumber("Number of particles", nParticles);
     }
 }
