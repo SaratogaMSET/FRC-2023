@@ -77,21 +77,6 @@ public class PoseEstimator {
     private void update(SwerveOdomMeasurement odometryMeas, VisionMeasurement visionMeas) {
         double currentTime = Timer.getFPGATimestamp();
 
-        odometryMeas = new SwerveOdomMeasurement(new Rotation2d(new Random().nextDouble()), 
-            new SwerveModuleState[]{
-                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
-                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
-                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
-                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble()))
-            }
-        ); // DEBUG TODO REMOVE
-        visionMeas = new VisionMeasurement(new Random().nextBoolean(), new Random().nextDouble() * 100, // DEBUG TODO REMOVE
-        new Random().nextInt(), new Pose2d(new Translation2d(new Random().nextDouble(), new Random().nextDouble()), 
-        new Rotation2d(new Random().nextDouble())), 
-        new Pose2d(new Translation2d(new Random().nextDouble(), new Random().nextDouble()), new Rotation2d(new Random().nextDouble())), 
-        new double[]{new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(),
-            new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble()});
-
         rawOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());
         cookedOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());
         odomMap.put(currentTime, odometryMeas);
