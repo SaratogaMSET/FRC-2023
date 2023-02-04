@@ -33,7 +33,10 @@ public class FishClientNT {
     private final IntegerSubscriber visionIDSub = visionTable.getIntegerTopic("id").subscribe(-1);
     private final BooleanSubscriber hasTargetsSub = visionTable.getBooleanTopic("hasTargets").subscribe(false);
     private final IntegerSubscriber tagIDSub = visionTable.getIntegerTopic("tagID").subscribe(-1);
-    private final DoubleArraySubscriber distanceSub = visionTable.getDoubleArrayTopic("distances").subscribe(new double[]{-1, -1, -1, -1, -1, -1, -1, -1});
+    private final DoubleArraySubscriber distanceSub = visionTable.getDoubleArrayTopic("distances").subscribe(
+        new double[]{-1, -1, -1, -1, -1, -1, -1, -1});
+    private final DoubleArraySubscriber camposeSub = visionTable.getDoubleArrayTopic("campose").subscribe(
+        new double[3]);
 
     private final NetworkTable odomTable = inst.getTable("odom");
     private final IntegerSubscriber odomIDSub = odomTable.getIntegerTopic("id").subscribe(-1);
@@ -83,6 +86,7 @@ public class FishClientNT {
             hasTargetsSub.get(), 
             (int) tagIDSub.get(), 
             distanceSub.get(), 
+            camposeSub.get(),
             (int) odomIDSub.get(),
             odomXSub.get(),
             odomYSub.get(),
@@ -164,7 +168,7 @@ public class FishClientNT {
             if (odomIDSub.get() != -1) {
                 // FIXME check if deltas are field-relative or robot-relative
                 RobotData latestData = readNTData();
-                prevOdomPose = currentOdomPose; // TODO we can definitely optimize this (but do we need to?)
+                prevOdomPose = currentOdomPose;
                 currentOdomPose = new Pose2d(
                     latestData.odom.x, 
                     latestData.odom.y, 
@@ -176,10 +180,9 @@ public class FishClientNT {
                     currentOdomPose.getRotation().minus(prevOdomPose.getRotation())
                 );
 
-                // TODO check if poseDeltas are robot-relative or field-relative
                 if (latestData.vision.hasTargets) {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
-                    amcl.tagScanning(latestData.vision.distances);
+                    amcl.tagScanning(latestData.vision.hasTargets, latestData.vision.tagID, latestData.vision.distances, latestData.vision.campose);
                     publishEstimate(latestData.odom.id, amcl.getAverageEstimate().toPose2d());
                     amcl.outputNParticles();
                 } else {

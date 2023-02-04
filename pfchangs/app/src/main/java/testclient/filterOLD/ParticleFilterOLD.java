@@ -2,14 +2,14 @@ package testclient.filterOLD;
 
 import java.util.Random;
 
-import org.opencv.core.Point;
+import org.opencv.core.Point3;
 
 public class ParticleFilterOLD {
     ParticleOLD[] particles;
     int numParticles = 0;
     Random gen = new Random();
 
-    public ParticleFilterOLD(int numParticles, Point[] landmarks, double width, double height) {
+    public ParticleFilterOLD(int numParticles, Point3[] landmarks, double width, double height) {
         this.numParticles = numParticles;
 
         particles = new ParticleOLD[numParticles];

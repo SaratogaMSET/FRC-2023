@@ -5,12 +5,14 @@ public class SendableVisionMeasurement {
     private boolean hasTargets;
     private int tagID;
     private double[] distance;
+    private double[] campose;
 
-    public SendableVisionMeasurement(int measID, boolean hasTargets, int tagID, double[] distance) {
+    public SendableVisionMeasurement(int measID, boolean hasTargets, int tagID, double[] distance, double[] campose) {
         this.measID = measID;
         this.hasTargets = hasTargets;
         this.tagID = tagID;
         this.distance = distance;
+        this.campose = campose;
     }
 
     public void setMeasID(int id) {
@@ -33,4 +35,7 @@ public class SendableVisionMeasurement {
         return distance;
     }
 
+    public double[] getCamPose() {
+        return campose;
+    }
 }

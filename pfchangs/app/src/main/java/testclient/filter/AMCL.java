@@ -10,7 +10,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import testclient.Constants;
-import testclient.filterOLD.Maths;
+import testclient.Maths;
 import testclient.wrappers.TagDistance;
 
 // FIXME check if EVERYTHING (besides LL campose/botpose) is in radians
@@ -66,7 +66,7 @@ public class AMCL {
         vGaussY = 0.1; // meters, 3
         mGaussY =  0.25; // meters, 3
         mclASlow = 0.01;
-        useAdaptiveParticles = true;
+        useAdaptiveParticles = false;
         mclAFast = 0.1;
         vGaussX = 0.1; // meters, 5
     }
@@ -180,7 +180,7 @@ public class AMCL {
         }
     }
 
-    public void tagScanning(double[] dists) {
+    public void tagScanning(boolean hasTargets, int id, double[] dists, double[] campose) {
         TagDistance[] distances = new TagDistance[8];
 
         assert dists.length == 8;
@@ -193,12 +193,12 @@ public class AMCL {
             );
         }
 
-        tagDistances = (ArrayList<TagDistance>) Arrays.asList(distances);
+        tagDistances = new ArrayList<>(Arrays.asList(distances));
 
-        updatePerceptionPoints();
+        updatePerceptionPoints(hasTargets, id, campose);
     }
 
-    private void updatePerceptionPoints() {
+    private void updatePerceptionPoints(boolean hasTargets, int id, double[] campose) {
         int numPoints = tagDistances.size();
         double sumWeight = 0;
         double wAvg = 0;
@@ -223,9 +223,9 @@ public class AMCL {
 
                 if (useHeading && limelightTable.getEntry("tv").getInteger(0) == 1) {
                     cmpsProb = 1 / headingErr(p.w, 
-                        limelightTable.getEntry("campose").getDoubleArray(new double[6])[4] + 
+                        Math.toRadians((campose[2] + Constants.VisionConstants.Field.TAGS[id].z) % 360)  +
                             Maths.normalDistribution(0, vGaussW),
-                        false,
+                        true,
                         true
                     );
                     p.weight *= cmpsProb;
@@ -285,7 +285,7 @@ public class AMCL {
             }
         }
 
-        particles = (Particle[]) newParticles.toArray();
+        particles = newParticles.toArray(new Particle[1]);
 
         double dist = 0;
         double xBest = bestEstimate.x;
@@ -314,7 +314,7 @@ public class AMCL {
 
         if (useAdaptiveParticles) {
             cf = (dist / nParticles) / 18.38067;
-            if (cf >= 0.04) nParticles = cf * Constants.FilterConstants.NUM_PARTICLES;
+            if (cf >= 0.0004) nParticles = cf * Constants.FilterConstants.NUM_PARTICLES;
             else nParticles = Constants.FilterConstants.MIN_PARTICLES;
         } else {
             nParticles = Constants.FilterConstants.NUM_PARTICLES;

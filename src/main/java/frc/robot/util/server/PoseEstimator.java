@@ -87,7 +87,13 @@ public class PoseEstimator {
         SendableVisionMeasurement sendableVision = null;
 
         if (visionMeas.hasTargets()) {
-            sendableVision = new SendableVisionMeasurement(0, true, visionMeas.getTagID(), visionMeas.getDistance());
+            sendableVision = new SendableVisionMeasurement(
+                0,
+                true,
+                visionMeas.getTagID(),
+                visionMeas.getDistance(),
+                new double[]{visionMeas.getCampose().getX(), visionMeas.getCampose().getY(), visionMeas.getCampose().getRotation().getRadians()}
+            );
             sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);
             buffer.put(visionTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(sendableOdom, sendableVision));
         } else {
