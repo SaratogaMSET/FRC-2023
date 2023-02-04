@@ -264,7 +264,6 @@ public class AMCL {
         for (int j = 0; j < Constants.FilterConstants.NUM_PARTICLES; ++j) {
             double rand = Math.random();
             if (rand < resetProb || resetParticles) {
-                System.out.println("aslkdfjads;lkfj");
                 resetParticles = false;
                 newParticles.add(new Particle(
                     Math.random() * Constants.VisionConstants.Field.FIELD_WIDTH, 
@@ -273,26 +272,9 @@ public class AMCL {
                     1 / Constants.FilterConstants.NUM_PARTICLES
                 ));
             } else {
-                // System.out.println("aslkdfjads;lkfj 2");
-                /* double U = r + ((double) j / Constants.FilterConstants.NUM_PARTICLES);
-                while (U > c && id < Constants.FilterConstants.NUM_PARTICLES) {
-                    id += 1;
-                    if (id >= particles.length) break;
-                    System.out.println(particles[id].weight);
-                    c += particles[id].weight;
-                }
-                if (id >= Constants.FilterConstants.NUM_PARTICLES) break;
-                if (id < particles.length) {
-                    if (particles[id].weight > bestEstimate.weight) {
-                        bestEstimate = particles[id];
-                    }
-
-                    newParticles.add(particles[id]);
-                } */
                 double U = r + ((double) j / Constants.FilterConstants.NUM_PARTICLES);
                 while (U > c) {
                     id += 1;
-                    System.out.println(particles[id].weight);
                     c += particles[id].weight;
                 }
                 if (particles[id].weight > bestEstimate.weight) {
@@ -329,14 +311,6 @@ public class AMCL {
         meanEstimate.x = meanX;
         meanEstimate.y = meanY;
         meanEstimate.w = orient;
-
-        /* if (useAdaptiveParticles) {
-            cf = (dist / Constants.FilterConstants.NUM_PARTICLES) / 18.38067;
-            if (cf >= 0.0004) Constants.FilterConstants.NUM_PARTICLES = (int) (cf * Constants.FilterConstants.NUM_PARTICLES);
-            else Constants.FilterConstants.NUM_PARTICLES = Constants.FilterConstants.MIN_PARTICLES;
-        } else {
-            Constants.FilterConstants.NUM_PARTICLES = Constants.FilterConstants.NUM_PARTICLES;
-        } */
     }
 
     public Particle getBestEstimate() {

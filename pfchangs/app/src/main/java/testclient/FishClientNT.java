@@ -15,7 +15,7 @@ import testclient.filterOLD.ParticleFilterOLD;
 import testclient.wrappers.RobotData;
 
 public class FishClientNT {
-    public static final boolean USE_AMCL = true;
+    public static final boolean USE_AMCL = false;
 
     private ParticleFilterOLD filter = new ParticleFilterOLD(
         Constants.FilterConstants.NUM_PARTICLES, 
@@ -141,12 +141,10 @@ public class FishClientNT {
                 );
     
                 if (latestData.vision.hasTargets) {
-                    System.out.println("Visioning");
                     filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     filter.resample(latestData.vision.distances);
                     publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d());
                 } else {
-                    System.out.println("Not visioning");
                     filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d());
                 }
@@ -184,12 +182,10 @@ public class FishClientNT {
                 );
 
                 if (latestData.vision.hasTargets) {
-                    System.out.println("Visioning");
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     amcl.tagScanning(latestData.vision.hasTargets, latestData.vision.tagID, latestData.vision.distances, latestData.vision.campose);
                     publishEstimate(latestData.odom.id, amcl.getAverageEstimate().toPose2d());
                 } else {
-                    System.out.println("Not visioning");
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     publishEstimate(latestData.odom.id, amcl.getAverageEstimate().toPose2d());
                 }
