@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -72,6 +75,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        Logger.getInstance().recordOutput("Smart Targeting X", Math.hypot(getCamTran()[0], getCamTran()[2])); //get X stuff for verification
         SmartDashboard.putNumberArray("Distances", getDistances());
     }
 
