@@ -5,13 +5,14 @@ import java.util.Random;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import testclient.Maths;
 
 public class ParticleOLD {
     public double forwardNoise, turnNoise, senseNoise;
     public double x, y, orientation;
     public double worldWidth, worldHeight;
     public double probability = 0;
-    public org.opencv.core.Point[] landmarks;
+    public org.opencv.core.Point3[] landmarks;
     Random random;
 
     /**
@@ -21,7 +22,7 @@ public class ParticleOLD {
      * @param worldWidth2  width of the particle's world in pixels
      * @param worldHeight2 height of the particle's world in pixels
      */
-    public ParticleOLD(org.opencv.core.Point[] landmarks, double worldWidth2, double worldHeight2) {
+    public ParticleOLD(org.opencv.core.Point3[] landmarks, double worldWidth2, double worldHeight2) {
         this.landmarks = landmarks;
         this.worldWidth = worldWidth2;
         this.worldHeight = worldHeight2;

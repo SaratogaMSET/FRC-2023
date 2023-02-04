@@ -37,7 +37,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     public DrivetrainSubsystem() {  
         zeroGyroscope();        
-        resetModulesToAbsolute();     
+        resetModulesToAbsolute();
         swerveOdometry = new SwerveDriveOdometry(Constants.Drivetrain.m_kinematics, getRotation2d(), getModulePositions());  
         logPose = new LoggablePose("/SwerveDriveSubsystem/Pose", swerveOdometry.getPoseMeters(),true); 
     }

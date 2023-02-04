@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.Timer;
+import frc.lib.logging.LoggablePose;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.util.wrappers.FilterEstimate;
@@ -25,8 +26,8 @@ public class PoseEstimator {
     private final DrivetrainSubsystem drivetrain;
 
     private int currentID = 0;
-    private HashMap<Integer, Double> idMap = new HashMap<>(); // Convert measurement IDs to timestamps
-    private ConcurrentSkipListMap<Double, SwerveOdomMeasurement> odomMap = new ConcurrentSkipListMap<>(); // FIXME potentially: see 604's code
+    private HashMap<Integer, Double> idMap = new HashMap<>();
+    private ConcurrentSkipListMap<Double, SwerveOdomMeasurement> odomMap = new ConcurrentSkipListMap<>();
     private TimeInterpolatableBuffer<Pose2d> poseMap = TimeInterpolatableBuffer.createBuffer(10);
     private TreeMap<Double, Pair<SendableOdomMeasurement, SendableVisionMeasurement>> buffer = new TreeMap<>();
 
@@ -39,6 +40,9 @@ public class PoseEstimator {
 
     private FishServerNT ntServer = new FishServerNT(this::computeEstimate);
 
+    private LoggablePose logPose;
+    private LoggablePose rawLogPose;
+
     public PoseEstimator(
         VisionSubsystem vision,
         DrivetrainSubsystem drivetrain,
@@ -50,18 +54,24 @@ public class PoseEstimator {
         this.drivetrain = drivetrain;
         rawOdometry = new TimestampedSwerveOdometry(kinematics, initGyroAngle, prior);
         cookedOdometry = new TimestampedSwerveOdometry(kinematics, initGyroAngle, prior);
+
+        logPose = new LoggablePose("/Localizer/Pose", cookedOdometry.getPoseMeters(), true);
+        rawLogPose = new LoggablePose("/Localizer/RawPose", rawOdometry.getPoseMeters(), true);
     }
 
     private void poseEstimatorPeriodic() {
         VisionMeasurement latestMeasurement = vision.getLatestMeasurement();
-        SwerveOdomMeasurement odomMeasurement = new SwerveOdomMeasurement( // potential FIXME pending DT finalization
+        SwerveOdomMeasurement odomMeasurement = new SwerveOdomMeasurement(
             drivetrain.getRotation2d(), 
-            drivetrain.getModuleStates() // TODO check if the order is same as 604: FL --> FR --> BL --> BR
+            drivetrain.getModuleStates()
         );
 
         update(odomMeasurement, latestMeasurement);
 
         periodic();
+
+        logPose.set(getPose());
+        rawLogPose.set(rawOdometry.getPoseMeters());
     }
 
     private void update(SwerveOdomMeasurement odometryMeas, VisionMeasurement visionMeas) {
@@ -80,7 +90,13 @@ public class PoseEstimator {
         SendableVisionMeasurement sendableVision = null;
 
         if (visionMeas.hasTargets()) {
-            sendableVision = new SendableVisionMeasurement(0, true, visionMeas.getTagID(), visionMeas.getDistance());
+            sendableVision = new SendableVisionMeasurement(
+                0,
+                true,
+                visionMeas.getTagID(),
+                visionMeas.getDistance(),
+                new double[]{visionMeas.getCampose().getX(), visionMeas.getCampose().getY(), visionMeas.getCampose().getRotation().getRadians()}
+            );
             sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);
             buffer.put(visionTime, new Pair<SendableOdomMeasurement, SendableVisionMeasurement>(sendableOdom, sendableVision));
         } else {
@@ -144,7 +160,6 @@ public class PoseEstimator {
                     );
                 } else {
                     buffer.get(key).getFirst().setID(currentID);
-                    System.out.println(buffer.get(key).getFirst());
                     ntServer.publishOdometry(buffer.get(key).getFirst());
                 }
 
@@ -159,7 +174,7 @@ public class PoseEstimator {
 
     public void start() {
         System.out.println("Starting FishServer.");
-        new Thread() {
+        new Thread("FishServer") {
             public void run() {
                 while (true) {
                     poseEstimatorPeriodic();

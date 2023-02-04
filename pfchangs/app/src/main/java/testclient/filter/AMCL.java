@@ -1,27 +1,32 @@
 package testclient.filter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import org.opencv.core.Point3;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import testclient.Constants;
+import testclient.Maths;
 import testclient.wrappers.TagDistance;
 
 // FIXME check if EVERYTHING (besides LL campose/botpose) is in radians
 public class AMCL {
+    private NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+
     private ArrayList<TagDistance> tagDistances = new ArrayList<>();
 
-    private Point3 robotPose; // original robot pose
-    private Point3 motionDelta; // robot frame motion odometry
-    
-    private Particle[] particles;
-    private Particle bestEstimate;
-    private Particle meanEstimate;
+    private Point3 motionDelta = new Point3(); // robot frame motion odometry <-- maybe not?
 
-    private double xDev, yDev, wDev;
+    private Particle[] particles;
+    private Particle bestEstimate = new Particle(0, 0, 0, 0);
+    private Particle meanEstimate = new Particle(0, 0, 0, 0);
+
     private double mGaussX, mGaussY, mGaussW;
-    private double vGaussX, vGaussY;
+    private double vGaussX, vGaussY, vGaussW;
 
     private double mclFieldptsVar, mclHeadingVar; // vision and heading variance
     private double mclASlow, mclAFast, mclWFast, mclWSlow; // AMCL vars
@@ -32,15 +37,11 @@ public class AMCL {
 
     private boolean useHeading;
 
-    private double mclPt2LineVar, mclPtAngleVar, mclLine2LineVar;
-
     public AMCL() {
         useHeading = true;
     }
 
     public void init() {
-        robotPose = new Point3(0, 0, 0);
-
         cf = 0;
 
         Random xrd = new Random();
@@ -49,48 +50,25 @@ public class AMCL {
         
         nParticles = Constants.FilterConstants.NUM_PARTICLES;
         particles = new Particle[(int) nParticles];
-        for (Particle p : particles) {
-            p.x = xrd.nextDouble() * Constants.VisionConstants.Field.FIELD_WIDTH;
-            p.y = yrd.nextDouble() * Constants.VisionConstants.Field.FIELD_HEIGHT;
-            p.w = wrd.nextDouble() * Math.PI * 2;
-            p.weight = 1 / nParticles;
+        for (int i = 0; i < nParticles; ++i) {
+            particles[i] = new Particle(0, 0, 0, 0);
+            particles[i].x = xrd.nextDouble() * Constants.VisionConstants.Field.FIELD_WIDTH;
+            particles[i].y = yrd.nextDouble() * Constants.VisionConstants.Field.FIELD_HEIGHT;
+            particles[i].w = wrd.nextDouble() * Math.PI * 2;
+            particles[i].weight = 1 / nParticles;
         }
 
         mclFieldptsVar = 0.3;
-        mGaussX = 2;
-        mclPt2LineVar = 60;
-        mGaussW = 2;
+        mGaussX = 0.25; // meters, 2
+        mGaussW = 0.25; // radians, 2
         mclHeadingVar = 0.323;
-        mclPtAngleVar = 0.4;
-        vGaussY = 3;
-        mGaussY =  3;
+        vGaussW = 10; // degrees, 5
+        vGaussY = 0.1; // meters, 3
+        mGaussY =  0.25; // meters, 3
         mclASlow = 0.01;
-        useAdaptiveParticles = true;
+        useAdaptiveParticles = false;
         mclAFast = 0.1;
-        vGaussX = 5;
-        mclLine2LineVar = 0.2;
-    }
-
-    /**
-     * DO NOT USE THIS METHOD!!!!!!
-     * @param angle
-     * @param radians Whether or not angle is in radians
-     * @return Particle's heading error w.r.t. average particle's heading
-     */
-    public double headingErr(double angle, boolean radians) {
-        // FIXME use "botpose_targetspace" LL NT key as setpoint? absolute values of particle and botpose_targetspace thetas
-        // to compute deltas instead of using robotPose because using "known robot position" is BS and stupid and such a
-        // lazy cop-out and defeats the entire point of a particle filter????????????
-        if (radians) {
-            while (angle >= 2 * Math.PI) angle -= 2 * Math.PI;
-            while (angle <= 0) angle += 2 * Math.PI;
-            return Math.exp(Math.abs(angle - robotPose.z) / 2 * mclHeadingVar * mclHeadingVar);
-        } else {
-            while (angle >= 360) angle -= 360;
-            while (angle <= 0) angle += 360;
-            double res = Math.toRadians(angle);
-            return Math.exp(Math.abs(res - robotPose.z) / 2 * mclHeadingVar * mclHeadingVar);
-        }
+        vGaussX = 0.1; // meters, 5
     }
 
     /**
@@ -100,7 +78,7 @@ public class AMCL {
      * @param setpointIsRadians Whether or not <code>setpoint</code> is in radians
      * @return
      */
-    public double headingErr(double angle, double setpoint, boolean angleIsRadians, boolean setpointIsRadians) {
+    private double headingErr(double angle, double setpoint, boolean angleIsRadians, boolean setpointIsRadians) {
         if (!angleIsRadians) {
             angle = Math.toRadians(angle);
         }
@@ -117,18 +95,17 @@ public class AMCL {
         return Math.exp(Math.abs(angle - setpoint) / 2 * mclHeadingVar * mclHeadingVar);
     }
 
+    /**
+     * @param x Robot-relative x translation
+     * @param y Robot-relative y translation
+     * @param w Rotation in radians
+     */
     public void updateOdometry(double x, double y, double w) {
         motionDelta.x = x;
         motionDelta.y = y;
         motionDelta.z = w;
 
         updateMotion();
-    }
-
-    public void updatePose(double x, double y, double w) {
-        robotPose.x = x;
-        robotPose.y = y;
-        robotPose.z = w;
     }
 
     public void setNoise(
@@ -150,19 +127,13 @@ public class AMCL {
         double mclASlow,
         double mclHeadingVar,
         boolean useAdaptiveParticles,
-        double mclFieldptsVar,
-        double mclPt2LineVar,
-        double mclPtAngleVar,
-        double mclLine2LineVar
+        double mclFieldptsVar
     ) {
         this.mclAFast = mclAFast;
         this.mclASlow = mclASlow;
         this.mclHeadingVar = mclHeadingVar;
         this.useAdaptiveParticles = useAdaptiveParticles;
         this.mclFieldptsVar = mclFieldptsVar;
-        this.mclPt2LineVar = mclPt2LineVar;
-        this.mclPtAngleVar = mclPtAngleVar;
-        this.mclLine2LineVar = mclLine2LineVar;
     }
 
     public void resetMCL() {
@@ -171,11 +142,13 @@ public class AMCL {
         Random wrd = new Random();
         
         nParticles = Constants.FilterConstants.NUM_PARTICLES;
-        for (Particle p : particles) {
-            p.x = xrd.nextDouble() * Constants.VisionConstants.Field.FIELD_WIDTH;
-            p.y = yrd.nextDouble() * Constants.VisionConstants.Field.FIELD_HEIGHT;
-            p.w = wrd.nextDouble() * Math.PI * 2;
-            p.weight = 1 / nParticles;
+        particles = new Particle[(int) nParticles];
+        for (int i = 0; i < nParticles; ++i) {
+            particles[i] = new Particle(0, 0, 0, 0);
+            particles[i].x = xrd.nextDouble() * Constants.VisionConstants.Field.FIELD_WIDTH;
+            particles[i].y = yrd.nextDouble() * Constants.VisionConstants.Field.FIELD_HEIGHT;
+            particles[i].w = wrd.nextDouble() * Math.PI * 2;
+            particles[i].weight = 1 / nParticles;
         }
     }
 
@@ -187,23 +160,195 @@ public class AMCL {
         double dx = motionDelta.x;
         double dy = motionDelta.y;
         double dw = motionDelta.z;
-        double c, s;
         for (var p : particles) {
-            c = Math.cos(p.w);
-            s = Math.sin(p.w);
-
-            p.x += c * dx - s * dy + xgen.nextGaussian() * mGaussX;
-            p.y += s * dx + c * dy + ygen.nextGaussian() * mGaussY;
+            p.x += dx + xgen.nextGaussian() * mGaussX;
+            p.y += dy + ygen.nextGaussian() * mGaussY;
             p.w += dw + wgen.nextGaussian() * mGaussW;
 
             while (p.w >= Math.PI * 2) p.w -= Math.PI * 2;
             while (p.w < 0) p.w += Math.PI * 2;
+
+            if (p.x > Constants.VisionConstants.Field.FIELD_WIDTH) p.x = Constants.VisionConstants.Field.FIELD_WIDTH;
+            else if (p.x < 0) p.x = 0;
+
+            if (p.y > Constants.VisionConstants.Field.FIELD_HEIGHT) p.y = Constants.VisionConstants.Field.FIELD_HEIGHT;
+            else if (p.y < 0) p.y = 0;
         }
     }
 
-    /* 
-     * Our equivalent of LineScanning():
-     * Get the IDs of all visible tags
-     * The end result: push_back all visible tags x, y, and distance into tagDistances
-     */
+    public void tagScanning(boolean hasTargets, int id, double[] dists, double[] campose) {
+        TagDistance[] distances = new TagDistance[8];
+
+        assert dists.length == 8;
+
+        for (int i = 0; i < dists.length; ++i) {
+            distances[i] = new TagDistance(
+                Constants.VisionConstants.Field.TAGS[i].x, 
+                Constants.VisionConstants.Field.TAGS[i].y, 
+                dists[i]
+            );
+        }
+
+        tagDistances = new ArrayList<>(Arrays.asList(distances));
+
+        updatePerceptionPoints(hasTargets, id, campose);
+    }
+
+    private void updatePerceptionPoints(boolean hasTargets, int id, double[] campose) {
+        int numPoints = tagDistances.size();
+        double sumWeight = 0;
+        double wAvg = 0;
+
+        for (var p : particles) {
+            double prob = 1;
+            double cmpsProb = 0;
+
+            if (numPoints > 0) {
+                resetParticles = false;
+
+                for (var d : tagDistances) {
+                    if (d.distance > 0) {
+                        double tagDist = d.distance + Maths.normalDistribution(0, Math.hypot(vGaussX, vGaussY));
+                        double particleDistance = Math.hypot(p.x - d.x, p.y - d.y);
+                        double distanceDiff = Math.abs(particleDistance - tagDist);
+                        prob *= Math.exp((-distanceDiff * distanceDiff) / (2 * mclFieldptsVar * mclFieldptsVar));
+                    }
+                }
+
+                p.weight = prob;
+
+                if (useHeading && limelightTable.getEntry("tv").getInteger(0) == 1 && id > -1) {
+                    cmpsProb = 1 / headingErr(p.w, 
+                        Math.toRadians((campose[2] + Constants.VisionConstants.Field.TAGS[id - 1].z) % 360)  +
+                            Maths.normalDistribution(0, vGaussW),
+                        true,
+                        true
+                    );
+                    p.weight *= cmpsProb;
+                }
+                sumWeight += p.weight;
+            } else {
+                resetParticles = true;
+            }
+        }
+
+        for (var p : particles) {
+            wAvg += p.weight / nParticles;
+            p.weight /= sumWeight;
+        }
+
+        mclWSlow += mclASlow * (wAvg - mclWSlow);
+        mclWFast += mclAFast * (wAvg - mclWFast);
+
+        lowVarResampling();
+    }
+
+    private void lowVarResampling() {
+        ArrayList<Particle> newParticles = new ArrayList<>();
+        Random random = new Random();
+        double resetProb = Math.max(0, 1 - (mclWFast / mclWSlow));
+        double r = random.nextDouble() * (1 / nParticles);
+        double c = particles[0].weight;
+        bestEstimate = particles[0];
+        int id = 0;
+
+        double meanX = 0;
+        double meanY = 0;
+        double sin = 0, cos = 0;
+        double orient = 0;
+
+        for (int j = 0; j < nParticles; ++j) {
+            double rand = Math.random();
+            if (rand < resetProb || resetParticles) {
+                resetParticles = false;
+                newParticles.add(new Particle(
+                    Math.random() * Constants.VisionConstants.Field.FIELD_WIDTH, 
+                    Math.random() * Constants.VisionConstants.Field.FIELD_HEIGHT, 
+                    Math.random() * Math.PI * 2, 
+                    1 / nParticles
+                ));
+            } else {
+                double U = r + ((double) j / nParticles);
+                while (U > c && id < nParticles) {
+                    id += 1;
+                    c += particles[j].weight;
+                }
+                if (particles[j].weight > bestEstimate.weight) {
+                    bestEstimate = particles[j];
+                }
+
+                newParticles.add(particles[j]);
+            }
+        }
+
+        particles = newParticles.toArray(new Particle[1]);
+
+        double dist = 0;
+        double xBest = bestEstimate.x;
+        double yBest = bestEstimate.y;
+        cf = 0;
+
+        for (var p : particles) {
+            meanX += p.x;
+            meanY += p.y;
+            sin += Math.sin(p.w);
+            cos += Math.cos(p.w);
+            p.weight = 1 / nParticles;
+
+            double x = xBest - p.x;
+            double y = yBest - p.y;
+            dist += Math.hypot(x, y);
+        }
+
+        meanX /= nParticles;
+        meanY /= nParticles;
+        orient = Math.atan2(sin, cos);
+
+        meanEstimate.x = meanX;
+        meanEstimate.y = meanY;
+        meanEstimate.w = orient;
+
+        if (useAdaptiveParticles) {
+            cf = (dist / nParticles) / 18.38067;
+            if (cf >= 0.0004) nParticles = cf * Constants.FilterConstants.NUM_PARTICLES;
+            else nParticles = Constants.FilterConstants.MIN_PARTICLES;
+        } else {
+            nParticles = Constants.FilterConstants.NUM_PARTICLES;
+        }
+    }
+
+    public Particle getBestEstimate() {
+        bestEstimate = particles[0];
+
+        for (int j = 0; j < nParticles; ++j) {
+            if (particles[j].weight > bestEstimate.weight) {
+                bestEstimate = particles[j];
+            }
+
+        }
+
+        return bestEstimate;
+    }
+
+    public Particle getAverageEstimate() {
+        meanEstimate = new Particle(0, 0, 0, 0);
+
+        double meanX = 0, meanY = 0, meanW = 0;
+        for (var p : particles) {
+            meanX += p.x;
+            meanY += p.y;
+            meanW += p.w;
+        }
+
+        meanEstimate.x = meanX / particles.length;
+        meanEstimate.y = meanY / particles.length;
+        meanEstimate.w = meanW / particles.length;
+        meanEstimate.weight = 1 / particles.length;
+
+        return meanEstimate;
+    }
+
+    public void outputNParticles() {
+        SmartDashboard.putNumber("Number of particles", nParticles);
+    }
 }

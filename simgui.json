@@ -36,6 +36,9 @@
   },
   "NetworkTables": {
     "transitory": {
+      "Localizer": {
+        "open": true
+      },
       "SmartDashboard": {
         "Field": {
           "open": true

@@ -192,6 +192,13 @@ public final class Constants {
     }
 
     public static class VisionConstants {
+        public static final double H1 = 0; 
+        public static final double H2 = 0; 
+        public static final double A1 = 0;
+        
+        public static final double C1 = 0; //vrt / y value check the picture Idk why govind called it that
+        public static final double C2 = 0; // horizontal / x value check the picture :??????
+
         /* public static class Field {
         public static final float FIELD_WIDTH = 16.54175f;
         public static final float FIELD_HEIGHT = 8.0137f;
@@ -209,7 +216,6 @@ public final class Constants {
         } */
 
         public static enum Tags {
-            // TODO find tag coordinates
             ID_1(15.513558f, 1.071626f, 0.462788f),
             ID_2(15.513558f, 2.748026f, 0.462788f),
             ID_3(15.513558f, 4.424426f, 0.462788f),

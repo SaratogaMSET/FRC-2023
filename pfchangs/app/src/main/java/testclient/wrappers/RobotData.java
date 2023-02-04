@@ -9,12 +9,14 @@ public class RobotData {
         public final boolean hasTargets;
         public final int tagID;
         public final double[] distances;
+        public final double[] campose;
 
-        public VisionData(int id, boolean hasTargets, int tagID, double[] distances) {
+        public VisionData(int id, boolean hasTargets, int tagID, double[] distances, double[] campose) {
             this.id = id;
             this.hasTargets = hasTargets;
             this.tagID = tagID;
             this.distances = distances;
+            this.campose = campose;
         }
     }
 
@@ -37,12 +39,13 @@ public class RobotData {
         boolean hasTargets,
         int tagID,
         double[] distances,
+        double[] campose,
         int odomID,
         double odomX,
         double odomY,
         double odomW
     ) {
-        vision = new VisionData(visionID, hasTargets, tagID, distances);
+        vision = new VisionData(visionID, hasTargets, tagID, distances, campose);
         odom = new OdomData(odomID, odomX, odomY, odomW);
     }
 }
