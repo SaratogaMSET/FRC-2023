@@ -41,6 +41,7 @@ public class PoseEstimator {
     private FishServerNT ntServer = new FishServerNT(this::computeEstimate);
 
     private LoggablePose logPose;
+    private LoggablePose rawLogPose;
 
     public PoseEstimator(
         VisionSubsystem vision,
@@ -55,6 +56,7 @@ public class PoseEstimator {
         cookedOdometry = new TimestampedSwerveOdometry(kinematics, initGyroAngle, prior);
 
         logPose = new LoggablePose("/Localizer/Pose", cookedOdometry.getPoseMeters(), true);
+        rawLogPose = new LoggablePose("/Localizer/RawPose", rawOdometry.getPoseMeters(), true);
     }
 
     private void poseEstimatorPeriodic() {
@@ -69,6 +71,7 @@ public class PoseEstimator {
         periodic();
 
         logPose.set(getPose());
+        rawLogPose.set(rawOdometry.getPoseMeters());
     }
 
     private void update(SwerveOdomMeasurement odometryMeas, VisionMeasurement visionMeas) {
