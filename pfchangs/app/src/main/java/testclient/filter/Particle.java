@@ -20,4 +20,9 @@ public class Particle {
     public Pose2d toPose2d() {
         return new Pose2d(new Translation2d(x, y), new Rotation2d(w));
     }
+
+    @Override
+    public String toString() {
+        return "[" + x + ", " + y + ", " + w + ", " + weight + "]";
+    }
 }

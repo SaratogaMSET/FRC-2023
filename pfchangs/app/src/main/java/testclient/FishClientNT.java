@@ -60,6 +60,7 @@ public class FishClientNT {
 
     public FishClientNT() {
         inst.startClient4("estimator");
+        // inst.setServerTeam(649);
         // inst.startDSClient();
         inst.setServer("localhost"); // "localhost" for simulation
         // https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html
@@ -183,11 +184,11 @@ public class FishClientNT {
                 if (latestData.vision.hasTargets) {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     amcl.tagScanning(latestData.vision.hasTargets, latestData.vision.tagID, latestData.vision.distances, latestData.vision.campose);
-                    publishEstimate(latestData.odom.id, amcl.getAverageEstimate().toPose2d());
+                    publishEstimate(latestData.odom.id, amcl.getBestEstimate().toPose2d());
                     amcl.outputNParticles();
                 } else {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
-                    publishEstimate(latestData.odom.id, amcl.getAverageEstimate().toPose2d());
+                    publishEstimate(latestData.odom.id, amcl.getBestEstimate().toPose2d());
                     amcl.outputNParticles();
                 }
             }
