@@ -59,12 +59,12 @@ public class AMCL {
         }
 
         mclFieldptsVar = 0.3;
-        mGaussX = 0.25; // meters, 2
+        mGaussX = 0.15; // meters, 2
         mGaussW = 0.25; // radians, 2
         mclHeadingVar = 0.323;
         vGaussW = 10; // degrees, 5
         vGaussY = 0.1; // meters, 3
-        mGaussY =  0.25; // meters, 3
+        mGaussY =  0.15; // meters, 3
         mclASlow = 0.01;
         useAdaptiveParticles = false;
         mclAFast = 0.1;
@@ -216,6 +216,8 @@ public class AMCL {
                         double particleDistance = Math.hypot(p.x - d.x, p.y - d.y);
                         double distanceDiff = Math.abs(particleDistance - tagDist);
                         prob *= Math.exp((-distanceDiff * distanceDiff) / (2 * mclFieldptsVar * mclFieldptsVar));
+                    } else {
+                        prob = 1;
                     }
                 }
 
@@ -248,6 +250,7 @@ public class AMCL {
     }
 
     private void lowVarResampling() {
+        // System.out.println("Starting resampling.");
         ArrayList<Particle> newParticles = new ArrayList<>();
         Random random = new Random();
         double resetProb = Math.max(0, 1 - (mclWFast / mclWSlow));
@@ -273,10 +276,13 @@ public class AMCL {
                 ));
             } else {
                 double U = r + ((double) j / nParticles);
-                while (U > c) {
+                while (U > c/*  && id < nParticles - 1 */) {
                     id += 1;
+                    // if (id >= 1999) System.out.println(id);
+                    if (particles[id].weight > 0.1) System.out.println(particles[id].weight);
                     c += particles[id].weight;
                 }
+                // System.out.println("Loop finished. " + j);
                 if (particles[id].weight > bestEstimate.weight) {
                     bestEstimate = particles[id];
                 }
