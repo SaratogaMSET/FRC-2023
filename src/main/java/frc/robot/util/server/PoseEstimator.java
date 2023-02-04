@@ -80,21 +80,6 @@ public class PoseEstimator {
     private void update(SwerveOdomMeasurement odometryMeas, VisionMeasurement visionMeas) {
         double currentTime = Timer.getFPGATimestamp();
 
-        odometryMeas = new SwerveOdomMeasurement(new Rotation2d(), 
-            new SwerveModuleState[]{
-                new SwerveModuleState(),
-                new SwerveModuleState(),
-                new SwerveModuleState(),
-                new SwerveModuleState()
-            }
-        ); // DEBUG TODO REMOVE
-        visionMeas = new VisionMeasurement(true, 0 * 100, // DEBUG TODO REMOVE
-        1, new Pose2d(new Translation2d(0, 0), 
-        new Rotation2d()), 
-        new Pose2d(new Translation2d(0, 0), new Rotation2d()), 
-        new double[]{1, -1, -1, -1,
-            -1, -1, -1, -1});
-
         rawOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());
         cookedOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());
         odomMap.put(currentTime, odometryMeas);

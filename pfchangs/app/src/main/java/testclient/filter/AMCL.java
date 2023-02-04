@@ -8,7 +8,6 @@ import org.opencv.core.Point3;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import testclient.Constants;
 import testclient.Maths;
 import testclient.wrappers.TagDistance;
@@ -31,9 +30,7 @@ public class AMCL {
     private double mclFieldptsVar, mclHeadingVar; // vision and heading variance
     private double mclASlow, mclAFast, mclWFast, mclWSlow; // AMCL vars
 
-    private double cf; // adaptive particles vars
     private boolean resetParticles;
-    private boolean useAdaptiveParticles;
 
     private boolean useHeading;
 
@@ -42,8 +39,6 @@ public class AMCL {
     }
 
     public void init() {
-        cf = 0;
-
         Random xrd = new Random();
         Random yrd = new Random();
         Random wrd = new Random();
@@ -59,14 +54,13 @@ public class AMCL {
         }
 
         mclFieldptsVar = 0.3;
-        mGaussX = 0.25; // meters, 2
+        mGaussX = 0.15; // meters, 2
         mGaussW = 0.25; // radians, 2
         mclHeadingVar = 0.323;
         vGaussW = 10; // degrees, 5
         vGaussY = 0.1; // meters, 3
-        mGaussY =  0.25; // meters, 3
+        mGaussY =  0.1; // meters, 3
         mclASlow = 0.01;
-        useAdaptiveParticles = false;
         mclAFast = 0.1;
         vGaussX = 0.1; // meters, 5
     }
@@ -126,13 +120,11 @@ public class AMCL {
         double mclAFast,
         double mclASlow,
         double mclHeadingVar,
-        boolean useAdaptiveParticles,
         double mclFieldptsVar
     ) {
         this.mclAFast = mclAFast;
         this.mclASlow = mclASlow;
         this.mclHeadingVar = mclHeadingVar;
-        this.useAdaptiveParticles = useAdaptiveParticles;
         this.mclFieldptsVar = mclFieldptsVar;
     }
 
@@ -212,6 +204,8 @@ public class AMCL {
                         double particleDistance = Math.hypot(p.x - d.x, p.y - d.y);
                         double distanceDiff = Math.abs(particleDistance - tagDist);
                         prob *= Math.exp((-distanceDiff * distanceDiff) / (2 * mclFieldptsVar * mclFieldptsVar));
+                    } else {
+                        prob = 1;
                     }
                 }
 
@@ -287,21 +281,12 @@ public class AMCL {
 
         particles = newParticles.toArray(new Particle[1]);
 
-        double dist = 0;
-        double xBest = bestEstimate.x;
-        double yBest = bestEstimate.y;
-        cf = 0;
-
         for (var p : particles) {
             meanX += p.x;
             meanY += p.y;
             sin += Math.sin(p.w);
             cos += Math.cos(p.w);
             p.weight = 1 / Constants.FilterConstants.NUM_PARTICLES;
-
-            double x = xBest - p.x;
-            double y = yBest - p.y;
-            dist += Math.hypot(x, y);
         }
 
         meanX /= Constants.FilterConstants.NUM_PARTICLES;
