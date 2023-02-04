@@ -8,7 +8,6 @@ import org.opencv.core.Point3;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import testclient.Constants;
 import testclient.Maths;
 import testclient.wrappers.TagDistance;
@@ -31,9 +30,7 @@ public class AMCL {
     private double mclFieldptsVar, mclHeadingVar; // vision and heading variance
     private double mclASlow, mclAFast, mclWFast, mclWSlow; // AMCL vars
 
-    private double cf, nParticles; // adaptive particles vars
     private boolean resetParticles;
-    private boolean useAdaptiveParticles;
 
     private boolean useHeading;
 
@@ -42,31 +39,28 @@ public class AMCL {
     }
 
     public void init() {
-        cf = 0;
-
         Random xrd = new Random();
         Random yrd = new Random();
         Random wrd = new Random();
-        
-        nParticles = Constants.FilterConstants.NUM_PARTICLES;
-        particles = new Particle[(int) nParticles];
-        for (int i = 0; i < nParticles; ++i) {
+
+        // Constants.FilterConstants.NUM_PARTICLES = Constants.FilterConstants.NUM_PARTICLES;
+        particles = new Particle[(int) Constants.FilterConstants.NUM_PARTICLES];
+        for (int i = 0; i < Constants.FilterConstants.NUM_PARTICLES; ++i) {
             particles[i] = new Particle(0, 0, 0, 0);
             particles[i].x = xrd.nextDouble() * Constants.VisionConstants.Field.FIELD_WIDTH;
             particles[i].y = yrd.nextDouble() * Constants.VisionConstants.Field.FIELD_HEIGHT;
             particles[i].w = wrd.nextDouble() * Math.PI * 2;
-            particles[i].weight = 1 / nParticles;
+            particles[i].weight = 1 / Constants.FilterConstants.NUM_PARTICLES;
         }
 
         mclFieldptsVar = 0.3;
-        mGaussX = 0.25; // meters, 2
+        mGaussX = 0.15; // meters, 2
         mGaussW = 0.25; // radians, 2
         mclHeadingVar = 0.323;
         vGaussW = 10; // degrees, 5
         vGaussY = 0.1; // meters, 3
-        mGaussY =  0.25; // meters, 3
+        mGaussY =  0.1; // meters, 3
         mclASlow = 0.01;
-        useAdaptiveParticles = false;
         mclAFast = 0.1;
         vGaussX = 0.1; // meters, 5
     }
@@ -126,13 +120,11 @@ public class AMCL {
         double mclAFast,
         double mclASlow,
         double mclHeadingVar,
-        boolean useAdaptiveParticles,
         double mclFieldptsVar
     ) {
         this.mclAFast = mclAFast;
         this.mclASlow = mclASlow;
         this.mclHeadingVar = mclHeadingVar;
-        this.useAdaptiveParticles = useAdaptiveParticles;
         this.mclFieldptsVar = mclFieldptsVar;
     }
 
@@ -141,14 +133,14 @@ public class AMCL {
         Random yrd = new Random();
         Random wrd = new Random();
         
-        nParticles = Constants.FilterConstants.NUM_PARTICLES;
-        particles = new Particle[(int) nParticles];
-        for (int i = 0; i < nParticles; ++i) {
+        // Constants.FilterConstants.NUM_PARTICLES = Constants.FilterConstants.NUM_PARTICLES;
+        particles = new Particle[(int) Constants.FilterConstants.NUM_PARTICLES];
+        for (int i = 0; i < Constants.FilterConstants.NUM_PARTICLES; ++i) {
             particles[i] = new Particle(0, 0, 0, 0);
             particles[i].x = xrd.nextDouble() * Constants.VisionConstants.Field.FIELD_WIDTH;
             particles[i].y = yrd.nextDouble() * Constants.VisionConstants.Field.FIELD_HEIGHT;
             particles[i].w = wrd.nextDouble() * Math.PI * 2;
-            particles[i].weight = 1 / nParticles;
+            particles[i].weight = 1 / Constants.FilterConstants.NUM_PARTICLES;
         }
     }
 
@@ -212,6 +204,8 @@ public class AMCL {
                         double particleDistance = Math.hypot(p.x - d.x, p.y - d.y);
                         double distanceDiff = Math.abs(particleDistance - tagDist);
                         prob *= Math.exp((-distanceDiff * distanceDiff) / (2 * mclFieldptsVar * mclFieldptsVar));
+                    } else {
+                        prob = 1;
                     }
                 }
 
@@ -233,21 +227,25 @@ public class AMCL {
         }
 
         for (var p : particles) {
-            wAvg += p.weight / nParticles;
+            wAvg += p.weight / Constants.FilterConstants.NUM_PARTICLES;
             p.weight /= sumWeight;
         }
 
         mclWSlow += mclASlow * (wAvg - mclWSlow);
         mclWFast += mclAFast * (wAvg - mclWFast);
 
-        lowVarResampling();
+        try {
+            lowVarResampling();
+        } catch (Exception e) {
+            System.out.println("Oh noes.");
+        }
     }
 
     private void lowVarResampling() {
         ArrayList<Particle> newParticles = new ArrayList<>();
         Random random = new Random();
         double resetProb = Math.max(0, 1 - (mclWFast / mclWSlow));
-        double r = random.nextDouble() * (1 / nParticles);
+        double r = random.nextDouble() * (1 / Constants.FilterConstants.NUM_PARTICLES);
         double c = particles[0].weight;
         bestEstimate = particles[0];
         int id = 0;
@@ -257,7 +255,7 @@ public class AMCL {
         double sin = 0, cos = 0;
         double orient = 0;
 
-        for (int j = 0; j < nParticles; ++j) {
+        for (int j = 0; j < Constants.FilterConstants.NUM_PARTICLES; ++j) {
             double rand = Math.random();
             if (rand < resetProb || resetParticles) {
                 resetParticles = false;
@@ -265,62 +263,45 @@ public class AMCL {
                     Math.random() * Constants.VisionConstants.Field.FIELD_WIDTH, 
                     Math.random() * Constants.VisionConstants.Field.FIELD_HEIGHT, 
                     Math.random() * Math.PI * 2, 
-                    1 / nParticles
+                    1 / Constants.FilterConstants.NUM_PARTICLES
                 ));
             } else {
-                double U = r + ((double) j / nParticles);
-                while (U > c && id < nParticles) {
+                double U = r + ((double) j / Constants.FilterConstants.NUM_PARTICLES);
+                while (U > c) {
                     id += 1;
-                    c += particles[j].weight;
+                    c += particles[id].weight;
                 }
-                if (particles[j].weight > bestEstimate.weight) {
-                    bestEstimate = particles[j];
+                if (particles[id].weight > bestEstimate.weight) {
+                    bestEstimate = particles[id];
                 }
 
-                newParticles.add(particles[j]);
+                newParticles.add(particles[id]);
             }
         }
 
         particles = newParticles.toArray(new Particle[1]);
-
-        double dist = 0;
-        double xBest = bestEstimate.x;
-        double yBest = bestEstimate.y;
-        cf = 0;
 
         for (var p : particles) {
             meanX += p.x;
             meanY += p.y;
             sin += Math.sin(p.w);
             cos += Math.cos(p.w);
-            p.weight = 1 / nParticles;
-
-            double x = xBest - p.x;
-            double y = yBest - p.y;
-            dist += Math.hypot(x, y);
+            p.weight = 1 / Constants.FilterConstants.NUM_PARTICLES;
         }
 
-        meanX /= nParticles;
-        meanY /= nParticles;
+        meanX /= Constants.FilterConstants.NUM_PARTICLES;
+        meanY /= Constants.FilterConstants.NUM_PARTICLES;
         orient = Math.atan2(sin, cos);
 
         meanEstimate.x = meanX;
         meanEstimate.y = meanY;
         meanEstimate.w = orient;
-
-        if (useAdaptiveParticles) {
-            cf = (dist / nParticles) / 18.38067;
-            if (cf >= 0.0004) nParticles = cf * Constants.FilterConstants.NUM_PARTICLES;
-            else nParticles = Constants.FilterConstants.MIN_PARTICLES;
-        } else {
-            nParticles = Constants.FilterConstants.NUM_PARTICLES;
-        }
     }
 
     public Particle getBestEstimate() {
         bestEstimate = particles[0];
 
-        for (int j = 0; j < nParticles; ++j) {
+        for (int j = 0; j < Constants.FilterConstants.NUM_PARTICLES; ++j) {
             if (particles[j].weight > bestEstimate.weight) {
                 bestEstimate = particles[j];
             }
@@ -346,9 +327,5 @@ public class AMCL {
         meanEstimate.weight = 1 / particles.length;
 
         return meanEstimate;
-    }
-
-    public void outputNParticles() {
-        SmartDashboard.putNumber("Number of particles", nParticles);
     }
 }
