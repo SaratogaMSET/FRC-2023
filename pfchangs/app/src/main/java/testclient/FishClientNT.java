@@ -15,7 +15,7 @@ import testclient.filterOLD.ParticleFilterOLD;
 import testclient.wrappers.RobotData;
 
 public class FishClientNT {
-    public static final boolean USE_AMCL = false;
+    public static final boolean USE_AMCL = true;
 
     private ParticleFilterOLD filter = new ParticleFilterOLD(
         Constants.FilterConstants.NUM_PARTICLES, 
@@ -60,9 +60,9 @@ public class FishClientNT {
 
     public FishClientNT() {
         inst.startClient4("estimator");
-        // inst.setServerTeam(649);
+        inst.setServerTeam(649);
         // inst.startDSClient();
-        inst.setServer("localhost"); // "localhost" for simulation
+        // inst.setServer("localhost"); // "localhost" for simulation
         // https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html
         System.out.println("Finshed client init.");
 
