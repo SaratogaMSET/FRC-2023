@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
+import org.littletonrobotics.junction.Logger;
+
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -121,8 +123,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
     }
 
+    public double getPoseXConverted(){
+        return (getPose().getX())/100;
+    }
+
     @Override
     public void periodic(){
+        Logger.getInstance().recordOutput("CurrentSwerveModuleStates", getModuleStates());
+        getPose().getX();
+        Logger.getInstance().recordOutput("Odom Location X", getPoseXConverted()); //get X stuff for verification
+
         double[] cSpeeds = new double[]{m_chassisSpeeds.vxMetersPerSecond, m_chassisSpeeds.vyMetersPerSecond,m_chassisSpeeds.omegaRadiansPerSecond};
         SmartDashboard.putNumberArray("Desired Chassis Speeds", cSpeeds);
 
