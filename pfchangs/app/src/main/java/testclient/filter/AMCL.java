@@ -160,13 +160,9 @@ public class AMCL {
         double dx = motionDelta.x;
         double dy = motionDelta.y;
         double dw = motionDelta.z;
-        double c, s;
         for (var p : particles) {
-            c = Math.cos(p.w);
-            s = Math.sin(p.w);
-
-            p.x += c * dx - s * dy + xgen.nextGaussian() * mGaussX;
-            p.y += s * dx + c * dy + ygen.nextGaussian() * mGaussY;
+            p.x += dx + xgen.nextGaussian() * mGaussX;
+            p.y += dy + ygen.nextGaussian() * mGaussY;
             p.w += dw + wgen.nextGaussian() * mGaussW;
 
             while (p.w >= Math.PI * 2) p.w -= Math.PI * 2;
@@ -221,9 +217,9 @@ public class AMCL {
 
                 p.weight = prob;
 
-                if (useHeading && limelightTable.getEntry("tv").getInteger(0) == 1) {
+                if (useHeading && limelightTable.getEntry("tv").getInteger(0) == 1 && id > -1) {
                     cmpsProb = 1 / headingErr(p.w, 
-                        Math.toRadians((campose[2] + Constants.VisionConstants.Field.TAGS[id].z) % 360)  +
+                        Math.toRadians((campose[2] + Constants.VisionConstants.Field.TAGS[id - 1].z) % 360)  +
                             Maths.normalDistribution(0, vGaussW),
                         true,
                         true
@@ -273,15 +269,15 @@ public class AMCL {
                 ));
             } else {
                 double U = r + ((double) j / nParticles);
-                while (U > c) {
+                while (U > c && id < nParticles) {
                     id += 1;
-                    c += particles[id].weight;
+                    c += particles[j].weight;
                 }
-                if (particles[id].weight > bestEstimate.weight) {
-                    bestEstimate = particles[id];
+                if (particles[j].weight > bestEstimate.weight) {
+                    bestEstimate = particles[j];
                 }
 
-                newParticles.add(particles[id]);
+                newParticles.add(particles[j]);
             }
         }
 
