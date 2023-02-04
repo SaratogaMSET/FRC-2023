@@ -60,8 +60,8 @@ public class FishClientNT {
 
     public FishClientNT() {
         inst.startClient4("estimator");
-        inst.startDSClient();
-        // inst.setServer("localhost"); // "localhost" for simulation
+        // inst.startDSClient();
+        inst.setServer("localhost"); // "localhost" for simulation
         // https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html
         System.out.println("Finshed client init.");
 
@@ -140,10 +140,12 @@ public class FishClientNT {
                 );
     
                 if (latestData.vision.hasTargets) {
+                    System.out.println("Visioning");
                     filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     filter.resample(latestData.vision.distances);
                     publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d());
                 } else {
+                    System.out.println("Not visioning");
                     filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d());
                 }
@@ -181,11 +183,13 @@ public class FishClientNT {
                 );
 
                 if (latestData.vision.hasTargets) {
+                    System.out.println("Visioning");
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     amcl.tagScanning(latestData.vision.hasTargets, latestData.vision.tagID, latestData.vision.distances, latestData.vision.campose);
                     publishEstimate(latestData.odom.id, amcl.getAverageEstimate().toPose2d());
                     amcl.outputNParticles();
                 } else {
+                    System.out.println("Not visioning");
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     publishEstimate(latestData.odom.id, amcl.getAverageEstimate().toPose2d());
                     amcl.outputNParticles();

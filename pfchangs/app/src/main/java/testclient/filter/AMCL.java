@@ -271,13 +271,14 @@ public class AMCL {
                 double U = r + ((double) j / nParticles);
                 while (U > c && id < nParticles) {
                     id += 1;
-                    c += particles[j].weight;
+                    c += particles[id].weight;
                 }
-                if (particles[j].weight > bestEstimate.weight) {
-                    bestEstimate = particles[j];
+                if (id >= nParticles) break;
+                if (particles[id].weight > bestEstimate.weight) {
+                    bestEstimate = particles[id];
                 }
 
-                newParticles.add(particles[j]);
+                newParticles.add(particles[id]);
             }
         }
 
