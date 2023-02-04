@@ -11,7 +11,7 @@ import frc.robot.util.wrappers.VisionMeasurement;
 import frc.robot.Constants;
 
 public class VisionSubsystem extends SubsystemBase {
-    private final NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
     public VisionSubsystem() {}
 
@@ -45,6 +45,14 @@ public class VisionSubsystem extends SubsystemBase {
 
     private double getDistanceFromRetro(){
         return (Constants.VisionConstants.H2 - Constants.VisionConstants.H1) / Math.tan(Math.toRadians(Constants.VisionConstants.A1 + getTY()));
+    }
+
+    /**
+     * *
+     * @param pipelineNum the pipeline number to switch to. We might need one for the high tape, one for the mid tape and one for apriltag.
+     */
+    public void switchPipeline(int pipelineNum){
+        table.getEntry("pipeline").setNumber(pipelineNum);
     }
 
     private int getTagID() {
@@ -107,7 +115,7 @@ public class VisionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumberArray("Distances", getDistances());
-        SmartDashboard.putNumberArray("Pose to target(arm base)", getOffsetTo2DOFBase());
+        SmartDashboard.putNumberArray("Pose to target(arm base)", getOffsetTo2DOFBase()); //Ignore if not on retroreflective pipeline. 
     }
 
     @Override
