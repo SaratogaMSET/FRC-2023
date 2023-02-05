@@ -22,6 +22,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.SwitchPipeline;
 import frc.robot.commands.ZeroGyroCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
@@ -131,13 +132,12 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(m_exampleSubsystem::exampleCondition)
-        .onTrue(new ExampleCommand(m_exampleSubsystem));
+    m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-    m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
+    m_driverController.x().onTrue(new SwitchPipeline(vision, 1));
+    m_driverController.b().onTrue(new SwitchPipeline(vision, 0));
   }
 
   /**

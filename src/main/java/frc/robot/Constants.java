@@ -192,8 +192,8 @@ public final class Constants {
     }
 
     public static class VisionConstants {
-        public static final double H1 = 0; 
-        public static final double H2 = 0; 
+        public static final double H1 = 0.3429; // METERS, 0.3429 on board, 0.489 on floudner.
+        public static final double H2 = 1.1736; //Low goal = 0.628, high goal = 1.17
         public static final double A1 = 0;
         
         public static final double C1 = 0; //vrt / y value check the picture Idk why govind called it that
