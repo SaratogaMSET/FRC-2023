@@ -12,21 +12,21 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 /** An example command that uses an example subsystem. */
 public class IntakeCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  
   private final ClawSubsystem m_intake;
 
 
   private Direction direction;
   public static enum Direction {
     OPEN, 
-    CLOSE
+    CLOSE, 
+    IDLE
   }
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
- public IntakeCommand(ClawSubsystem subsystem, Direction direction) {
+  public IntakeCommand(ClawSubsystem subsystem, Direction direction) {
     m_intake = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     this.direction = direction;
@@ -42,6 +42,9 @@ public class IntakeCommand extends CommandBase {
         break;
       case CLOSE:
         m_intake.closeIntake();
+        break;
+      case IDLE:
+        m_intake.setIdle();
         break;
     }
   }

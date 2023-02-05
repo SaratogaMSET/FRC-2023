@@ -13,9 +13,13 @@ package frc.robot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 // import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.IntakeCommand.Direction;
+import frc.robot.subsystems.ClawSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -25,16 +29,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  // final IntakeSubsystemWheel m_intake;
-  private final XboxController m_driverController =
-      new XboxController(0);
+  private final ClawSubsystem m_claw;
+  private final XboxController m_driverController = new XboxController(0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // m_intake = new IntakeSubsystemWheel();
-    SmartDashboard.putNumber("Intake Speed", 0.0);
     // Configure the trigger bindings
     configureBindings();
+    m_claw = new ClawSubsystem();
   }
 
   /**
@@ -48,17 +50,9 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    // new Trigger(m_intake::exampleCondition)
-    //     .onTrue(new IntakeCommand(m_intake));
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // cancelling on release.
-    // m_driverController.
-
-    // new Trigger(m_driverController::getRightBumper).whileTrue(new InstantCommand(() -> m_intake.runIntake(Direction.INTAKE)));
-    // new Trigger(m_driverController::getRightBumper).whileFalse(new InstantCommand(() -> m_intake.runIntake(Direction.IDLE)));
-    // new Trigger(m_driverController::getLeftBumper).whileTrue(new InstantCommand(() -> m_intake.runIntake(Direction.OUTTAKE)));
-    // new Trigger(m_driverController::getLeftBumper).whileFalse(new InstantCommand(() -> m_intake.runIntake(Direction.IDLE)));
+    new Trigger(m_driverController::getRightBumper).whileTrue(new InstantCommand(() -> m_claw.closeIntake()));
+    // new Trigger(m_driverController::getRightBumper).toggleOnFalse(new IntakeCommand(m_claw, Direction.CLOSE));
   }
 
   /**

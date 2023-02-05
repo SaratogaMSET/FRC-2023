@@ -13,6 +13,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 
@@ -33,11 +34,17 @@ public class ClawSubsystem extends SubsystemBase {
   private boolean objectSecuredVar;
   private double torqueThreshold = 175;
   private double closingTorqueThreshold = 125;
-  private int[] redRange = new int[2];
-  private int[] greenRange = new int[2];
-  private int[] blueRange = new int[2];
+  private double cubeBlueTheshold = 0.2;
+  private Objects objectState = Objects.None;
+  private Color currentColor;
 
   public static ColorSensorV3 colorSensor;
+
+  public static enum Objects {
+    Cone,
+    Cube,
+    None
+  }
 
   /** Creates a new ExampleSubsystem. */
   public ClawSubsystem() {
@@ -48,9 +55,25 @@ public class ClawSubsystem extends SubsystemBase {
     encoder.setPositionConversionFactor(360.0 / 320 * 3);
     encoder.setPosition(0);
     TARGET_VELOCITY = IntakeConstants.TARGET_VELOCITY;
-    // timer = new Timer();
     objectSecuredVar = false;
     colorSensor = new ColorSensorV3(Port.kOnboard);
+  }
+
+  private void updateProximitySensor() {
+    proximityBuffer[bufferIndex] = colorSensor.getProximity();
+    bufferIndex++;
+    bufferIndex = bufferIndex % proximityBuffer.length;
+  }
+
+  private double proximityValue() {
+    double sum = 0;
+    for (double x : proximityBuffer)
+      sum += x;
+    return sum / proximityBuffer.length;
+  }
+
+  private boolean objectInRange() {
+    return proximityValue() > 35;
   }
 
   public void openIntake() {
@@ -59,54 +82,34 @@ public class ClawSubsystem extends SubsystemBase {
     motor.set(-velocitySetpoint);
   }
   
-  public void closeIntake() {
-    updateProximitySensor();
-    objectSecuredVar = objectSecured() && objectInRange();
-    boolean objectBeingSecuredVar = objectBeingSecured() && objectInRange();
-    if (objectSecuredVar) {
-      double holdVoltage = 0.5;
-      appliedVoltage = holdVoltage;
-      intakeVoltage(holdVoltage);
-    } else if (objectBeingSecuredVar){
-      appliedVoltage = 0.5;
-      intakeVoltage(0.5);
-    } else if (objectInRange()) {
-      intakeVoltage(ffVoltage);
-    // } else {
-    //   intakeVoltage(-ffVoltage);
-    }
-  }
-
   public void setIdle() {
     motor.set(0.0);
+    appliedVoltage = 0.0;
   }
-  
+
+  private void resetEncoder() {
+    encoder.setPosition(0.0);
+  }
+
   public void intakeVoltage(double voltage) {
+    objectState = getObject();
     if (getLimitSwitch())
       resetEncoder();
-
     boolean lowerBound = encoder.getPosition() < 10 && Math.signum(voltage) == -1;
     boolean coneMediumBound = encoder.getPosition() > 35 && Math.signum(voltage) == 1;
     boolean cubeMediumBound = encoder.getPosition() > 14 && Math.signum(voltage) == 1;
     boolean higherBound = encoder.getPosition() > 45 && Math.signum(voltage) == 1;
 
-    if(cubeMediumBound){
+    if ((objectState == Objects.Cube && cubeMediumBound) || (objectState == Objects.Cone && coneMediumBound)) {
       appliedVoltage = 1;
-      motor.setVoltage(appliedVoltage);
-    }
-    else if (Math.signum(voltage) == -1 && !getLimitSwitch()) {
+    } else if ((Math.signum(voltage) == -1 && !lowerBound) || (Math.signum(voltage) == 1 && !higherBound))
       appliedVoltage = voltage;
-      motor.setVoltage(voltage);
-    } else if (!lowerBound && !higherBound) { // !higherBound &&
-      appliedVoltage = voltage;
-      motor.setVoltage(voltage);
-    } else {
-      motor.setVoltage(0.0);
+    else
       appliedVoltage = 0.0;
-    }
+    motor.setVoltage(appliedVoltage);
   }
 
-  public boolean getTorqueBuffer(double torque, double threshold) {
+  private boolean getTorqueBuffer(double torque, double threshold) {
     torqueBuffer[torqueCounter] = torque;
     torqueCounter++;
     torqueCounter = torqueCounter % torqueBuffer.length;
@@ -117,63 +120,64 @@ public class ClawSubsystem extends SubsystemBase {
     return true;
   }
 
-  public double getTorque(double rpm, double appliedVoltage, double gearRatio) {
+  private double getTorque(double rpm, double appliedVoltage, double gearRatio) {
     double radpersec = rpm * RPM_TO_RADPERSEC;
     torque = (Math.abs(appliedVoltage) - IntakeConstants.TORQUE_CONSTANT * Math.abs(radpersec))
         * IntakeConstants.TORQUE_CONSTANT
         / IntakeConstants.RESISTANCE;
-
     return torque / gearRatio;
   }
 
-  
-
-  public boolean objectSecured() {
-    return getTorqueBuffer(getTorque(encoder.getVelocity(), appliedVoltage, IntakeConstants.GEAR_RATIO), torqueThreshold);
+  public void closeIntake() {
+    updateProximitySensor();
+    objectSecuredVar = objectSecured() && objectInRange();
+    boolean objectBeingSecuredVar = objectBeingSecured() && objectInRange();
+    if (objectSecuredVar) {
+      double holdVoltage = 0.5;
+      appliedVoltage = holdVoltage;
+      intakeVoltage(holdVoltage);
+    } else if (objectBeingSecuredVar) {
+      appliedVoltage = 0.5;
+      intakeVoltage(0.5);
+    } else if (objectInRange()) {
+      intakeVoltage(ffVoltage);
+    } else {
+      intakeVoltage(-ffVoltage);
+    }
   }
 
-  public boolean objectBeingSecured() {
-    return getTorqueBuffer(getTorque(encoder.getVelocity(), appliedVoltage, IntakeConstants.GEAR_RATIO), closingTorqueThreshold);
+  private boolean objectSecured() {
+    return getTorqueBuffer(getTorque(encoder.getVelocity(), appliedVoltage, IntakeConstants.GEAR_RATIO),
+        torqueThreshold);
   }
 
-  public void updateProximitySensor() {
-    proximityBuffer[bufferIndex] = colorSensor.getProximity();
-    bufferIndex++;
-    bufferIndex = bufferIndex % proximityBuffer.length;
+  private boolean objectBeingSecured() {
+    return getTorqueBuffer(getTorque(encoder.getVelocity(), appliedVoltage, IntakeConstants.GEAR_RATIO),
+        closingTorqueThreshold);
   }
 
-  public double proximityValue() {
-    double sum = 0;
-    for (double x : proximityBuffer)
-      sum += x;
-    return sum / proximityBuffer.length;
-  }
-
-  public boolean objectInRange() {
-    return proximityValue() > 35;
-  }
-
-
-  
-
-  public void resetEncoder() {
-    encoder.setPosition(0.0);
-  }
-
-  
-  public boolean getLimitSwitch() {
+  private boolean getLimitSwitch() {
     return limitSwitch.get();
   }
 
-  public void updateObject() {
-  } // Do I need to actually identify the object?
+  public Objects getObject() {
+    currentColor = colorSensor.getColor();
+    double magnitude = currentColor.blue + currentColor.red + currentColor.green;
+    try {
+      if (currentColor.blue / magnitude > cubeBlueTheshold)
+        return Objects.Cube;
+      else
+        return Objects.Cone;
+    } catch (NullPointerException e) {
+    }
+    return Objects.None;
+  }
 
-  public void updateIntake(){
+  public void updateIntake() {
     SmartDashboard.putNumber("ClawPos", encoder.getPosition());
     SmartDashboard.putBoolean("Limit Switch", limitSwitch.get());
     SmartDashboard.putNumber("Lidar (from 0-2047)", colorSensor.getProximity()); // 1-10 cm range, should be good enough
                                                                                  // for closing the close in time...
-    SmartDashboard.putBoolean("Object secured", objectSecured());
     SmartDashboard.putBoolean("Detecting", objectInRange());
     SmartDashboard.putNumber("Red value", colorSensor.getRed()); // speed would have to be 45 meters per sec, so more
                                                                  // than 100 mph
@@ -183,6 +187,8 @@ public class ClawSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("Limit Switch", getLimitSwitch());
     SmartDashboard.putBoolean("Object Secured", objectSecured());
     SmartDashboard.putNumber("Torque", getTorque(encoder.getVelocity(), appliedVoltage, IntakeConstants.GEAR_RATIO));
+    SmartDashboard.putString("Object", objectState.toString());
+    SmartDashboard.putBoolean("Object in range", objectInRange());
   }
 
   @Override

@@ -4,26 +4,14 @@
 
 package frc.robot;
 
-// import frc.robot.subsystems.IntakeSubsystemWheel.*;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import java.nio.ByteBuffer;
-
-import com.revrobotics.ColorSensorV3;
-
-// import com.revrobotics.Rev2mDistanceSensor.*;
-
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.I2C.Port;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ClawSubsystem;
-// import frc.robot.subsystems.IntakeSubsystemWheel;
-import frc.robot.subsystems.LidarSubsystem;
+import frc.robot.subsystems.IntakeSubsystemWheel;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -36,12 +24,10 @@ import frc.robot.subsystems.LidarSubsystem;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-
   private RobotContainer m_robotContainer;
-  // private Rev2mDistanceSensor m_lidar;
-  private ClawSubsystem claw;
-  // private IntakeSubsystemWheel m_intake;
-  // private LidarSubsystem m_lidar;
+  private ClawSubsystem m_claw;
+  private IntakeSubsystemWheel m_intakeSubsystem;
+  private XboxController m_controller;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -50,18 +36,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    m_claw = new ClawSubsystem();
+    m_intakeSubsystem = new IntakeSubsystemWheel();
+    m_controller = new XboxController(0);
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our
     // autonomous chooser on the dashboard.
-    claw = new ClawSubsystem();
-    // m_intake = new IntakeSubsystemWheel();
-    // m_lidar = new Rev2mDistanceSensor(Port.kOnboard, Unit.kInches,
-    // RangeProfile.kDefault);
-    m_robotContainer = new RobotContainer();
-    // m_lidar = new LidarSubsystem(Port.kOnboard);
-
-    // m_lidar.start();
-    // m_lidar.setAutomaticMode(true);
   }
 
   /**
@@ -84,15 +64,7 @@ public class Robot extends TimedRobot {
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    // m_lidar.update();
-    // SmartDashboard.putNumber("Lidar Distance", m_lidar.getDistance()); // For
-    // instant running
-    // if(m_lidar.isRangeValid()) {
-    // SmartDashboard.putNumber("Range Onboard", m_lidar.getRange());
-    // SmartDashboard.putNumber("Timestamp Onboard", m_lidar.getTimestamp());
-    // }
-    // else
-    // SmartDashboard.putBoolean("Range Valid", false);
+    m_intakeSubsystem.runIntake(m_controller.getLeftY());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -137,7 +109,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    new InstantCommand(() -> claw.closeIntake()).schedule();
+     m_claw.closeIntake();
+
   }
 
   @Override
