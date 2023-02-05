@@ -49,7 +49,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     private double getDistanceFromRetro(){
-        return (Constants.VisionConstants.H2 - Constants.VisionConstants.H1) / Math.tan(Math.toRadians(Constants.VisionConstants.A1 + getTY()));
+        return (Constants.VisionConstants.H2 - Constants.VisionConstants.H1) / Math.tan(0.017453292519943295 * (Constants.VisionConstants.A1 + getTY()));
     }
 
     /**
@@ -93,12 +93,12 @@ public class VisionSubsystem extends SubsystemBase {
         double d1 = getDistanceFromRetro();
         double tx = getTX();
 
-        double a = Math.sin(tx) * d1;  // x val 
-        double b = Math.cos(tx) * d1;  // y val
+        double a = Math.sin(Math.toRadians(tx)) * d1;  // x val 
+        double b = Math.cos(Math.toRadians(tx)) * d1;  // y val
 
         double angle = Math.atan((a + Constants.VisionConstants.C2) / (b + Constants.VisionConstants.C1));
 
-        double[] x = {a + Constants.VisionConstants.C2, b + Constants.VisionConstants.C1, angle};
+        double[] x = {a + Constants.VisionConstants.C2, b + Constants.VisionConstants.C1, Math.toDegrees(angle)};
 
         return x;
     }
@@ -127,6 +127,7 @@ public class VisionSubsystem extends SubsystemBase {
         Logger.getInstance().recordOutput("Smart Targeting X", 100*Math.hypot(getCamTran()[0], getCamTran()[2])); //get X stuff for verification
         SmartDashboard.putNumberArray("Distances", getDistances());
         SmartDashboard.putNumberArray("Pose to target(arm base)", getOffsetTo2DOFBase()); //Ignore if not on retroreflective pipeline. 
+        SmartDashboard.putNumber("distance to retro", getDistanceFromRetro());
     }
 
     @Override
