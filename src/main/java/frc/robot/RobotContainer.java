@@ -22,6 +22,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.ResetEncoder;
 import frc.robot.commands.SwitchPipeline;
 import frc.robot.commands.ZeroGyroCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -138,6 +139,7 @@ public class RobotContainer {
     // cancelling on release.
     m_driverController.x().onTrue(new SwitchPipeline(vision, 1));
     m_driverController.b().onTrue(new SwitchPipeline(vision, 0));
+    m_driverController.a().onTrue(new ResetEncoder(m_drivetrainSubsystem));
   }
 
   /**

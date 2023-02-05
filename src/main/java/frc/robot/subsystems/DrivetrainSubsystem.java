@@ -127,10 +127,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
         return -1*100*(getPose().getX());
     }
 
+
     @Override
     public void periodic(){
         Logger.getInstance().recordOutput("CurrentSwerveModuleStates", getModuleStates());
-        getPose().getX();
         Logger.getInstance().recordOutput("Odom Location X", getPoseXConverted()); //get X stuff for verification
 
         double[] cSpeeds = new double[]{m_chassisSpeeds.vxMetersPerSecond, m_chassisSpeeds.vyMetersPerSecond,m_chassisSpeeds.omegaRadiansPerSecond};
