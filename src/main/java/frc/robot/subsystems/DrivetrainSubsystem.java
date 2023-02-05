@@ -124,7 +124,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     public double getPoseXConverted(){
-        return -((getPose().getX())/100)*2200.15797083/24.57430131;
+        return -1*100*(getPose().getX());
     }
 
     @Override

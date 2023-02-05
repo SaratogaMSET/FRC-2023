@@ -124,7 +124,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger.getInstance().recordOutput("Smart Targeting X", Math.hypot(getCamTran()[0], getCamTran()[2])); //get X stuff for verification
+        Logger.getInstance().recordOutput("Smart Targeting X", 100*Math.hypot(getCamTran()[0], getCamTran()[2])); //get X stuff for verification
         SmartDashboard.putNumberArray("Distances", getDistances());
         SmartDashboard.putNumberArray("Pose to target(arm base)", getOffsetTo2DOFBase()); //Ignore if not on retroreflective pipeline. 
     }
