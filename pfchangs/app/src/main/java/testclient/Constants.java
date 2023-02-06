@@ -5,8 +5,8 @@ import org.opencv.core.Point3;
 public class Constants {
     public static class VisionConstants {
         public static class Field {
-            public static final double FIELD_WIDTH = 16.54175f;
-            public static final double FIELD_HEIGHT = 8.0137f;
+            public static final double FIELD_WIDTH = 16.54175;
+            public static final double FIELD_HEIGHT = 8.0137;
             public static final int NUM_TAGS = 8;
             public static final Point3[] TAGS = {
                 new Point3(Tags.ID_1.x, Tags.ID_1.y, Tags.ID_1.z),
@@ -22,14 +22,22 @@ public class Constants {
 
         public static enum Tags {
             // FIXME - we might have to reverse the rotations (1-4 = 180 and 4-8 = 0)
-            ID_1(15.513558, 1.071626, 0),
+            /* ID_1(15.513558, 1.071626, 0),
             ID_2(15.513558, 2.748026, 0),
             ID_3(15.513558, 4.424426, 0),
             ID_4(16.178784, 6.749796, 0),
             ID_5(0.36195, 6.749796, 180),
             ID_6(1.02743, 4.424426, 180),
             ID_7(1.02743, 2.748026, 180),
-            ID_8(1.02743, 1.071626, 180);
+            ID_8(1.02743, 1.071626, 180); */
+            ID_1(15.513558 - Field.FIELD_WIDTH / 2, 1.071626 - Field.FIELD_HEIGHT / 2, 0),
+            ID_2(15.513558 - Field.FIELD_WIDTH / 2, 2.748026 - Field.FIELD_HEIGHT / 2, 0),
+            ID_3(15.513558 - Field.FIELD_WIDTH / 2, 4.424426 - Field.FIELD_HEIGHT / 2, 0),
+            ID_4(16.178784 - Field.FIELD_WIDTH / 2, 6.749796 - Field.FIELD_HEIGHT / 2, 0),
+            ID_5(0.36195 - Field.FIELD_WIDTH / 2, 6.749796 - Field.FIELD_HEIGHT / 2, 180),
+            ID_6(1.02743 - Field.FIELD_WIDTH / 2, 4.424426 - Field.FIELD_HEIGHT / 2, 180),
+            ID_7(1.02743 - Field.FIELD_WIDTH / 2, 2.748026 - Field.FIELD_HEIGHT / 2, 180),
+            ID_8(1. - Field.FIELD_WIDTH / 2, 1.071626 - Field.FIELD_HEIGHT / 2, 180);
 
             public final double x;
             public final double y;

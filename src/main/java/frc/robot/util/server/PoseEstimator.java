@@ -2,14 +2,17 @@ package frc.robot.util.server;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import frc.lib.logging.LoggablePose;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -76,6 +79,35 @@ public class PoseEstimator {
 
     private void update(SwerveOdomMeasurement odometryMeas, VisionMeasurement visionMeas) {
         double currentTime = Timer.getFPGATimestamp();
+
+        odometryMeas = new SwerveOdomMeasurement(new Rotation2d(), 
+            new SwerveModuleState[]{
+                new SwerveModuleState(),
+                new SwerveModuleState(),
+                new SwerveModuleState(),
+                new SwerveModuleState()
+            }
+        ); // DEBUG TODO REMOVE
+        visionMeas = new VisionMeasurement(true, 0 * 100, // DEBUG TODO REMOVE
+        7, new Pose2d(new Translation2d(0, 0), 
+        new Rotation2d()), 
+        new Pose2d(new Translation2d(0, 0), new Rotation2d()), 
+        new double[]{2.5, 2.5, -1, -1,
+            -1, -1, -1, -1});
+        /* odometryMeas = new SwerveOdomMeasurement(new Rotation2d(new Random().nextDouble()), 
+            new SwerveModuleState[]{
+                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
+                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
+                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),
+                new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble()))
+            }
+        ); // DEBUG TODO REMOVE
+        visionMeas = new VisionMeasurement(new Random().nextBoolean(), new Random().nextDouble() * 100, // DEBUG TODO REMOVE
+        new Random().nextInt(), new Pose2d(new Translation2d(new Random().nextDouble(), new Random().nextDouble()), 
+        new Rotation2d(new Random().nextDouble())), 
+        new Pose2d(new Translation2d(new Random().nextDouble(), new Random().nextDouble()), new Rotation2d(new Random().nextDouble())), 
+        new double[]{new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(),
+            new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble(), new Random().nextDouble()}); */
 
         rawOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());
         cookedOdometry.updateWithTime(currentTime, odometryMeas.getGyroAngle(), odometryMeas.getModuleStates());

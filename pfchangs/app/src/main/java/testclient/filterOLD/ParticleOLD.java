@@ -131,6 +131,13 @@ public class ParticleOLD {
         );
     }
 
+    public Pose2d toPose2d(double xOffset, double yOffset, double radOffset) {
+        return new Pose2d(
+            new Translation2d(x + xOffset, y + yOffset),
+            new Rotation2d(orientation + radOffset)
+        );
+    }
+
     private double circle(double num, double length) {
         while (num > length - 1)
             num -= length;
