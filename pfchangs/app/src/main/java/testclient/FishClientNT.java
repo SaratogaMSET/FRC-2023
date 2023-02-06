@@ -15,7 +15,7 @@ import testclient.filterOLD.ParticleFilterOLD;
 import testclient.wrappers.RobotData;
 
 public class FishClientNT {
-    public static final boolean USE_AMCL = true;
+    public static final boolean USE_AMCL = false;
 
     private ParticleFilterOLD filter = new ParticleFilterOLD(
         Constants.FilterConstants.NUM_PARTICLES, 
@@ -143,10 +143,18 @@ public class FishClientNT {
                 if (latestData.vision.hasTargets) {
                     filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     filter.resample(latestData.vision.distances);
-                    publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d());
+                    publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d(
+                        Constants.VisionConstants.Field.FIELD_WIDTH / 2,
+                        Constants.VisionConstants.Field.FIELD_HEIGHT / 2,
+                        0
+                    ));
                 } else {
                     filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
-                    publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d());
+                    publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d(
+                        Constants.VisionConstants.Field.FIELD_WIDTH / 2,
+                        Constants.VisionConstants.Field.FIELD_HEIGHT / 2,
+                        0
+                    ));
                 }
             }
         }
@@ -165,7 +173,7 @@ public class FishClientNT {
                 System.out.println("REINITIALIZING FILTER!!!!!!!!!!!");
                 amcl.resetMCL();
             }
-
+            // System.out.println("Loop!"); // DEBUG TODO REMOVE
             if (odomIDSub.get() != -1) {
                 // FIXME check if deltas are field-relative or robot-relative
                 RobotData latestData = readNTData();
@@ -184,11 +192,19 @@ public class FishClientNT {
                 if (latestData.vision.hasTargets) {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     amcl.tagScanning(latestData.vision.hasTargets, latestData.vision.tagID, latestData.vision.distances, latestData.vision.campose);
-                    publishEstimate(latestData.odom.id, amcl.getBestEstimate().toPose2d());
+                    publishEstimate(latestData.odom.id, amcl.getBestEstimate().toPose2d(
+                        Constants.VisionConstants.Field.FIELD_WIDTH / 2,
+                        Constants.VisionConstants.Field.FIELD_HEIGHT / 2,
+                        0
+                    ));
                     amcl.outputNParticles();
                 } else {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
-                    publishEstimate(latestData.odom.id, amcl.getBestEstimate().toPose2d());
+                    publishEstimate(latestData.odom.id, amcl.getBestEstimate().toPose2d(
+                        Constants.VisionConstants.Field.FIELD_WIDTH / 2,
+                        Constants.VisionConstants.Field.FIELD_HEIGHT / 2,
+                        0
+                    ));
                     amcl.outputNParticles();
                 }
             }

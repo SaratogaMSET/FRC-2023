@@ -89,7 +89,7 @@ public class PoseEstimator {
         7, new Pose2d(new Translation2d(0, 0), 
         new Rotation2d()), 
         new Pose2d(new Translation2d(0, 0), new Rotation2d()), 
-        new double[]{-1, 2.5, -1, -1,
+        new double[]{2.5, 2.5, -1, -1,
             -1, -1, -1, -1});
         /* odometryMeas = new SwerveOdomMeasurement(new Rotation2d(new Random().nextDouble()), 
             new SwerveModuleState[]{
