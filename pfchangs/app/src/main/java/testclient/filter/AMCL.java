@@ -6,8 +6,7 @@ import java.util.Random;
 
 import org.opencv.core.Point3;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import testclient.Constants;
 import testclient.Maths;
 import testclient.wrappers.TagDistance;
@@ -32,6 +31,11 @@ public class AMCL {
     private boolean resetParticles;
 
     private boolean useHeading;
+
+    private double nParticles;
+
+    private boolean useAdaptiveParticles;
+    private double cf, dist;
 
     public AMCL() {
         useHeading = false;
