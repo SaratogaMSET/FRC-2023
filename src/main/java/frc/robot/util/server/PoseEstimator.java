@@ -80,7 +80,7 @@ public class PoseEstimator {
     private void update(SwerveOdomMeasurement odometryMeas, VisionMeasurement visionMeas) {
         double currentTime = Timer.getFPGATimestamp();
 
-        odometryMeas = new SwerveOdomMeasurement(new Rotation2d(), 
+        odometryMeas = new SwerveOdomMeasurement(new Rotation2d(Math.PI / 4), 
             new SwerveModuleState[]{
                 new SwerveModuleState(),
                 new SwerveModuleState(),
@@ -88,12 +88,11 @@ public class PoseEstimator {
                 new SwerveModuleState()
             }
         ); // DEBUG TODO REMOVE
-        visionMeas = new VisionMeasurement(true, 0 * 100, // DEBUG TODO REMOVE
-        7, new Pose2d(new Translation2d(0, 0), 
-        new Rotation2d()), 
-        new Pose2d(new Translation2d(0, 0), new Rotation2d()), 
-        new double[]{2.5, 2.5, -1, -1,
-            -1, -1, -1, -1});
+        visionMeas = new VisionMeasurement(true, 0, // DEBUG TODO REMOVE
+        7, new Pose2d(new Translation2d(new Random().nextDouble(), new Random().nextDouble()), 
+        new Rotation2d(new Random().nextDouble())), 
+        new Pose2d(new Translation2d(new Random().nextDouble(), new Random().nextDouble()), new Rotation2d(Math.PI / 4)), 
+        new double[]{-1, -1, -1, -1, -1, -1, 2.5, 2.5});
         /* odometryMeas = new SwerveOdomMeasurement(new Rotation2d(new Random().nextDouble()), 
             new SwerveModuleState[]{
                 new SwerveModuleState(new Random().nextDouble(), new Rotation2d(new Random().nextDouble())),

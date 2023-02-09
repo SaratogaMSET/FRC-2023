@@ -37,7 +37,7 @@ public class AMCL {
     private double cf, dist;
 
     public AMCL() {
-        useHeading = true;
+        useHeading = false;
     }
 
     public void init() {
@@ -55,15 +55,15 @@ public class AMCL {
             ));
         }
 
-        mGaussX = 2 / 300; // meters, 2
-        mGaussW = 2 / 300; // radians, 2
-        vGaussW = 5 / 300; // (degrees) radians, 5
-        vGaussY = 0.1 / 300; // meters, 3
-        mGaussY =  3 / 300; // meters, 3
-        mclASlow = 0.01 / 300; // 0.01
+        mGaussX = 0.15; // meters, 2
+        mGaussW = 0.2; // radians, 2
+        vGaussW = 0.15; // (degrees) radians, 5
+        vGaussY = 0.1; // meters, 3
+        mGaussY =  0.15; // meters, 3
+        mclASlow = 0.01; // 0.01
         useAdaptiveParticles = false;
-        mclAFast = 0.1 / 300; // 0.1
-        vGaussX = 5 / 300; // meters, 5
+        mclAFast = 0.1; // 0.1
+        vGaussX = 0.1; // meters, 5
     }
 
     /**
@@ -86,7 +86,7 @@ public class AMCL {
         setpoint = Math.abs(setpoint);
 
         while (angle >= 2 * Math.PI) angle -= 2 * Math.PI;
-        while (angle <= 0) angle += 2 * Math.PI;
+        while (angle < 0) angle += 2 * Math.PI;
         return Maths.Gaussian(setpoint, vGaussW, angle);
     }
 
@@ -238,11 +238,7 @@ public class AMCL {
         mclWSlow += mclASlow * (wAvg - mclWSlow);
         mclWFast += mclAFast * (wAvg - mclWFast);
 
-        try {
-            lowVarResampling();
-        } catch (Exception e) {
-            System.out.println("Oh noes.");
-        }
+        lowVarResampling();
     }
 
     private void lowVarResampling() {
@@ -284,12 +280,23 @@ public class AMCL {
 
         particles = newParticles;
 
+        dist = 0;
+        cf = 0;
+        bestEstimate = getBestEstimate();
+        double xBest = bestEstimate.x;
+        double yBest = bestEstimate.y;
+
+        // FIXME we may need to check which heading computation is correct for average particle
         for (var p : particles) {
             meanX += p.x;
             meanY += p.y;
             sin += Math.sin(p.w);
             cos += Math.cos(p.w);
             p.weight = 1 / Constants.FilterConstants.NUM_PARTICLES;
+
+            double tmpX = xBest - p.x;
+            double tmpY = yBest - p.y;
+            dist += Math.hypot(tmpX, tmpY);
         }
 
         meanX /= Constants.FilterConstants.NUM_PARTICLES;
@@ -322,6 +329,7 @@ public class AMCL {
     }
 
     public Particle getAverageEstimate() {
+        // FIXME we may need to check which heading computation is correct for average particle
         meanEstimate = new Particle(0, 0, 0, 0);
 
         double meanX = 0, meanY = 0, meanW = 0;
