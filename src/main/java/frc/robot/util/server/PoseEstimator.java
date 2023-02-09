@@ -28,17 +28,44 @@ public class PoseEstimator {
     private final VisionSubsystem vision;
     private final DrivetrainSubsystem drivetrain;
 
+    /**
+     * Tracks measurements to associate between measurement and timestamp.
+     */
     private int currentID = 0;
+    /**
+     * Converts ID to timestamp.
+     */
     private HashMap<Integer, Double> idMap = new HashMap<>();
+    /**
+     * Associates timestamps with SwerveOdomMeasurements.
+     */
     private ConcurrentSkipListMap<Double, SwerveOdomMeasurement> odomMap = new ConcurrentSkipListMap<>();
+    /**
+     * Interpolates timestamped estimates from swerve.
+     */
     private TimeInterpolatableBuffer<Pose2d> poseMap = TimeInterpolatableBuffer.createBuffer(10);
+    /**
+     * Associates timestamps with odom and vision measurements.
+     */
     private TreeMap<Double, Pair<SendableOdomMeasurement, SendableVisionMeasurement>> buffer = new TreeMap<>();
 
+    /**
+     * Stores raw (unfiltered) odometry data from swerve.
+     */
     private TimestampedSwerveOdometry rawOdometry;
+    /**
+     * Stores latency-adjusted pose estimate calculated using raw swerve odom and particle filter estimates.
+     */
     private TimestampedSwerveOdometry cookedOdometry;
 
+    /**
+     * Stores the most recently-received position estimate from the particle filter. Currently unused.
+     */
     private FilterEstimate currentEstimate = new FilterEstimate(0, new Pose2d());
 
+    /**
+     * How old in seconds raw measurements need to be before they are published over NetworkTables.
+     */
     private double timeThreshold = 0.2;
 
     private FishServerNT ntServer = new FishServerNT(this::computeEstimate);

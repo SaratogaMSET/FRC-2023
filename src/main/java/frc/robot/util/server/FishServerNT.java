@@ -56,8 +56,8 @@ public class FishServerNT {
                 estimateListener.accept(new FilterEstimate(
                     (int) estimateIDSub.get(),
                     new Pose2d(
-                        new Translation2d(estimateXSub.get(), estimateYSub.get()), // FIXME hopefully x and y are in meters
-                        new Rotation2d(estimateWSub.get()) // FIXME radian-degree or vice versa unit conversions hopefully not though
+                        new Translation2d(estimateXSub.get(), estimateYSub.get()),
+                        new Rotation2d(estimateWSub.get())
                     )
                 ));
             }
