@@ -87,7 +87,7 @@ public class AMCL {
 
         while (angle >= 2 * Math.PI) angle -= 2 * Math.PI;
         while (angle <= 0) angle += 2 * Math.PI;
-        return frc.robot.util.Maths.Gaussian(setpoint, vGaussW, angle);
+        return Maths.Gaussian(setpoint, vGaussW, angle);
     }
 
     /**
@@ -209,7 +209,7 @@ public class AMCL {
                         double tagDist = d.distance + Maths.normalDistribution(0, Math.hypot(vGaussX, vGaussY));
                         double particleDistance = Math.hypot(p.x - d.x, p.y - d.y);
                         double distanceDiff = Math.abs(particleDistance - tagDist);
-                        prob *= frc.robot.util.Maths.Gaussian(0, Math.hypot(vGaussX, vGaussY), distanceDiff);
+                        prob *= Maths.Gaussian(0, Math.hypot(vGaussX, vGaussY), distanceDiff);
                     } else {
                         prob *= 1;
                     }
