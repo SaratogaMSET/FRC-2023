@@ -49,8 +49,21 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     private double getDistanceFromRetro(){
-        return (Constants.VisionConstants.H2 - Constants.VisionConstants.H1) / Math.tan(0.017453292519943295 * (Constants.VisionConstants.A1 + getTY()));
+        if (getTY() < 0){
+            return (Constants.VisionConstants.H2b - Constants.VisionConstants.H1) / Math.tan(0.017453292519943295 * (Constants.VisionConstants.A1 + getTY()));
+        } 
+        return (Constants.VisionConstants.H2a - Constants.VisionConstants.H1) / Math.tan(0.017453292519943295 * (Constants.VisionConstants.A1 + getTY()));
     }
+
+    private double[] getCornerData(){ // returns in ndc.    
+        return table.getEntry("tcornxy").getDoubleArray(new double[12]);
+    }
+
+    // private double[] getOptimalTape(){ // returns tx, ty of optimal tape. closest, highest.
+    //     for(int i = 0 ; i < 8; i += 2){
+            
+    //     }
+    // }
 
     /**
      * *
