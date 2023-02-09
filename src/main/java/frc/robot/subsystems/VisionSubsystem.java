@@ -66,7 +66,6 @@ public class VisionSubsystem extends SubsystemBase {
 
 
     private double[] getDistances() {
-        // TODO check if we can get number of tags in view, if we can, switch between this method and botpose-->all 8 tag distances
         double[] distances = new double[]{
             -1,
             -1,
@@ -79,9 +78,7 @@ public class VisionSubsystem extends SubsystemBase {
         };
         int tagID = getTagID();
         if (tagID > 0) {
-            // TODO check distance calc (are we using the right values from camtran, should we even be using camtran, etc.)
             distances[tagID - 1] = Math.hypot(getCamTran()[0], getCamTran()[2]);
-            // distances[tagID - 1] = Math.sqrt(Math.pow(getCamTran()[0], 2) + Math.pow(getCamTran()[2], 2));
         }
 
         return distances;
@@ -120,6 +117,10 @@ public class VisionSubsystem extends SubsystemBase {
             ),
             getDistances()
         );
+    }
+
+    public LimelightResults getLatestResults() {
+        return LimelightHelpers.getLatestResults("");
     }
 
     @Override

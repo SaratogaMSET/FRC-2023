@@ -33,4 +33,8 @@ public class Maths {
     public static double normalDistribution(double mean, double stddev) {
         return r.nextGaussian() * stddev + mean;
     }
+
+    public static double clamp(double x, double min, double max) {
+        return Math.max(min, Math.min(x, max));
+    }
 }
