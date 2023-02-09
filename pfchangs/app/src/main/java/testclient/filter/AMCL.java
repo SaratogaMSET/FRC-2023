@@ -232,7 +232,8 @@ public class AMCL {
                         double tagDist = d.distance + Maths.normalDistribution(0, Math.hypot(vGaussX, vGaussY));
                         double particleDistance = Math.hypot(p.x - d.x, p.y - d.y);
                         double distanceDiff = Math.abs(particleDistance - tagDist);
-                        prob *= Math.exp((-distanceDiff * distanceDiff) / (2 * mclFieldptsVar * mclFieldptsVar));
+                        prob *= frc.robot.util.Maths.Gaussian(0, Math.hypot(vGaussX, vGaussY), distanceDiff);
+                        // prob *= Math.exp((-distanceDiff * distanceDiff) / (2 * mclFieldptsVar * mclFieldptsVar));
                         // System.out.println("Before: " + p.weight);
                         // p.weight = prob;
                         // System.out.println(p.x + " " + p.y);
