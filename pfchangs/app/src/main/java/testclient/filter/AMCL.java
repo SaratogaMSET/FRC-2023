@@ -6,6 +6,7 @@ import java.util.Random;
 
 import org.opencv.core.Point3;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import testclient.Constants;
 import testclient.Maths;
@@ -41,16 +42,14 @@ public class AMCL {
     }
 
     public void init() {
-        Random xrd = new Random();
-        Random yrd = new Random();
-        Random wrd = new Random();
+        Random r = new Random();
         
         nParticles = Constants.FilterConstants.NUM_PARTICLES;
         for (int i = 0; i < nParticles; ++i) {
             particles.add(new Particle(
-                xrd.nextDouble() * Constants.VisionConstants.Field.FIELD_WIDTH - (Constants.VisionConstants.Field.FIELD_WIDTH / 2), 
-                yrd.nextDouble() * Constants.VisionConstants.Field.FIELD_HEIGHT - (Constants.VisionConstants.Field.FIELD_HEIGHT / 2), 
-                wrd.nextDouble() * Math.PI * 2, 
+                r.nextDouble(-Constants.VisionConstants.Field.FIELD_WIDTH / 2, Constants.VisionConstants.Field.FIELD_WIDTH / 2), 
+                r.nextDouble(-Constants.VisionConstants.Field.FIELD_HEIGHT / 2, Constants.VisionConstants.Field.FIELD_HEIGHT / 2), 
+                r.nextDouble(Math.PI * 2), 
                 1 / nParticles
             ));
         }
@@ -135,33 +134,29 @@ public class AMCL {
     }
 
     public void resetMCL() {
-        Random xrd = new Random();
-        Random yrd = new Random();
-        Random wrd = new Random();
+        Random r = new Random();
         
         nParticles = Constants.FilterConstants.NUM_PARTICLES;
         for (int i = 0; i < nParticles; ++i) {
             particles.add(new Particle(
-                xrd.nextDouble() * Constants.VisionConstants.Field.FIELD_WIDTH - (Constants.VisionConstants.Field.FIELD_WIDTH / 2), 
-                yrd.nextDouble() * Constants.VisionConstants.Field.FIELD_HEIGHT - (Constants.VisionConstants.Field.FIELD_HEIGHT / 2), 
-                wrd.nextDouble() * Math.PI * 2, 
+                r.nextDouble(-Constants.VisionConstants.Field.FIELD_WIDTH / 2, Constants.VisionConstants.Field.FIELD_WIDTH / 2), 
+                r.nextDouble(-Constants.VisionConstants.Field.FIELD_HEIGHT / 2, Constants.VisionConstants.Field.FIELD_HEIGHT / 2), 
+                r.nextDouble(Math.PI * 2), 
                 1 / nParticles
             ));
         }
     }
 
     private void updateMotion() {
-        Random xgen = new Random();
-        Random ygen = new Random();
-        Random wgen = new Random();
+        Random r = new Random();
 
         double dx = motionDelta.x;
         double dy = motionDelta.y;
         double dw = motionDelta.z;
         for (var p : particles) {
-            p.x += dx + xgen.nextGaussian(0, mGaussX);
-            p.y += dy + ygen.nextGaussian(0, mGaussY);
-            p.w += dw + wgen.nextGaussian(0, mGaussW);
+            p.x += dx + r.nextGaussian(0, mGaussX);
+            p.y += dy + r.nextGaussian(0, mGaussY);
+            p.w += dw + r.nextGaussian(0, mGaussW);
 
             while (p.w >= Math.PI * 2) p.w -= Math.PI * 2;
             while (p.w < 0) p.w += Math.PI * 2;
@@ -219,13 +214,14 @@ public class AMCL {
 
                 if (useHeading && hasTargets) {
                     cmpsProb = 1 / headingErr(p.w, 
-                        Math.toRadians((campose[2] + Constants.VisionConstants.Field.TAGS[id - 1].z) % 360)  +
+                        Math.toRadians((campose[2] + Constants.VisionConstants.Field.TAGS[id - 1].z) % 360) +
                             Maths.normalDistribution(0, vGaussW)
                     );
                     p.weight *= cmpsProb;
                 }
                 sumWeight += p.weight;
             } else {
+                // FIXME - potentially causes problems when we can't see any tags
                 resetParticles = true;
             }
         }
@@ -260,9 +256,11 @@ public class AMCL {
             if (rand < resetProb || resetParticles) {
                 resetParticles = false;
                 newParticles.add(new Particle(
-                    Math.random() * Constants.VisionConstants.Field.FIELD_WIDTH - (Constants.VisionConstants.Field.FIELD_WIDTH / 2), 
-                    Math.random() * Constants.VisionConstants.Field.FIELD_HEIGHT - (Constants.VisionConstants.Field.FIELD_HEIGHT / 2), 
-                    Math.random() * Math.PI * 2, 
+                    random.nextDouble(-Constants.VisionConstants.Field.FIELD_WIDTH / 2, 
+                        Constants.VisionConstants.Field.FIELD_WIDTH / 2), 
+                    random.nextDouble(-Constants.VisionConstants.Field.FIELD_HEIGHT / 2, 
+                        Constants.VisionConstants.Field.FIELD_HEIGHT / 2), 
+                    random.nextDouble(Math.PI * 2), 
                     1 / Constants.FilterConstants.NUM_PARTICLES
                 ));
             } else {
@@ -325,7 +323,8 @@ public class AMCL {
             }
 
         }
-        return bestEstimate;
+
+        return bestEstimate.clone();
     }
 
     public Particle getAverageEstimate() {
@@ -343,7 +342,37 @@ public class AMCL {
         meanEstimate.y = meanY / particles.size();
         meanEstimate.w = meanW / particles.size();
         meanEstimate.weight = 1 / particles.size();
-        return meanEstimate;
+
+        return meanEstimate.clone();
+    }
+
+    public Particle getWeightedAverage() {
+        double meanX = 0, meanY = 0, meanW = 0;
+        for (var p : particles) {
+            meanX += p.x * p.weight;
+            meanY += p.y * p.weight;
+            meanW += p.w * p.weight;
+        }
+
+        return new Particle(meanX, meanY, meanW, 0);
+    }
+
+    public Particle getFilteredAverage() {
+        Particle tmp = getAverageEstimate();
+        LinearFilter xFilter = LinearFilter.movingAverage(10);
+        LinearFilter yFilter = LinearFilter.movingAverage(10);
+        LinearFilter wFilter = LinearFilter.movingAverage(10);
+
+        return new Particle(xFilter.calculate(tmp.x), yFilter.calculate(tmp.y), wFilter.calculate(tmp.w), 0);
+    }
+
+    public Particle getFilteredWeightedAverage() {
+        Particle tmp = getWeightedAverage();
+        LinearFilter xFilter = LinearFilter.movingAverage(10);
+        LinearFilter yFilter = LinearFilter.movingAverage(10);
+        LinearFilter wFilter = LinearFilter.movingAverage(10);
+
+        return new Particle(xFilter.calculate(tmp.x), yFilter.calculate(tmp.y), wFilter.calculate(tmp.w), 0);
     }
 
     public void outputNParticles() {

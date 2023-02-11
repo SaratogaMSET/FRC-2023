@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.wrappers.VisionMeasurement;
 import frc.robot.Constants;
+import frc.robot.subsystems.LimelightHelpers.LimelightResults;
 
 public class VisionSubsystem extends SubsystemBase {
     private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -18,13 +19,13 @@ public class VisionSubsystem extends SubsystemBase {
     public VisionSubsystem() {}
 
     private double[] getCamTran() {
-        double[] pose = table.getEntry("campose").getDoubleArray(new double[10]);
+        double[] pose = table.getEntry("botpose_targetspace").getDoubleArray(new double[10]);
         if (pose.length > 0) return pose;
         else return new double[6];
     }
 
     private double[] getBotPose() {
-        double[] pose = table.getEntry("botpose").getDoubleArray(new double[10]);
+        double[] pose = getLatestResults().targetingResults.botpose;
         if (pose.length > 0) return pose;
         else return new double[6];
     }
@@ -88,9 +89,11 @@ public class VisionSubsystem extends SubsystemBase {
             -1,
             -1
         };
-        int tagID = getTagID();
-        if (tagID > 0) {
-            distances[tagID - 1] = Math.hypot(getCamTran()[0], getCamTran()[2]);
+
+        var tmp = new Pose2d();
+        for (var r : getLatestResults().targetingResults.targets_Fiducials) {
+            tmp = r.getRobotPose_TargetSpace2D();
+            distances[(int) r.fiducialID] = Math.hypot(tmp.getX(), tmp.getY());
         }
 
         return distances;

@@ -27,11 +27,11 @@ public class Maths {
     }
 
     public static double normalDistribution(Random r, double mean, double stddev) {
-        return r.nextGaussian() * stddev + mean;
+        return r.nextGaussian(mean, stddev);
     }
 
     public static double normalDistribution(double mean, double stddev) {
-        return r.nextGaussian() * stddev + mean;
+        return r.nextGaussian(mean, stddev);
     }
 
     public static double clamp(double x, double min, double max) {

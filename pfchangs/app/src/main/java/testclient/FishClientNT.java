@@ -60,9 +60,9 @@ public class FishClientNT {
 
     public FishClientNT() {
         inst.startClient4("estimator");
-        // inst.setServerTeam(649);
+        inst.setServerTeam(649);
         // inst.startDSClient();
-        inst.setServer("localhost"); // "localhost" for simulation
+        // inst.setServer("localhost"); // "localhost" for simulation
         // https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html
         System.out.println("Finshed client init.");
 
