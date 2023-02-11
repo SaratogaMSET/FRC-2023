@@ -77,7 +77,6 @@ public class VisionSubsystem extends SubsystemBase {
         return (int) table.getEntry("tid").getInteger(-1);
     }
 
-
     private double[] getDistances() {
         double[] distances = new double[]{
             -1,

@@ -11,18 +11,9 @@ import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import testclient.filter.AMCL;
-import testclient.filterOLD.ParticleFilterOLD;
 import testclient.wrappers.RobotData;
 
 public class FishClientNT {
-    public static final boolean USE_AMCL = true;
-
-    private ParticleFilterOLD filter = new ParticleFilterOLD(
-        Constants.FilterConstants.NUM_PARTICLES, 
-        Constants.VisionConstants.Field.TAGS, 
-        Constants.VisionConstants.Field.FIELD_WIDTH, 
-        Constants.VisionConstants.Field.FIELD_HEIGHT
-    );
     private AMCL amcl = new AMCL();
 
     private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -66,19 +57,9 @@ public class FishClientNT {
         // https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html
         System.out.println("Finshed client init.");
 
-        if (USE_AMCL) {
-            System.out.println("Initializing AMCL.");
-            amcl.init();
-            System.out.println("Finished initializing AMCL.");
-        } else {
-            System.out.println("Starting filter init.");
-            filter.setNoise(
-                Constants.FilterConstants.FNOISE, 
-                Constants.FilterConstants.TNOISE, 
-                Constants.FilterConstants.SNOISE
-            );
-            System.out.println("Finished filter init.");
-        }
+        System.out.println("Initializing AMCL.");
+        amcl.init();
+        System.out.println("Finished initializing AMCL.");
     }
 
     private RobotData readNTData() {
@@ -102,67 +83,9 @@ public class FishClientNT {
         estimateWPub.set(pose.getRotation().getRadians());
     }
 
-    public void start() {
-        System.out.println("Starting particle filter.");
-        while (odomIDSub.get() == -1) {} // scuffed thread blocking TODO make better
-        System.out.println("Received first measurement!");
-        filter = new ParticleFilterOLD(
-            Constants.FilterConstants.NUM_PARTICLES, 
-            Constants.VisionConstants.Field.TAGS, 
-            Constants.VisionConstants.Field.FIELD_WIDTH, 
-            Constants.VisionConstants.Field.FIELD_HEIGHT
-        );
-        while (true) {
-            prevFlag = resetFlag;
-            resetFlag = (int) resetFlagSub.get();
-            if (prevFlag != resetFlag) {
-                System.out.println("REINITIALIZING FILTER!!!!!!!!!!!");
-                filter = new ParticleFilterOLD(
-                    Constants.FilterConstants.NUM_PARTICLES, 
-                    Constants.VisionConstants.Field.TAGS, 
-                    Constants.VisionConstants.Field.FIELD_WIDTH, 
-                    Constants.VisionConstants.Field.FIELD_HEIGHT
-                );
-            } 
-
-            if (odomIDSub.get() != -1) {
-                // FIXME check if deltas are field-relative or robot-relative
-                RobotData latestData = readNTData();
-                prevOdomPose = currentOdomPose; // TODO we can definitely optimize this (but do we need to?)
-                currentOdomPose = new Pose2d(
-                    latestData.odom.x, 
-                    latestData.odom.y, 
-                    new Rotation2d(latestData.odom.w)
-                );
-                poseDeltas = new Pose2d(
-                    currentOdomPose.getX() - prevOdomPose.getX(),
-                    currentOdomPose.getY() - prevOdomPose.getY(),
-                    currentOdomPose.getRotation().minus(prevOdomPose.getRotation())
-                );
-    
-                if (latestData.vision.hasTargets) {
-                    filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
-                    filter.resample(latestData.vision.distances);
-                    publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d(
-                        Constants.VisionConstants.Field.FIELD_WIDTH / 2,
-                        Constants.VisionConstants.Field.FIELD_HEIGHT / 2,
-                        0
-                    ));
-                } else {
-                    filter.move(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
-                    publishEstimate(latestData.odom.id, filter.getAverageParticle().toPose2d(
-                        Constants.VisionConstants.Field.FIELD_WIDTH / 2,
-                        Constants.VisionConstants.Field.FIELD_HEIGHT / 2,
-                        0
-                    ));
-                }
-            }
-        }
-    }
-
     public void startAMCL() {
         System.out.println("Starting AMCL.");
-        while (odomIDSub.get() == -1) {} // scuffed thread blocking TODO make better
+        while (odomIDSub.get() == -1) {}
         System.out.println("Received first measurement!");
 
         amcl.resetMCL();
@@ -173,9 +96,7 @@ public class FishClientNT {
                 System.out.println("REINITIALIZING FILTER!!!!!!!!!!!");
                 amcl.resetMCL();
             }
-            // System.out.println("Loop!"); // DEBUG TODO REMOVE
             if (odomIDSub.get() != -1) {
-                // FIXME check if deltas are field-relative or robot-relative
                 RobotData latestData = readNTData();
                 prevOdomPose = currentOdomPose;
                 currentOdomPose = new Pose2d(
@@ -191,7 +112,7 @@ public class FishClientNT {
 
                 if (latestData.vision.hasTargets) {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
-                    amcl.tagScanning(latestData.vision.hasTargets, latestData.vision.tagID, latestData.vision.distances, latestData.vision.campose);
+                    amcl.tagScanning(latestData.vision.tagID, latestData.vision.distances, latestData.vision.campose);
                     publishEstimate(latestData.odom.id, amcl.getAverageEstimate().toPose2d(
                         Constants.VisionConstants.Field.FIELD_WIDTH / 2,
                         Constants.VisionConstants.Field.FIELD_HEIGHT / 2,
@@ -205,6 +126,10 @@ public class FishClientNT {
                         0
                     ));
                 }
+            } else {
+                System.out.println("Connection dropped!");
+                while (odomIDSub.get() == -1) {}
+                System.out.println("Connection reestablished!");
             }
         }
     }

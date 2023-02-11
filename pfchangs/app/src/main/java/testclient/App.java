@@ -6,7 +6,6 @@ package testclient;
 public class App {
     public static void main(String[] args) {
         FishClientNT c = new FishClientNT();
-        if (FishClientNT.USE_AMCL) c.startAMCL();
-        else c.start();
+        c.startAMCL();
     }
 }

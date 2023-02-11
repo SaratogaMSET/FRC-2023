@@ -18,7 +18,6 @@ public class AMCL {
 
     private Point3 motionDelta = new Point3(); // robot frame motion odometry <-- maybe not?
 
-    // private Particle[] particles;
     private ArrayList<Particle> particles = new ArrayList<Particle>();
     private Particle bestEstimate = new Particle(0, 0, 0, 0);
     private Particle meanEstimate = new Particle(0, 0, 0, 0);
@@ -169,10 +168,8 @@ public class AMCL {
         }
     }
 
-    public void tagScanning(boolean hasTargets, int id, double[] dists, double[] campose) {
+    public void tagScanning(int id, double[] dists, double[] campose) {
         TagDistance[] distances = new TagDistance[8];
-
-        assert dists.length == 8;
 
         for (int i = 0; i < dists.length; ++i) {
             distances[i] = new TagDistance(
@@ -184,10 +181,10 @@ public class AMCL {
 
         tagDistances = new ArrayList<>(Arrays.asList(distances));
 
-        updatePerceptionPoints(hasTargets, id, campose);
+        updatePerceptionPoints(id, campose);
     }
 
-    private void updatePerceptionPoints(boolean hasTargets, int id, double[] campose) {
+    private void updatePerceptionPoints(int id, double[] campose) {
         int numPoints = tagDistances.size();
         double sumWeight = 0;
         double wAvg = 0;
@@ -212,7 +209,7 @@ public class AMCL {
 
                 p.weight = prob;
 
-                if (useHeading && hasTargets) {
+                if (useHeading) {
                     cmpsProb = 1 / headingErr(p.w, 
                         Math.toRadians((campose[2] + Constants.VisionConstants.Field.TAGS[id - 1].z) % 360) +
                             Maths.normalDistribution(0, vGaussW)
