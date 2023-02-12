@@ -114,22 +114,24 @@ public class FishClientNT {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     amcl.tagScanning(latestData.vision.tagID, latestData.vision.distances, latestData.vision.campose);
                     publishEstimate(latestData.odom.id, amcl.getAverageEstimate().toPose2d(
-                        Constants.VisionConstants.Field.FIELD_WIDTH / 2,
-                        Constants.VisionConstants.Field.FIELD_HEIGHT / 2,
+                        Constants.FIELD_WIDTH / 2,
+                        Constants.FIELD_HEIGHT / 2,
                         0
                     ));
                 } else {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     publishEstimate(latestData.odom.id, amcl.getAverageEstimate().toPose2d(
-                        Constants.VisionConstants.Field.FIELD_WIDTH / 2,
-                        Constants.VisionConstants.Field.FIELD_HEIGHT / 2,
+                        Constants.FIELD_WIDTH / 2,
+                        Constants.FIELD_HEIGHT / 2,
                         0
                     ));
                 }
             } else {
                 System.out.println("Connection dropped!");
                 while (odomIDSub.get() == -1) {}
-                System.out.println("Connection reestablished!");
+                System.out.println("Connection reestablished! Resetting AMCL...");
+                amcl.resetMCL();
+                System.out.println("Reinitialized AMCL!");
             }
         }
     }

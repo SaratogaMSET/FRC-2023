@@ -64,14 +64,14 @@ public class FishServerNT {
         );
     }
 
-    public void publishOdometry(SendableOdomMeasurement odometry) {
+    public void publish(SendableOdomMeasurement odometry) {
         odomIDPub.set(odometry.getId());
         odomXPub.set(odometry.getPose().getX());
         odomYPub.set(odometry.getPose().getY());
         odomWPub.set(odometry.getPose().getRotation().getRadians());
     }
 
-    public void publishAll(SendableOdomMeasurement odometry, SendableVisionMeasurement vision) {
+    public void publish(SendableOdomMeasurement odometry, SendableVisionMeasurement vision) {
         resetFlagPub.set(resetFlag);
         // "I don't trust like that!"
         if (odometry.getId() == vision.getMeasID()) {

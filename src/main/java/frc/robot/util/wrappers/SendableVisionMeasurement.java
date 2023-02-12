@@ -7,6 +7,20 @@ public class SendableVisionMeasurement {
     private double[] distance;
     private double[] campose;
 
+    public SendableVisionMeasurement(int measID) {
+        this(measID, 
+            false, 
+            -1, 
+            new double[]{
+                -1, -1, -1, -1,
+                -1, -1, -1, -1
+            }, new double[]{
+                -1, -1, -1,
+                -1, -1, -1
+            }
+        );
+    }
+
     public SendableVisionMeasurement(int measID, boolean hasTargets, int tagID, double[] distance, double[] campose) {
         this.measID = measID;
         this.hasTargets = hasTargets;

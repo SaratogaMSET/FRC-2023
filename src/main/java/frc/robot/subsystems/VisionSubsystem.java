@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
@@ -24,18 +25,8 @@ public class VisionSubsystem extends SubsystemBase {
         else return new double[6];
     }
 
-    private double[] getBotPose() {
-        double[] pose = getLatestResults().targetingResults.botpose;
-        if (pose.length > 0) return pose;
-        else return new double[6];
-    }
-
-    private int getTV() {
-        return (int) table.getEntry("tv").getInteger(0);
-    }
-
-    private double getLatency() {
-        return table.getEntry("tl").getDouble(-1) + 11;
+    private boolean hasTargets() {
+        return table.getEntry("tv").getInteger(0) == 1;
     }
 
     /* Retroreflective(NOT USEFUL) */
@@ -54,16 +45,6 @@ public class VisionSubsystem extends SubsystemBase {
         } 
         return (Constants.VisionConstants.H2a - Constants.VisionConstants.H1) / Math.tan(0.017453292519943295 * (Constants.VisionConstants.A1 + getTY()));
     }
-
-    private double[] getCornerData(){ // returns in ndc.    
-        return table.getEntry("tcornxy").getDoubleArray(new double[12]);
-    }
-
-    // private double[] getOptimalTape(){ // returns tx, ty of optimal tape. closest, highest.
-    //     for(int i = 0 ; i < 8; i += 2){
-            
-    //     }
-    // }
 
     /**
      * *
@@ -89,10 +70,10 @@ public class VisionSubsystem extends SubsystemBase {
             -1
         };
 
-        var tmp = new Pose2d();
+        var tmp = new Pose3d();
         for (var r : getLatestResults().targetingResults.targets_Fiducials) {
-            tmp = r.getRobotPose_TargetSpace2D();
-            distances[(int) r.fiducialID] = Math.hypot(tmp.getX(), tmp.getY());
+            tmp = r.getRobotPose_TargetSpace();
+            distances[(int) r.fiducialID - 1] = Math.hypot(tmp.getX(), tmp.getZ());
         }
 
         return distances;
@@ -115,11 +96,12 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public VisionMeasurement getLatestMeasurement() {
-        double[] botpose = getBotPose();
+        LimelightResults results = getLatestResults();
+        double[] botpose = results.targetingResults.botpose;
         double[] campose = getCamTran();
         return new VisionMeasurement(
-            getTV() != 0,
-            getLatency(),
+            hasTargets(),
+            results.targetingResults.latency_capture + results.targetingResults.latency_pipeline + results.targetingResults.latency_jsonParse,
             getTagID(),
             new Pose2d(
                 new Translation2d(botpose[0], botpose[2]),

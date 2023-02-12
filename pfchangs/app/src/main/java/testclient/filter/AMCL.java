@@ -1,7 +1,7 @@
 package testclient.filter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
 
 import org.opencv.core.Point3;
@@ -14,6 +14,7 @@ import testclient.wrappers.TagDistance;
 
 // FIXME check if EVERYTHING (besides LL campose/botpose) is in radians
 public class AMCL {
+    private HashMap<Integer, TagDistance> distances = new HashMap<>();
     private ArrayList<TagDistance> tagDistances = new ArrayList<>();
 
     private Point3 motionDelta = new Point3(); // robot frame motion odometry <-- maybe not?
@@ -46,8 +47,8 @@ public class AMCL {
         nParticles = Constants.FilterConstants.NUM_PARTICLES;
         for (int i = 0; i < nParticles; ++i) {
             particles.add(new Particle(
-                r.nextDouble(-Constants.VisionConstants.Field.FIELD_WIDTH / 2, Constants.VisionConstants.Field.FIELD_WIDTH / 2), 
-                r.nextDouble(-Constants.VisionConstants.Field.FIELD_HEIGHT / 2, Constants.VisionConstants.Field.FIELD_HEIGHT / 2), 
+                r.nextDouble(-Constants.FIELD_WIDTH / 2, Constants.FIELD_WIDTH / 2), 
+                r.nextDouble(-Constants.FIELD_HEIGHT / 2, Constants.FIELD_HEIGHT / 2), 
                 r.nextDouble(Math.PI * 2), 
                 1 / nParticles
             ));
@@ -138,8 +139,8 @@ public class AMCL {
         nParticles = Constants.FilterConstants.NUM_PARTICLES;
         for (int i = 0; i < nParticles; ++i) {
             particles.add(new Particle(
-                r.nextDouble(-Constants.VisionConstants.Field.FIELD_WIDTH / 2, Constants.VisionConstants.Field.FIELD_WIDTH / 2), 
-                r.nextDouble(-Constants.VisionConstants.Field.FIELD_HEIGHT / 2, Constants.VisionConstants.Field.FIELD_HEIGHT / 2), 
+                r.nextDouble(-Constants.FIELD_WIDTH / 2, Constants.FIELD_WIDTH / 2), 
+                r.nextDouble(-Constants.FIELD_HEIGHT / 2, Constants.FIELD_HEIGHT / 2), 
                 r.nextDouble(Math.PI * 2), 
                 1 / nParticles
             ));
@@ -160,32 +161,27 @@ public class AMCL {
             while (p.w >= Math.PI * 2) p.w -= Math.PI * 2;
             while (p.w < 0) p.w += Math.PI * 2;
 
-            if (p.x > Constants.VisionConstants.Field.FIELD_WIDTH / 2) p.x = Constants.VisionConstants.Field.FIELD_WIDTH / 2;
-            else if (p.x < 0 - Constants.VisionConstants.Field.FIELD_WIDTH / 2) p.x = 0 - Constants.VisionConstants.Field.FIELD_WIDTH / 2;
+            if (p.x > Constants.FIELD_WIDTH / 2) p.x = Constants.FIELD_WIDTH / 2;
+            else if (p.x < 0 - Constants.FIELD_WIDTH / 2) p.x = 0 - Constants.FIELD_WIDTH / 2;
 
-            if (p.y > Constants.VisionConstants.Field.FIELD_HEIGHT / 2) p.y = Constants.VisionConstants.Field.FIELD_HEIGHT / 2;
-            else if (p.y < 0 - Constants.VisionConstants.Field.FIELD_HEIGHT / 2) p.y = 0 - Constants.VisionConstants.Field.FIELD_HEIGHT / 2;
+            if (p.y > Constants.FIELD_HEIGHT / 2) p.y = Constants.FIELD_HEIGHT / 2;
+            else if (p.y < 0 - Constants.FIELD_HEIGHT / 2) p.y = 0 - Constants.FIELD_HEIGHT / 2;
         }
     }
 
     public void tagScanning(int id, double[] dists, double[] campose) {
-        TagDistance[] distances = new TagDistance[8];
-
         for (int i = 0; i < dists.length; ++i) {
-            distances[i] = new TagDistance(
-                Constants.VisionConstants.Field.TAGS[i].x, 
-                Constants.VisionConstants.Field.TAGS[i].y, 
-                dists[i]
-            );
+            if (dists[i] > 0) {
+                distances.put(i + 1, 
+                    new TagDistance(Constants.TAG_ARR[i].x, Constants.TAG_ARR[i].y, dists[i]));
+            }
         }
-
-        tagDistances = new ArrayList<>(Arrays.asList(distances));
 
         updatePerceptionPoints(id, campose);
     }
 
     private void updatePerceptionPoints(int id, double[] campose) {
-        int numPoints = tagDistances.size();
+        int numPoints = distances.size();
         double sumWeight = 0;
         double wAvg = 0;
 
@@ -196,22 +192,18 @@ public class AMCL {
             if (numPoints > 0) {
                 resetParticles = false;
 
-                for (var d : tagDistances) {
-                    if (d.distance > 0) {
-                        double tagDist = d.distance + Maths.normalDistribution(0, Math.hypot(vGaussX, vGaussY));
-                        double particleDistance = Math.hypot(p.x - d.x, p.y - d.y);
-                        double distanceDiff = Math.abs(particleDistance - tagDist);
-                        prob *= Maths.Gaussian(0, Math.hypot(vGaussX, vGaussY), distanceDiff);
-                    } else {
-                        prob *= 1;
-                    }
+                for (var d : distances.values()) {
+                    double tagDist = d.distance + Maths.normalDistribution(0, Math.hypot(vGaussX, vGaussY));
+                    double particleDistance = Math.hypot(p.x - d.x, p.y - d.y);
+                    double distanceDiff = Math.abs(particleDistance - tagDist);
+                    prob *= Maths.Gaussian(0, Math.hypot(vGaussX, vGaussY), distanceDiff);
                 }
 
                 p.weight = prob;
 
                 if (useHeading) {
                     cmpsProb = 1 / headingErr(p.w, 
-                        Math.toRadians((campose[2] + Constants.VisionConstants.Field.TAGS[id - 1].z) % 360) +
+                        Math.toRadians((campose[2] + Constants.TAG_ARR[id - 1].z) % 360) +
                             Maths.normalDistribution(0, vGaussW)
                     );
                     p.weight *= cmpsProb;
@@ -253,10 +245,10 @@ public class AMCL {
             if (rand < resetProb || resetParticles) {
                 resetParticles = false;
                 newParticles.add(new Particle(
-                    random.nextDouble(-Constants.VisionConstants.Field.FIELD_WIDTH / 2, 
-                        Constants.VisionConstants.Field.FIELD_WIDTH / 2), 
-                    random.nextDouble(-Constants.VisionConstants.Field.FIELD_HEIGHT / 2, 
-                        Constants.VisionConstants.Field.FIELD_HEIGHT / 2), 
+                    random.nextDouble(-Constants.FIELD_WIDTH / 2, 
+                        Constants.FIELD_WIDTH / 2), 
+                    random.nextDouble(-Constants.FIELD_HEIGHT / 2, 
+                        Constants.FIELD_HEIGHT / 2), 
                     random.nextDouble(Math.PI * 2), 
                     1 / Constants.FilterConstants.NUM_PARTICLES
                 ));

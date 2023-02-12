@@ -1,6 +1,8 @@
 package frc.robot.util.wrappers;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 public class VisionMeasurement {
     private boolean hasTargets;
@@ -9,6 +11,26 @@ public class VisionMeasurement {
     private Pose2d botpose;
     private Pose2d campose;
     private double[] distance;
+
+    public VisionMeasurement() {
+        this(
+            false,
+            -1,
+            -1,
+            new Pose2d(
+                new Translation2d(-1, -1),
+                new Rotation2d(-1)
+            ),
+            new Pose2d(
+                new Translation2d(-1, -1),
+                new Rotation2d(-1)
+            ),
+            new double[]{
+                -1, -1, -1, -1,
+                -1, -1, -1, -1
+            }
+        );
+    }
 
     public VisionMeasurement(
         boolean hasTargets,
