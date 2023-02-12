@@ -3,23 +3,38 @@ package frc.robot.subsystems;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.wrappers.VisionMeasurement;
 import frc.robot.Constants;
 import frc.robot.subsystems.LimelightHelpers.LimelightResults;
+import frc.robot.util.wrappers.VisionMeasurement;
 
 public class VisionSubsystem extends SubsystemBase {
     private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
     public VisionSubsystem() {}
 
+    private Pose2d getCamPose2d() {
+        double id = getTagID();
+        for (var v : getLatestResults().targetingResults.targets_Fiducials) {
+            if (v.fiducialID == id) return v.getRobotPose_TargetSpace2D();
+        }
+
+        return new Pose2d();
+    }
+
     private double[] getCamTran() {
+        double id = getTagID();
+        for (var v : getLatestResults().targetingResults.targets_Fiducials) {
+            if (v.fiducialID == id) return new double[]{
+                v.getRobotPose_TargetSpace2D().getX(),
+                v.getRobotPose_TargetSpace2D().getY(),
+                v.getRobotPose_TargetSpace2D().getRotation().getDegrees()
+            };
+        }
+
         double[] pose = table.getEntry("botpose_targetspace").getDoubleArray(new double[10]);
         if (pose.length > 0) return pose;
         else return new double[6];
@@ -70,9 +85,8 @@ public class VisionSubsystem extends SubsystemBase {
             -1
         };
 
-        var tmp = new Pose3d();
         for (var r : getLatestResults().targetingResults.targets_Fiducials) {
-            tmp = r.getRobotPose_TargetSpace();
+            var tmp = r.getRobotPose_TargetSpace();
             distances[(int) r.fiducialID - 1] = Math.hypot(tmp.getX(), tmp.getZ());
         }
 
@@ -97,20 +111,14 @@ public class VisionSubsystem extends SubsystemBase {
 
     public VisionMeasurement getLatestMeasurement() {
         LimelightResults results = getLatestResults();
-        double[] botpose = results.targetingResults.botpose;
-        double[] campose = getCamTran();
         return new VisionMeasurement(
             hasTargets(),
-            results.targetingResults.latency_capture + results.targetingResults.latency_pipeline + results.targetingResults.latency_jsonParse,
+            results.targetingResults.latency_capture + 
+                results.targetingResults.latency_pipeline + 
+                results.targetingResults.latency_jsonParse,
             getTagID(),
-            new Pose2d(
-                new Translation2d(botpose[0], botpose[2]),
-                new Rotation2d(botpose[5])
-            ),
-            new Pose2d(
-                new Translation2d(campose[0], campose[2]),
-                new Rotation2d(campose[5])
-            ),
+            results.targetingResults.getBotPose2d(),
+            getCamPose2d(),
             getDistances()
         );
     }
@@ -122,6 +130,8 @@ public class VisionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         Logger.getInstance().recordOutput("Smart Targeting X", 100*Math.hypot(getCamTran()[0], getCamTran()[2])); //get X stuff for verification
+        SmartDashboard.putNumberArray("Botpose 2d", getLatestResults().targetingResults.botpose);
+        SmartDashboard.putNumber("Botpose rotation", getLatestResults().targetingResults.getBotPose2d().getRotation().getDegrees());
         SmartDashboard.putNumberArray("Distances", getDistances());
         SmartDashboard.putNumberArray("Pose to target(arm base)", getOffsetTo2DOFBase()); //Ignore if not on retroreflective pipeline. 
         SmartDashboard.putNumber("distance to retro", getDistanceFromRetro());

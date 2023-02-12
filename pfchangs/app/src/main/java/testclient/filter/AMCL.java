@@ -15,7 +15,6 @@ import testclient.wrappers.TagDistance;
 // FIXME check if EVERYTHING (besides LL campose/botpose) is in radians
 public class AMCL {
     private HashMap<Integer, TagDistance> distances = new HashMap<>();
-    private ArrayList<TagDistance> tagDistances = new ArrayList<>();
 
     private Point3 motionDelta = new Point3(); // robot frame motion odometry <-- maybe not?
 
@@ -38,7 +37,7 @@ public class AMCL {
     private double cf, dist;
 
     public AMCL() {
-        useHeading = false;
+        useHeading = true;
     }
 
     public void init() {
@@ -201,10 +200,10 @@ public class AMCL {
 
                 p.weight = prob;
 
-                if (useHeading) {
-                    cmpsProb = 1 / headingErr(p.w, 
-                        Math.toRadians((campose[2] + Constants.TAG_ARR[id - 1].z) % 360) +
-                            Maths.normalDistribution(0, vGaussW)
+                if (useHeading && id > 1) {
+                    cmpsProb = headingErr(p.w, 
+                        (campose[2] + Math.toRadians(Constants.TAG_ARR[id - 1].z)) % 2 * Math.PI +
+                                Maths.normalDistribution(0, vGaussW)
                     );
                     p.weight *= cmpsProb;
                 }

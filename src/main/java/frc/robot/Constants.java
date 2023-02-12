@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import org.opencv.core.Point;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 
@@ -200,7 +202,7 @@ public final class Constants {
         public static final double C1 = 0; //vrt / y value check the picture Idk why govind called it that
         public static final double C2 = 0; // horizontal / x value check the picture :??????
 
-        /* public static class Field {
+        public static class Field {
         public static final float FIELD_WIDTH = 16.54175f;
         public static final float FIELD_HEIGHT = 8.0137f;
         public static final int NUM_TAGS = 8;
@@ -214,7 +216,7 @@ public final class Constants {
             new Point(Tags.ID_7.x, Tags.ID_7.y),
             new Point(Tags.ID_8.x, Tags.ID_8.y)
         };
-        } */
+        }
 
         public static enum Tags {
             ID_1(15.513558f, 1.071626f, 0.462788f),
