@@ -51,15 +51,15 @@ public class AMCL {
             ));
         }
 
-        mGaussX = 0.15; // meters, 2
-        mGaussW = 0.2; // radians, 2
-        vGaussW = 0.15; // (degrees) radians, 5
-        vGaussY = 0.1; // meters, 3
-        mGaussY =  0.15; // meters, 3
-        mclASlow = 0.01; // 0.01
+        mGaussX = 0.15; // meters, 0.15
+        mGaussW = 0.2; // radians, 0.2
+        vGaussW = 0.15; // (degrees) radians, 0.15
+        vGaussY = 0.1; // meters, 0.1
+        mGaussY =  0.15; // meters, 0.15
+        mclASlow = 0.005; // 0.01
         useAdaptiveParticles = false;
-        mclAFast = 0.1; // 0.1
-        vGaussX = 0.1; // meters, 5
+        mclAFast = 0.2; // 0.1
+        vGaussX = 0.1; // meters, 0.1
     }
 
     /**
@@ -233,6 +233,7 @@ public class AMCL {
         double orient = 0;
 
         for (int j = 0; j < Constants.FilterConstants.NUM_PARTICLES; ++j) {
+            SmartDashboard.putNumber("resetprob", resetProb);
             if (MathX.bernoulliDistribution(resetProb)) {
                 newParticles.add(new Particle(
                     random.nextDouble(-Constants.FIELD_WIDTH / 2, 
