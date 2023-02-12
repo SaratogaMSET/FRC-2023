@@ -27,8 +27,6 @@ public class AMCL {
 
     private double mclASlow, mclAFast, mclWFast, mclWSlow; // AMCL vars
 
-    private boolean resetParticles;
-
     private boolean useHeading;
 
     private double nParticles;
