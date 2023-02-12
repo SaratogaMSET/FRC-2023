@@ -1,7 +1,10 @@
 package frc.robot.subsystems;
 
+import java.util.HashMap;
+
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -12,6 +15,19 @@ import frc.robot.subsystems.LimelightHelpers.LimelightResults;
 import frc.robot.util.wrappers.VisionMeasurement;
 
 public class VisionSubsystem extends SubsystemBase {
+    private final double filterTimeConstant = 0.08;
+    private final double filterPeriod = 0.005;
+    private final HashMap<Integer, LinearFilter> linearFilters = new HashMap<>(){{
+        put(0, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
+        put(1, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
+        put(2, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
+        put(3, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
+        put(4, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
+        put(5, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
+        put(6, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
+        put(7, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
+    }};
+
     private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
     public VisionSubsystem() {}
@@ -73,7 +89,7 @@ public class VisionSubsystem extends SubsystemBase {
         return (int) table.getEntry("tid").getInteger(-1);
     }
 
-    private double[] getDistances() {
+    private double[] getRawDistances() {
         double[] distances = new double[]{
             -1,
             -1,
@@ -88,6 +104,17 @@ public class VisionSubsystem extends SubsystemBase {
         for (var r : getLatestResults().targetingResults.targets_Fiducials) {
             var tmp = r.getRobotPose_TargetSpace();
             distances[(int) r.fiducialID - 1] = Math.hypot(tmp.getX(), tmp.getZ());
+        }
+
+        return distances;
+    }
+
+    private double[] getDistances() {
+        double[] distances = getRawDistances();
+
+        for (int i = 0; i < distances.length; ++i) {
+            if (distances[i] > 0) distances[i] = linearFilters.get(i).calculate(distances[i]);
+            else distances[i] = -1;
         }
 
         return distances;
