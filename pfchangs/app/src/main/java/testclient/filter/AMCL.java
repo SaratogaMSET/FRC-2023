@@ -12,11 +12,10 @@ import testclient.Constants;
 import testclient.MathX;
 import testclient.wrappers.TagDistance;
 
-// FIXME check if EVERYTHING (besides LL campose/botpose) is in radians
 public class AMCL {
     private HashMap<Integer, TagDistance> distances = new HashMap<>();
 
-    private Point3 motionDelta = new Point3(); // robot frame motion odometry <-- maybe not?
+    private Point3 motionDelta = new Point3();
 
     private ArrayList<Particle> particles = new ArrayList<Particle>();
     private Particle bestEstimate = new Particle(0, 0, 0, 0);
@@ -167,11 +166,18 @@ public class AMCL {
         }
     }
 
-    public void tagScanning(int id, double[] dists, double[] campose) {
+    public void tagScanning(int id, double[] dists, double[] distX, double[] distY, double[] campose) {
         for (int i = 0; i < dists.length; ++i) {
             if (dists[i] > 0) {
                 distances.put(i + 1, 
-                    new TagDistance(Constants.TAG_ARR[i].x, Constants.TAG_ARR[i].y, dists[i]));
+                    new TagDistance(
+                        Constants.TAG_ARR[i].x, 
+                        Constants.TAG_ARR[i].y, 
+                        dists[i],
+                        distX[i],
+                        distY[i]
+                    )
+                );
             }
         }
 
@@ -187,6 +193,7 @@ public class AMCL {
             double prob = 1;
             double cmpsProb = 0;
 
+            // TODO compute weights for x and y distance components. Keep in mind absolute value distances.
             if (numPoints > 0) {
                 for (var d : distances.values()) {
                     double tagDist = d.distance + MathX.normalDistribution(0, Math.hypot(vGaussX, vGaussY));

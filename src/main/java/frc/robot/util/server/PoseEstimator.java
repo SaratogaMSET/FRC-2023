@@ -122,6 +122,8 @@ public class PoseEstimator {
                 true,
                 visionMeas.getTagID(),
                 visionMeas.getDistance(),
+                visionMeas.getDistanceX(),
+                visionMeas.getDistanceY(),
                 new double[]{visionMeas.getCampose().getX(), visionMeas.getCampose().getY(), visionMeas.getCampose().getRotation().getRadians()}
             );
             sendableOdom = new SendableOdomMeasurement(0, interpolatedPose);

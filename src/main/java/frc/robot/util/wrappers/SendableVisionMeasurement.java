@@ -5,6 +5,8 @@ public class SendableVisionMeasurement {
     private boolean hasTargets;
     private int tagID;
     private double[] distance;
+    private double[] distanceX;
+    private double[] distanceY;
     private double[] campose;
 
     public SendableVisionMeasurement(int measID) {
@@ -14,18 +16,37 @@ public class SendableVisionMeasurement {
             new double[]{
                 -1, -1, -1, -1,
                 -1, -1, -1, -1
-            }, new double[]{
+            },
+            new double[]{
+                -1, -1, -1, -1,
+                -1, -1, -1, -1
+            },
+            new double[]{
+                -1, -1, -1, -1,
+                -1, -1, -1, -1
+            },
+            new double[]{
                 -1, -1, -1,
                 -1, -1, -1
             }
         );
     }
 
-    public SendableVisionMeasurement(int measID, boolean hasTargets, int tagID, double[] distance, double[] campose) {
+    public SendableVisionMeasurement(
+        int measID, 
+        boolean hasTargets, 
+        int tagID, 
+        double[] distance, 
+        double[] distanceX,
+        double[] distanceY,
+        double[] campose
+    ) {
         this.measID = measID;
         this.hasTargets = hasTargets;
         this.tagID = tagID;
         this.distance = distance;
+        this.distanceX = distanceX;
+        this.distanceY = distanceY;
         this.campose = campose;
     }
 
@@ -51,5 +72,13 @@ public class SendableVisionMeasurement {
 
     public double[] getCamPose() {
         return campose;
+    }
+
+    public double[] getDistanceX() {
+        return distanceX;
+    }
+
+    public double[] getDistanceY() {
+        return distanceY;
     }
 }
