@@ -30,6 +30,27 @@ public class VisionSubsystem extends SubsystemBase {
 
     private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
+    private double[] rawDistances = new double[]{
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+    };
+    private double[] distances = new double[]{
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+    };
+
     public VisionSubsystem() {}
 
     private Pose2d getCamPose2d() {
@@ -90,7 +111,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     private double[] getRawDistances() {
-        double[] distances = new double[]{
+        rawDistances = new double[]{
             -1,
             -1,
             -1,
@@ -103,18 +124,20 @@ public class VisionSubsystem extends SubsystemBase {
 
         for (var r : getLatestResults().targetingResults.targets_Fiducials) {
             var tmp = r.getRobotPose_TargetSpace();
-            distances[(int) r.fiducialID - 1] = Math.hypot(tmp.getX(), tmp.getZ());
+            rawDistances[(int) r.fiducialID - 1] = Math.hypot(tmp.getX(), tmp.getZ());
         }
 
-        return distances;
+        return rawDistances;
     }
 
     private double[] getDistances() {
-        double[] distances = getRawDistances();
-
-        for (int i = 0; i < distances.length; ++i) {
-            if (distances[i] > 0) distances[i] = linearFilters.get(i).calculate(distances[i]);
-            else distances[i] = -1;
+        getRawDistances();
+        for (int i = 0; i < rawDistances.length; ++i) {
+            if (rawDistances[i] > 0) distances[i] = linearFilters.get(i).calculate(distances[i]);
+            else {
+                distances[i] = -1;
+                linearFilters.get(i).calculate(rawDistances[i]);
+            }
         }
 
         return distances;
