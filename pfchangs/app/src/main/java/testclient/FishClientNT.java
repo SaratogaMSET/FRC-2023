@@ -26,10 +26,6 @@ public class FishClientNT {
     private final IntegerSubscriber tagIDSub = visionTable.getIntegerTopic("tagID").subscribe(-1);
     private final DoubleArraySubscriber distanceSub = visionTable.getDoubleArrayTopic("distances").subscribe(
         new double[]{-1, -1, -1, -1, -1, -1, -1, -1});
-    private final DoubleArraySubscriber distanceXSub = visionTable.getDoubleArrayTopic("distanceX").subscribe(
-        new double[]{-1, -1, -1, -1, -1, -1, -1, -1});
-    private final DoubleArraySubscriber distanceYSub = visionTable.getDoubleArrayTopic("distanceY").subscribe(
-        new double[]{-1, -1, -1, -1, -1, -1, -1, -1});
     private final DoubleArraySubscriber camposeSub = visionTable.getDoubleArrayTopic("campose").subscribe(
         new double[3]);
 
@@ -72,8 +68,6 @@ public class FishClientNT {
             hasTargetsSub.get(), 
             (int) tagIDSub.get(), 
             distanceSub.get(), 
-            distanceXSub.get(),
-            distanceYSub.get(),
             camposeSub.get(),
             (int) odomIDSub.get(),
             odomXSub.get(),
@@ -118,13 +112,7 @@ public class FishClientNT {
 
                 if (latestData.vision.hasTargets) {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
-                    amcl.tagScanning(
-                        latestData.vision.tagID, 
-                        latestData.vision.distances, 
-                        latestData.vision.distanceX,
-                        latestData.vision.distanceY,
-                        latestData.vision.campose
-                    );
+                    amcl.tagScanning(latestData.vision.tagID, latestData.vision.distances, latestData.vision.campose);
                     publishEstimate(latestData.odom.id, amcl.getWeightedAverage().toPose2d(
                         Constants.FIELD_WIDTH / 2,
                         Constants.FIELD_HEIGHT / 2,

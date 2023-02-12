@@ -11,8 +11,6 @@ public class VisionMeasurement {
     private Pose2d botpose;
     private Pose2d campose;
     private double[] distance;
-    private double[] distanceX;
-    private double[] distanceY;
 
     public VisionMeasurement() {
         this(
@@ -30,14 +28,6 @@ public class VisionMeasurement {
             new double[]{
                 -1, -1, -1, -1,
                 -1, -1, -1, -1
-            },
-            new double[]{
-                -1, -1, -1, -1,
-                -1, -1, -1, -1
-            },
-            new double[]{
-                -1, -1, -1, -1,
-                -1, -1, -1, -1
             }
         );
     }
@@ -48,9 +38,7 @@ public class VisionMeasurement {
         int tagID,
         Pose2d botpose,
         Pose2d campose,
-        double[] distance,
-        double[] distanceX,
-        double[] distanceY
+        double... distance
     ) {
         this.hasTargets = hasTargets;
         this.latency = latency;
@@ -58,8 +46,6 @@ public class VisionMeasurement {
         this.botpose = botpose;
         this.campose = campose;
         this.distance = distance;
-        this.distanceX = distanceX;
-        this.distanceY = distanceY;
     }
 
     public boolean hasTargets() {
@@ -84,13 +70,5 @@ public class VisionMeasurement {
     
     public double[] getDistance() {
         return distance;
-    }
-
-    public double[] getDistanceX() {
-        return distanceX;
-    }
-
-    public double[] getDistanceY() {
-        return distanceY;
     }
 }

@@ -27,8 +27,6 @@ public class FishServerNT {
     private final BooleanPublisher hasTargetsPub = visionTable.getBooleanTopic("hasTargets").publish();
     private final IntegerPublisher tagIDPub = visionTable.getIntegerTopic("tagID").publish();
     private final DoubleArrayPublisher distancePub = visionTable.getDoubleArrayTopic("distances").publish();
-    private final DoubleArrayPublisher distanceXPub = visionTable.getDoubleArrayTopic("distanceX").publish();
-    private final DoubleArrayPublisher distanceYPub = visionTable.getDoubleArrayTopic("distanceY").publish();
     private final DoubleArrayPublisher camposePub = visionTable.getDoubleArrayTopic("campose").publish();
 
     private final NetworkTable odomTable = inst.getTable("odom");
@@ -67,8 +65,10 @@ public class FishServerNT {
     }
 
     public void publish(SendableOdomMeasurement odometry) {
-        publish(odometry, new SendableVisionMeasurement(odometry.getId()));
-        // FIXME somehow tell the PF to only update odom data (possible fix above, needs to be tested)
+        odomIDPub.set(odometry.getId());
+        odomXPub.set(odometry.getPose().getX());
+        odomYPub.set(odometry.getPose().getY());
+        odomWPub.set(odometry.getPose().getRotation().getRadians());
     }
 
     public void publish(SendableOdomMeasurement odometry, SendableVisionMeasurement vision) {
@@ -87,8 +87,6 @@ public class FishServerNT {
         hasTargetsPub.set(vision.hasTargets());
         tagIDPub.set(vision.getTagID());
         distancePub.set(vision.getDistance());
-        distanceXPub.set(vision.getDistanceX());
-        distanceYPub.set(vision.getDistanceY());
         camposePub.set(vision.getCamPose());
     }
 
