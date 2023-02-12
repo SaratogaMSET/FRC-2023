@@ -233,8 +233,7 @@ public class AMCL {
         double orient = 0;
 
         for (int j = 0; j < Constants.FilterConstants.NUM_PARTICLES; ++j) {
-            double rand = Math.random();
-            if (rand < resetProb) {
+            if (MathX.bernoulliDistribution(resetProb)) {
                 newParticles.add(new Particle(
                     random.nextDouble(-Constants.FIELD_WIDTH / 2, 
                         Constants.FIELD_WIDTH / 2), 
