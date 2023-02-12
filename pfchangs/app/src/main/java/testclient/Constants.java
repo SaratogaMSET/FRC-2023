@@ -41,7 +41,7 @@ public class Constants {
     }
 
     public static class FilterConstants {
-        public static final int NUM_PARTICLES = 200;
+        public static final int NUM_PARTICLES = 2000;
         public static final int MIN_PARTICLES = 200;
     }
 }

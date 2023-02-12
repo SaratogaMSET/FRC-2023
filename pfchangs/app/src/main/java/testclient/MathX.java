@@ -2,7 +2,7 @@ package testclient;
 
 import java.util.Random;
 
-public class Maths {
+public class MathX {
     private static final Random r = new Random();
 
     /**

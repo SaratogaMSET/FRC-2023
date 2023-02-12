@@ -9,7 +9,7 @@ import org.opencv.core.Point3;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import testclient.Constants;
-import testclient.Maths;
+import testclient.MathX;
 import testclient.wrappers.TagDistance;
 
 // FIXME check if EVERYTHING (besides LL campose/botpose) is in radians
@@ -85,7 +85,7 @@ public class AMCL {
 
         while (angle >= 2 * Math.PI) angle -= 2 * Math.PI;
         while (angle < 0) angle += 2 * Math.PI;
-        return Maths.Gaussian(setpoint, vGaussW, angle);
+        return MathX.Gaussian(setpoint, vGaussW, angle);
     }
 
     /**
@@ -189,13 +189,11 @@ public class AMCL {
             double cmpsProb = 0;
 
             if (numPoints > 0) {
-                resetParticles = false;
-
                 for (var d : distances.values()) {
-                    double tagDist = d.distance + Maths.normalDistribution(0, Math.hypot(vGaussX, vGaussY));
+                    double tagDist = d.distance + MathX.normalDistribution(0, Math.hypot(vGaussX, vGaussY));
                     double particleDistance = Math.hypot(p.x - d.x, p.y - d.y);
                     double distanceDiff = Math.abs(particleDistance - tagDist);
-                    prob *= Maths.Gaussian(0, Math.hypot(vGaussX, vGaussY), distanceDiff);
+                    prob *= MathX.Gaussian(0, Math.hypot(vGaussX, vGaussY), distanceDiff);
                 }
 
                 p.weight = prob;
@@ -203,14 +201,11 @@ public class AMCL {
                 if (useHeading && id > 1) {
                     cmpsProb = headingErr(p.w, 
                         (campose[2] + Math.toRadians(Constants.TAG_ARR[id - 1].z)) % 2 * Math.PI +
-                                Maths.normalDistribution(0, vGaussW)
+                                MathX.normalDistribution(0, vGaussW)
                     );
                     p.weight *= cmpsProb;
                 }
                 sumWeight += p.weight;
-            } else {
-                // FIXME - potentially causes problems when we can't see any tags
-                resetParticles = true;
             }
         }
 
@@ -241,8 +236,7 @@ public class AMCL {
 
         for (int j = 0; j < Constants.FilterConstants.NUM_PARTICLES; ++j) {
             double rand = Math.random();
-            if (rand < resetProb || resetParticles) {
-                resetParticles = false;
+            if (rand < resetProb) {
                 newParticles.add(new Particle(
                     random.nextDouble(-Constants.FIELD_WIDTH / 2, 
                         Constants.FIELD_WIDTH / 2), 
