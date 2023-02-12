@@ -21,6 +21,7 @@ public class AMCL {
     private ArrayList<Particle> particles = new ArrayList<Particle>();
     private Particle bestEstimate = new Particle(0, 0, 0, 0);
     private Particle meanEstimate = new Particle(0, 0, 0, 0);
+    private Particle weightedAverage = new Particle();
 
     private double mGaussX, mGaussY, mGaussW;
     private double vGaussX, vGaussY, vGaussW;
@@ -215,6 +216,7 @@ public class AMCL {
         mclWSlow += mclASlow * (wAvg - mclWSlow);
         mclWFast += mclAFast * (wAvg - mclWFast);
 
+        computeWeightedAverage();
         lowVarResampling();
     }
 
@@ -326,7 +328,7 @@ public class AMCL {
         return meanEstimate.clone();
     }
 
-    public Particle getWeightedAverage() {
+    public Particle computeWeightedAverage() {
         double meanX = 0, meanY = 0, meanW = 0;
         for (var p : particles) {
             meanX += p.x * p.weight;
@@ -334,7 +336,12 @@ public class AMCL {
             meanW += p.w * p.weight;
         }
 
-        return new Particle(meanX, meanY, meanW, 0);
+        weightedAverage = new Particle(meanX, meanY, meanW, 0);
+        return weightedAverage;
+    }
+
+    public Particle getWeightedAverage() {
+        return weightedAverage;
     }
 
     public Particle getFilteredAverage() {

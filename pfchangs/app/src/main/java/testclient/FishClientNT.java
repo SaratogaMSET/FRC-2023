@@ -113,18 +113,22 @@ public class FishClientNT {
                 if (latestData.vision.hasTargets) {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     amcl.tagScanning(latestData.vision.tagID, latestData.vision.distances, latestData.vision.campose);
-                    publishEstimate(latestData.odom.id, amcl.getAverageEstimate().toPose2d(
+                    publishEstimate(latestData.odom.id, amcl.getWeightedAverage().toPose2d(
                         Constants.FIELD_WIDTH / 2,
                         Constants.FIELD_HEIGHT / 2,
                         0
                     ));
+                    System.out.println("Raw average: " + amcl.getAverageEstimate());
+                    System.out.println("Weighted average: " + amcl.getWeightedAverage());
                 } else {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
-                    publishEstimate(latestData.odom.id, amcl.getAverageEstimate().toPose2d(
+                    publishEstimate(latestData.odom.id, amcl.getWeightedAverage().toPose2d(
                         Constants.FIELD_WIDTH / 2,
                         Constants.FIELD_HEIGHT / 2,
                         0
                     ));
+                    System.out.println("Raw average: " + amcl.getAverageEstimate());
+                    System.out.println("Weighted average: " + amcl.getWeightedAverage());
                 }
             } else {
                 System.out.println("Connection dropped!");

@@ -15,17 +15,25 @@ import frc.robot.subsystems.LimelightHelpers.LimelightResults;
 import frc.robot.util.wrappers.VisionMeasurement;
 
 public class VisionSubsystem extends SubsystemBase {
-    private final double filterTimeConstant = 0.08;
-    private final double filterPeriod = 0.005;
+    // private final double filterTimeConstant = 0.02;
+    // private final double filterPeriod = 0.005;
     private final HashMap<Integer, LinearFilter> linearFilters = new HashMap<>(){{
-        put(0, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
+        /* put(0, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
         put(1, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
         put(2, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
         put(3, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
         put(4, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
         put(5, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
         put(6, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
-        put(7, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod));
+        put(7, LinearFilter.singlePoleIIR(filterTimeConstant, filterPeriod)); */
+        put(0, LinearFilter.movingAverage(10));
+        put(1, LinearFilter.movingAverage(10));
+        put(2, LinearFilter.movingAverage(10));
+        put(3, LinearFilter.movingAverage(10));
+        put(4, LinearFilter.movingAverage(10));
+        put(5, LinearFilter.movingAverage(10));
+        put(6, LinearFilter.movingAverage(10));
+        put(7, LinearFilter.movingAverage(10));
     }};
 
     private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -133,11 +141,11 @@ public class VisionSubsystem extends SubsystemBase {
     private double[] getDistances() {
         getRawDistances();
         for (int i = 0; i < rawDistances.length; ++i) {
-            if (rawDistances[i] > 0) distances[i] = linearFilters.get(i).calculate(distances[i]);
-            else {
+            /* if (rawDistances[i] > 0)  */distances[i] = linearFilters.get(i).calculate(distances[i]);
+            /* else {
                 distances[i] = -1;
                 linearFilters.get(i).calculate(rawDistances[i]);
-            }
+            } */
         }
 
         return distances;
@@ -169,7 +177,7 @@ public class VisionSubsystem extends SubsystemBase {
             getTagID(),
             results.targetingResults.getBotPose2d(),
             getCamPose2d(),
-            getDistances()
+            getRawDistances() // FIXME distance filter
         );
     }
 
