@@ -177,7 +177,7 @@ public class VisionSubsystem extends SubsystemBase {
             getTagID(),
             results.targetingResults.getBotPose2d(),
             getCamPose2d(),
-            getRawDistances() // FIXME distance filter
+            getRawDistances() // FIXME filtering distances
         );
     }
 
@@ -187,12 +187,12 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger.getInstance().recordOutput("Smart Targeting X", 100*Math.hypot(getCamTran()[0], getCamTran()[2])); //get X stuff for verification
-        SmartDashboard.putNumberArray("Botpose 2d", getLatestResults().targetingResults.botpose);
-        SmartDashboard.putNumber("Botpose rotation", getLatestResults().targetingResults.getBotPose2d().getRotation().getDegrees());
-        SmartDashboard.putNumberArray("Distances", getDistances());
-        SmartDashboard.putNumberArray("Pose to target(arm base)", getOffsetTo2DOFBase()); //Ignore if not on retroreflective pipeline. 
-        SmartDashboard.putNumber("distance to retro", getDistanceFromRetro());
+        // Logger.getInstance().recordOutput("Smart Targeting X", 100*Math.hypot(getCamTran()[0], getCamTran()[2])); //get X stuff for verification
+        // SmartDashboard.putNumberArray("Botpose 2d", getLatestResults().targetingResults.botpose);
+        // SmartDashboard.putNumber("Botpose rotation", getLatestResults().targetingResults.getBotPose2d().getRotation().getDegrees());
+        // SmartDashboard.putNumberArray("Distances", getDistances());
+        // SmartDashboard.putNumberArray("Pose to target(arm base)", getOffsetTo2DOFBase()); //Ignore if not on retroreflective pipeline. 
+        // SmartDashboard.putNumber("distance to retro", getDistanceFromRetro());
     }
 
     @Override

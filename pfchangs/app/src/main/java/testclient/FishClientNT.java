@@ -118,8 +118,6 @@ public class FishClientNT {
                         Constants.FIELD_HEIGHT / 2,
                         0
                     ));
-                    System.out.println("Raw average: " + amcl.getAverageEstimate());
-                    System.out.println("Weighted average: " + amcl.getWeightedAverage());
                 } else {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     publishEstimate(latestData.odom.id, amcl.getWeightedAverage().toPose2d(
@@ -127,8 +125,6 @@ public class FishClientNT {
                         Constants.FIELD_HEIGHT / 2,
                         0
                     ));
-                    System.out.println("Raw average: " + amcl.getAverageEstimate());
-                    System.out.println("Weighted average: " + amcl.getWeightedAverage());
                 }
             } else {
                 System.out.println("Connection dropped!");

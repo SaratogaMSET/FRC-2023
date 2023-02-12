@@ -52,11 +52,11 @@ public class AMCL {
             ));
         }
 
-        mGaussX = 0.15; // meters, 0.15
-        mGaussW = 0.2; // radians, 0.2
+        mGaussX = 0.1; // meters, 0.15
+        mGaussW = 0.1; // radians, 0.2
         vGaussW = 0.15; // (degrees) radians, 0.15
         vGaussY = 0.1; // meters, 0.1
-        mGaussY =  0.15; // meters, 0.15
+        mGaussY =  0.1; // meters, 0.15
         mclASlow = 0.005; // 0.01
         useAdaptiveParticles = false;
         mclAFast = 0.2; // 0.1
@@ -82,8 +82,8 @@ public class AMCL {
         angle = Math.abs(angle);
         setpoint = Math.abs(setpoint);
 
-        while (angle >= 2 * Math.PI) angle -= 2 * Math.PI;
-        while (angle < 0) angle += 2 * Math.PI;
+        angle %= (2 * Math.PI);
+        if (angle < 0) angle += 2 * Math.PI;
         return MathX.Gaussian(setpoint, vGaussW, angle);
     }
 
@@ -156,8 +156,8 @@ public class AMCL {
             p.y += dy + r.nextGaussian(0, mGaussY);
             p.w += dw + r.nextGaussian(0, mGaussW);
 
-            while (p.w >= Math.PI * 2) p.w -= Math.PI * 2;
-            while (p.w < 0) p.w += Math.PI * 2;
+            p.w %= (2 * Math.PI);
+            if (p.w < 0) p.w += 2 * Math.PI;
 
             if (p.x > Constants.FIELD_WIDTH / 2) p.x = Constants.FIELD_WIDTH / 2;
             else if (p.x < 0 - Constants.FIELD_WIDTH / 2) p.x = 0 - Constants.FIELD_WIDTH / 2;
@@ -199,7 +199,7 @@ public class AMCL {
 
                 if (useHeading && id > 1) {
                     cmpsProb = headingErr(p.w, 
-                        (campose[2] + Math.toRadians(Constants.TAG_ARR[id - 1].z)) % 2 * Math.PI +
+                        (campose[2] + Math.toRadians(Constants.TAG_ARR[id - 1].z)) % (2 * Math.PI) +
                                 MathX.normalDistribution(0, vGaussW)
                     );
                     p.weight *= cmpsProb;
