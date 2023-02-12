@@ -57,9 +57,9 @@ public class AMCL {
         vGaussW = 0.15; // (degrees) radians, 0.15
         vGaussY = 0.1; // meters, 0.1
         mGaussY =  0.1; // meters, 0.15
-        mclASlow = 0.005; // 0.01
+        mclASlow = 0.01; // 0.01
         useAdaptiveParticles = false;
-        mclAFast = 0.2; // 0.1
+        mclAFast = 0.1; // 0.1
         vGaussX = 0.1; // meters, 0.1
     }
 
