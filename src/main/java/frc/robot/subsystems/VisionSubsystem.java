@@ -130,41 +130,12 @@ public class VisionSubsystem extends SubsystemBase {
             -1
         };
 
-        var tmp = getLatestResults().targetingResults.targets_Fiducials[0].getRobotPose_TargetSpace();
         for (var r : getLatestResults().targetingResults.targets_Fiducials) {
-            tmp = r.getRobotPose_TargetSpace();
+            var tmp = r.getRobotPose_TargetSpace();
             rawDistances[(int) r.fiducialID - 1] = Math.hypot(tmp.getX(), tmp.getZ());
         }
 
         return rawDistances;
-    }
-
-    private double[] getRawXDistances() {
-        double[] rawX = new double[]{
-
-        };
-
-        var tmp = getLatestResults().targetingResults.targets_Fiducials[0].getRobotPose_TargetSpace();
-        for (var r : getLatestResults().targetingResults.targets_Fiducials) {
-            tmp = r.getRobotPose_TargetSpace();
-            rawX[(int) r.fiducialID - 1] = tmp.getX();
-        }
-
-        return rawX;
-    }
-
-    private double[] getRawYDistances() {
-        double[] rawY = new double[]{
-
-        };
-
-        var tmp = getLatestResults().targetingResults.targets_Fiducials[0].getRobotPose_TargetSpace();
-        for (var r : getLatestResults().targetingResults.targets_Fiducials) {
-            tmp = r.getRobotPose_TargetSpace();
-            rawY[(int) r.fiducialID - 1] = tmp.getZ();
-        }
-
-        return rawY;
     }
 
     private double[] getDistances() {
@@ -206,9 +177,7 @@ public class VisionSubsystem extends SubsystemBase {
             getTagID(),
             results.targetingResults.getBotPose2d(),
             getCamPose2d(),
-            getRawDistances(),
-            getRawXDistances(),
-            getRawYDistances()
+            getRawDistances() // FIXME filtering distances
         );
     }
 
