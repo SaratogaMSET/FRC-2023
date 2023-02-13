@@ -5,8 +5,8 @@ import org.opencv.core.Point3;
 public class Constants {
     public static final double FIELD_WIDTH = 16.54175;
     public static final double FIELD_HEIGHT = 8.0137;
-    public static final double FIELD_WIDTH_OFFSET = FIELD_WIDTH / 2;
-    public static final double FIELD_HEIGHT_OFFSET = FIELD_HEIGHT / 2;
+    public static final double FIELD_WIDTH_OFFSET = 0; // FIELD_WIDTH / 2
+    public static final double FIELD_HEIGHT_OFFSET = 0; // FIELD_HEIGHT / 2
     public static final double ROTATION_OFFSET = 0;
 
     public static final int NUM_TAGS = 8;
