@@ -69,6 +69,7 @@ public class FishServerNT {
         odomXPub.set(odometry.getPose().getX());
         odomYPub.set(odometry.getPose().getY());
         odomWPub.set(odometry.getPose().getRotation().getRadians());
+        // publish(odometry, new SendableVisionMeasurement(odometry.getId()));
     }
 
     public void publish(SendableOdomMeasurement odometry, SendableVisionMeasurement vision) {

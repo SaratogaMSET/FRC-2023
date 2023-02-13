@@ -231,7 +231,6 @@ public class AMCL {
 
         double meanX = 0;
         double meanY = 0;
-        double sin = 0, cos = 0;
         double orient = 0;
 
         for (int j = 0; j < Constants.FilterConstants.NUM_PARTICLES; ++j) {
@@ -266,12 +265,10 @@ public class AMCL {
         double xBest = bestEstimate.x;
         double yBest = bestEstimate.y;
 
-        // FIXME we may need to check which heading computation is correct for average particle
         for (var p : particles) {
             meanX += p.x;
             meanY += p.y;
-            sin += Math.sin(p.w);
-            cos += Math.cos(p.w);
+            orient += p.w;
             p.weight = 1 / Constants.FilterConstants.NUM_PARTICLES;
 
             double tmpX = xBest - p.x;
@@ -281,7 +278,7 @@ public class AMCL {
 
         meanX /= Constants.FilterConstants.NUM_PARTICLES;
         meanY /= Constants.FilterConstants.NUM_PARTICLES;
-        orient = Math.atan2(sin, cos);
+        orient /= Constants.FilterConstants.NUM_PARTICLES;
 
         meanEstimate.x = meanX;
         meanEstimate.y = meanY;
@@ -310,7 +307,6 @@ public class AMCL {
     }
 
     public Particle getAverageEstimate() {
-        // FIXME we may need to check which heading computation is correct for average particle
         meanEstimate = new Particle(0, 0, 0, 0);
 
         double meanX = 0, meanY = 0, meanW = 0;
@@ -337,11 +333,11 @@ public class AMCL {
         }
 
         weightedAverage = new Particle(meanX, meanY, meanW, 0);
-        return weightedAverage;
+        return weightedAverage.clone();
     }
 
     public Particle getWeightedAverage() {
-        return weightedAverage;
+        return weightedAverage.clone();
     }
 
     public Particle getFilteredAverage() {
