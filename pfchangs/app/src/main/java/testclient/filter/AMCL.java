@@ -45,8 +45,10 @@ public class AMCL {
         nParticles = Constants.FilterConstants.NUM_PARTICLES;
         for (int i = 0; i < nParticles; ++i) {
             particles.add(new Particle(
-                r.nextDouble(-Constants.FIELD_WIDTH / 2, Constants.FIELD_WIDTH / 2), 
-                r.nextDouble(-Constants.FIELD_HEIGHT / 2, Constants.FIELD_HEIGHT / 2), 
+                r.nextDouble(-Constants.FIELD_WIDTH_OFFSET, 
+                    Constants.FIELD_WIDTH - Constants.FIELD_WIDTH_OFFSET), 
+                r.nextDouble(-Constants.FIELD_HEIGHT_OFFSET, 
+                    Constants.FIELD_HEIGHT - Constants.FIELD_HEIGHT_OFFSET), 
                 r.nextDouble(Math.PI * 2), 
                 1 / nParticles
             ));
@@ -137,8 +139,10 @@ public class AMCL {
         nParticles = Constants.FilterConstants.NUM_PARTICLES;
         for (int i = 0; i < nParticles; ++i) {
             particles.add(new Particle(
-                r.nextDouble(-Constants.FIELD_WIDTH / 2, Constants.FIELD_WIDTH / 2), 
-                r.nextDouble(-Constants.FIELD_HEIGHT / 2, Constants.FIELD_HEIGHT / 2), 
+                r.nextDouble(-Constants.FIELD_WIDTH_OFFSET, 
+                    Constants.FIELD_WIDTH - Constants.FIELD_WIDTH_OFFSET), 
+                r.nextDouble(-Constants.FIELD_HEIGHT_OFFSET, 
+                    Constants.FIELD_HEIGHT - Constants.FIELD_HEIGHT_OFFSET), 
                 r.nextDouble(Math.PI * 2), 
                 1 / nParticles
             ));
@@ -159,11 +163,11 @@ public class AMCL {
             p.w %= (2 * Math.PI);
             if (p.w < 0) p.w += 2 * Math.PI;
 
-            if (p.x > Constants.FIELD_WIDTH / 2) p.x = Constants.FIELD_WIDTH / 2;
-            else if (p.x < 0 - Constants.FIELD_WIDTH / 2) p.x = 0 - Constants.FIELD_WIDTH / 2;
+            if (p.x > Constants.FIELD_WIDTH - Constants.FIELD_WIDTH_OFFSET) p.x = Constants.FIELD_WIDTH - Constants.FIELD_WIDTH_OFFSET;
+            else if (p.x < 0 - Constants.FIELD_WIDTH_OFFSET) p.x = 0 - Constants.FIELD_WIDTH_OFFSET;
 
-            if (p.y > Constants.FIELD_HEIGHT / 2) p.y = Constants.FIELD_HEIGHT / 2;
-            else if (p.y < 0 - Constants.FIELD_HEIGHT / 2) p.y = 0 - Constants.FIELD_HEIGHT / 2;
+            if (p.y > Constants.FIELD_HEIGHT - Constants.FIELD_HEIGHT_OFFSET) p.y = Constants.FIELD_HEIGHT - Constants.FIELD_HEIGHT_OFFSET;
+            else if (p.y < 0 - Constants.FIELD_HEIGHT_OFFSET) p.y = 0 - Constants.FIELD_HEIGHT_OFFSET;
         }
     }
 
@@ -237,10 +241,10 @@ public class AMCL {
             SmartDashboard.putNumber("resetprob", resetProb);
             if (MathX.bernoulliDistribution(resetProb)) {
                 newParticles.add(new Particle(
-                    random.nextDouble(-Constants.FIELD_WIDTH / 2, 
-                        Constants.FIELD_WIDTH / 2), 
-                    random.nextDouble(-Constants.FIELD_HEIGHT / 2, 
-                        Constants.FIELD_HEIGHT / 2), 
+                    random.nextDouble(-Constants.FIELD_WIDTH_OFFSET, 
+                        Constants.FIELD_WIDTH - Constants.FIELD_WIDTH_OFFSET), 
+                    random.nextDouble(-Constants.FIELD_HEIGHT_OFFSET, 
+                        Constants.FIELD_HEIGHT - Constants.FIELD_HEIGHT_OFFSET), 
                     random.nextDouble(Math.PI * 2), 
                     1 / Constants.FilterConstants.NUM_PARTICLES
                 ));

@@ -5,6 +5,10 @@ import org.opencv.core.Point3;
 public class Constants {
     public static final double FIELD_WIDTH = 16.54175;
     public static final double FIELD_HEIGHT = 8.0137;
+    public static final double FIELD_WIDTH_OFFSET = FIELD_WIDTH / 2;
+    public static final double FIELD_HEIGHT_OFFSET = FIELD_HEIGHT / 2;
+    public static final double ROTATION_OFFSET = 0;
+
     public static final int NUM_TAGS = 8;
     public static final Point3[] TAG_ARR = {
         new Point3(Tags.ID_1.x, Tags.ID_1.y, Tags.ID_1.z),
@@ -19,14 +23,14 @@ public class Constants {
 
     public static enum Tags {
         // FIXME - we might have to reverse the rotations (1-4 = 180 and 4-8 = 0)
-        ID_1(15.513558 - FIELD_WIDTH / 2, 1.071626 - FIELD_HEIGHT / 2, 0),
-        ID_2(15.513558 - FIELD_WIDTH / 2, 2.748026 - FIELD_HEIGHT / 2, 0),
-        ID_3(15.513558 - FIELD_WIDTH / 2, 4.424426 - FIELD_HEIGHT / 2, 0),
-        ID_4(16.178784 - FIELD_WIDTH / 2, 6.749796 - FIELD_HEIGHT / 2, 0),
-        ID_5(0.36195 - FIELD_WIDTH / 2, 6.749796 - FIELD_HEIGHT / 2, 180),
-        ID_6(1.02743 - FIELD_WIDTH / 2, 4.424426 - FIELD_HEIGHT / 2, 180),
-        ID_7(1.02743 - FIELD_WIDTH / 2, 2.748026 - FIELD_HEIGHT / 2, 180),
-        ID_8(1. - FIELD_WIDTH / 2, 1.071626 - FIELD_HEIGHT / 2, 180);
+        ID_1(15.513558 - FIELD_WIDTH_OFFSET, 1.071626 - FIELD_HEIGHT_OFFSET, 0),
+        ID_2(15.513558 - FIELD_WIDTH_OFFSET, 2.748026 - FIELD_HEIGHT_OFFSET, 0),
+        ID_3(15.513558 - FIELD_WIDTH_OFFSET, 4.424426 - FIELD_HEIGHT_OFFSET, 0),
+        ID_4(16.178784 - FIELD_WIDTH_OFFSET, 6.749796 - FIELD_HEIGHT_OFFSET, 0),
+        ID_5(0.36195 - FIELD_WIDTH_OFFSET, 6.749796 - FIELD_HEIGHT_OFFSET, 180),
+        ID_6(1.02743 - FIELD_WIDTH_OFFSET, 4.424426 - FIELD_HEIGHT_OFFSET, 180),
+        ID_7(1.02743 - FIELD_WIDTH_OFFSET, 2.748026 - FIELD_HEIGHT_OFFSET, 180),
+        ID_8(1.02743 - FIELD_WIDTH_OFFSET, 1.071626 - FIELD_HEIGHT_OFFSET, 180);
 
         public final double x;
         public final double y;

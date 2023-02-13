@@ -114,16 +114,16 @@ public class FishClientNT {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     amcl.tagScanning(latestData.vision.tagID, latestData.vision.distances, latestData.vision.campose);
                     publishEstimate(latestData.odom.id, amcl.getWeightedAverage().toPose2d(
-                        Constants.FIELD_WIDTH / 2,
-                        Constants.FIELD_HEIGHT / 2,
-                        0
+                        Constants.FIELD_WIDTH_OFFSET,
+                        Constants.FIELD_HEIGHT_OFFSET,
+                        Constants.ROTATION_OFFSET
                     ));
                 } else {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     publishEstimate(latestData.odom.id, amcl.getWeightedAverage().toPose2d(
-                        Constants.FIELD_WIDTH / 2,
-                        Constants.FIELD_HEIGHT / 2,
-                        0
+                        Constants.FIELD_WIDTH_OFFSET,
+                        Constants.FIELD_HEIGHT_OFFSET,
+                        Constants.ROTATION_OFFSET
                     ));
                 }
             } else {
