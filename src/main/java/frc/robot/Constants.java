@@ -38,6 +38,12 @@ public final class Constants {
             public static final int STATE3 = 190;
             public static final int STATE4 = 270;
         }
+
+        public static final double apriltagToMidHorizontal = 0.219837;
+        public static final double apriltagToHighHorizontal = apriltagToMidHorizontal*3;
+        public static final double apriltagtoMidVertical = 0.15875;
+        public static final double apriltagtoHighVertical = 0.73025;
+
     }
 
     public static class Drivetrain {

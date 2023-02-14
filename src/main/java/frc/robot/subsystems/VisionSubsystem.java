@@ -185,6 +185,54 @@ public class VisionSubsystem extends SubsystemBase {
         return LimelightHelpers.getLatestResults("");
     }
 
+    //start of atrey's math stuff
+    public double getLimelightAngle(){
+        double rawAngle = getLatestResults().targetingResults.getBotPose2d().getRotation().getDegrees();
+        double finalAngle=0;
+        if(90<rawAngle && rawAngle<180){
+            finalAngle = rawAngle-90;
+        }
+        else if(-180<rawAngle && rawAngle<-90){
+            finalAngle=rawAngle+270;
+        }
+        else{
+            finalAngle=-1;
+        }
+        return finalAngle;
+    }
+    public double getLimelightTx(int topOrMid){
+        double apriltagDistance = Math.hypot(getCamTran()[0], getCamTran()[2]);
+        double angle = getLimelightAngle();
+        if(angle>90){
+            angle-=90;
+        }
+        double adjacentComponent = apriltagDistance*Math.cos(angle);
+        double oppositeComponent = apriltagDistance*Math.sin(angle);
+        if(topOrMid==1){ //mid position
+            return Math.hypot(adjacentComponent+Constants.Vision.apriltagToMidHorizontal, oppositeComponent);
+        }
+        else if(topOrMid==2){ //top position
+            return Math.hypot(adjacentComponent+Constants.Vision.apriltagToHighHorizontal, oppositeComponent);
+        }
+        else{
+            return -1;
+        }
+    }
+
+    public double getLimelightTy(int topOrMid){
+        if(topOrMid==1){
+            return Constants.Vision.apriltagtoMidVertical+Constants.Vision.H1;
+        }
+        else if(topOrMid==2){
+            return Constants.Vision.apriltagtoHighVertical+Constants.Vision.H1;
+        }
+        else{
+            return -1;
+        }
+    }
+    //I am pretty sure this system only works between a returned getLimelightAngle() of 45 degress to 135 degrees.
+
+
     @Override
     public void periodic() {
         // Logger.getInstance().recordOutput("Smart Targeting X", 100*Math.hypot(getCamTran()[0], getCamTran()[2])); //get X stuff for verification
@@ -193,6 +241,16 @@ public class VisionSubsystem extends SubsystemBase {
         // SmartDashboard.putNumberArray("Distances", getDistances());
         // SmartDashboard.putNumberArray("Pose to target(arm base)", getOffsetTo2DOFBase()); //Ignore if not on retroreflective pipeline. 
         // SmartDashboard.putNumber("distance to retro", getDistanceFromRetro());
+        SmartDashboard.putNumber("getLimelightAngle",getLimelightAngle());
+
+        SmartDashboard.putNumber("getLimelightTx For Mid",getLimelightTx(1));
+        SmartDashboard.putNumber("getLimelightTx For High",getLimelightTx(2));
+
+        SmartDashboard.putNumber("doublegetLimelightTy For Mid",getLimelightTy(1));
+        SmartDashboard.putNumber("doublegetLimelightTy For High",getLimelightTy(2));
+
+
+
     }
 
     @Override
