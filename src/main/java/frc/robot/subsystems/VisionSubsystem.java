@@ -186,6 +186,11 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     //start of atrey's math stuff
+
+    private double[] getCamTranOld() {
+        return table.getEntry("campose").getDoubleArray(new double[10]);
+    }
+
     public double getLimelightAngle(){
         double rawAngle = getLatestResults().targetingResults.getBotPose2d().getRotation().getDegrees();
         double finalAngle=0;
@@ -200,19 +205,32 @@ public class VisionSubsystem extends SubsystemBase {
         }
         return finalAngle;
     }
+
     public double getLimelightTx(int topOrMid){
-        double apriltagDistance = Math.hypot(getCamTran()[0], getCamTran()[2]);
-        double angle = getLimelightAngle();
-        if(angle>90){
-            angle-=90;
+        double apriltagDistance = Math.hypot(getCamTranOld()[0], getCamTranOld()[2]);
+        
+        
+        // double angle = getLimelightAngle();
+        // if(angle>90){
+        //     angle-=90;
+        // }
+        // double adjacentComponent = apriltagDistance*Math.cos(angle);
+        // double oppositeComponent = apriltagDistance*Math.sin(angle);
+        // if(topOrMid==1){ //mid position
+        //     return Math.hypot(adjacentComponent+Constants.Vision.apriltagToMidHorizontal, oppositeComponent);
+        // }
+        // else if(topOrMid==2){ //top position
+        //     return Math.hypot(adjacentComponent+Constants.Vision.apriltagToHighHorizontal, oppositeComponent);
+        // }
+        // else{
+        //     return -1;
+        // }
+
+        if(topOrMid==1){
+            return apriltagDistance+Constants.Vision.apriltagToMidHorizontal;
         }
-        double adjacentComponent = apriltagDistance*Math.cos(angle);
-        double oppositeComponent = apriltagDistance*Math.sin(angle);
-        if(topOrMid==1){ //mid position
-            return Math.hypot(adjacentComponent+Constants.Vision.apriltagToMidHorizontal, oppositeComponent);
-        }
-        else if(topOrMid==2){ //top position
-            return Math.hypot(adjacentComponent+Constants.Vision.apriltagToHighHorizontal, oppositeComponent);
+        else if(topOrMid==2){
+            return apriltagDistance+Constants.Vision.apriltagToHighHorizontal;
         }
         else{
             return -1;
@@ -221,10 +239,10 @@ public class VisionSubsystem extends SubsystemBase {
 
     public double getLimelightTy(int topOrMid){
         if(topOrMid==1){
-            return Constants.Vision.apriltagtoMidVertical+Constants.Vision.H1;
+            return Constants.Vision.apriltagtoMidVertical;
         }
         else if(topOrMid==2){
-            return Constants.Vision.apriltagtoHighVertical+Constants.Vision.H1;
+            return Constants.Vision.apriltagtoHighVertical;
         }
         else{
             return -1;
@@ -235,7 +253,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // Logger.getInstance().recordOutput("Smart Targeting X", 100*Math.hypot(getCamTran()[0], getCamTran()[2])); //get X stuff for verification
+        // Logger.getInstance().recordOutput("Smart Targeting X", 100*Math.hypot(getCamTranOld()[0], getCamTranOld()[2])); //get X stuff for verification
         // SmartDashboard.putNumberArray("Botpose 2d", getLatestResults().targetingResults.botpose);
         SmartDashboard.putNumber("Botpose rotation", getLatestResults().targetingResults.getBotPose2d().getRotation().getDegrees());
         // SmartDashboard.putNumberArray("Distances", getDistances());
@@ -250,6 +268,8 @@ public class VisionSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("doublegetLimelightTy For High",getLimelightTy(2));
 
 
+
+        SmartDashboard.putNumber("apriltag to limelight distance",Math.hypot(getCamTranOld()[0], getCamTranOld()[2]));
 
     }
 
