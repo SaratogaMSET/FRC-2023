@@ -4,7 +4,16 @@
 
 package frc.robot;
 
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -14,9 +23,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
-
+  public static CTREConfigs ctreConfigs;
   private RobotContainer m_robotContainer;
 
   /**
@@ -27,6 +36,29 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
+    Logger.getInstance().recordMetadata("FRC-2023", "FRC-2023"); // Set a metadata value
+
+    switch (Constants.currentMode) {
+      case REAL:
+        Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
+        Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+        new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+        break;
+
+      case SIM:
+        Logger.getInstance().addDataReceiver(new NT4Publisher());
+        break;
+
+      case REPLAY:
+        String path = LogFileUtil.findReplayLog();
+        Logger.getInstance().setReplaySource(new WPILOGReader(path));
+        Logger.getInstance().addDataReceiver(
+            new WPILOGWriter(LogFileUtil.addPathSuffix(path, "_sim")));
+        break;
+    }
+
+    Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+    ctreConfigs = new CTREConfigs();
     m_robotContainer = new RobotContainer();
   }
 

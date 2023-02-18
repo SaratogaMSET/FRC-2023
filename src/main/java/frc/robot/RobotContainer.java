@@ -4,52 +4,184 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
+
+
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+import com.pathplanner.lib.commands.PPSwerveControllerCommandA;
+
+import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants.Drivetrain;
+import frc.robot.commands.DefaultDriveCommand;
+import frc.robot.commands.ZeroGyroCommand;
+// import frc.robot.commands.SwerveControllerStrafe;
+import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.DrivetrainUtil.GyroIO;
+import frc.robot.subsystems.DrivetrainUtil.GyroIONavx;
+import frc.robot.subsystems.DrivetrainUtil.SwerveModuleIOSim;
+import frc.robot.subsystems.SwerveModule;
+
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
+ * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  public final SendableChooser<String> m_autoSwitcher = new SendableChooser<String>();
+  public static final String Forward = "Forward";
+  public static final String ForwardRotate = "Forward + Rotate";
+  public String m_autoSelected;
+  public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
+  // private final VisionSystem m_visionSubsystem = new VisionSystem();  
+  public static final double pi = Math.PI;
+  private final CommandXboxController m_controller = new CommandXboxController(0);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    // Configure the trigger bindings
-    configureBindings();
-  }
+  public static final double MAX_VELOCITY_METERS_PER_SECOND = (6380.0 / 60.0 *
+          SdsModuleConfigurations.MK4_L2.getDriveReduction() *
+          SdsModuleConfigurations.MK4_L2.getWheelDiameter() * Math.PI);
+
+  public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
+          Math.hypot(Drivetrain.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, Drivetrain.DRIVETRAIN_WHEELBASE_METERS / 2.0);
+
 
   /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
+   * The container for the robot. Contains subsystems, OI devices, and commands.
    */
-  private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(m_exampleSubsystem::exampleCondition)
-        .onTrue(new ExampleCommand(m_exampleSubsystem));
+  public RobotContainer() {
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // cancelling on release.
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+    // switch(Constants.currentMode){
+    //   case REAL:
+    //   m_drivetrainSubsystem = new DrivetrainSubsystem(new GyroIONavx(), 
+    //     new SwerveModule(0, Constants.Drivetrain.Mod0.constants),
+    //     new SwerveModule(1, Constants.Drivetrain.Mod1.constants), 
+    //     new SwerveModule(2, Constants.Drivetrain.Mod2.constants), 
+    //     new SwerveModule(3, Constants.Drivetrain.Mod3.constants));
+    //   case SIM:
+    //     m_drivetrainSubsystem = new DrivetrainSubsystem(new GyroIO(), 
+    //       new SwerveModuleIOSim(), 
+    //       new SwerveModuleIOSim(), 
+    //       new SwerveModuleIOSim(), 
+    //       new SwerveModuleIOSim());
+    //   default:
+    //     m_drivetrainSubsystem = new DrivetrainSubsystem(new GyroIO(), 
+    //       new SwerveModule(0, Constants.Drivetrain.Mod0.constants),
+    //       new SwerveModule(1, Constants.Drivetrain.Mod1.constants), 
+    //       new SwerveModule(2, Constants.Drivetrain.Mod2.constants), 
+    //       new SwerveModule(3, Constants.Drivetrain.Mod3.constants));
+    //   }
+
+    m_autoSwitcher.addOption(Forward, Forward);
+    // m_autoSwitcher.addOption(Rotate, Rotate);
+    m_autoSwitcher.addOption(ForwardRotate, ForwardRotate);
+    
+    // m_field = new Field2d();
+    SmartDashboard.putData(m_autoSwitcher);
+    
+    
+    configureButtonBindings();
+      
   }
+
+       
+    
+    //modifyAxis(value) no exponent
+
+    // Configure the button bindings
+    
+  
+
+  /**
+   * Use this method to define your button->command mappings. Buttons can be created by
+   * instantiating a {@link GenericHID} or one of its subclasses ({@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   */
+  private void configureButtonBindings() {
+
+    new SequentialCommandGroup( 
+        new WaitCommand(1),
+        new InstantCommand(() -> m_drivetrainSubsystem.drive(new ChassisSpeeds(0.0, 0.0, 0.0))),
+        new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(new Pose2d()))
+    ).schedule();
+
+    m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
+            m_drivetrainSubsystem,
+            () -> -modifyAxis(-m_controller.getLeftX()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(-m_controller.getLeftY()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> -modifyAxis(-m_controller.getRightX()/1.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+            
+    ));
+
+    m_controller.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
+
+    m_controller.leftBumper().whileTrue(
+      new DefaultDriveCommand(
+            m_drivetrainSubsystem,
+            () -> -modifyAxis(-m_controller.getLeftX())/3 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(-m_controller.getLeftY())/3 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> -modifyAxis(-m_controller.getRightX()) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+    )
+    );
+  }
+
+  private static double deadband(double value, double deadband) {
+    if (Math.abs(value) > deadband) {
+      if (value > 0.0) {
+        return (value - deadband) / (1.0 - deadband);
+      } else {
+        return (value + deadband) / (1.0 - deadband);
+      }
+    } else {
+      return 0.0;
+    }
+  }
+
+  private static double modifyAxis(double value) {
+    // Deadband
+    value = deadband(value, 0.05);
+
+    // Square the axis
+    value = Math.copySign(value * value, value);
+
+    return value;
+  }
+  
+  /** 
+   * @param value the joystick input
+   * @param exponent the exponent number to use
+   * @param activeLinearDeadband when to activate linear scaling instead of exponential scaling
+   * **/
+  private static double modifyAxis(double value, double exponent, double activeLinearDeadband) {
+		// Deadband
+
+		value = MathUtil.applyDeadband(value, 0.05);
+
+    if(Math.abs(value) < activeLinearDeadband)
+		  value = Math.copySign(Math.pow(value, exponent), value);
+    else if(value > activeLinearDeadband){
+      value = Math.copySign(value * value, value);
+    }
+		return value;
+	}
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -57,7 +189,57 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+    // An ExampleCommand will run in autonomous
+    // String auto = m_autoSwitcher.getSelected();
+    PathPlannerTrajectory trajectory = PathPlanner.loadPath("New Path", 2, 0.65);
+    // switch (auto) {
+    //   case Forward:
+    //     trajectory = PathPlanner.loadPath("Forward", 0.5, 0.2);
+    //   case ForwardRotate:
+    //     trajectory = PathPlanner.loadPath("Forward + Rotate", 0.5, 0.2);
+    //   // case pathTestBall:
+    //     // return getPathTestAuto(trajectory, velocity, acceleration);
+    //   default:
+    //   trajectory = PathPlanner.loadPath("Forward", 0.5, 0.2);
+    // }
+    PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory.getInitialState(), DriverStation.getAlliance());
+    
+    PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
+    PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);//FIXME
+    PIDController thetaController = new PIDController(
+          Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
+    
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    xController.reset();
+    yController.reset();
+    thetaController.reset();
+    
+    PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
+      trajectory, 
+      m_drivetrainSubsystem::getPose,
+      Constants.Drivetrain.m_kinematics,
+      xController,
+      yController,
+      thetaController,
+      m_drivetrainSubsystem::drive,
+      true,
+      m_drivetrainSubsystem
+    );
+      
+    double[] xControllerArray = new double[]{ xController.getP(), xController.getI(), xController.getD()}; 
+    double[] yControllerArray = new double[]{ yController.getP(), yController.getI(), yController.getD()}; 
+    double[] ThetaControllerArray = new double[]{ thetaController.getP(), thetaController.getI(), thetaController.getD()}; 
+    SmartDashboard.putNumberArray("PID X Controller", xControllerArray);
+    SmartDashboard.putNumberArray("PID Y Controller", yControllerArray);
+    SmartDashboard.putNumberArray("PID Theta Controller",ThetaControllerArray);
+    
+
+    return new SequentialCommandGroup(
+      new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
+      new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
+      new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
+        swerveTrajectoryFollower.withTimeout(15).andThen(new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0, 0, 0))))
+        );
   }
-}
+
+  }
