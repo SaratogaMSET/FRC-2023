@@ -188,7 +188,7 @@ public class VisionSubsystem extends SubsystemBase {
     //start of atrey's math stuff
 
     private double[] getCamTranOld() {
-        return table.getEntry("campose").getDoubleArray(new double[10]);
+        return table.getEntry("botpose_targetspace").getDoubleArray(new double[6]);
     }
 
     public double getLimelightAngle(){
