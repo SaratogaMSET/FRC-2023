@@ -6,6 +6,8 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.networktables.DoubleEntry;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -13,8 +15,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.LimelightHelpers.LimelightResults;
 import frc.robot.util.wrappers.VisionMeasurement;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
+import edu.wpi.first.networktables.NetworkTableEntry;
 
 public class VisionSubsystem extends SubsystemBase {
+
     // private final double filterTimeConstant = 0.02;
     // private final double filterPeriod = 0.005;
     private final HashMap<Integer, LinearFilter> linearFilters = new HashMap<>(){{
@@ -250,9 +257,13 @@ public class VisionSubsystem extends SubsystemBase {
     }
     //I am pretty sure this system only works between a returned getLimelightAngle() of 45 degress to 135 degrees.
 
+    public double postAprilTagLLDistance(){
+        return Math.hypot(getCamTranOld()[0], getCamTranOld()[2]);
+    }
 
     @Override
     public void periodic() {
+
         // Logger.getInstance().recordOutput("Smart Targeting X", 100*Math.hypot(getCamTranOld()[0], getCamTranOld()[2])); //get X stuff for verification
         // SmartDashboard.putNumberArray("Botpose 2d", getLatestResults().targetingResults.botpose);
         SmartDashboard.putNumber("Botpose rotation", getLatestResults().targetingResults.getBotPose2d().getRotation().getDegrees());
@@ -262,14 +273,14 @@ public class VisionSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("getLimelightAngle",getLimelightAngle());
 
         SmartDashboard.putNumber("getLimelightTx For Mid",getLimelightTx(1));
-        SmartDashboard.putNumber("getLimelightTx For High",getLimelightTx(2));
+        SmartDashboard.putNumber("getLimelightTx For High", getLimelightTx(2));
 
         SmartDashboard.putNumber("doublegetLimelightTy For Mid",getLimelightTy(1));
         SmartDashboard.putNumber("doublegetLimelightTy For High",getLimelightTy(2));
 
 
 
-        SmartDashboard.putNumber("apriltag to limelight distance",Math.hypot(getCamTranOld()[0], getCamTranOld()[2]));
+        SmartDashboard.putNumber("apriltag to limelight distance",Math.hypot(getCamTranOld()[0] * 39.27, getCamTranOld()[2]* 39.27));
 
     }
 
