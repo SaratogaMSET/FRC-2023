@@ -13,7 +13,7 @@ public class DefaultDriveCommand extends CommandBase {
     private final DoubleSupplier m_translationXSupplier;
     private final DoubleSupplier m_translationYSupplier;
     private final DoubleSupplier m_rotationSupplier;
-
+    
     private double m_translationXTrapezoidal = 0;
     private double m_translationYTrapezoidal = 0;
 
@@ -50,14 +50,12 @@ public class DefaultDriveCommand extends CommandBase {
         SmartDashboard.putNumber("m_rotationSupplier", m_rotationSupplier.getAsDouble());
         
         m_drivetrainSubsystem.drive(
-            new ChassisSpeeds(
+                new ChassisSpeeds(
                 resultX,
                 resultY,
-                m_rotationSupplier.getAsDouble() * multiplier
-            )
+                m_rotationSupplier.getAsDouble() * multiplier)
         );
     }
-
     @Override
     public void end(boolean interrupted) {
         m_drivetrainSubsystem.drive(new ChassisSpeeds(0.0, 0.0, 0.0));

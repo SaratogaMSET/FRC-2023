@@ -2,6 +2,8 @@ package frc.lib.util;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.lib.swerve.BetterSwerveModuleState;
+import frc.lib.swerve.BetterSwerveModuleState;
 
 public class CTREModuleState {
 
@@ -13,7 +15,7 @@ public class CTREModuleState {
    * @param desiredState The desired state.
    * @param currentAngle The current module angle.
    */
-  public static SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle) {
+  public static SwerveModuleState optimize(BetterSwerveModuleState desiredState, Rotation2d currentAngle) {
     double targetAngle = placeInAppropriate0To360Scope(currentAngle.getDegrees(), desiredState.angle.getDegrees());
     double targetSpeed = desiredState.speedMetersPerSecond;
     double delta = targetAngle - currentAngle.getDegrees();
@@ -23,6 +25,23 @@ public class CTREModuleState {
     }        
     return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
   }
+
+  public static BetterSwerveModuleState optimize(BetterSwerveModuleState desiredState, Rotation2d currentAngle, double secondOrderOffsetDegrees) {
+    //        double targetAngle = placeInAppropriate0To360Scope(currentAngle.getDegrees(), desiredState.angle.getDegrees());
+            // TODO: test this
+            double targetAngle = placeInAppropriate0To360Scope(currentAngle.getDegrees(), desiredState.angle.getDegrees() + secondOrderOffsetDegrees);
+            double targetSpeed = desiredState.speedMetersPerSecond;
+            double delta = targetAngle - currentAngle.getDegrees();
+            if (Math.abs(delta) > 90){
+                targetSpeed = -targetSpeed;
+                if (delta > 90) {
+                    targetAngle -= 180;
+                } else {
+                    targetAngle += 180;
+                }
+            }
+            return new BetterSwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle), desiredState.omegaRadPerSecond);
+        }
 
   /**
      * @param scopeReference Current Angle

@@ -6,17 +6,19 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 import frc.lib.math.Conversions;
+import frc.lib.swerve.BetterSwerveModuleState;
 import frc.lib.util.CTREModuleState;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.subsystems.DrivetrainUtil.SwerveModuleIO;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 
-public class SwerveModule {
+public class SwerveModule implements SwerveModuleIO {
     public int moduleNumber;
     private Rotation2d angleOffset;
     private Rotation2d lastAngle;
@@ -46,15 +48,16 @@ public class SwerveModule {
         lastAngle = getState().angle;
     }
 
-    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop){
+        
+    public void setDesiredState(BetterSwerveModuleState desiredState, boolean isOpenLoop){
         /* This is a custom optimize function, since default WPILib optimize assumes continuous controller which CTRE and Rev onboard is not */
 
-        desiredState = CTREModuleState.optimize(desiredState, getState().angle); 
+        desiredState = CTREModuleState.optimize(desiredState, getState().angle,0); 
         setAngle(desiredState);
         setSpeed(desiredState, isOpenLoop);
     }
 
-    private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop){
+    private void setSpeed(BetterSwerveModuleState desiredState, boolean isOpenLoop){
         if(isOpenLoop){
             double percentOutput = desiredState.speedMetersPerSecond / Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND;
             mDriveMotor.set(ControlMode.PercentOutput, percentOutput);
@@ -66,7 +69,7 @@ public class SwerveModule {
     }
 }
 
-    public void setAngle(SwerveModuleState desiredState){
+    public void setAngle(BetterSwerveModuleState desiredState){
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND * 0.01)) ? lastAngle : desiredState.angle; //Prevent rotating module if speed is less then 1%. Prevents Jittering.
         
         mAngleMotor.set(ControlMode.Position, Conversions.degreesToFalcon(angle.getDegrees(), Constants.Drivetrain.angleGearRatio));
@@ -120,4 +123,23 @@ public class SwerveModule {
             getAngle()
         );
     }
+
+    @Override
+    public void updateInputs(SwerveModuleIOInputs inputs) {
+        
+        inputs.drivePositionMeters = mDriveMotor.getSelectedSensorVelocity();
+        inputs.driveVelocityMetersPerSec = mDriveMotor.getSelectedSensorVelocity();
+        inputs.driveAppliedVolts = mDriveMotor.getMotorOutputVoltage();
+        inputs.driveCurrentAmps = mDriveMotor.getStatorCurrent();
+        inputs.driveTempCelcius = mDriveMotor.getTemperature();
+
+        inputs.steerAbsolutePositionRad = angleEncoder.getPosition();
+        inputs.steerAbsoluteVelocityRadPerSec = angleEncoder.getVelocity();
+        inputs.steerPositionRad = mAngleMotor.getSelectedSensorVelocity();
+        inputs.steerVelocityRadPerSec = mAngleMotor.getSelectedSensorVelocity();
+        inputs.steerAppliedVolts = mAngleMotor.getMotorOutputVoltage();
+        inputs.steerCurrentAmps = mAngleMotor.getStatorCurrent();
+        inputs.steerTempCelcius = mAngleMotor.getTemperature();
+    }
+
 }

@@ -4,11 +4,16 @@
 
 package frc.robot;
 
+import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -29,26 +34,32 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotInit() {
-    Logger.getInstance().recordMetadata("Flounder", "Flounder"); // Set a metadata value
+    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
+    // autonomous chooser on the dashboard.
+    Logger.getInstance().recordMetadata("FRC-2023", "FRC-2023"); // Set a metadata value
 
-    if (isReal()) {
+    switch (Constants.currentMode) {
+      case REAL:
         Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
         Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-    } /* 
-    else {
-    setUseTiming(false); // Run as fast as possible
-    String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-    Logger.getInstance().setReplaySource(new WPILOGReader(logPath)); // Read replay log
-    Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
-}  */
+        new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+        break;
+
+      case SIM:
+        Logger.getInstance().addDataReceiver(new NT4Publisher());
+        break;
+
+      case REPLAY:
+        String path = LogFileUtil.findReplayLog();
+        Logger.getInstance().setReplaySource(new WPILOGReader(path));
+        Logger.getInstance().addDataReceiver(
+            new WPILOGWriter(LogFileUtil.addPathSuffix(path, "_sim")));
+        break;
+    }
 
     Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
     ctreConfigs = new CTREConfigs();
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-
-    m_robotContainer.addOne();
   }
 
   /**
@@ -69,9 +80,7 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {
-    m_robotContainer.addOne();
-  }
+  public void disabledInit() {}
 
   @Override
   public void disabledPeriodic() {}
@@ -79,8 +88,6 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_robotContainer.addOne();
-
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -95,8 +102,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
-    m_robotContainer.addOne();
-
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -112,8 +117,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void testInit() {
-    m_robotContainer.addOne();
-
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
   }
