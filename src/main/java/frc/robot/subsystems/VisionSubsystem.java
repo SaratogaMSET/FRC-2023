@@ -266,21 +266,35 @@ public class VisionSubsystem extends SubsystemBase {
 
         // Logger.getInstance().recordOutput("Smart Targeting X", 100*Math.hypot(getCamTranOld()[0], getCamTranOld()[2])); //get X stuff for verification
         // SmartDashboard.putNumberArray("Botpose 2d", getLatestResults().targetingResults.botpose);
-        SmartDashboard.putNumber("Botpose rotation", getLatestResults().targetingResults.getBotPose2d().getRotation().getDegrees());
         // SmartDashboard.putNumberArray("Distances", getDistances());
         // SmartDashboard.putNumberArray("Pose to target(arm base)", getOffsetTo2DOFBase()); //Ignore if not on retroreflective pipeline. 
         // SmartDashboard.putNumber("distance to retro", getDistanceFromRetro());
-        SmartDashboard.putNumber("getLimelightAngle",getLimelightAngle());
-
-        SmartDashboard.putNumber("getLimelightTx For Mid",getLimelightTx(1));
-        SmartDashboard.putNumber("getLimelightTx For High", getLimelightTx(2));
-
-        SmartDashboard.putNumber("doublegetLimelightTy For Mid",getLimelightTy(1));
-        SmartDashboard.putNumber("doublegetLimelightTy For High",getLimelightTy(2));
 
 
+        SmartDashboard.putNumber("Raw Angle", getLatestResults().targetingResults.getBotPose2d().getRotation().getDegrees());
+        SmartDashboard.putNumber("LL Angle",getLimelightAngle());
 
-        SmartDashboard.putNumber("apriltag to limelight distance",Math.hypot(getCamTranOld()[0] * 39.27, getCamTranOld()[2]* 39.27));
+
+        SmartDashboard.putNumber("LL to Mid (Horizontal)",getLimelightTx(1));
+        SmartDashboard.putNumber("LL to High (Horizontal)", getLimelightTx(2));
+        SmartDashboard.putNumber("LL to Mid (Vertical)",getLimelightTy(1));
+        SmartDashboard.putNumber("LL to Mid (Vertical)",getLimelightTy(2));
+        SmartDashboard.putNumber("LL to AprilTag",Math.hypot(getCamTranOld()[0], getCamTranOld()[2]));
+
+        //meters to inches: 1m = 39.3701 in
+        SmartDashboard.putNumber("LL to Mid (Horizontal, Inches)",39.3701*(getLimelightTx(1)));
+        SmartDashboard.putNumber("LL to High (Horizontal, Inches)", 39.3701*(getLimelightTx(2)));
+        SmartDashboard.putNumber("LL to Mid (Vertical, Inches)",39.3701*(getLimelightTy(1)));
+        SmartDashboard.putNumber("LL to Mid (Vertical, Inches)",39.3701*(getLimelightTy(2)));
+        SmartDashboard.putNumber("LL to AprilTag (Inches)",39.3701*(Math.hypot(getCamTranOld()[0], getCamTranOld()[2])));
+
+        /*
+        * things to fix: 
+        * [] calibrate horizontal distances
+        * [] re-make constants for vertical height based on new limelight position
+        * [] create function to return tx,ty,angle in an array?? (idk if this is needed)
+        */
+
 
     }
 
