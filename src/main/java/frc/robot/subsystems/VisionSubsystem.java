@@ -215,23 +215,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     public double getLimelightTx(int topOrMid){
         double apriltagDistance = Math.hypot(getCamTranOld()[0], getCamTranOld()[2]);
-        
-        
-        // double angle = getLimelightAngle();
-        // if(angle>90){
-        //     angle-=90;
-        // }
-        // double adjacentComponent = apriltagDistance*Math.cos(angle);
-        // double oppositeComponent = apriltagDistance*Math.sin(angle);
-        // if(topOrMid==1){ //mid position
-        //     return Math.hypot(adjacentComponent+Constants.Vision.apriltagToMidHorizontal, oppositeComponent);
-        // }
-        // else if(topOrMid==2){ //top position
-        //     return Math.hypot(adjacentComponent+Constants.Vision.apriltagToHighHorizontal, oppositeComponent);
-        // }
-        // else{
-        //     return -1;
-        // }
 
         if(topOrMid==1){
             return apriltagDistance+Constants.Vision.apriltagToMidHorizontal;
@@ -246,19 +229,14 @@ public class VisionSubsystem extends SubsystemBase {
 
     public double getLimelightTy(int topOrMid){
         if(topOrMid==1){
-            return Constants.Vision.apriltagtoMidVertical;
+            return 0.6477;
         }
         else if(topOrMid==2){
-            return Constants.Vision.apriltagtoHighVertical;
+            return 0.9652;
         }
         else{
             return -1;
         }
-    }
-    //I am pretty sure this system only works between a returned getLimelightAngle() of 45 degress to 135 degrees.
-
-    public double postAprilTagLLDistance(){
-        return Math.hypot(getCamTranOld()[0], getCamTranOld()[2]);
     }
 
     @Override
@@ -278,14 +256,14 @@ public class VisionSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("LL to Mid (Horizontal)",getLimelightTx(1));
         SmartDashboard.putNumber("LL to High (Horizontal)", getLimelightTx(2));
         SmartDashboard.putNumber("LL to Mid (Vertical)",getLimelightTy(1));
-        SmartDashboard.putNumber("LL to Mid (Vertical)",getLimelightTy(2));
+        SmartDashboard.putNumber("LL to High (Vertical)",getLimelightTy(2));
         SmartDashboard.putNumber("LL to AprilTag",Math.hypot(getCamTranOld()[0], getCamTranOld()[2]));
 
         //meters to inches: 1m = 39.3701 in
         SmartDashboard.putNumber("LL to Mid (Horizontal, Inches)",39.3701*(getLimelightTx(1)));
         SmartDashboard.putNumber("LL to High (Horizontal, Inches)", 39.3701*(getLimelightTx(2)));
         SmartDashboard.putNumber("LL to Mid (Vertical, Inches)",39.3701*(getLimelightTy(1)));
-        SmartDashboard.putNumber("LL to Mid (Vertical, Inches)",39.3701*(getLimelightTy(2)));
+        SmartDashboard.putNumber("LL to High (Vertical, Inches)",39.3701*(getLimelightTy(2)));
         SmartDashboard.putNumber("LL to AprilTag (Inches)",39.3701*(Math.hypot(getCamTranOld()[0], getCamTranOld()[2])));
 
         /*
