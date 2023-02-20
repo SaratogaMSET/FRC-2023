@@ -19,13 +19,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
+import frc.robot.Constants.Vision;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.ResetEncoder;
 import frc.robot.commands.SwitchPipeline;
 import frc.robot.commands.ZeroGyroCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
-import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.util.server.PoseEstimator;
 import com.pathplanner.lib.PathPlanner;
@@ -75,13 +75,13 @@ public class RobotContainer {
   public static final String ForwardRotate = "Forward + Rotate";
   public String m_autoSelected;
   public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
-  private final VisionSystem m_visionSubsystem = new VisionSubsystem();  
+  private final VisionSubsystem m_visionSubsystem = new VisionSubsystem();  
   public static final double pi = Math.PI;
   private final CommandXboxController m_controller = new CommandXboxController(0);
   private final PoseEstimator localizer = new PoseEstimator(
-    vision, 
+    m_visionSubsystem, 
     m_drivetrainSubsystem, 
-    kinematics, 
+    Constants.Drivetrain.m_kinematics, 
     new Rotation2d(), 
     new Pose2d()
   );
@@ -204,13 +204,13 @@ public class RobotContainer {
   private void configureBindings() {
 
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
+    m_controller.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-    m_driverController.x().onTrue(new SwitchPipeline(vision, 1));
-    m_driverController.b().onTrue(new SwitchPipeline(vision, 0));
-    m_driverController.a().onTrue(new ResetEncoder(m_drivetrainSubsystem));
+    m_controller.x().onTrue(new SwitchPipeline(m_visionSubsystem, 1));
+    m_controller.b().onTrue(new SwitchPipeline(m_visionSubsystem, 0));
+    m_controller.a().onTrue(new ResetEncoder(m_drivetrainSubsystem));
   }
 
   /**
