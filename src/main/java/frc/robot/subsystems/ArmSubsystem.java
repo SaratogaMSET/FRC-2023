@@ -4,7 +4,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.revrobotics.CANEncoder;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
@@ -20,7 +20,9 @@ public class ArmSubsystem extends SubsystemBase {
         motorDistal.setInverted(false);
         motorProximal.setIdleMode(IdleMode.kCoast);
         motorDistal.setIdleMode(IdleMode.kCoast);
-        calibrateArm();
+
+        ext_encProximal.setDistancePerRotation(convertRotRad);
+        ext_encDistal.setDistancePerRotation(convertRotRad);
     }
 
     private final double[] boundsProxima = new double[]{Math.toRadians(35), Math.toRadians(145)};
@@ -37,18 +39,14 @@ public class ArmSubsystem extends SubsystemBase {
     RelativeEncoder encoderProximal = motorProximal.getEncoder();
     RelativeEncoder encoderDistal = motorDistal.getEncoder();
 
+    DutyCycleEncoder ext_encProximal = new DutyCycleEncoder(9);
+    DutyCycleEncoder ext_encDistal = new DutyCycleEncoder(8);
+
     double convertRotRad = 2 * Math.PI;
-    public void calibrateArm(){
-        encoderProximal.setPositionConversionFactor(convertRotRad/Constants.Arm.gearProximalReduction);
-        encoderProximal.setVelocityConversionFactor(convertRotRad/Constants.Arm.gearProximalReduction);
-        encoderDistal.setPositionConversionFactor(convertRotRad/Constants.Arm.gearDistalReduction);
-        encoderDistal.setVelocityConversionFactor(convertRotRad/Constants.Arm.gearDistalReduction);
-        encoderProximal.setPosition(convertRotRad * Constants.Arm.initialAngleProximal / 360);
-        encoderDistal.setPosition(convertRotRad * Constants.Arm.initialAngleDistal / 360);
-    }
+
     public void updateState(){
         Arm.setAngles(encoderProximal.getPosition(), encoderDistal.getPosition());
-        Arm.setOmegas(encoderProximal.getVelocity(), encoderDistal.getPosition());
+        Arm.setOmegas(encoderProximal.getVelocity(), encoderDistal.getVelocity());
     }
     public double[] forwardKinematics(){
         double[] fK = Arm.forwardKinematics(encoderProximal.getPosition(), encoderDistal.getPosition());
@@ -75,30 +73,65 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Error Distal", errorD);
     }
     public void voltageMotors(double controlVoltageProxima, double controlVoltageDistal, double gravityVoltageProxima, double gravityVoltageDistal){
-        if(encoderProximal.getPosition() < boundsProxima[0] && controlVoltageProxima < 0) controlVoltageProxima = 0;
-        if(encoderProximal.getPosition() > boundsProxima[1] && controlVoltageProxima > 0) controlVoltageProxima = 0;
-        if(encoderDistal.getPosition() < boundsDistal[0] && controlVoltageDistal < 0) controlVoltageDistal = 0;
-        if(encoderDistal.getPosition() > boundsDistal[1] && controlVoltageDistal > 0) controlVoltageDistal = 0;
+        if(getProximalRadians() < boundsProxima[0] && controlVoltageProxima < 0) controlVoltageProxima = 0;
+        if(getProximalRadians() > boundsProxima[1] && controlVoltageProxima > 0) controlVoltageProxima = 0;
+        if(getDistalRadians() < boundsDistal[0] && controlVoltageDistal < 0) controlVoltageDistal = 0;
+        if(getDistalRadians() > boundsDistal[1] && controlVoltageDistal > 0) controlVoltageDistal = 0;
         motorProximal.setVoltage(controlVoltageProxima + gravityVoltageProxima);
         motorDistal.setVoltage(controlVoltageDistal + gravityVoltageDistal);
     }
-
+    
+    public double getProximalRadians(){
+        double angle = (ext_encProximal.getAbsolutePosition() - 0.94) * (2 * Math.PI) + Math.PI/2;
+        if(angle < 0) angle += 2*Math.PI;
+        if(angle > 2*Math.PI) angle -= 2*Math.PI;
+        return angle;
+    }
+    public double getDistalRadians(){
+        double angle = -(ext_encDistal.getAbsolutePosition() - 0.237) * (2 * Math.PI) - getProximalRadians();
+        if(angle < -3.0/2 * Math.PI) angle += 2*Math.PI;
+        if(angle > Math.PI/2) angle -= 2*Math.PI;
+        return angle;
+    }
   @Override
     public void periodic() {
         updateState();
-        SmartDashboard.putBoolean("lb Prox", encoderProximal.getPosition() < boundsProxima[0]);
-        SmartDashboard.putBoolean("hb Prox", encoderProximal.getPosition() > boundsProxima[1]);
-        SmartDashboard.putBoolean("lb Dist", encoderDistal.getPosition() < boundsDistal[0]);
-        SmartDashboard.putBoolean("hb Dist", encoderDistal.getPosition() > boundsDistal[1]);
-        SmartDashboard.putNumber("Gravity Apply", Math.cos(encoderProximal.getPosition()));
-        SmartDashboard.putNumber("Angle Proxima Deg", 180 / Math.PI * encoderProximal.getPosition());
-        SmartDashboard.putNumber("Angle Distal Deg", 180 / Math.PI * encoderDistal.getPosition());
-        double[] fK = Arm.forwardKinematics(encoderProximal.getPosition(), encoderDistal.getPosition());
-        SmartDashboard.putNumber("pX", fK[0]);
-        SmartDashboard.putNumber("pY", fK[1]);
-        double[] iK = Arm.inverseKinematics(fK[0], fK[1]);
-        SmartDashboard.putNumber("q1", 180 / Math.PI * iK[0]);
-        SmartDashboard.putNumber("q2", 180 / Math.PI * iK[1]);
+
+
+        boolean ShowBounds = true;
+        if(ShowBounds){
+            SmartDashboard.putBoolean("lb Prox", getProximalRadians() < boundsProxima[0]);
+            SmartDashboard.putBoolean("hb Prox", getProximalRadians() > boundsProxima[1]);
+            SmartDashboard.putBoolean("lb Dist", getDistalRadians() < boundsDistal[0]);
+            SmartDashboard.putBoolean("hb Dist", getDistalRadians() > boundsDistal[1]);
+        }
+        boolean ShowCurrent = false;
+        if(ShowCurrent){
+            SmartDashboard.putNumber("Proxima cuurrent", motorProximal.getOutputCurrent());
+            SmartDashboard.putNumber("Distal cuurrent", motorDistal.getOutputCurrent());
+        }
+        
+        boolean ShowPositionals = false;
+        if(ShowPositionals){
+            SmartDashboard.putNumber("Gravity Apply", Math.cos(encoderProximal.getPosition()));
+            SmartDashboard.putNumber("Omega Proxima Deg", 180 / Math.PI * encoderProximal.getVelocity());
+            SmartDashboard.putNumber("Omega Distal Deg", 180 / Math.PI * encoderDistal.getVelocity());
+            SmartDashboard.putNumber("Theta Proxima Deg", 180 / Math.PI * encoderProximal.getPosition());
+            SmartDashboard.putNumber("Theta Distal Deg", 180 / Math.PI * encoderDistal.getPosition());
+            double[] fK = Arm.forwardKinematics(encoderProximal.getPosition(), encoderDistal.getPosition());
+            SmartDashboard.putNumber("pX", fK[0]);
+            SmartDashboard.putNumber("pY", fK[1]);
+            double[] iK = Arm.inverseKinematics(fK[0], fK[1]);
+            SmartDashboard.putNumber("q1", 180 / Math.PI * iK[0]);
+            SmartDashboard.putNumber("q2", 180 / Math.PI * iK[1]);
+            double[] xdot = Arm.cartesianSpeed();
+            SmartDashboard.putNumber("vX", xdot[0]);
+            SmartDashboard.putNumber("vY", xdot[1]);
+        }
+        
+        SmartDashboard.putNumber("ExtEnc proximal", getProximalRadians() * 180/Math.PI);
+        SmartDashboard.putNumber("ExtEnc distal", getDistalRadians() * 180/Math.PI);
+        
     }
 
 @Override

@@ -52,12 +52,12 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    m_driver.b().whileTrue(new ArmPositionCommand(armSubsystem, 0.3, 0.12));
-    m_driver.a().whileTrue(new ArmPositionCommand(armSubsystem, 0.3, -0.03));
-    m_driver.x().whileTrue(new ArmPositionCommand(armSubsystem, -0.7, 0.5));
-    m_driver.y().whileTrue(new ArmPositionCommand(armSubsystem, -0.1, 0.5));
-    m_driver.rightBumper().whileTrue(new ArmPositionCommand(armSubsystem, -0.3, 0.12));
-    m_driver.leftBumper().whileTrue(new ArmZeroCommand(armSubsystem));
+    // m_driver.b().whileTrue(new ArmPositionCommand(armSubsystem, 0.3, 0.12));
+    // m_driver.a().whileTrue(new ArmPositionCommand(armSubsystem, 0.3, -0.03));
+    // m_driver.x().whileTrue(new ArmPositionCommand(armSubsystem, -0.7, 0.5));
+    // m_driver.y().whileTrue(new ArmPositionCommand(armSubsystem, -0.1, 0.5));
+    // m_driver.rightBumper().whileTrue(new ArmPositionCommand(armSubsystem, -0.3, 0.12));
+    // m_driver.leftBumper().whileTrue(new ArmZeroCommand(armSubsystem));
   }
 
   private static double modifyAxisTranslate(double value) {
