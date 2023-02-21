@@ -4,17 +4,26 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
+
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
+import frc.robot.Constants;
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
@@ -27,6 +36,34 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
+    Logger logger = Logger.getInstance();
+
+    // Set up data receivers & replay source
+    switch (Constants.currentMode) {
+      case REAL:
+        String folder = "/media/sda1/";
+        if (folder != null) {
+          logger.addDataReceiver(new WPILOGWriter(folder));
+        } 
+        logger.addDataReceiver(new NT4Publisher());
+        LoggedPowerDistribution.getInstance(1, ModuleType.kRev);
+        break;
+
+      case SIM:
+        logger.addDataReceiver(new NT4Publisher());
+        break;
+
+      case REPLAY:
+        String path = LogFileUtil.findReplayLog();
+        logger.setReplaySource(new WPILOGReader(path));
+        logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(path, "_sim")));
+        break;
+    }
+
+    // Start AdvantageKit logger
+    setUseTiming(Constants.currentMode != Constants.Mode.REPLAY);
+    logger.start();
+
     m_robotContainer = new RobotContainer();
   }
 

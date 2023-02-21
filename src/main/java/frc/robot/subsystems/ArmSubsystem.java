@@ -15,6 +15,7 @@ import frc.robot.Constants;
 
 public class ArmSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
+    ArmVisualizer visualizerMeasured;
     public ArmSubsystem() {
         motorProximal.setInverted(true);
         motorDistal.setInverted(false);
@@ -23,6 +24,7 @@ public class ArmSubsystem extends SubsystemBase {
 
         ext_encProximal.setDistancePerRotation(convertRotRad);
         ext_encDistal.setDistancePerRotation(convertRotRad);
+        visualizerMeasured = new ArmVisualizer("ArmMeasured", null);
     }
 
     private final double[] boundsProxima = new double[]{Math.toRadians(35), Math.toRadians(145)};
@@ -131,7 +133,9 @@ public class ArmSubsystem extends SubsystemBase {
         
         SmartDashboard.putNumber("ExtEnc proximal", getProximalRadians() * 180/Math.PI);
         SmartDashboard.putNumber("ExtEnc distal", getDistalRadians() * 180/Math.PI);
-        
+
+
+        visualizerMeasured.update(getProximalRadians(), getDistalRadians());
     }
 
 @Override
