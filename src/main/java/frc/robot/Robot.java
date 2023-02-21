@@ -4,14 +4,25 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.ClawSubsystem;
-import frc.robot.subsystems.IntakeSubsystemWheel;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.IntakeCommand.Direction;
+import frc.robot.subsystems.Claw.ClawIOSparkMax;
+import frc.robot.subsystems.Claw.ClawSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -22,12 +33,13 @@ import frc.robot.subsystems.IntakeSubsystemWheel;
  * build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
   private ClawSubsystem m_claw;
-  private IntakeSubsystemWheel m_intakeSubsystem;
+  // private IntakeSubsystemWheel m_intakeSubsystem;
   private XboxController m_controller;
+  private Logger logger;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -36,12 +48,54 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    m_claw = new ClawSubsystem();
-    m_intakeSubsystem = new IntakeSubsystemWheel();
+    logger = Logger.getInstance();
+    logger.recordMetadata("Claw_Prototype", "Claw_Prototype"); // Set a metadata value
+    switch (Constants.getMode()) {
+      case REAL:
+        String folder = "/Users/User/Documents/FRC-2023-Logs";
+        if (folder != null) {
+          logger.addDataReceiver(new WPILOGWriter(folder));
+        }
+        LoggedPowerDistribution.getInstance();
+      case REPLAY:
+        // setUseTiming(false); // Run as fast as possible
+        // String path = LogFileUtil.findReplayLog();
+        // logger.setReplaySource(new WPILOGReader(path));
+        // logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(path,
+        //     "_sim")));
+        // break;
+    }
+    logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
+                    // be added.
+    m_claw = new ClawSubsystem(new ClawIOSparkMax());
+    // m_intakeSubsystem = new IntakeSubsystemWheel();
     m_controller = new XboxController(0);
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our
     // autonomous chooser on the dashboard.
+
+    // Start AdvantageKit logger
+    Map<String, Integer> commandCounts = new HashMap<>();
+    BiConsumer<Command, Boolean> logCommandFunction = (Command command, Boolean active) -> {
+      String name = command.getName();
+      int count = commandCounts.getOrDefault(name, 0) + (active ? 1 : -1);
+      commandCounts.put(name, count);
+    };
+    CommandScheduler.getInstance()
+        .onCommandInitialize(
+            (Command command) -> {
+              logCommandFunction.accept(command, true);
+            });
+    CommandScheduler.getInstance()
+        .onCommandFinish(
+            (Command command) -> {
+              logCommandFunction.accept(command, false);
+            });
+    CommandScheduler.getInstance()
+        .onCommandInterrupt(
+            (Command command) -> {
+              logCommandFunction.accept(command, false);
+            });
   }
 
   /**
@@ -64,7 +118,11 @@ public class Robot extends TimedRobot {
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    m_intakeSubsystem.runIntake(m_controller.getLeftY());
+    // m_intakeSubsystem.runIntake(m_controller.getLeftY());
+
+    new Trigger(m_controller::getRightBumper).whileTrue(new IntakeCommand(m_claw, Direction.CLOSE));
+    new Trigger(m_controller::getRightBumper).whileFalse(new IntakeCommand(m_claw, Direction.OPEN));
+
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -109,8 +167,6 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-     m_claw.closeIntake();
-
   }
 
   @Override

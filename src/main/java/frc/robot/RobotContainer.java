@@ -11,15 +11,12 @@ package frc.robot;
 // import frc.robot.subsystems.IntakeSubsystemWheel;
 // import frc.robot.subsystems.IntakeSubsystemWheel.Direction;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 // import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.IntakeCommand.Direction;
-import frc.robot.subsystems.ClawSubsystem;
+import frc.robot.subsystems.Claw.ClawIOSparkMax;
+import frc.robot.subsystems.Claw.ClawSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -35,8 +32,8 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
+    m_claw = new ClawSubsystem(new ClawIOSparkMax());
     configureBindings();
-    m_claw = new ClawSubsystem();
   }
 
   /**
@@ -51,8 +48,6 @@ public class RobotContainer {
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
-    new Trigger(m_driverController::getRightBumper).whileTrue(new InstantCommand(() -> m_claw.closeIntake()));
-    // new Trigger(m_driverController::getRightBumper).toggleOnFalse(new IntakeCommand(m_claw, Direction.CLOSE));
   }
 
   /**
