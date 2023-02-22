@@ -77,6 +77,10 @@ public class VisionSubsystem extends SubsystemBase {
         return new Pose2d();
     }
 
+    public long getPipeline(){
+        return table.getEntry("getpipe").getInteger(0);
+    }
+
     private double[] getCamTran() {
         double id = getTagID();
         for (var v : getLatestResults().targetingResults.targets_Fiducials) {

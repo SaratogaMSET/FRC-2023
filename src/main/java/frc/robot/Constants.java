@@ -222,6 +222,8 @@ public final class Constants {
         public static final double H2a = 1.1736; //Low goal = 0.628, high goal = 1.17
         public static final double H2b = 0.638; //height of low goal
         public static final double A1 = 10; // limelight angle!
+
+        public static final double retroPipeline = 1; //pipline id of the retroreflective pipeline.
         
         public static final double C1 = 0; //vrt / y value check the picture Idk why govind called it that
         public static final double C2 = 0; // horizontal / x value check the picture :??????
@@ -294,6 +296,9 @@ public final class Constants {
                 return maxY;
             }
         }
+    }
+
+    public static class LEDConstants{
     }
 
     public static class FilterConstants {

@@ -22,10 +22,12 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.Vision;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.robot.commands.DefaultDriveCommand;
+import frc.robot.commands.DefaultLedCommand;
 import frc.robot.commands.ResetEncoder;
 import frc.robot.commands.SwitchPipeline;
 import frc.robot.commands.ZeroGyroCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.LedSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.util.server.PoseEstimator;
 import com.pathplanner.lib.PathPlanner;
@@ -85,6 +87,7 @@ public class RobotContainer {
     new Rotation2d(), 
     new Pose2d()
   );
+  private final LedSubsystem m_LedSubsystem = new LedSubsystem();
   public static final double MAX_VELOCITY_METERS_PER_SECOND = (6380.0 / 60.0 *
           SdsModuleConfigurations.MK4_L2.getDriveReduction() *
           SdsModuleConfigurations.MK4_L2.getWheelDiameter() * Math.PI);
@@ -179,6 +182,8 @@ public class RobotContainer {
             () -> -modifyAxis(-m_controller.getRightX()/1.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
             
     ));
+
+    m_LedSubsystem.setDefaultCommand(new DefaultLedCommand(m_LedSubsystem, m_visionSubsystem));
 
     m_controller.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
 
