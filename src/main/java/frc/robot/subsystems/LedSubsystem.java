@@ -7,7 +7,7 @@ public class LedSubsystem extends SubsystemBase{
     private Spark blinkin1;
     //private double val;
     public LedSubsystem(){
-        blinkin1 = new Spark(0);
+        blinkin1 = new Spark(14);
     }
 
     public void changeColor(double val){
