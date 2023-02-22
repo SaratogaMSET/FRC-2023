@@ -218,10 +218,10 @@ public final class Constants {
     }
 
     public static class VisionConstants {
-        public static final double H1 = 0.489; // METERS, 0.3429 on board, 0.489 on floudner.
+        public static final double H1 = 0.279; // METERS, 0.3429 on board, 0.489 on floudner.
         public static final double H2a = 1.1736; //Low goal = 0.628, high goal = 1.17
         public static final double H2b = 0.638; //height of low goal
-        public static final double A1 = 10; // limelight angle!
+        public static final double A1 = 20; // limelight angle!
 
         public static final double retroPipeline = 1; //pipline id of the retroreflective pipeline.
         

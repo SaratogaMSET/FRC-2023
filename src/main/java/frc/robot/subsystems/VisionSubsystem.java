@@ -112,9 +112,9 @@ public class VisionSubsystem extends SubsystemBase {
 
     private double getDistanceFromRetro(){
         if (getTY() < 0){
-            return (Constants.VisionConstants.H2b - Constants.VisionConstants.H1) / Math.tan(0.017453292519943295 * (Constants.VisionConstants.A1 + getTY()));
+            return 39.37 * (Constants.VisionConstants.H2b - Constants.VisionConstants.H1) / Math.tan(0.017453292519943295 * (Constants.VisionConstants.A1 + getTY()));
         } 
-        return (Constants.VisionConstants.H2a - Constants.VisionConstants.H1) / Math.tan(0.017453292519943295 * (Constants.VisionConstants.A1 + getTY()));
+        return 39.37 * (Constants.VisionConstants.H2a - Constants.VisionConstants.H1) / Math.tan(0.017453292519943295 * (Constants.VisionConstants.A1 + getTY()));
     }
 
     /**
