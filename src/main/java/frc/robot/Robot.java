@@ -58,44 +58,20 @@ public class Robot extends LoggedRobot {
         }
         LoggedPowerDistribution.getInstance();
       case REPLAY:
-        // setUseTiming(false); // Run as fast as possible
-        // String path = LogFileUtil.findReplayLog();
-        // logger.setReplaySource(new WPILOGReader(path));
-        // logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(path,
-        //     "_sim")));
-        // break;
+        setUseTiming(false); // Run as fast as possible
+        String path = LogFileUtil.findReplayLog();
+        logger.setReplaySource(new WPILOGReader(path));
+        logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(path,
+            "_sim")));
+        break;
+      case NOT_SET:
+        break;
     }
     logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
                     // be added.
     m_claw = new ClawSubsystem(new ClawIOSparkMax());
     // m_intakeSubsystem = new IntakeSubsystemWheel();
     m_controller = new XboxController(0);
-    // Instantiate our RobotContainer. This will perform all our button bindings,
-    // and put our
-    // autonomous chooser on the dashboard.
-
-    // Start AdvantageKit logger
-    Map<String, Integer> commandCounts = new HashMap<>();
-    BiConsumer<Command, Boolean> logCommandFunction = (Command command, Boolean active) -> {
-      String name = command.getName();
-      int count = commandCounts.getOrDefault(name, 0) + (active ? 1 : -1);
-      commandCounts.put(name, count);
-    };
-    CommandScheduler.getInstance()
-        .onCommandInitialize(
-            (Command command) -> {
-              logCommandFunction.accept(command, true);
-            });
-    CommandScheduler.getInstance()
-        .onCommandFinish(
-            (Command command) -> {
-              logCommandFunction.accept(command, false);
-            });
-    CommandScheduler.getInstance()
-        .onCommandInterrupt(
-            (Command command) -> {
-              logCommandFunction.accept(command, false);
-            });
   }
 
   /**

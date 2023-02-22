@@ -14,12 +14,14 @@ import frc.robot.LoggedTunableNumber;
 public class ClawSubsystem extends SubsystemBase {
   public static ColorSensorV3 colorSensor;
   public ClawIO io;
-  public ClawIOVisualizer visualizer = new ClawIOVisualizer();
   public ClawIOInputsAutoLogged inputs = new ClawIOInputsAutoLogged();
-  private static final LoggedTunableNumber limitSwitch = new LoggedTunableNumber("Claw/Limit_Switch");
-  private static final LoggedTunableNumber motorVolts = new LoggedTunableNumber("Claw/Motor_Volts");
-  private static final LoggedTunableNumber currentVelocity = new LoggedTunableNumber("Claw/Current_Velocity");
-  private static final LoggedTunableNumber appliedTorque = new LoggedTunableNumber("Claw/Applied_Torque");
+  public static double TARGET_VELOCITY = 0.2;
+  public static final int INTAKE_DISTANCE_THRESHOLD = 50;
+  public static final double TORQUE_CONSTANT = 0.01042;
+  public static final double RESISTANCE = 12 / (11000 * 2 * 3.14159265 / 60);
+  public static final double TORQUE_THRESHOLD = 175;
+  public static final double CLOSING_TORQUE_THRESHOLD = 125;
+  private static final LoggedTunableNumber targetVelocity = new LoggedTunableNumber("Claw/Target_Velocity");
 
   public static enum Objects {
     Cone,
@@ -49,8 +51,9 @@ public class ClawSubsystem extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.getInstance().processInputs("Mechanisms/Claw", inputs);
     Logger.getInstance().recordOutput("Mechanism/Claw/Limit_Switch", io.getLimitSwitch());
-    if (Constants.getMode() == Constants.Mode.REPLAY)
-      visualizer.updateIntakeSim(inputs.rotations);
+    if (targetVelocity.hasChanged(hashCode())) {
+      TARGET_VELOCITY = targetVelocity.get();
+    }
     // This method will be called once per scheduler run
   }
 
