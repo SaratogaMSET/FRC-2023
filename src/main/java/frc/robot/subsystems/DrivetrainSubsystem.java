@@ -260,13 +260,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
             currentDesiredState[2].angle = previousDesiredState[2].angle;
             currentDesiredState[3].angle = previousDesiredState[3].angle;
         }
-        // for(int i = 0; i < 4; i++){
-        //     SmartDashboard.putNumber("Mod " + i + " Cancoder", mSwerveMods[i].getCanCoder().getDegrees());
+        for(int i = 0; i < 4; i++){
+            SmartDashboard.putNumber("Mod " + i + " Cancoder", mSwerveMods[i].getCanCoder().getDegrees());
         //     SmartDashboard.putNumber("Mod " + i + " Integrated", mSwerveMods[i].getPosition().angle.getDegrees());
         //     SmartDashboard.putNumber("Mod " + i + " Velocity", mSwerveMods[i].getState().speedMetersPerSecond);
         //     SmartDashboard.putNumber("Desired Module "+ i + " Angle", currentDesiredState[i].angle.getDegrees());   
         //     SmartDashboard.putNumber("Desired Module "+ i + " Velocity", currentDesiredState[i].speedMetersPerSecond);     
-        // }
+        }
         
         setModuleStates(currentDesiredState);
         //Logger.getInstance().recordOutput("Gyro Rotation2d", new Pose2d(new Translation2d(0,0),m_navx.getRotation2d()));
