@@ -25,6 +25,7 @@ import frc.lib.util.SwerveModuleConstants;
 public final class Constants {
     public static final boolean competitionMode = false;
     public static final Mode currentMode = Mode.REAL;
+    public static final boolean tuningMode = true;
     public static final double loopPeriodSecs = 0.02;
     public static enum Mode {
       /** Running on a real robot. */

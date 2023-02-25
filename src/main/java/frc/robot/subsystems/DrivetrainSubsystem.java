@@ -19,12 +19,14 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.subsystems.DrivetrainUtil.SwerveModuleIOInputsAutoLogged;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.math.Matrix;
@@ -211,10 +213,19 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     public void zeroGyroscope(){
-      Pose2d pose = new Pose2d(getPose().getX(), getPose().getY(), new Rotation2d());
-      odomFiltered.resetPosition(getRotation2d(), getModulePositions(), pose);
-      m_navx.zeroYaw();
+        //Pose2d pose = new Pose2d(getPose().getX(), getPose().getY(), new Rotation2d());
+        m_navx.zeroYaw();
+        resetOdometry(getPose());
+      
     }
+
+    public static double apply(double xCoordinate) {
+        if (DriverStation.getAlliance() == Alliance.Red) {
+          return Units.inchesToMeters(651.25) - xCoordinate;
+        } else {
+          return xCoordinate;
+        }
+      }
 
     public Rotation2d getYaw() {
         return (Constants.Drivetrain.invertGyro) ? Rotation2d.fromDegrees(360 - m_navx.getYaw()) : Rotation2d.fromDegrees(m_navx.getYaw());

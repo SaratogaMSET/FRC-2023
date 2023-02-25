@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
-public class SnapToClosest90 extends CommandBase {
+public class MoveWithClosest90 extends CommandBase {
 
     double desiredAngle;
     private DrivetrainSubsystem drivetrain;
@@ -19,7 +19,7 @@ public class SnapToClosest90 extends CommandBase {
     double yT;
     int axis = 0;
     double lastRot;
-    public SnapToClosest90(DrivetrainSubsystem drivetrainSubsystem,
+    public MoveWithClosest90(DrivetrainSubsystem drivetrainSubsystem,
         DoubleSupplier translationXSupplier,
         DoubleSupplier translationYSupplier){
         

@@ -61,15 +61,15 @@ public class SwerveModule implements SwerveModuleIO {
         setAngle(swerveModuleState);
         setSpeed(swerveModuleState, isOpenLoop);
     }
-        private void setSpeed(BetterSwerveModuleState desiredState, boolean isOpenLoop){
-            if(isOpenLoop){
-                double percentOutput = desiredState.speedMetersPerSecond / Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND;
-                mDriveMotor.set(ControlMode.PercentOutput, percentOutput);
-            }
-            else {
-                double velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, Constants.Drivetrain.wheelCircumference, Constants.Drivetrain.driveGearRatio);
-                mDriveMotor.set(ControlMode.Velocity, velocity, DemandType.ArbitraryFeedForward, feedforward.calculate(desiredState.speedMetersPerSecond));
-            
+
+    private void setSpeed(BetterSwerveModuleState desiredState, boolean isOpenLoop){
+        if(isOpenLoop){
+            double percentOutput = desiredState.speedMetersPerSecond / Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND;
+            mDriveMotor.set(ControlMode.PercentOutput, percentOutput);
+        }
+        else {
+            double velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, Constants.Drivetrain.wheelCircumference, Constants.Drivetrain.driveGearRatio);
+            mDriveMotor.set(ControlMode.Velocity, velocity, DemandType.ArbitraryFeedForward, feedforward.calculate(desiredState.speedMetersPerSecond));
         }
     }
     private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop){

@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.Drivetrain;
 
 
 import edu.wpi.first.math.controller.PIDController;
@@ -18,10 +18,6 @@ public class BalanceCommand extends CommandBase {
   private Rotation2d drivePitch;
   private Rotation2d driveRoll;
 
-    @Override
-    public void initialize(){
-        intitalPitch = drivetrain.m_navx.getRoll();
-    }
   private static final double AutoBalanceKP = 0.5;
     //   new LoggedTunableNumber("ChargeStationAutoBalance/AutoBalanceKP");
   private static final double AutoBalanceKI = 0.0;
@@ -30,10 +26,6 @@ public class BalanceCommand extends CommandBase {
     //   new LoggedTunableNumber("ChargeStationAutoBalance/AutoBalanceKD");
   double driveSpeedMetersPerSec = 5.0;
 
-    @Override
-    public void execute(){
-        
-    }
   private final PIDController pidController =
       new PIDController(AutoBalanceKP, AutoBalanceKI, AutoBalanceKD);
 
@@ -59,9 +51,6 @@ public class BalanceCommand extends CommandBase {
     //   pidController.setI(AutoBalanceKI.get());
     //   pidController.setD(AutoBalanceKD.get());
     // }
-
-    @Override
-    public void end(boolean interrupted){
     // get rotation of robot
     driveRoll = new Rotation2d(drive.m_navx.getRoll());
     drivePitch = new Rotation2d(drive.m_navx.getPitch());
