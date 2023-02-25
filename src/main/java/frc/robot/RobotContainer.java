@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.ArmPIDCommand;
+import frc.robot.commands.ArmLQRCommand;
 import frc.robot.commands.ArmPositionCommand;
 import frc.robot.commands.ArmVoltageCommand;
 import frc.robot.commands.ArmZeroCommand;
@@ -31,8 +31,8 @@ public class RobotContainer {
     armSubsystem.setDefaultCommand(
       new ArmVoltageCommand(
         armSubsystem,
-        () -> modifyAxisTranslate(m_driver.getLeftY() * 2),  
-        () -> modifyAxisTranslate(m_driver.getRightY() * 2)
+        () -> modifyAxisTranslate(-m_driver.getLeftY() * 1),  //Axes are reverse with this setup, pushing up returns a negative number on both y axes
+        () -> modifyAxisTranslate(-m_driver.getRightY() * 1)
       ));
     // Configure the trigger bindings
     configureBindings();

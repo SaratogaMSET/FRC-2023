@@ -10,15 +10,15 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import java.util.ArrayList;
-import java.util.List;
+//import java.util.ArrayList;
+//import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 /** Helper class for creating a {@link Mechanism2d} and 3D component representation of an arm. */
 public class ArmVisualizer {
   private final String logKey;
   private double shoulderLength = 0.445;
-  private double elbowLength = 0.3683;
+  //private double elbowLength = 0.3683;
   private final Mechanism2d mechanism;
   private final MechanismRoot2d mechanismRoot;
   private final MechanismLigament2d fixedLigament;

@@ -16,7 +16,7 @@ public class ArmPositionCommand extends CommandBase{
 
     @Override
     public void execute(){
-        double[] iK = armSubsystem.Arm.inverseKinematics(tX, tY);
-        armSubsystem.pidToAngles(iK[0], iK[1]);
+        double[] iK = armSubsystem.inverseKinematics(tX, tY);
+        armSubsystem.LQRtoAngles(iK[0], iK[1]);
     }         
 }

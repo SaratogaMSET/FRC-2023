@@ -14,8 +14,8 @@ import java.util.function.BiFunction;
 
 import org.ejml.simple.SimpleMatrix;
 
-public class ArmControl {
-    protected ArmDynamics Arm;
+public class ArmMassControl {
+    public ArmDynamics Arm;
 
     protected final double dT = 1.0 / 50;
     protected BiFunction<Matrix<N4, N1>, Matrix<N2, N1>, Matrix<N4, N1>> dynamics;
@@ -24,9 +24,8 @@ public class ArmControl {
 
     protected LinearSystem<N4, N2, N0> plant;
     protected LinearQuadraticRegulator<N4, N2, N0> feedback;
-    protected ControlAffinePlantInversionFeedforward<N4, N2> feedforward;
 
-    public ArmControl(Joint proxima, Joint distal){
+    public ArmMassControl(Joint proxima, Joint distal){
         Arm = new ArmDynamics(proxima, distal);
 
         dynamics = (x, u) -> Arm.dynamics(x, u);
@@ -42,9 +41,6 @@ public class ArmControl {
         double proximalControlCost = 100;
         double distalControlCost = 75;
         r = VecBuilder.fill(proximalControlCost, distalControlCost);
-
-
-        feedforward = new ControlAffinePlantInversionFeedforward<>(Nat.N4(), Nat.N2(), dynamics, dT);
     }
     private void linearize(SimpleMatrix state, SimpleMatrix control){
         Matrix<N4, N1> x = new Matrix<>(state);
@@ -62,6 +58,14 @@ public class ArmControl {
     public SimpleMatrix counteractErroneousForces(SimpleMatrix state){
         return Arm.counteractErroneousForces(state);
     }
+    public SimpleMatrix getKMatrix(SimpleMatrix state){
+        Matrix<N2, N4> kMatrix = feedback.getK();
+
+        SimpleMatrix control = new SimpleMatrix(2, 1);
+        linearize(state, control);
+
+        return kMatrix.getStorage();
+    }
     public SimpleMatrix control(SimpleMatrix reference, SimpleMatrix state){
         SimpleMatrix control = new SimpleMatrix(2, 1);
         return control(new Matrix<>(reference), new Matrix<>(state), new Matrix<>(control)).getStorage();
@@ -71,8 +75,7 @@ public class ArmControl {
     }
     private Matrix<N2, N1> control(Matrix<N4, N1> reference, Matrix<N4, N1> state, Matrix<N2, N1> control){
         linearize(state.getStorage(), control.getStorage());
-        Matrix<N2, N1> u_ff = feedforward.calculate(reference);
         Matrix<N2, N1> u_fb = feedback.calculate(state, reference);
-        return u_ff.plus(u_fb);
+        return u_fb;
     }
 }

@@ -1,7 +1,7 @@
 package frc.robot;
 public final class Constants {
   
-  public static final Mode currentMode = Mode.REPLAY;
+  public static final Mode currentMode = Mode.REAL;
 
   public static enum Mode {
     REAL,
@@ -17,6 +17,6 @@ public final class Constants {
       public static final int distalEncoderID = 6;
 
       public static final double gearProximalReduction = 45;
-      public static final double gearDistalReduction = 33.333;
+      public static final double gearDistalReduction = 25 * 48.0 / 32;
   }
 }
