@@ -38,7 +38,7 @@ public class DefaultDriveCommand extends CommandBase {
         double magnitude = Math.hypot(m_translationXTrapezoidal, m_translationYTrapezoidal);
 
         double joyAngle = Math.atan2(m_translationYTrapezoidal, m_translationXTrapezoidal);
-        double roboAngle = (m_drivetrainSubsystem.getNavHeading() + joyAngle);
+        double roboAngle = (m_drivetrainSubsystem.getNavHeading()+ joyAngle); 
 
         double resultX = Math.cos(roboAngle) * magnitude;
         double resultY = Math.sin(roboAngle) * magnitude;
@@ -50,10 +50,13 @@ public class DefaultDriveCommand extends CommandBase {
         SmartDashboard.putNumber("m_rotationSupplier", m_rotationSupplier.getAsDouble());
         
         m_drivetrainSubsystem.drive(
+                // ChassisSpeeds.fromFieldRelativeSpeeds(
                 new ChassisSpeeds(
                 resultX,
                 resultY,
                 m_rotationSupplier.getAsDouble() * multiplier)
+                // m_drivetrainSubsystem.getRotation2d()
+                // )
         );
     }
     @Override

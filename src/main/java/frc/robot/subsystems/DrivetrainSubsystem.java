@@ -38,20 +38,18 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public final AHRS m_navx = new AHRS(SPI.Port.kMXP, (byte) 200);
     public double offset = 0;
     private Rotation2d lastRotation = new Rotation2d();
-    private final PIDController driftCorrectionPID = new PIDController(0.225, 0.00, 0.005);
+    private final PIDController driftCorrectionPID = new PIDController(0.1, 0.00, 0.000);
     public ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);    
     //private SwerveDriveOdometry swerveOdometry;
 
     private Field2d m_field = new Field2d();
 
-    /* Vision!!! */
     private NetworkTable visionData;
 
-    private SwerveDrivePoseEstimator odomFiltered; // = new SwerveDrivePoseEstimator(null, null, null, null);
+    private SwerveDrivePoseEstimator odomFiltered;
     private final Matrix<N3, N1> stateSTD = new Matrix<>(Nat.N3(), Nat.N1());
     private final Matrix<N3, N1> visDataSTD = new Matrix<>(Nat.N3(), Nat.N1());
 
-    /*  ITS A DROP IN REPLACEMENT FOR ODOM!!! */
 
     private final SwerveModuleIOInputsAutoLogged[] moduleInputs = new SwerveModuleIOInputsAutoLogged[] {new SwerveModuleIOInputsAutoLogged(), new SwerveModuleIOInputsAutoLogged(), new SwerveModuleIOInputsAutoLogged(), new SwerveModuleIOInputsAutoLogged()};
     double pXY = 0;
@@ -75,7 +73,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         stateSTD.set(0, 0, 0.01); stateSTD.set(1, 0, 0.01); stateSTD.set(2, 0, 0.01); //Tune Values
         visDataSTD.set(0, 0, 0.99); visDataSTD.set(1, 0, 0.99); visDataSTD.set(2, 0, 0.99);
 
-        this.odomFiltered = new SwerveDrivePoseEstimator(Constants.Drivetrain.m_kinematics, getRotation2d(), getModulePositions(), new Pose2d()); //, stateSTD, visDataSTD);
+        this.odomFiltered = new SwerveDrivePoseEstimator(Constants.Drivetrain.m_kinematics2, getRotation2d(), getModulePositions(), new Pose2d()); //, stateSTD, visDataSTD);
         //swerveOdometry = new SwerveDriveOdometry(Constants.Drivetrain.m_kinematics, getRotation2d(), getModulePositions());   
     }
 
@@ -104,14 +102,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
       }
 
       public void drive(ChassisSpeeds chassisSpeeds) {
-        double IpX = Units.inchesToMeters(2);
-        double IpY = Units.inchesToMeters(-5.4);
-        double IpD = Math.hypot(IpY, IpX);
-        double theta = Math.atan2(IpY, IpX);
-        double omega = chassisSpeeds.omegaRadiansPerSecond;
-        double deltaTheta = 0.02 * omega;
-        chassisSpeeds.vxMetersPerSecond += IpD * omega * (Math.cos(theta)*Math.cos(deltaTheta) - Math.sin(theta)*Math.sin(deltaTheta));
-        chassisSpeeds.vyMetersPerSecond += IpD * omega * (Math.sin(theta)*Math.cos(deltaTheta) + Math.cos(theta)*Math.sin(deltaTheta));
+        // double IpX = Units.inchesToMeters(2);
+        // double IpY = Units.inchesToMeters(-5.4);
+        // double IpD = Math.hypot(IpY, IpX);
+        // double theta = Math.atan2(IpY, IpX);
+        // double omega = chassisSpeeds.omegaRadiansPerSecond;
+        // double deltaTheta = 0.02 * omega;
+        // chassisSpeeds.vxMetersPerSecond += IpD * omega * (Math.cos(theta)*Math.cos(deltaTheta) - Math.sin(theta)*Math.sin(deltaTheta));
+        // chassisSpeeds.vyMetersPerSecond += IpD * omega * (Math.sin(theta)*Math.cos(deltaTheta) + Math.cos(theta)*Math.sin(deltaTheta));
         //chassisSpeeds = driftCorrection(chassisSpeeds);
         m_chassisSpeeds = chassisSpeeds;
       }    
@@ -128,7 +126,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
 
     public void setModuleStates(ChassisSpeeds chassisSpeeds) {
-        BetterSwerveModuleState[] desiredStates = Constants.Drivetrain.m_kinematics.toSwerveModuleStates(chassisSpeeds);
+
+        BetterSwerveModuleState[] desiredStates = Constants.Drivetrain.m_kinematics2.toSwerveModuleStates(chassisSpeeds);
         for(SwerveModule mod : mSwerveMods){
             mod.setDesiredState(desiredStates[mod.moduleNumber], false);
         }
@@ -240,7 +239,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         previousDesiredState = currentDesiredState;
         //currentDesiredState = Constants.Drivetrain.m_kinematics.toSwerveModuleStates(speeds);
-        currentDesiredState = Constants.Drivetrain.m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
+        currentDesiredState = Constants.Drivetrain.m_kinematics2.toSwerveModuleStates(m_chassisSpeeds);
         // ChassisSpeeds currentSpeeds = Constants.Drivetrain.m_kinematics.toChassisSpeeds(previousDesiredState);
         SwerveDriveKinematics2.desaturateWheelSpeeds(currentDesiredState, Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND);
 
@@ -251,7 +250,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         double joystickCenterState = 0;
         boolean joystickCentered = true;
         for(int i = 0; i < currentDesiredState.length && joystickCentered; i++){
-            if(Math.abs(currentDesiredState[i].angle.getRadians() - joystickCenterState) > 0.001) joystickCentered = false;
+            if(Math.abs(currentDesiredState[i].angle.getRadians() - joystickCenterState) > 0.004) joystickCentered = false;
         }
         
         if(joystickCentered){
@@ -260,6 +259,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
             currentDesiredState[2].angle = previousDesiredState[2].angle;
             currentDesiredState[3].angle = previousDesiredState[3].angle;
         }
+
         for(int i = 0; i < 4; i++){
             SmartDashboard.putNumber("Mod " + i + " Cancoder", mSwerveMods[i].getCanCoder().getDegrees());
         //     SmartDashboard.putNumber("Mod " + i + " Integrated", mSwerveMods[i].getPosition().angle.getDegrees());
@@ -287,6 +287,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         m_field.setRobotPose(odomFiltered.getEstimatedPosition());
         //if (pose != null) visionPoseEstimates.setRobotPose(pose);
         SmartDashboard.putData("Field", m_field);
+        SmartDashboard.putNumber("Nav Heading", getNavHeading());
         //SmartDashboard.putData("visionEstimate", visionPoseEstimates);
         
     }

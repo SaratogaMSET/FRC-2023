@@ -27,7 +27,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.commands.DefaultDriveCommand;
+import frc.robot.commands.SnapToClosest90;
 import frc.robot.commands.ZeroGyroCommand;
+import frc.robot.commands.Auton.AutoRunCommand;
 // import frc.robot.commands.SwerveControllerStrafe;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.DrivetrainUtil.GyroIO;
@@ -49,7 +51,8 @@ public class RobotContainer {
   public final SendableChooser<String> m_autoSwitcher = new SendableChooser<String>();
   public static final String Forward = "Forward";
   public static final String ForwardRotate = "Forward + Rotate";
-  public String m_autoSelected;
+  public static final String NewPath = "New Path";
+  // public String m_autoSelected;
   public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
   // private final VisionSystem m_visionSubsystem = new VisionSystem();  
   public static final double pi = Math.PI;
@@ -89,8 +92,10 @@ public class RobotContainer {
     //       new SwerveModule(3, Constants.Drivetrain.Mod3.constants));
     //   }
 
-    m_autoSwitcher.addOption(Forward, Forward);
+    
     // m_autoSwitcher.addOption(Rotate, Rotate);
+    m_autoSwitcher.setDefaultOption(NewPath, NewPath);
+    m_autoSwitcher.addOption(Forward, Forward);
     m_autoSwitcher.addOption(ForwardRotate, ForwardRotate);
     
     // m_field = new Field2d();
@@ -126,21 +131,26 @@ public class RobotContainer {
     m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
             m_drivetrainSubsystem,
             () -> modifyAxis(m_controller.getLeftX()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> modifyAxis(m_controller.getLeftY()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> modifyAxis(m_controller.getRightX()/1.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+            () -> modifyAxis(-m_controller.getLeftY()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(-m_controller.getRightX()/1.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
             
     ));
 
     m_controller.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
 
-    m_controller.leftBumper().whileTrue(
+    m_controller.rightBumper().whileTrue(
       new DefaultDriveCommand(
             m_drivetrainSubsystem,
-            () -> -modifyAxis(-m_controller.getLeftX())/3 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(m_controller.getLeftX())/3 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
             () -> modifyAxis(-m_controller.getLeftY())/3 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> -modifyAxis(-m_controller.getRightX()) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
-    )
-    );
+            () -> modifyAxis(-m_controller.getRightX()) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+    ));
+
+    m_controller.a().toggleOnTrue(new SnapToClosest90(
+      m_drivetrainSubsystem, 
+      () -> modifyAxis(m_controller.getLeftX()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+      () -> modifyAxis(-m_controller.getLeftY()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND
+    ));
   }
 
   private static double deadband(double value, double deadband) {
@@ -189,19 +199,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    // String auto = m_autoSwitcher.getSelected();
-    PathPlannerTrajectory trajectory = PathPlanner.loadPath("New Path", 2, 0.65);
-    // switch (auto) {
-    //   case Forward:
-    //     trajectory = PathPlanner.loadPath("Forward", 0.5, 0.2);
-    //   case ForwardRotate:
-    //     trajectory = PathPlanner.loadPath("Forward + Rotate", 0.5, 0.2);
-    //   // case pathTestBall:
-    //     // return getPathTestAuto(trajectory, velocity, acceleration);
-    //   default:
-    //   trajectory = PathPlanner.loadPath("Forward", 0.5, 0.2);
-    // }
+    PathPlannerTrajectory trajectory = PathPlanner.loadPath(m_autoSwitcher.getSelected(), 2, 1);
     PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory.getInitialState(), DriverStation.getAlliance());
     
     PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
@@ -217,7 +215,7 @@ public class RobotContainer {
     PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
       trajectory, 
       m_drivetrainSubsystem::getPose,
-      Constants.Drivetrain.m_kinematics,
+      Constants.Drivetrain.m_kinematics2,
       xController,
       yController,
       thetaController,

@@ -284,7 +284,7 @@ public class PPSwerveControllerCommandA extends CommandBase {
         currentPose);
 
     ChassisSpeeds targetChassisSpeeds = this.controller.calculate(currentPose, desiredState);
-    Logger.getInstance().recordOutput("PP Target Module States", Constants.Drivetrain.m_kinematics.toSwerveModuleStates(targetChassisSpeeds));
+    Logger.getInstance().recordOutput("PP Target Module States", Constants.Drivetrain.m_kinematics2.toSwerveModuleStates(targetChassisSpeeds));
     if (this.useKinematics) {
       SwerveModuleState[] targetModuleStates =
           this.kinematics.toSwerveModuleStates(targetChassisSpeeds);
