@@ -4,8 +4,11 @@
 
 package frc.robot.subsystems.Claw;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -42,7 +45,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
     public void updateInputs(ClawIOInputsAutoLogged inputs) {
         inputs.rotations = ClawConfig.encoder.getPosition() / ClawConfig.encoder.getCountsPerRevolution();
         inputs.torque = ClawKinematics.getTorque();
-        inputs.appliedVoltage = appliedVoltage;
+        inputs.appliedVoltage = ClawKinematics.appliedVoltage;
         inputs.objectSecured = ClawKinematics.objectSecured();
         inputs.objectDetected = objectInRange();
         inputs.proximity = proximityValue();
@@ -55,21 +58,22 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
      *         spikes
      */
     public double closeIntake() {
+        updateIntake();
         objectSecuredVar = ClawKinematics.objectSecured() && objectInRange();
         boolean objectBeingSecuredVar = ClawKinematics.objectBeingSecured() && objectInRange();
         if (objectSecuredVar) {
             double holdVoltage = 0.5;
-            appliedVoltage = holdVoltage;
+            ClawKinematics.setAppliedVoltage(holdVoltage);
             intakeVoltage(holdVoltage);
         } else if (objectBeingSecuredVar) {
-            appliedVoltage = 0.5;
-            intakeVoltage(0.5);
+            ClawKinematics.setAppliedVoltage(IntakeConstants.TARGET_VOLTAGE);
+            intakeVoltage(IntakeConstants.TARGET_VOLTAGE);
         } else if (objectInRange()) {
             intakeVoltage(ffVoltage);
         } else {
             intakeVoltage(-ffVoltage);
         }
-        return appliedVoltage;
+        return ClawKinematics.appliedVoltage;
     }
 
     public void openIntake() {
@@ -80,7 +84,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
 
     public void setIdle() {
         ClawConfig.motor.set(0.0);
-        appliedVoltage = 0.0;
+        ClawKinematics.setAppliedVoltage(0.0);
     }
 
     private void updateProximitySensor() {
@@ -110,18 +114,24 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
         objectState = getObject();
         if (getLimitSwitch())
             resetEncoder();
-        boolean lowerBound = encoderPosition < 10 && Math.signum(voltage) == -1; // All mutually exclusive - change into
+        boolean lowerBound = encoderPosition < 2 && Math.signum(voltage) == -1; // All mutually exclusive - change into
                                                                                  // if-statements
-        boolean coneMediumBound = encoderPosition > 35 && Math.signum(voltage) == 1;
-        boolean cubeMediumBound = encoderPosition > 14 && Math.signum(voltage) == 1;
-        boolean higherBound = encoderPosition > 45 && Math.signum(voltage) == 1;
+        boolean coneMediumBound = encoderPosition > 7 && Math.signum(voltage) == 1;
+        boolean cubeMediumBound = encoderPosition > 2 && Math.signum(voltage) == 1;
+        boolean higherBound = encoderPosition > 12 && Math.signum(voltage) == 1;
+        SmartDashboard.putBoolean("Higher bound", higherBound); // speed would
+        // SmartDashboard.putBoolean("Higher bound", higherBound);
 
-        if ((objectState == Objects.Cube && cubeMediumBound) || (objectState == Objects.Cone && coneMediumBound)) {
+        /*   if(higherBound)
+            appliedVoltage = 0;
+        else  */
+     if ((objectState == Objects.Cube && cubeMediumBound) || (objectState == Objects.Cone && coneMediumBound)) {
             appliedVoltage = 1;
         } else if ((Math.signum(voltage) == -1 && !lowerBound) || (Math.signum(voltage) == 1 && !higherBound))
             appliedVoltage = voltage;
         else
             appliedVoltage = 0.0;
+        ClawKinematics.setAppliedVoltage(appliedVoltage);
         ClawConfig.motor.setVoltage(appliedVoltage);
     }
 
@@ -142,26 +152,27 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
         return Objects.None;
     }
 
-    // public void updateIntake() {
-    // SmartDashboard.putNumber("ClawPos", encoder.getPosition());
-    // SmartDashboard.putBoolean("Limit Switch", limitSwitch.get());
-    // SmartDashboard.putNumber("Lidar (from 0-2047)", colorSensor.getProximity());
-    // // 1-10 cm range, should be good enough
-    // // for closing the close in time...
-    // SmartDashboard.putBoolean("Detecting", objectInRange());
-    // SmartDashboard.putNumber("Red value", colorSensor.getRed()); // speed would
+    public void updateIntake() {
+        Logger.getInstance().recordOutput("Mechanism/Claw/Claw_torque", ClawKinematics.getTorque(ClawConfig.encoder.getVelocity(), appliedVoltage, IntakeConstants.GEAR_RATIO));
+    SmartDashboard.putNumber("ClawPos", ClawConfig.encoder.getPosition());
+    SmartDashboard.putBoolean("Limit Switch", ClawConfig.limitSwitch.get());
+    SmartDashboard.putNumber("Lidar (from 0-2047)", colorSensor.getProximity());
+    // 1-10 cm range, should be good enough
+    // for closing the close in time...
+    SmartDashboard.putBoolean("Detecting", objectInRange());
+    SmartDashboard.putNumber("Red value", colorSensor.getRed()); // speed would
     // have to be 45 meters per sec, so more
-    // // than 100 mph
-    // SmartDashboard.putNumber("Green value", colorSensor.getGreen());
-    // SmartDashboard.putNumber("Blue value", colorSensor.getBlue());
-    // SmartDashboard.putNumber("applied voltage", appliedVoltage);
-    // SmartDashboard.putBoolean("Limit Switch", getLimitSwitch());
-    // SmartDashboard.putBoolean("Object Secured", objectSecured());
-    // SmartDashboard.putNumber("Torque", getTorque(encoder.getVelocity(),
-    // appliedVoltage, IntakeConstants.GEAR_RATIO));
-    // SmartDashboard.putString("Object", objectState.toString());
-    // SmartDashboard.putBoolean("Object in range", objectInRange());
-    // }
+    // than 100 mph
+    SmartDashboard.putNumber("Green value", colorSensor.getGreen());
+    SmartDashboard.putNumber("Blue value", colorSensor.getBlue());
+    SmartDashboard.putNumber("applied voltage", ClawKinematics.appliedVoltage);
+    SmartDashboard.putBoolean("Limit Switch", getLimitSwitch());
+    SmartDashboard.putBoolean("Object Secured", ClawKinematics.objectSecured());
+    SmartDashboard.putNumber("Torque", ClawKinematics.getTorque(ClawConfig.encoder.getVelocity(),
+    ClawKinematics.appliedVoltage, IntakeConstants.GEAR_RATIO));
+    SmartDashboard.putString("Object", objectState.toString());
+    SmartDashboard.putBoolean("Object in range", objectInRange());
+    }
 
     @Override
     public void periodic() {

@@ -27,16 +27,17 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final int INTAKE_MOTOR = 20;
-    public static final int WHEEL_INTAKE_MOTOR = 6;
+    public static final int INTAKE_MOTOR = 6;
+    public static final int WHEEL_INTAKE_MOTOR = 7;
     public static final double GEAR_RATIO = 3.0 / 320.0;
     public static final int LIMIT_SWITCH = 0;
     public static final double TARGET_VELOCITY = 0.2;
     public static final int INTAKE_DISTANCE_THRESHOLD = 50;
     public static final double TORQUE_CONSTANT = 0.01042;
     public static final double RESISTANCE = 12 / (11000 * 2 * 3.14159265 / 60);
-    public static final double TORQUE_THRESHOLD = 175;
-    public static final double CLOSING_TORQUE_THRESHOLD = 125;
+    public static final double TARGET_VOLTAGE = 1.0;
+    public static final double TORQUE_THRESHOLD = 125 * TARGET_VOLTAGE / 0.5;
+    public static final double CLOSING_TORQUE_THRESHOLD = 75;
   }
 
   public static Mode getMode() {

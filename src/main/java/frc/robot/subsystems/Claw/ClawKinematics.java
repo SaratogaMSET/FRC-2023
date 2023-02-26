@@ -8,7 +8,7 @@ public class ClawKinematics {
     private static double ffVoltage = 5;
     private static double torque = 0;
     private static final double RPM_TO_RADPERSEC = 2 * Math.PI / 60;
-    private static double appliedVoltage;
+    public static double appliedVoltage;
     private static double[] torqueBuffer = new double[5];
     private static int torqueCounter = 0;
 
@@ -21,6 +21,14 @@ public class ClawKinematics {
                 return false;
         }
         return true;
+    }
+
+    public static void setAppliedVoltage(double newAppliedVoltage){
+        appliedVoltage = newAppliedVoltage;
+    }
+
+    public static double getAppliedVoltage(){
+        return appliedVoltage;
     }
 
     public static double getTorque() {

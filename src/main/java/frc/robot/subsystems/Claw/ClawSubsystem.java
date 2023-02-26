@@ -35,7 +35,7 @@ public class ClawSubsystem extends SubsystemBase {
   }
 
   public void openIntake() {
-    io.openIntake();
+    io.openIntake();  
   }
 
   public void setIdle() {

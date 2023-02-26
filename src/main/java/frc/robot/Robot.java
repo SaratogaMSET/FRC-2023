@@ -36,10 +36,10 @@ import frc.robot.subsystems.Claw.ClawSubsystem;
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
-  private ClawSubsystem m_claw;
+  private ClawIOSparkMax m_claw;
   // private IntakeSubsystemWheel m_intakeSubsystem;
   private XboxController m_controller;
-  private Logger logger;
+  // private Logger logger;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -48,28 +48,28 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotInit() {
-    logger = Logger.getInstance();
-    logger.recordMetadata("Claw_Prototype", "Claw_Prototype"); // Set a metadata value
-    switch (Constants.getMode()) {
-      case REAL:
-        String folder = "/Users/User/Documents/FRC-2023-Logs";
-        if (folder != null) {
-          logger.addDataReceiver(new WPILOGWriter(folder));
-        }
-        LoggedPowerDistribution.getInstance();
-      case REPLAY:
-        setUseTiming(false); // Run as fast as possible
-        String path = LogFileUtil.findReplayLog();
-        logger.setReplaySource(new WPILOGReader(path));
-        logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(path,
-            "_sim")));
-        break;
-      case NOT_SET:
-        break;
-    }
-    logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
+    // logger = Logger.getInstance();
+    // logger.recordMetadata("Claw_Prototype", "Claw_Prototype"); // Set a metadata value
+    // switch (Constants.getMode()) {
+    //   case REAL:
+    //     String folder = "/Users/User/Documents/FRC-2023-Logs";
+    //     if (folder != null) {
+    //       logger.addDataReceiver(new WPILOGWriter(folder));
+    //     }
+    //     LoggedPowerDistribution.getInstance();
+    //   case REPLAY:
+    //     setUseTiming(false); // Run as fast as possible
+    //     String path = LogFileUtil.findReplayLog();
+    //     logger.setReplaySource(new WPILOGReader(path));
+    //     logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(path,
+    //         "_sim")));
+    //     break;
+    //   case NOT_SET:
+    //     break;
+    // }
+    // logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
                     // be added.
-    m_claw = new ClawSubsystem(new ClawIOSparkMax());
+    m_claw = new ClawIOSparkMax();
     // m_intakeSubsystem = new IntakeSubsystemWheel();
     m_controller = new XboxController(0);
   }
@@ -95,9 +95,9 @@ public class Robot extends LoggedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     // m_intakeSubsystem.runIntake(m_controller.getLeftY());
-
-    new Trigger(m_controller::getRightBumper).whileTrue(new IntakeCommand(m_claw, Direction.CLOSE));
-    new Trigger(m_controller::getRightBumper).whileFalse(new IntakeCommand(m_claw, Direction.OPEN));
+    m_claw.closeIntake();
+    // new Trigger(m_controller::getRightBumper).whileTrue(new IntakeCommand(m_claw, Direction.CLOSE));
+    // new Trigger(m_controller::getRightBumper).whileFalse(new IntakeCommand(m_claw, Direction.OPEN));
 
   }
 
