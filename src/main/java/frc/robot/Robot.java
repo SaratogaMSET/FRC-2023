@@ -15,7 +15,11 @@ import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -39,6 +43,7 @@ public class Robot extends LoggedRobot {
   private ClawIOSparkMax m_claw;
   // private IntakeSubsystemWheel m_intakeSubsystem;
   private XboxController m_controller;
+  private TalonFX motor;
   // private Logger logger;
 
   /**
@@ -48,6 +53,7 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotInit() {
+    motor = new TalonFX(54);
     // logger = Logger.getInstance();
     // logger.recordMetadata("Claw_Prototype", "Claw_Prototype"); // Set a metadata value
     // switch (Constants.getMode()) {
@@ -143,6 +149,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    motor.set(ControlMode.PercentOutput, 0.5);
   }
 
   @Override
