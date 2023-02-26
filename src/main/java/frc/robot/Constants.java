@@ -35,9 +35,14 @@ public final class Constants {
     public static final int INTAKE_DISTANCE_THRESHOLD = 50;
     public static final double TORQUE_CONSTANT = 0.01042;
     public static final double RESISTANCE = 12 / (11000 * 2 * 3.14159265 / 60);
-    public static final double TARGET_VOLTAGE = 1.0;
-    public static final double TORQUE_THRESHOLD = 125 * TARGET_VOLTAGE / 0.5;
+    public static final double TARGET_VOLTAGE = 5.0;
+    public static final double TORQUE_THRESHOLD = 125;
     public static final double CLOSING_TORQUE_THRESHOLD = 75;
+    public static final double LOWER_BOUND = 0.5;
+    public static final double CUBE_MEDIUM_BOUND = 2;
+    public static final double CONE_MEDIUM_BOUND = 7;
+    public static final double UPPER_BOUND = 12;
+    public static final double HOLD_VOLTAGE = TARGET_VOLTAGE / 10;
   }
 
   public static Mode getMode() {
