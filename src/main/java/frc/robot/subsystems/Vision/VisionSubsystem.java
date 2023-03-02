@@ -1,11 +1,14 @@
 package frc.robot.subsystems.Vision;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.subsystems.Vision.LimelightHelpers.LimelightResults;
+import frc.robot.util.wrappers.VisionMeasurement;
 
 public class VisionSubsystem extends SubsystemBase {
     private NetworkTable ll2 = NetworkTableInstance.getDefault().getTable("limelight-two");
@@ -17,7 +20,65 @@ public class VisionSubsystem extends SubsystemBase {
     private double a;  // x val 
     private double b;  // y val
 
+    private double[] distances = new double[]{
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+    };
+
     public VisionSubsystem() {}
+
+    private Pose2d getCamPose2d() {
+        double id = getTagID();
+        for (var v : getLatestResults().targetingResults.targets_Fiducials) {
+            if (v.fiducialID == id) return v.getRobotPose_TargetSpace2D();
+        }
+
+        return new Pose2d();
+    }
+
+    private double[] getDistances() {
+        distances = new double[]{
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        };
+
+        for (var r : getLatestResults().targetingResults.targets_Fiducials) {
+            var tmp = r.getRobotPose_TargetSpace();
+            distances[(int) r.fiducialID - 1] = Math.hypot(tmp.getX(), tmp.getZ());
+        }
+
+        return distances;
+    }
+
+    public VisionMeasurement getLatestMeasurement() {
+        LimelightResults results = getLatestResults();
+        return new VisionMeasurement(
+            hasTargets(),
+            results.targetingResults.latency_capture + 
+                results.targetingResults.latency_pipeline + 
+                results.targetingResults.latency_jsonParse,
+            getTagID(),
+            results.targetingResults.getBotPose2d(),
+            getCamPose2d(),
+            getDistances()
+        );
+    }
+
+    public LimelightResults getLatestResults() {
+        return LimelightHelpers.getLatestResults("limelight-three");
+    }
 
     public NetworkTable getTable(){
         if (ll3.getEntry("tv").getInteger(0) == 1){
@@ -44,9 +105,9 @@ public class VisionSubsystem extends SubsystemBase {
         return getTable().getEntry("tv").getInteger(0) == 1;
     }
 
-    public long getTagId(){
+    public int getTagID(){
         if (getPipeline() != 0) return -1;
-        return getTable().getEntry("tid").getInteger(-1);
+        return (int) getTable().getEntry("tid").getInteger(-1);
     }
 
     /* Retroreflective(NOT USEFUL) */
@@ -164,7 +225,7 @@ public class VisionSubsystem extends SubsystemBase {
         // SmartDashboard.putNumber("LL to Mid (Vertical)",getLimelightTy(1));
         // SmartDashboard.putNumber("LL to High (Vertical)",getLimelightTy(2));
         // SmartDashboard.putNumber("LL to AprilTag",Math.hypot(getCamTranOld()[0], getCamTranOld()[2]));
-        // NetworkTableInstance.getDefault().flush();
+        NetworkTableInstance.getDefault().flush();
         //meters to inches: 1m = 39.3701 in
         // SmartDashboard.putNumber("LL to Mid (Horizontal, Inches)",39.3701*(getLimelightTx(1)));
         // SmartDashboard.putNumber("LL to High (Horizontal, Inches)", 39.3701*(getLimelightTx(2)));
