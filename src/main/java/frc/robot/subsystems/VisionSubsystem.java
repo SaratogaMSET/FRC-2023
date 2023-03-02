@@ -2,12 +2,8 @@ package frc.robot.subsystems;
 
 import java.util.HashMap;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.networktables.DoubleEntry;
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -15,10 +11,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.LimelightHelpers.LimelightResults;
 import frc.robot.util.wrappers.VisionMeasurement;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
-import edu.wpi.first.networktables.NetworkTableEntry;
 
 public class VisionSubsystem extends SubsystemBase {
 

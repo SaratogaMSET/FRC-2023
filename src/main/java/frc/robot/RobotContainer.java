@@ -4,12 +4,20 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+import com.pathplanner.lib.commands.PPSwerveControllerCommandA;
+import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -18,9 +26,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Drivetrain;
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.Vision;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.DefaultLedCommand;
 import frc.robot.commands.ResetEncoder;
@@ -30,37 +35,6 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.LedSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.util.server.PoseEstimator;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
-import com.pathplanner.lib.commands.PPSwerveControllerCommandA;
-
-import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
-
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants.Drivetrain;
-import frc.robot.commands.DefaultDriveCommand;
-import frc.robot.commands.ZeroGyroCommand;
-// import frc.robot.commands.SwerveControllerStrafe;
-import frc.robot.subsystems.DrivetrainSubsystem;
-import frc.robot.subsystems.DrivetrainUtil.GyroIO;
-import frc.robot.subsystems.DrivetrainUtil.GyroIONavx;
-import frc.robot.subsystems.DrivetrainUtil.SwerveModuleIOSim;
-import frc.robot.subsystems.SwerveModule;
-
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 
 

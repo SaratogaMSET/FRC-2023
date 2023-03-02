@@ -2,7 +2,6 @@ package frc.robot.subsystems.DrivetrainUtil;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.lib.swerve.BetterSwerveModuleState;

@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import frc.robot.Constants;
-import frc.robot.Constants.Vision;
 import frc.robot.subsystems.LedSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
