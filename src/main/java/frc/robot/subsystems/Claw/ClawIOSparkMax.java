@@ -7,12 +7,15 @@ package frc.robot.subsystems.Claw;
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.ColorSensorV3;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.subsystems.Claw.ClawSubsystem.Objects;
 
 public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
     private double[] proximityBuffer = new double[3];
@@ -26,14 +29,15 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
     private boolean coneMediumBound = false;
     private boolean cubeMediumBound = false;
     private boolean upperBound = false;
+    private PIDController pid = new PIDController(IntakeConstants.AUTO_KP, IntakeConstants.AUTO_KI, IntakeConstants.AUTO_KD);
 
     public static ColorSensorV3 colorSensor;
 
-    public static enum Objects {
-        Cone,
-        Cube,
-        None
-    }
+    // public static enum Objects {
+    //     Cone,
+    //     Cube,
+    //     None
+    // }
 
     /** Creates a new ExampleSubsystem. */
     public ClawIOSparkMax() {
@@ -77,6 +81,26 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
             intakeVoltage(-IntakeConstants.TARGET_VOLTAGE);
         }
         return ClawKinematics.appliedVoltage;
+    }
+
+    @Override
+    /**
+     * Only for auto use
+     */
+    public void closeIntake(Objects object){
+        switch(object.toString()){
+            case "Cone":
+                objectState = Objects.Cone;
+                break;
+            case "Cube":
+                objectState = Objects.Cube;
+                break;
+            case "None":
+                System.out.println("!!!!!!!!!!!!!!  WARNING  !!!!!!!!!!!!!!!!!");
+                System.out.println("--------NO OBJECT FOUND IN AUTO-----------");
+                System.out.println("------------------------------------------");
+        }
+        intakeVoltage(IntakeConstants.TARGET_VOLTAGE);
     }
 
     public void openIntake() {

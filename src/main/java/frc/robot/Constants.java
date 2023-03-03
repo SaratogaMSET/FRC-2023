@@ -43,6 +43,11 @@ public final class Constants {
     public static final double CONE_MEDIUM_BOUND = 7;
     public static final double UPPER_BOUND = 12;
     public static final double HOLD_VOLTAGE = TARGET_VOLTAGE / 10;
+    public static final double AUTO_CONE_DIAMETER = 0.0;
+    public static final double AUTO_CUBE_DIAMETER = 0.0;
+    public static final double AUTO_KP = 0.0;
+    public static final double AUTO_KI = 0.0;
+    public static final double AUTO_KD = 0.0;
   }
 
   public static Mode getMode() {

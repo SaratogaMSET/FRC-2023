@@ -8,7 +8,6 @@ import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.LoggedTunableNumber;
 
 public class ClawSubsystem extends SubsystemBase {
@@ -44,6 +43,10 @@ public class ClawSubsystem extends SubsystemBase {
 
   public void closeIntake() {
     io.closeIntake();
+  }
+
+  public void closeIntake(ClawSubsystem.Objects object){
+    io.closeIntake(object);
   }
 
   @Override

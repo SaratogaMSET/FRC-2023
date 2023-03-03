@@ -3,6 +3,7 @@ package frc.robot.subsystems.Claw;
 import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import frc.robot.subsystems.Claw.ClawSubsystem.Objects;
 
 public interface ClawIO {
     @AutoLog
@@ -33,6 +34,8 @@ public interface ClawIO {
     public default boolean getLimitSwitch() {
         return false;
     }
+
+    public default void closeIntake(Objects object){}
 
     public default double closeIntake() {
         return 0.0;
