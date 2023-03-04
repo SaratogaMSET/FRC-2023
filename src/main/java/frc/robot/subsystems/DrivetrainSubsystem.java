@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
@@ -38,7 +39,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private Rotation2d lastRotation = new Rotation2d();
     private final PIDController driftCorrectionPID = new PIDController(0.1, 0.00, 0.000);
     public ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);    
-    //private SwerveDriveOdometry swerveOdometry;
+    private SwerveDriveOdometry swerveOdometry;
 
     private Field2d m_field = new Field2d();
 
@@ -136,7 +137,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
         for(SwerveModule mod : mSwerveMods){
             mod.setDesiredState(desiredStates[mod.moduleNumber], false);
         }
-    } 
+    }
+
+    public Pose2d getRawPose() {
+        return swerveOdometry.getPoseMeters();
+    }
 
     public Pose2d getPose() {
         return odomFiltered.getEstimatedPosition();
@@ -281,6 +286,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         //Logger.getInstance().recordOutput("Gyro Yaw", m_navx.getYaw());
 
         odomFiltered.update(getRotation2d(), getModulePositions());
+        swerveOdometry.update(getRotation2d(), getModulePositions());  
         lastPose = odomFiltered.getEstimatedPosition();
         Pose2d pose = getVisionPose2d();
         if (pose != null){ 
@@ -288,8 +294,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
             double timestamp = Timer.getFPGATimestamp() - (visionData.getEntry("tl").getDouble(0) + 11) / 1000;
             odomFiltered.addVisionMeasurement(pose, timestamp);
         }
-
-        // swerveOdometry.update(getRotation2d(), getModulePositions());  
         //Logger.getInstance().recordOutput("Odometry", odomFiltered.getEstimatedPosition());
         //lastRotation = new Rotation2d(-gyroInputs.yawPositionRad);
         m_field.setRobotPose(odomFiltered.getEstimatedPosition());
