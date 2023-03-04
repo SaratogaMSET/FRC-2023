@@ -25,21 +25,22 @@ public class ArmMassControl {
     protected LinearSystem<N4, N2, N0> plant;
     protected LinearQuadraticRegulator<N4, N2, N0> feedback;
 
+    Matrix<N2, N4> previousK;
+
     public ArmMassControl(Joint proxima, Joint distal){
         Arm = new ArmDynamics(proxima, distal);
 
-        dynamics = (x, u) -> Arm.dynamics(x, u);
-
-        double thetaDeviation = 0.01;
-        double omegaDeviation = 0.1;
+        dynamics = (x, u) -> Arm.massDynamics(x, u);
+        double thetaDeviation = 0.0005;
+        double omegaDeviation = 0.0005;
         q = VecBuilder.fill(
-            1/thetaDeviation * thetaDeviation,
-            1/thetaDeviation * thetaDeviation,
-            1/omegaDeviation * omegaDeviation,
-            1/omegaDeviation * omegaDeviation);
+            thetaDeviation,
+            thetaDeviation,
+            omegaDeviation,
+            omegaDeviation);
 
-        double proximalControlCost = 100;
-        double distalControlCost = 75;
+        double proximalControlCost = 25;
+        double distalControlCost = 16;
         r = VecBuilder.fill(proximalControlCost, distalControlCost);
     }
     private void linearize(SimpleMatrix state, SimpleMatrix control){
@@ -58,14 +59,6 @@ public class ArmMassControl {
     public SimpleMatrix counteractErroneousForces(SimpleMatrix state){
         return Arm.counteractErroneousForces(state);
     }
-    public SimpleMatrix getKMatrix(SimpleMatrix state){
-        Matrix<N2, N4> kMatrix = feedback.getK();
-
-        SimpleMatrix control = new SimpleMatrix(2, 1);
-        linearize(state, control);
-
-        return kMatrix.getStorage();
-    }
     public SimpleMatrix control(SimpleMatrix reference, SimpleMatrix state){
         SimpleMatrix control = new SimpleMatrix(2, 1);
         return control(new Matrix<>(reference), new Matrix<>(state), new Matrix<>(control)).getStorage();
@@ -75,7 +68,17 @@ public class ArmMassControl {
     }
     private Matrix<N2, N1> control(Matrix<N4, N1> reference, Matrix<N4, N1> state, Matrix<N2, N1> control){
         linearize(state.getStorage(), control.getStorage());
-        Matrix<N2, N1> u_fb = feedback.calculate(state, reference);
+        Matrix<N2, N4> K;
+
+        try{
+            K = feedback.getK();
+            previousK = K;
+        }catch(Exception e){
+            System.out.println("Arm Linearization Failed");
+            K = previousK;
+        }
+        
+        Matrix<N2, N1> u_fb = K.times(reference.minus(state));
         return u_fb;
     }
 }

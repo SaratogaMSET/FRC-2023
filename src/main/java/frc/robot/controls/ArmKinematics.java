@@ -93,7 +93,7 @@ public class ArmKinematics {
     //     double[] Xraw = inverseKinematics(Q.get(0), Q.get(1));
     //     return new SimpleMatrix(new double[][]{{Xraw[0]},{Xraw[1]}});
     // }
-    private SimpleMatrix jacobianEE(){
+    public SimpleMatrix jacobianEE(){
         double L1 = proxima.L;
         double L2 = distal.L;
         double t1 = angleProxima;

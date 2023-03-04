@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -22,6 +23,9 @@ import frc.robot.controls.Joint;
 import frc.robot.controls.VelocityFromEncoder;
 import frc.robot.controls.VoltageControl;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+
 public class ArmSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
     ArmVisualizer visualizerMeasured;
@@ -34,16 +38,8 @@ public class ArmSubsystem extends SubsystemBase {
         visualizerMeasured = new ArmVisualizer("ArmMeasured", null);
     }
 
-    
     private final double[] boundsProxima = new double[]{Math.toRadians(35), Math.toRadians(145)};
     private final double[] boundsDistal = new double[]{Math.toRadians(-180 -20), Math.toRadians(20)};
-    private final double kGP = 0.29;
-    private final double kpP = 3.5;
-    private final double minVP = 1.25;
-
-    private final double kGD = 0.02;
-    private final double kpD = 3.1;
-    private final double minVD = 1;
 
     private final double pounds_to_kilograms = 0.453592;
     private final double inches_to_meters = 0.0254;
@@ -79,11 +75,120 @@ public class ArmSubsystem extends SubsystemBase {
         return new double[]{iK[0], iK[1]};
     }
     public void LQRtoAngles(double target_proximal, double target_distal){
-        SimpleMatrix feedback = ArmControl.control(new SimpleMatrix(new double[][]{{target_proximal}, {target_distal}, {0}, {0}}), new SimpleMatrix(new double[][]{{getProximalRadians()}, {getDistalRadians()}, {0}, {0}}));
+        SimpleMatrix target = new SimpleMatrix(new double[][]{{target_proximal}, {target_distal}, {0}, {0}});
+        SimpleMatrix state = new SimpleMatrix(new double[][]{{getProximalRadians()}, {getDistalRadians()}, {getProximalRadiansPerSecond()}, {getDistalRadiansPerSecond()}});
+        SimpleMatrix feedback = ArmControl.control(target, state);
+
+
+        SmartDashboard.putNumber("LQR Err Prox", target_proximal - getProximalRadians());
+        SmartDashboard.putNumber("LQR Err Dist", target_distal - getDistalRadians());
+        SmartDashboard.putNumber("LQR Err ProxVel", 0 - getProximalRadiansPerSecond());
+        SmartDashboard.putNumber("LQR Err DistVel", 0 - getProximalRadiansPerSecond());
+
+        SmartDashboard.putNumber("LQR TQ Prox", feedback.get(0));
+        SmartDashboard.putNumber("LQR TQ Dist", feedback.get(1));
+
         double voltageProximal = VoltageControl.GearedNEOVoltage(feedback.get(0), getProximalRadiansPerSecond(), 0, Constants.Arm.gearProximalReduction);
         double voltageDistal = VoltageControl.GearedNEOVoltage(feedback.get(1), getDistalRadiansPerSecond(), 0, Constants.Arm.gearDistalReduction);
-        //voltageMotors(voltageProximal, voltageDistal);
+
+        double max_voltage = 3.5;
+        if(Math.abs(voltageProximal) > max_voltage){
+            voltageProximal = Math.signum(voltageProximal) * max_voltage;
+            System.out.println("Feedback Exceeds Proximal");
+        }
+        if(Math.abs(voltageDistal) > max_voltage){
+            voltageDistal = Math.signum(voltageDistal) * max_voltage;
+            System.out.println("Feedback Exceeds Distal");
+        }
+
+        SmartDashboard.putNumber("LQR Volt Prox", voltageProximal);
+        SmartDashboard.putNumber("LQR Volt Dist", voltageDistal);
+
+        voltageMotors(voltageProximal, voltageDistal);
     }
+    public void VelocityCartesian(double vx, double vy){
+        SimpleMatrix target_xDot = new SimpleMatrix(new double[][]{{vx}, {vy}});
+        SimpleMatrix inverse_jacobian = Arm.jacobianEE().invert();
+        
+        SimpleMatrix target_qDot = inverse_jacobian.mult(target_xDot);
+
+        double proximal_kV = 2;
+        double distal_kV = 2;
+
+        double voltageProximal = proximal_kV * target_qDot.get(0);
+        double voltageDistal = distal_kV * target_qDot.get(1);
+
+        double max_voltage = 1.5;
+        if(Math.abs(voltageProximal) > max_voltage){
+            voltageDistal = 0;
+            voltageProximal = 0;
+            System.out.println("Feedback Exceeds Proximal");
+        }
+        if(Math.abs(voltageDistal) > max_voltage){
+            voltageProximal = 0;
+            voltageDistal = 0;
+            System.out.println("Feedback Exceeds Distal");
+        }
+
+        SmartDashboard.putNumber("CartV Prox", voltageProximal);
+        SmartDashboard.putNumber("CartV Dist", voltageDistal);
+
+        voltageMotors(voltageProximal, voltageDistal);
+    }
+    public void PIDtoAngles(double target_proximal, double target_distal){
+        SimpleMatrix target = new SimpleMatrix(new double[][]{{target_proximal}, {target_distal}, {0}, {0}});
+        SimpleMatrix state = new SimpleMatrix(new double[][]{{getProximalRadians()}, {getDistalRadians()}, {getProximalRadiansPerSecond()}, {getDistalRadiansPerSecond()}});
+
+        SimpleMatrix error = target.minus(state);
+        double proxKp = 5.2;
+        double distKp = 3.5;
+
+        double proxKd = 0.2;
+        double distKd = 0.2;
+
+        double proxKf = 0.50;
+        double distKf = 0.30;
+        double armTolerance = 0.03;
+
+        double maxVoltPerVelocity = 3.5;
+
+        double voltageProximal = error.get(0) * proxKp + error.get(2) * proxKd;
+        double voltageDistal = error.get(1) * distKp + error.get(3) * distKd;
+
+        if(Math.abs(voltageProximal) > Math.abs(maxVoltPerVelocity * getProximalRadiansPerSecond())){
+            voltageProximal = Math.signum(error.get(0)) * (Math.abs(maxVoltPerVelocity * getProximalRadiansPerSecond()) + proxKf);
+        }
+        if(Math.abs(voltageDistal) > Math.abs(maxVoltPerVelocity * getDistalRadiansPerSecond())){
+            voltageDistal = Math.signum(error.get(1)) * (Math.abs(maxVoltPerVelocity * getDistalRadiansPerSecond()) + distKf);
+        }
+
+        if(Math.abs(voltageProximal) < proxKf){
+            voltageProximal = Math.signum(error.get(0)) * proxKf;
+        }
+        if(Math.abs(voltageDistal) < distKf){
+            voltageDistal = Math.signum(error.get(1)) * distKf;
+        }
+
+        if(Math.abs(error.get(0)) < armTolerance){
+            voltageProximal = 0;
+        }
+        if(Math.abs(error.get(1)) < armTolerance){
+            voltageDistal = 0;
+        }
+
+        double max_voltage = 2.5;
+        if(Math.abs(voltageProximal) > max_voltage){
+            voltageProximal = Math.signum(voltageProximal) * max_voltage;
+            System.out.println("Feedback Exceeds Proximal");
+        }
+        if(Math.abs(voltageDistal) > max_voltage){
+            voltageDistal = Math.signum(voltageDistal) * max_voltage;
+            System.out.println("Feedback Exceeds Distal");
+        }
+
+        voltageMotors(voltageProximal, voltageDistal);
+    }
+
     public void voltageMotors(double controlVoltageProxima, double controlVoltageDistal){
         if(getProximalRadians() < boundsProxima[0] && controlVoltageProxima < 0) controlVoltageProxima = 0;
         if(getProximalRadians() > boundsProxima[1] && controlVoltageProxima > 0) controlVoltageProxima = 0;
@@ -96,6 +201,17 @@ public class ArmSubsystem extends SubsystemBase {
         double tq_ff_dist = counteractingTorquesErroneous.get(1);
         double voltage_ff_prox = VoltageControl.GearedNEOVoltage(tq_ff_prox, 0, 0, Constants.Arm.gearProximalReduction);
         double voltage_ff_dist = VoltageControl.GearedNEOVoltage(tq_ff_dist, 0, 0, Constants.Arm.gearDistalReduction);
+
+        double max_ff = 1;
+
+        if(Math.abs(voltage_ff_prox) > max_ff) {
+            voltage_ff_prox = 0;
+            System.out.println("Feedforward Error Proximal");
+        }
+        if(Math.abs(voltage_ff_dist) > max_ff) {
+            voltage_ff_dist = 0;
+            System.out.println("Feedforward Error Distal");
+        }
 
         motorProximal.setVoltage(controlVoltageProxima + voltage_ff_prox);
         motorDistal.setVoltage(controlVoltageDistal + voltage_ff_dist);
@@ -110,13 +226,13 @@ public class ArmSubsystem extends SubsystemBase {
     }
     
     public double getProximalRadians(){
-        double angle = -(encProximal.getAbsolutePosition() - 0.7664) * (2 * Math.PI) + Math.PI/2;
+        double angle = -(encProximal.getAbsolutePosition() - 0.6875) * (2 * Math.PI) + Math.PI/2;
         if(angle < 0) angle += 2*Math.PI;
         if(angle > 2*Math.PI) angle -= 2*Math.PI;
         return angle;
     }
     public double getDistalRadians(){
-        double angle = -(encDistal.getAbsolutePosition() - 0.07611) * (2 * Math.PI) - Math.PI + getProximalRadians();
+        double angle = -(encDistal.getAbsolutePosition() - 0.3980) * (2 * Math.PI) - Math.PI + getProximalRadians();
         if(angle < -3.0/2 * Math.PI) angle += 2*Math.PI;
         if(angle > Math.PI/2) angle -= 2*Math.PI;
         return angle;
