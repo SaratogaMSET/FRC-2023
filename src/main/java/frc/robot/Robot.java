@@ -14,6 +14,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -33,13 +34,15 @@ import frc.robot.subsystems.Claw.ClawSubsystem;
  */
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
-
+  public static CTREConfigs ctreConfigs;
   private RobotContainer m_robotContainer;
-  private ClawIOSparkMax m_claw;
+  private ClawIOSparkMax clawSubsystem = new ClawIOSparkMax();
   // private IntakeSubsystemWheel m_intakeSubsystem;
-  private XboxController m_controller;
-  private TalonFX motor;
+  // private XboxController m_controller;
+  // private TalonFX motor;
   // private Logger logger;
+  private final ClawSubsystem m_claw = new ClawSubsystem(clawSubsystem);
+
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -97,10 +100,10 @@ public class Robot extends LoggedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     // m_intakeSubsystem.runIntake(m_controller.getLeftY());
-    m_claw.closeIntake();
+    // m_claw.closeIntake();
     // new Trigger(m_controller::getRightBumper).whileTrue(new IntakeCommand(m_claw, Direction.CLOSE));
     // new Trigger(m_controller::getRightBumper).whileFalse(new IntakeCommand(m_claw, Direction.OPEN));
-
+    SmartDashboard.putNumber("Proximity", ClawIOSparkMax.colorSensor.getProximity());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -145,7 +148,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    motor.set(ControlMode.PercentOutput, 0.5);
+    m_claw.closeIntake();
   }
 
   @Override

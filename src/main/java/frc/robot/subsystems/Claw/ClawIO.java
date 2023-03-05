@@ -31,7 +31,7 @@ public interface ClawIO {
     /**  */
     public default void setIdle() {}
 
-    public default boolean getLimitSwitch() {
+    public default boolean getHallEffect() {
         return false;
     }
 

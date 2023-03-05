@@ -30,7 +30,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
     private boolean cubeMediumBound = false;
     private boolean upperBound = false;
     private PIDController pid = new PIDController(IntakeConstants.AUTO_KP, IntakeConstants.AUTO_KI, IntakeConstants.AUTO_KD);
-
+    boolean previousHallEffect = false;
     public static ColorSensorV3 colorSensor;
 
     // public static enum Objects {
@@ -80,7 +80,8 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
         } else {
             intakeVoltage(-IntakeConstants.TARGET_VOLTAGE);
         }
-        return ClawKinematics.appliedVoltage;
+        SmartDashboard.putNumber("Applied Voltage", ClawKinematics.appliedVoltage);
+        return appliedVoltage;
     }
 
     @Override
@@ -104,7 +105,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
     }
 
     public void openIntake() {
-        double velocitySetpoint = ClawConfig.limitSwitch.get() ? 0.0
+        double velocitySetpoint = ClawConfig.HallEffect.get() ? 0.0
                 : Constants.IntakeConstants.TARGET_VELOCITY;
         ClawConfig.motor.set(-velocitySetpoint);
     }
@@ -133,14 +134,15 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
     }
 
     private void resetEncoder() {
-        ClawConfig.encoder.setPosition(0.0);
+        ClawConfig.encoder.setPosition(-3);
     }
 
     private void intakeVoltage(double voltage) {
         double encoderPosition = ClawConfig.encoder.getPosition();
         objectState = getObject();
-        if (getLimitSwitch())
+        if (getHallEffect() && !previousHallEffect){
             resetEncoder();
+        previousHallEffect = getHallEffect();
         
         lowerBound = false;
         coneMediumBound = false;
@@ -155,7 +157,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
         else if(encoderPosition > IntakeConstants.UPPER_BOUND && Math.signum(voltage) == 1)
             upperBound = true;
 
-        if(lowerBound && !getLimitSwitch())
+        if(lowerBound && getHallEffect())
             appliedVoltage = -IntakeConstants.HOLD_VOLTAGE;
         else if ((objectState == Objects.Cube && cubeMediumBound) || (objectState == Objects.Cone && coneMediumBound)) {
             appliedVoltage = IntakeConstants.HOLD_VOLTAGE;
@@ -166,10 +168,10 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
         ClawKinematics.setAppliedVoltage(appliedVoltage);
         ClawConfig.motor.setVoltage(appliedVoltage);
     }
-
-    public boolean getLimitSwitch() {
-        return ClawConfig.limitSwitch.get();
-    }
+}
+    // public boolean getLimitSwitch() {
+    //     // return ClawConfig.limitSwitch.get();
+    // }
 
     private Objects getObject() {
         currentColor = colorSensor.getColor();
@@ -188,8 +190,9 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
         Logger.getInstance().recordOutput("Mechanism/Claw/Claw_torque",
                 ClawKinematics.getTorque(ClawConfig.encoder.getVelocity(), appliedVoltage, IntakeConstants.GEAR_RATIO));
         SmartDashboard.putNumber("ClawPos", ClawConfig.encoder.getPosition());
-        SmartDashboard.putBoolean("Limit Switch", ClawConfig.limitSwitch.get());
+        SmartDashboard.putBoolean("Limit Switch", ClawConfig.HallEffect.get());
         SmartDashboard.putNumber("Lidar (from 0-2047)", colorSensor.getProximity());
+        SmartDashboard.putNumber("Rotations",  ClawConfig.encoder.getPosition() / ClawConfig.encoder.getCountsPerRevolution());
         // 1-10 cm range, should be good enough
         // for closing the close in time...
         SmartDashboard.putBoolean("Detecting", objectInRange());
@@ -199,7 +202,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
         SmartDashboard.putNumber("Green value", colorSensor.getGreen());
         SmartDashboard.putNumber("Blue value", colorSensor.getBlue());
         SmartDashboard.putNumber("applied voltage", ClawKinematics.appliedVoltage);
-        SmartDashboard.putBoolean("Limit Switch", getLimitSwitch());
+        SmartDashboard.putBoolean("Hall Effect", getHallEffect());
         SmartDashboard.putBoolean("Object Secured", ClawKinematics.objectSecured());
         SmartDashboard.putNumber("Torque", ClawKinematics.getTorque(ClawConfig.encoder.getVelocity(),
                 ClawKinematics.appliedVoltage, IntakeConstants.GEAR_RATIO));

@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LoggedTunableNumber;
 
 public class ClawSubsystem extends SubsystemBase {
-  public static ColorSensorV3 colorSensor;
+  // public static ColorSensorV3 colorSensor;
   public ClawIO io;
   public ClawIOInputsAutoLogged inputs = new ClawIOInputsAutoLogged();
   public static double TARGET_VELOCITY = 0.2;
@@ -53,7 +53,7 @@ public class ClawSubsystem extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.getInstance().processInputs("Mechanisms/Claw", inputs);
-    Logger.getInstance().recordOutput("Mechanism/Claw/Limit_Switch", io.getLimitSwitch());
+    Logger.getInstance().recordOutput("Mechanism/Claw/Limit_Switch", io.getHallEffect());
     if (targetVelocity.hasChanged(hashCode())) {
       TARGET_VELOCITY = targetVelocity.get();
     }

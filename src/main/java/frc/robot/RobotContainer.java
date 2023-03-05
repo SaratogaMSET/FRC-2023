@@ -26,18 +26,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.Drivetrain;
+import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.ManualCloseIntake;
+import frc.robot.commands.ManualOpenIntake;
 import frc.robot.commands.Auton.AutoRunCommand;
 import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.DefaultDriveCommand;
 import frc.robot.commands.Drivetrain.MoveWithClosest90;
 import frc.robot.commands.Drivetrain.ZeroGyroCommand;
+import frc.robot.commands.IntakeCommand.Direction;
 // import frc.robot.commands.SwerveControllerStrafe;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.DrivetrainUtil.GyroIO;
 import frc.robot.subsystems.DrivetrainUtil.GyroIONavx;
 import frc.robot.subsystems.DrivetrainUtil.SwerveModuleIOSim;
 import frc.robot.subsystems.SwerveModule;
-
+import frc.robot.subsystems.Claw.ClawIOSparkMax;
+import frc.robot.subsystems.Claw.ClawSubsystem;
+import frc.robot.subsystems.Claw.ClawSubsystem.Objects;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -48,12 +54,25 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  public final SendableChooser<String> m_autoSwitcher = new SendableChooser<String>();
+  public static final String Forward = "Forward";
+  public static final String ForwardRotate = "Forward + Rotate";
+  public static final String NewPath = "New Path";
+  // public String m_autoSelected;
+  public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
+  private final ClawSubsystem m_claw = new ClawSubsystem(new ClawIOSparkMax());
+  // private final VisionSystem m_visionSubsystem = new VisionSystem();  
+  public static final double pi = Math.PI;
+  private final CommandXboxController m_controller = new CommandXboxController(0);
+
+  public static final double MAX_VELOCITY_METERS_PER_SECOND = (6380.0 / 60.0 *
+          SdsModuleConfigurations.MK4_L2.getDriveReduction() *
+          SdsModuleConfigurations.MK4_L2.getWheelDiameter() * Math.PI);
+
+  public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
+          Math.hypot(Drivetrain.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, Drivetrain.DRIVETRAIN_WHEELBASE_METERS / 2.0);
+
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -116,7 +135,7 @@ public class RobotContainer {
         new InstantCommand(() -> m_drivetrainSubsystem.drive(new ChassisSpeeds(0.0, 0.0, 0.0))),
         new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(new Pose2d()))
     ).schedule();
-
+    
     m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
             m_drivetrainSubsystem,
             () -> modifyAxis(m_controller.getLeftX()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
@@ -124,6 +143,8 @@ public class RobotContainer {
             () -> modifyAxis(-m_controller.getRightX()/1.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
             
     ));
+
+    // m_claw.setDefaultCommand(new IntakeCommand(m_claw, Direction.CLOSE));
 
     m_controller.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
 

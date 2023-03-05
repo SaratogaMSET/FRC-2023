@@ -65,11 +65,11 @@ public final class Constants {
      */
     public static final double DRIVETRAIN_WHEELBASE_METERS =  0.4953;
 
-    public static final double kPXController = 0.6; //0.6
+    public static final double kPXController = 19.2; //0.6
     public static final double kIXController = 0.000;
     public static final double kPThetaController = 0.075;
 
-    public static final double kPYController = 1; //1
+    public static final double kPYController = 14.5; //1
     public static final double kIYController = 0.000;
     public static final double kPThetaControllerTrajectory = 0.39*1.75 *2 * 1.2; //0.39 * 2
     public static final double kDThetaControllerTrajectory = 0.004;
@@ -179,16 +179,15 @@ public final class Constants {
 
     /* Drive Motor Characterization Values 
     * Divide SYSID values by 12 to convert from volts to percent output for CTRE */
-    public static final double driveKS = (0.32 / 12); 
-    public static final double driveKV = (1.51 / 12); 
-    public static final double driveKA = (0.27 / 12);
+    public static final double driveKS = (0); 
+    public static final double driveKV = (0); 
+    public static final double driveKA = (0);
   }
 
   public static class IntakeConstants {
-    public static final int INTAKE_MOTOR = 6;
-    public static final int WHEEL_INTAKE_MOTOR = 7;
-    public static final double GEAR_RATIO = 3.0 / 320.0;
-    public static final int LIMIT_SWITCH = 0;
+    public static final int INTAKE_MOTOR = 20;
+    public static final double GEAR_RATIO = 1 / 20.0;
+    public static final int HALL_EFFECT = 0;
     public static final double TARGET_VELOCITY = 0.2;
     public static final int INTAKE_DISTANCE_THRESHOLD = 50;
     public static final double TORQUE_CONSTANT = 0.01042;
@@ -196,10 +195,10 @@ public final class Constants {
     public static final double TARGET_VOLTAGE = 5.0;
     public static final double TORQUE_THRESHOLD = 125;
     public static final double CLOSING_TORQUE_THRESHOLD = 75;
-    public static final double LOWER_BOUND = 0.5;
-    public static final double CUBE_MEDIUM_BOUND = 2;
-    public static final double CONE_MEDIUM_BOUND = 7;
-    public static final double UPPER_BOUND = 12;
+    public static final double LOWER_BOUND = -2.5;
+    public static final double CUBE_MEDIUM_BOUND = 2.5;
+    public static final double CONE_MEDIUM_BOUND = 4.6;
+    public static final double UPPER_BOUND = 22;
     public static final double HOLD_VOLTAGE = TARGET_VOLTAGE / 10;
     public static final double AUTO_CONE_DIAMETER = 0.0;
     public static final double AUTO_CUBE_DIAMETER = 0.0;
@@ -212,9 +211,4 @@ public final class Constants {
       return Mode.REAL;
   }
 
-  public static enum Mode {
-    REAL,
-    REPLAY,
-    NOT_SET
-  }
 }
