@@ -48,24 +48,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  // The robot's subsystems and commands are defined here...
+  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
-  public final SendableChooser<String> m_autoSwitcher = new SendableChooser<String>();
-  public static final String Forward = "Forward";
-  public static final String ForwardRotate = "Forward + Rotate";
-  public static final String NewPath = "New Path";
-  // public String m_autoSelected;
-  public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
-  // private final VisionSystem m_visionSubsystem = new VisionSystem();  
-  public static final double pi = Math.PI;
-  private final CommandXboxController m_controller = new CommandXboxController(0);
-
-  public static final double MAX_VELOCITY_METERS_PER_SECOND = (6380.0 / 60.0 *
-          SdsModuleConfigurations.MK4_L2.getDriveReduction() *
-          SdsModuleConfigurations.MK4_L2.getWheelDiameter() * Math.PI);
-
-  public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
-          Math.hypot(Drivetrain.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, Drivetrain.DRIVETRAIN_WHEELBASE_METERS / 2.0);
-
+  // Replace with CommandPS4Controller or CommandJoystick if needed
+  private final CommandXboxController m_driverController =
+      new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
