@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ArmCartesianVelocity;
-import frc.robot.commands.ArmLQRCommand;
 import frc.robot.commands.ArmPositionCommand;
 import frc.robot.commands.ArmVoltageCommand;
 import frc.robot.commands.ArmZeroCommand;
@@ -32,8 +31,8 @@ public class RobotContainer {
     armSubsystem.setDefaultCommand(
       new ArmVoltageCommand(
         armSubsystem,
-        () -> modifyAxisTranslate(-m_driver.getLeftY() * 1),  //Axes are reverse with this setup, pushing up returns a negative number on both y axes
-        () -> modifyAxisTranslate(-m_driver.getRightY() * 1)
+        () -> modifyAxisTranslate(-m_driver.getLeftY() * 1.5),  //Axes are reverse with this setup, pushing up returns a negative number on both y axes
+        () -> modifyAxisTranslate(-m_driver.getRightY() * 1.5)
       ));
     // Configure the trigger bindings
     configureBindings();
@@ -55,14 +54,14 @@ public class RobotContainer {
   private void configureBindings() {
     // m_driver.b().whileTrue(new ArmPositionCommand(armSubsystem, 0.3, 0.12));
     // m_driver.a().whileTrue(new ArmPositionCommand(armSubsystem, 0.3, -0.03));
-    m_driver.x().whileTrue(new ArmPositionCommand(armSubsystem, -0.6, 0.5));
-    m_driver.y().whileTrue(new ArmPositionCommand(armSubsystem, -0.1, 0.5));
+    // m_driver.x().whileTrue(new ArmPositionCommand(armSubsystem, -0.6, 0.5));
+    // m_driver.y().whileTrue(new ArmPositionCommand(armSubsystem, -0.1, 0.5));
     
     
-    m_driver.rightBumper().whileTrue(new ArmCartesianVelocity(armSubsystem,
-    () -> modifyAxisTranslate(m_driver.getLeftX() * 0.5),
-    () -> modifyAxisTranslate(-m_driver.getLeftY() * 0.5)
-    ));
+    // m_driver.rightBumper().whileTrue(new ArmCartesianVelocity(armSubsystem,
+    // () -> modifyAxisTranslate(m_driver.getLeftX() * 0.5),
+    // () -> modifyAxisTranslate(-m_driver.getLeftY() * 0.5)
+    // ));
 
 
     // m_driver.leftBumper().whileTrue(new ArmZeroCommand(armSubsystem));

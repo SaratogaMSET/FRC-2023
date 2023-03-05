@@ -12,13 +12,13 @@ public class ArmZeroCommand extends CommandBase{
 
     @Override
     public void execute(){
-        double[] position = armSubsystem.forwardKinematics();
-        double minY = 0.05;
-        if(position[1] < minY){
-            double[] armAngles = armSubsystem.Arm.inverseKinematics(position[0], minY + 0.03);
-            armSubsystem.LQRtoAngles(armAngles[0], armAngles[1]);
-        }else{
-            armSubsystem.LQRtoAngles(Math.PI/2, -Math.PI/2);
-        }
+        // double[] position = armSubsystem.forwardKinematics();
+        // double minY = 0.05;
+        // if(position[1] < minY){
+        //     double[] armAngles = armSubsystem.Arm.inverseKinematics(position[0], minY + 0.03);
+        //     armSubsystem.LQRtoAngles(armAngles[0], armAngles[1]);
+        // }else{
+        //     armSubsystem.LQRtoAngles(Math.PI/2, -Math.PI/2);
+        // }
     }         
 }

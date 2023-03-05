@@ -18,21 +18,21 @@ public class ArmCartesianVelocity extends CommandBase{
         this.vX = vXSupplier;
         this.vY = vYSupplier;
 
-        this.initialX = armSubsystem.forwardKinematics()[0];
+        // this.initialX = armSubsystem.forwardKinematics()[0];
 
         addRequirements(armSubsystem);
     }   
 
     @Override
     public void execute(){
-        if(initialX * armSubsystem.forwardKinematics()[0] > 0 || initialX * vX.getAsDouble() > 0){
-            armSubsystem.VelocityCartesian(vX.getAsDouble(), vY.getAsDouble());
-            SmartDashboard.putString("CartVel Stat", "Moving");
-        }else{
-            SmartDashboard.putString("CartVel Stat", "Frozen");
-            SmartDashboard.putString("CartVel Check", "" + initialX + "," + armSubsystem.forwardKinematics()[0]);
-            armSubsystem.voltageMotors(0, 0);
-        }
+        // if(initialX * armSubsystem.forwardKinematics()[0] > 0 || initialX * vX.getAsDouble() > 0){
+        //     armSubsystem.VelocityCartesian(vX.getAsDouble(), vY.getAsDouble());
+        //     SmartDashboard.putString("CartVel Stat", "Moving");
+        // }else{
+        //     SmartDashboard.putString("CartVel Stat", "Frozen");
+        //     SmartDashboard.putString("CartVel Check", "" + initialX + "," + armSubsystem.forwardKinematics()[0]);
+        //     armSubsystem.voltageMotors(0, 0);
+        // }
         
     }
 }

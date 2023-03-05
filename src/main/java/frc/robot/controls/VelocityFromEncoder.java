@@ -19,6 +19,7 @@ public class VelocityFromEncoder {
         //Autohandle rotation lapping
         while(position - value_buffer[value_buffer.length - 1] > Math.PI) position -= 2 * Math.PI;
         while(position - value_buffer[value_buffer.length - 1] < -Math.PI) position += 2 * Math.PI;
+        
         if(timestamp_buffer[timestamp_buffer.length - 1] != getTime()){
             for(int i = 0; i < value_buffer.length - 1; i++){
                 value_buffer[i] = value_buffer[i + 1];

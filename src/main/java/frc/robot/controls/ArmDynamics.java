@@ -40,9 +40,9 @@ public class ArmDynamics {
         double theta1 = x.get(0);
         double theta2 = x.get(1);
 		return new SimpleMatrix(new double[][] 
-		{
-			{(J1.CoM * J1.m + J2.L * J2.m) * Math.cos(theta1)},
-			{ J2.CoM * J2.m                * Math.cos(theta2)}
+		{	//Added Cross Joint Gravity Term
+			{(J1.CoM * J1.m + J1.L * J2.m + J2.CoM * J2.m) * Math.cos(theta1)},
+			{ J2.CoM * J2.m                                * Math.cos(theta2)}
 		}).scale(-9.806);
 
 	}
