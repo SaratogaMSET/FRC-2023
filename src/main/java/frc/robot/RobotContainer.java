@@ -10,7 +10,6 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.pathplanner.lib.commands.PPSwerveControllerCommandA;
-
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 
 import edu.wpi.first.math.MathUtil;
@@ -25,27 +24,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Drivetrain;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.ManualCloseIntake;
-import frc.robot.commands.ManualOpenIntake;
-import frc.robot.commands.Auton.AutoRunCommand;
 import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.DefaultDriveCommand;
 import frc.robot.commands.Drivetrain.MoveWithClosest90;
 import frc.robot.commands.Drivetrain.ZeroGyroCommand;
-import frc.robot.commands.IntakeCommand.Direction;
-// import frc.robot.commands.SwerveControllerStrafe;
 import frc.robot.subsystems.DrivetrainSubsystem;
-import frc.robot.subsystems.DrivetrainUtil.GyroIO;
-import frc.robot.subsystems.DrivetrainUtil.GyroIONavx;
-import frc.robot.subsystems.DrivetrainUtil.SwerveModuleIOSim;
-import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.Claw.ClawIOSparkMax;
 import frc.robot.subsystems.Claw.ClawSubsystem;
-import frc.robot.subsystems.Claw.ClawSubsystem.Objects;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
