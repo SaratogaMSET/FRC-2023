@@ -16,7 +16,18 @@ public class ArmPositionCommand extends CommandBase{
 
     @Override
     public void execute(){
-        // double[] iK = armSubsystem.inverseKinematics(tX, tY);
-        // armSubsystem.PIDtoAngles(iK[0], iK[1]);
-    }         
+        double[] iK = armSubsystem.inverseKinematics(tX, tY);
+        armSubsystem.PIDtoAngles(iK[0], iK[1]);
+    }
+
+    @Override
+    public boolean isFinished(){
+        double x_err = tX - armSubsystem.forwardKinematics()[0];
+        double y_err = tY - armSubsystem.forwardKinematics()[1];
+        double tolerance = 0.03;
+        if(Math.abs(x_err) < tolerance && Math.abs(y_err) < tolerance){
+            return true;
+        }
+        return false;
+    }
 }

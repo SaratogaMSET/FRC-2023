@@ -43,10 +43,19 @@ public class ArmInterface {
     public ArmKinematics Arm = new ArmKinematics(proximal, distal);
 
     public ArmInterface(){
-        Proximal_Left.setNeutralMode(NeutralMode.Coast);
-        Proximal_Right.setNeutralMode(NeutralMode.Coast);
-        Distal_Left.setNeutralMode(NeutralMode.Coast);
-        Distal_Right.setNeutralMode(NeutralMode.Coast);
+        boolean coasted = false;
+        if(coasted){
+            Proximal_Left.setNeutralMode(NeutralMode.Coast);
+            Proximal_Right.setNeutralMode(NeutralMode.Coast);
+            Distal_Left.setNeutralMode(NeutralMode.Coast);
+            Distal_Right.setNeutralMode(NeutralMode.Coast);
+        }else{
+            Proximal_Left.setNeutralMode(NeutralMode.Brake);
+            Proximal_Right.setNeutralMode(NeutralMode.Brake);
+            Distal_Left.setNeutralMode(NeutralMode.Brake);
+            Distal_Right.setNeutralMode(NeutralMode.Brake);
+        }
+        
 
         Proximal_Left.setInverted(Constants.ArmParameters.proximal_left_inversion);
         Proximal_Right.setInverted(Constants.ArmParameters.proximal_right_inversion);
@@ -355,11 +364,15 @@ public class ArmInterface {
         if(getPositionDistal() < Bounds_Distal[0] && controlVoltageDistal < 0) controlVoltageDistal = 0;
         if(getPositionDistal() > Bounds_Distal[1] && controlVoltageDistal > 0) controlVoltageDistal = 0;
 
-        double proximal_kVG = 1.6;
-        double distal_kVG = 0.75;
+        double proximal_kVG = 1.20;
+        double distal_kVG = 0.66;
 
         double voltage_ff_prox = Math.cos(getPositionProximal()) * proximal_kVG;
         double voltage_ff_dist = Math.cos(getPositionDistal()) * distal_kVG;
+
+        if(controlVoltageProxima == 0 && controlVoltageDistal == 0){
+
+        }
 
         Proximal_Left.setVoltage(controlVoltageProxima + voltage_ff_prox);
         Proximal_Right.setVoltage(controlVoltageProxima + voltage_ff_prox);

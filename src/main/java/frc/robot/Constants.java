@@ -58,4 +58,25 @@ public final class Constants {
     public static final double distal_inertia = 2*866.840 * lbs_sqinches_to_kg_sqmeters;
     public static final double distal_com = 13.56 * inches_to_meters;
   }
+  public final class ArmNodeDictionary{
+    public double[] ready_highcone_score = new double[]{1.38, 1.18};
+    public double[] ready_midcone_score = new double[]{0.96, 0.66};
+
+    public double[] ready_highcube_score = new double[]{1.38, 0.96};
+    public double[] ready_midcube_score = new double[]{0.97, 0.65};
+
+    public double[] ready_low_score = new double[]{0.59, 0};
+
+    public double[] ready_ground_intake = new double[]{0.56, 0.17};
+    public static final double ready_ground_intake_x = 0.56;
+    public static final double ready_ground_intake_y = 0.17;
+    public double[] ground_intake = new double[]{0.56, -0.12};
+    public static final double ground_intake_x = 0.60;
+    public static final double ground_intake_y = -0.1;
+
+    public double[] ready_arm_score = new double[]{0.668, 1.05};
+
+    public double[] ready_double_substation = new double[]{0.668, 1.05};
+    public double[] pickup_double_substation = new double[]{0.62, 0.90};
+  }
 }

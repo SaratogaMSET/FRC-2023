@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ArmCartesianVelocity;
 import frc.robot.commands.ArmPositionCommand;
+import frc.robot.commands.ArmSequences;
 import frc.robot.commands.ArmVoltageCommand;
 import frc.robot.commands.ArmZeroCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -52,10 +53,10 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // m_driver.b().whileTrue(new ArmPositionCommand(armSubsystem, 0.3, 0.12));
-    // m_driver.a().whileTrue(new ArmPositionCommand(armSubsystem, 0.3, -0.03));
-    // m_driver.x().whileTrue(new ArmPositionCommand(armSubsystem, -0.6, 0.5));
-    // m_driver.y().whileTrue(new ArmPositionCommand(armSubsystem, -0.1, 0.5));
+    m_driver.b().onTrue(new ArmZeroCommand(armSubsystem));
+    m_driver.a().onTrue(ArmSequences.groundIntake(armSubsystem, 1));
+    m_driver.x().onTrue(new ArmPositionCommand(armSubsystem, 1.38, 1.18)); //From High Ready To High Cone Score
+    m_driver.y().onTrue(new ArmPositionCommand(armSubsystem, 0.668, 1.05)); //From Zero To High Ready
     
     
     // m_driver.rightBumper().whileTrue(new ArmCartesianVelocity(armSubsystem,
