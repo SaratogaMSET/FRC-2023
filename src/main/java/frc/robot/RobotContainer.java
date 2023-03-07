@@ -32,6 +32,7 @@ import frc.robot.commands.Drivetrain.DefaultDriveCommand;
 import frc.robot.commands.Drivetrain.MoveWithClosest90;
 import frc.robot.commands.Drivetrain.ZeroGyroCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.Vision.VisionSubsystem;
 import frc.robot.subsystems.Claw.ClawIOSparkMax;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 
@@ -50,6 +51,7 @@ public class RobotContainer {
   // public String m_autoSelected;
   public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
   private final ClawSubsystem m_claw = new ClawSubsystem(new ClawIOSparkMax());
+  private final VisionSubsystem m_visionSubsystem = new VisionSubsystem();
   // private final VisionSystem m_visionSubsystem = new VisionSystem();  
   public static final double pi = Math.PI;
   private final CommandXboxController m_controller = new CommandXboxController(0);

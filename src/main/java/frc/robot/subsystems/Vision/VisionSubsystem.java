@@ -5,6 +5,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.VisionConstants;
 
 public class VisionSubsystem extends SubsystemBase {
     private NetworkTable ll2 = NetworkTableInstance.getDefault().getTable("limelight-two");
@@ -14,6 +15,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     private NetworkTable getTable(){
         if (ll3.getEntry("tv").getInteger(0) == 1){
+            SmartDashboard.putNumber("check", 1);
             return ll3;
         } else {
             return ll2;
@@ -39,25 +41,49 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     private double getDistanceFromRetro(){
-        if (getTY() < -3){
-            return 39.37 * (Constants.VisionConstants.H2b - Constants.Vision.H1) / Math.tan(0.017453292519943295 * (Constants.Vision.A1 + getTY()));
-        } 
-        return 39.37 * (Constants.VisionConstants.H2a - Constants.Vision.H1) / Math.tan(0.017453292519943295 * (Constants.Vision.A1 + getTY()));
+        double camHeight, camAngle;
+        if (getPipeline() > 0){
+            if (getTable().equals(ll3)){
+                camHeight = VisionConstants.H1_LL3;
+                camAngle = VisionConstants.A1_LL3;
+            } else {
+                camHeight = VisionConstants.H1_LL2;
+                camAngle = VisionConstants.A1_LL2; 
+            }
+            if (getTY() < -3){
+                return (Constants.VisionConstants.H2b - camHeight) / Math.tan(0.017453292519943295 * (camAngle + getTY()));
+            } 
+            return (Constants.VisionConstants.H2a - camHeight) / Math.tan(0.017453292519943295 * (camAngle + getTY()));
+        } else {
+            return 0.0;
+        }
     }
 
-    public double[] getOffsetTo2DOFBase(){        
+    public double[] getOffsetTo2DOFBase(){       
 
-        double d1 = getDistanceFromRetro();
-        double tx = getTX();
+        if (getTable().equals(ll3)){
+            double d1 = getDistanceFromRetro();
+            double tx = getTX();
 
-        double a = Math.sin(Math.toRadians(tx)) * d1;  // x val 
-        double b = Math.cos(Math.toRadians(tx)) * d1;  // y val
+            double a = Math.sin(Math.toRadians(tx)) * d1;  // x val 
+            double b = Math.cos(Math.toRadians(tx)) * d1;  // y val
 
-        double angle = Math.atan((a + Constants.VisionConstants.C2) / (b + Constants.VisionConstants.C1));
+            //double angle = Math.atan((a + Constants.VisionConstants.C2_LL3) / (b + Constants.VisionConstants.C1_LL3));
+            double[] x = {a + Constants.VisionConstants.C2_LL3, b + Constants.VisionConstants.C1_LL3}; //, Math.toDegrees(angle)};
+            return x;
+        } else {
+            double d1 = getDistanceFromRetro();
+            double tx = getTX();
 
-        double[] x = {a + Constants.VisionConstants.C2, b + Constants.VisionConstants.C1, Math.toDegrees(angle)};
+            double a = Math.sin(Math.toRadians(tx)) * d1;  // x val 
+            double b = Math.cos(Math.toRadians(tx)) * d1;  // y val
 
-        return x;
+            //double angle = Math.atan((a + Constants.VisionConstants.C2_LL3) / (b + Constants.VisionConstants.C1_LL3));
+
+            // if its back, i guess we just * -1 on all these values.
+            double[] x = {a + Constants.VisionConstants.C2_LL2, b + Constants.VisionConstants.C1_LL2}; //, Math.toDegrees(angle)};
+            return x; 
+        }
     }
 
     /**

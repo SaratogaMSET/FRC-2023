@@ -225,15 +225,23 @@ public final class Constants {
     }
 
     public static class VisionConstants {
-        public static final double H1 = 0.279; // METERS, 0.3429 on board, 0.489 on floudner.
+        /* LL3 Data */
+        public static final double H1_LL3 = 0.273; // METERS, 0.3429 on board, 0.489 on floudner.
         public static final double H2a = 1.1736; //Low goal = 0.628, high goal = 1.17
         public static final double H2b = 0.638; //height of low goal
-        public static final double A1 = 20; // limelight angle!
-
-        public static final double retroPipeline = 1; //pipline id of the retroreflective pipeline.
+        public static final double A1_LL3 = 24; // limelight angle!
+        public static final double C1_LL3 = 0.323; //vrt / y value check the picture Idk why govind called it that
+        public static final double C2_LL3 = 0.254; // horizontal / x value check the picture :??????
         
-        public static final double C1 = 0; //vrt / y value check the picture Idk why govind called it that
-        public static final double C2 = 0; // horizontal / x value check the picture :??????        
+        /* LL2 Data */
+
+        public static final double H1_LL2 = 0.279; // METERS, 0.3429 on board, 0.489 on floudner.
+        public static final double A1_LL2 = 24; // limelight angle!
+
+        public static final double retroPipeline = 1; //pipline id of the retroreflective pipeline. no longer used
+        
+        public static final double C1_LL2 = 0.320; //vrt / y value check the picture Idk why govind called it that
+        public static final double C2_LL2 = 0.248; // horizontal / x value check the picture :??????
     }
 
     public static class Vision {
