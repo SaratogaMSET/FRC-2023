@@ -27,9 +27,11 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Drivetrain;
+import frc.robot.commands.Drivetrain.AlignToCone;
 import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.DefaultDriveCommand;
 import frc.robot.commands.Drivetrain.MoveWithClosest90;
+import frc.robot.commands.Drivetrain.TurnTo90;
 import frc.robot.commands.Drivetrain.ZeroGyroCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.Vision.VisionSubsystem;
@@ -136,7 +138,13 @@ public class RobotContainer {
 
     // m_claw.setDefaultCommand(new IntakeCommand(m_claw, Direction.CLOSE));
 
-    m_controller.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
+    m_controller.y().onTrue(new SequentialCommandGroup(
+      new TurnTo90(m_drivetrainSubsystem),
+      new WaitCommand(1),
+      new AlignToCone(m_drivetrainSubsystem, m_visionSubsystem)
+    ));
+
+    m_controller.rightBumper().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
 
     m_controller.rightBumper().whileTrue(
       new DefaultDriveCommand(
@@ -145,9 +153,8 @@ public class RobotContainer {
             () -> modifyAxis(-m_controller.getLeftY())/3 * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
             () -> modifyAxis(-m_controller.getRightX()) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
     ));
-
-    m_controller.b().onTrue(new BalanceCommand(m_drivetrainSubsystem));
     
+    m_controller.b().onTrue(new BalanceCommand(m_drivetrainSubsystem));
     m_controller.a().toggleOnTrue(new MoveWithClosest90(
       m_drivetrainSubsystem, 
       () -> modifyAxis(m_controller.getLeftX()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,

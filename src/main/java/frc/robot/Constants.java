@@ -235,7 +235,7 @@ public final class Constants {
         
         /* LL2 Data */
 
-        public static final double H1_LL2 = 0.279; // METERS, 0.3429 on board, 0.489 on floudner.
+        public static final double H1_LL2 = 0.273; // METERS, 0.3429 on board, 0.489 on floudner.
         public static final double A1_LL2 = 24; // limelight angle!
 
         public static final double retroPipeline = 1; //pipline id of the retroreflective pipeline. no longer used

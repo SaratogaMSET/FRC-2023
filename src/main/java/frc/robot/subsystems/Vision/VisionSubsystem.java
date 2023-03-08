@@ -11,6 +11,12 @@ public class VisionSubsystem extends SubsystemBase {
     private NetworkTable ll2 = NetworkTableInstance.getDefault().getTable("limelight-two");
     private NetworkTable ll3 = NetworkTableInstance.getDefault().getTable("limelight-three");
 
+    private double d1;
+    private double tx;
+
+    private double a;  // x val 
+    private double b;  // y val
+
     public VisionSubsystem() {}
 
     private NetworkTable getTable(){
@@ -51,9 +57,10 @@ public class VisionSubsystem extends SubsystemBase {
                 camAngle = VisionConstants.A1_LL2; 
             }
             if (getTY() < -3){
-                return (Constants.VisionConstants.H2b - camHeight) / Math.tan(0.017453292519943295 * (camAngle + getTY()));
+                return (Constants.VisionConstants.H2b - camHeight) / Math.tan(Math.toRadians(camAngle + getTY()));
             } 
-            return (Constants.VisionConstants.H2a - camHeight) / Math.tan(0.017453292519943295 * (camAngle + getTY()));
+            SmartDashboard.putNumber("gET ME OUT", ((Constants.VisionConstants.H2a - camHeight) / Math.tan(Math.toRadians(camAngle + getTY()))));
+            return (Constants.VisionConstants.H2a - camHeight) / Math.tan(Math.toRadians(camAngle + getTY()));
         } else {
             return 0.0;
         }
@@ -62,21 +69,20 @@ public class VisionSubsystem extends SubsystemBase {
     public double[] getOffsetTo2DOFBase(){       
 
         if (getTable().equals(ll3)){
-            double d1 = getDistanceFromRetro();
-            double tx = getTX();
+            d1 = getDistanceFromRetro();
+            tx = getTX();
 
-            double a = Math.sin(Math.toRadians(tx)) * d1;  // x val 
-            double b = Math.cos(Math.toRadians(tx)) * d1;  // y val
+            a = Math.sin(Math.toRadians(tx)) * d1;  // x val 
+            b = Math.cos(Math.toRadians(tx)) * d1;  // y val
 
             //double angle = Math.atan((a + Constants.VisionConstants.C2_LL3) / (b + Constants.VisionConstants.C1_LL3));
             double[] x = {a + Constants.VisionConstants.C2_LL3, b + Constants.VisionConstants.C1_LL3}; //, Math.toDegrees(angle)};
             return x;
         } else {
-            double d1 = getDistanceFromRetro();
-            double tx = getTX();
-
-            double a = Math.sin(Math.toRadians(tx)) * d1;  // x val 
-            double b = Math.cos(Math.toRadians(tx)) * d1;  // y val
+            d1 = getDistanceFromRetro();
+            tx = getTX();
+            a = Math.sin(Math.toRadians(tx)) * d1;  // x val 
+            b = Math.cos(Math.toRadians(tx)) * d1;  // y val
 
             //double angle = Math.atan((a + Constants.VisionConstants.C2_LL3) / (b + Constants.VisionConstants.C1_LL3));
 
