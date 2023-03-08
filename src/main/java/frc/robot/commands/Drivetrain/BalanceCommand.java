@@ -1,40 +1,30 @@
 package frc.robot.commands.Drivetrain;
 
-
-import edu.wpi.first.math.controller.PIDController;
+import frc.lib.swerve.BetterSwerveModuleState;
+import frc.robot.Constants;
+import frc.robot.Robot;
+import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.lib.logging.LoggedTunableNumber;
-import frc.lib.swerve.BetterSwerveModuleState;
-import frc.robot.subsystems.DrivetrainSubsystem;
 
 public class BalanceCommand extends CommandBase {
-  private final DrivetrainSubsystem drive;
+
+  private DrivetrainSubsystem m_DriveSubsystem;
+
+  private double error;
+  private double currentAngle;
+  private double drivePower;
   private Rotation2d driveYaw;
   private Rotation2d drivePitch;
   private Rotation2d driveRoll;
 
-  private static final double AutoBalanceKP = 0.5;
-    //   new LoggedTunableNumber("ChargeStationAutoBalance/AutoBalanceKP");
-  private static final double AutoBalanceKI = 0.0;
-    //   new LoggedTunableNumber("ChargeStationAutoBalance/AutoBalanceKI");
-  private static final double AutoBalanceKD = 0.0;
-    //   new LoggedTunableNumber("ChargeStationAutoBalance/AutoBalanceKD");
-  double driveSpeedMetersPerSec = 5.0;
-
-  private final PIDController pidController =
-      new PIDController(AutoBalanceKP, AutoBalanceKI, AutoBalanceKD);
-
-  /** Creates a new ChargeStationAutoBalance. */
-  public BalanceCommand(DrivetrainSubsystem drive) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    this.drive = drive;
+  /** Command to use Gyro data to resist the tip angle from the beam - to stabalize and balanace */
+  public BalanceCommand(DrivetrainSubsystem m_DrivetrainSubsystem) {
+    this.m_DriveSubsystem = m_DrivetrainSubsystem;
+    addRequirements(this.m_DriveSubsystem);
   }
-
 
   // Called when the command is initially scheduled.
   @Override
@@ -42,73 +32,53 @@ public class BalanceCommand extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    // update tunnable numbers if changed
-    // if (AutoBalanceKD.hasChanged(hashCode())
-    //     || AutoBalanceKI.hasChanged(hashCode())
-    //     || AutoBalanceKP.hasChanged(hashCode())) {
-    //   pidController.setP(AutoBalanceKP.get());
-    //   pidController.setI(AutoBalanceKI.get());
-    //   pidController.setD(AutoBalanceKD.get());
-    // }
-    // get rotation of robot
-    driveRoll = new Rotation2d(drive.m_navx.getRoll());
-    drivePitch = new Rotation2d(drive.m_navx.getPitch());
-    driveYaw = drive.getRotation2d();
+  public void execute() { 
+    // Uncomment the line below this to simulate the gyroscope axis with a controller joystick
+    // Double currentAngle = -1 * Robot.controller.getRawAxis(Constants.LEFT_VERTICAL_JOYSTICK_AXIS) * 45;
+    driveRoll = new Rotation2d(m_DriveSubsystem.m_navx.getRoll());
+    drivePitch = new Rotation2d(m_DriveSubsystem.m_navx.getPitch());
+    driveYaw = m_DriveSubsystem.getRotation2d();
+    this.currentAngle = driveRoll.getRadians() * driveYaw.getSin() + drivePitch.getRadians() * driveYaw.getCos();
+  
 
-    double chargeStationAngle =
-        driveRoll.getRadians() * driveYaw.getSin() + drivePitch.getRadians() * driveYaw.getCos();
+    error = Constants.Drivetrain.balanceGoalDegrees - currentAngle;
+    drivePower = -Math.min(Constants.Drivetrain.balanceKP * error, 1);
 
-    // P controller
-    double driveSpeedAfterPID = pidController.calculate(chargeStationAngle);
-
-    // charge station limits
-    double chargeStationInnerX = DrivetrainSubsystem.apply(Units.inchesToMeters(193.25) - Units.inchesToMeters(2.0) - (Units.inchesToMeters(76.125)/2)); //chargingStationInnerX
-    double chargeStationOuterX = DrivetrainSubsystem.apply(Units.inchesToMeters(193.25) - Units.inchesToMeters(2.0)); //chargingStationOuterX
-    
-    // speed limits depending on alliance
-    if (DriverStation.getAlliance() == Alliance.Blue) {
-      // check boundaries for left of charge station
-      if (drive.getPose().getX() <= chargeStationInnerX && driveSpeedAfterPID < 0) {
-        driveSpeedAfterPID = 0;
-      }
-
-      // check boundaries for right of charge station
-      if (drive.getPose().getX() > chargeStationOuterX
-          && driveSpeedAfterPID > 0) {
-        driveSpeedAfterPID = 0;
-      }
-    }else {
-      // check boundaries for left of charge station
-      if (drive.getPose().getX() <= chargeStationInnerX && driveSpeedAfterPID > 0) 
-      {
-        driveSpeedAfterPID = 0;
-      }
-
-      // check boundaries for right of charge station
-      if (drive.getPose().getX() > chargeStationOuterX
-          && driveSpeedAfterPID < 0) {
-        driveSpeedAfterPID = 0;
-      }
+    //Robot might need an extra push when going up backwards
+    if (drivePower < 0) {
+      drivePower *= Constants.Drivetrain.balanceBackwardsMultiplier;
     }
 
-    // command drive subsystem
-    drive.drive(ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(driveSpeedAfterPID, 0, 0),driveYaw));
+    // Limit the max power
+    if (Math.abs(drivePower) > 0.6) {
+      drivePower = Math.copySign(0.6, drivePower);
+    }
+
+    m_DriveSubsystem.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
+      new ChassisSpeeds(0, drivePower, 0),
+      driveYaw));
+    
+    // Debugging Print Statments
+  SmartDashboard.putNumber("Current Angle: ", currentAngle);
+  SmartDashboard.putNumber("Error " ,error);
+  SmartDashboard.putNumber("Drive Power: " , drivePower);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    drive.mSwerveMods[3].setAngle(new BetterSwerveModuleState(0.0, new Rotation2d(Math.PI * 1/4),0.0));
-    drive.mSwerveMods[2].setAngle(new BetterSwerveModuleState(0.0, new Rotation2d(Math.PI * 3/4),0.0));
+    m_DriveSubsystem.drive(new ChassisSpeeds(0.0,0.0,0.0));
+    m_DriveSubsystem.mSwerveMods[3].setAngle(new BetterSwerveModuleState(0.0, new Rotation2d(Math.PI * 1/4),0.0));
+    m_DriveSubsystem.mSwerveMods[2].setAngle(new BetterSwerveModuleState(0.0, new Rotation2d(Math.PI * 3/4),0.0));
 
-    drive.mSwerveMods[1].setAngle(new BetterSwerveModuleState(0.0, new Rotation2d(Math.PI * 3/4),0.0));
-    drive.mSwerveMods[0].setAngle(new BetterSwerveModuleState(0.0, new Rotation2d(Math.PI * 1/4),0.0));
+    m_DriveSubsystem.mSwerveMods[1].setAngle(new BetterSwerveModuleState(0.0, new Rotation2d(Math.PI * 3/4),0.0));
+    m_DriveSubsystem.mSwerveMods[0].setAngle(new BetterSwerveModuleState(0.0, new Rotation2d(Math.PI * 1/4),0.0));
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    // return Math.abs(error) < Constants.Drivetrain.balanceDriveTurningDegrees; 
     return false;
   }
 }

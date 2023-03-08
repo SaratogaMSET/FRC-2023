@@ -32,12 +32,12 @@ public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
   public static CTREConfigs ctreConfigs;
   private RobotContainer m_robotContainer;
-  private ClawIOSparkMax clawSubsystem = new ClawIOSparkMax();
+  // private ClawIOSparkMax clawSubsystem = new ClawIOSparkMax();
   // private IntakeSubsystemWheel m_intakeSubsystem;
   // private XboxController m_controller;
   // private TalonFX motor;
   // private Logger logger;
-  private final ClawSubsystem m_claw = new ClawSubsystem(clawSubsystem);
+  // private final ClawSubsystem m_claw = new ClawSubsystem(clawSubsystem);
 
 
   /**
@@ -99,7 +99,7 @@ public class Robot extends LoggedRobot {
     // m_claw.closeIntake();
     // new Trigger(m_controller::getRightBumper).whileTrue(new IntakeCommand(m_claw, Direction.CLOSE));
     // new Trigger(m_controller::getRightBumper).whileFalse(new IntakeCommand(m_claw, Direction.OPEN));
-    SmartDashboard.putNumber("Proximity", ClawIOSparkMax.colorSensor.getProximity());
+    // SmartDashboard.putNumber("Proximity", ClawIOSparkMax.colorSensor.getProximity());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -144,7 +144,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    m_claw.closeIntake();
+    // m_claw.closeIntake();
   }
 
   @Override

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.DrivetrainUtil;
+package frc.robot.subsystems.Drivetrain;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.Pigeon2;
