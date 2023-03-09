@@ -96,7 +96,7 @@ public class VisionSubsystem extends SubsystemBase {
      * *
      * @param pipelineNum the pipeline number to switch to. We might need one for the high tape, one for the mid tape and one for apriltag.
      */
-    public void switchPipeline(int pipelineNum){
+    public void setPipeline(int pipelineNum){
         getTable().getEntry("pipeline").setNumber(pipelineNum);
     }
     /* End Retroreflective */
