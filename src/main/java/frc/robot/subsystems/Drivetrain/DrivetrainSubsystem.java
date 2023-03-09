@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.Drivetrain;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.swerve.BetterSwerveModuleState;
 import frc.lib.swerve.SwerveDriveKinematics2;
 import frc.robot.Constants;
-import frc.robot.subsystems.DrivetrainUtil.SwerveModuleIOInputsAutoLogged;
+import frc.robot.subsystems.SwerveModule;
 
 public class DrivetrainSubsystem extends SubsystemBase {
     private BetterSwerveModuleState[] currentDesiredState = new BetterSwerveModuleState[4];

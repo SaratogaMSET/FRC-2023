@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Vision;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,7 +29,7 @@ public class VisionSubsystem extends SubsystemBase {
             return ll2;
         }
     }
-
+  
     public long getPipeline(){
         return getTable().getEntry("getpipe").getInteger(0);
     }

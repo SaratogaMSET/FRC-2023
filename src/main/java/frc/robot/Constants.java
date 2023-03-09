@@ -75,11 +75,11 @@ public final class Constants {
         public static final double kIYController = 0.000;
         public static final double kPThetaControllerTrajectory = 0.39 * 1.75 * 2 * 1.2; // 0.39 * 2
         public static final double kDThetaControllerTrajectory = 0.004;
-        public static final double balanceKP = 0.015;
+        public static final double balanceKP = 3.5;
         public static final double balanceGoalDegrees = 0;
         public static final double balanceThresholdDegrees = 1;
-        public static final double balanceBackwardsMultiplier = 1.35;
-        public static final double balanceDriveTurningDegrees = 3;
+        public static final double balanceBackwardsMultiplier = 1.8;
+        public static final double balanceDriveTurningDegrees = 2.5;
 
         public static final double MAX_VELOCITY_METERS_PER_SECOND = (6380.0 / 60.0 *
                 SdsModuleConfigurations.MK4_L2.getDriveReduction() *

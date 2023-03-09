@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.lib.swerve.SwerveDriveKinematics2;
 import frc.robot.Constants;
-import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
