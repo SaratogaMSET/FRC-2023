@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.Claw;
 
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 
 /** An example command that uses an example subsystem. */
-public class ManualCloseIntake extends CommandBase {
+public class ManualOpenIntake extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final ClawSubsystem m_intake;
   private final double speed;
@@ -25,7 +25,7 @@ public class ManualCloseIntake extends CommandBase {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public ManualCloseIntake(ClawSubsystem subsystem, double speed, ClawSubsystem.Objects object) {
+  public ManualOpenIntake(ClawSubsystem subsystem, double speed, ClawSubsystem.Objects object) {
     m_intake = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     this.speed = speed;
@@ -36,7 +36,7 @@ public class ManualCloseIntake extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intake.closeIntake(object);
+    m_intake.openIntake();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
