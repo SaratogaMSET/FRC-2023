@@ -29,6 +29,14 @@ public class VisionSubsystem extends SubsystemBase {
             return ll2;
         }
     }
+
+    public boolean isLL3(){
+        if (getTable().equals(ll3)){
+            return true; 
+        } else {
+            return false;
+        }
+    }
   
     public long getPipeline(){
         return getTable().getEntry("getpipe").getInteger(0);
@@ -61,7 +69,7 @@ public class VisionSubsystem extends SubsystemBase {
             if (getTY() < -3){
                 return (Constants.VisionConstants.H2b - camHeight) / Math.tan(Math.toRadians(camAngle + getTY()));
             } 
-            SmartDashboard.putNumber("gET ME OUT", ((Constants.VisionConstants.H2a - camHeight) / Math.tan(Math.toRadians(camAngle + getTY()))));
+            //SmartDashboard.putNumber("gET ME OUT", ((Constants.VisionConstants.H2a - camHeight) / Math.tan(Math.toRadians(camAngle + getTY()))));
             return (Constants.VisionConstants.H2a - camHeight) / Math.tan(Math.toRadians(camAngle + getTY()));
         } else {
             return 0.0;
@@ -78,7 +86,7 @@ public class VisionSubsystem extends SubsystemBase {
             b = Math.cos(Math.toRadians(tx)) * d1;  // y val
 
             //double angle = Math.atan((a + Constants.VisionConstants.C2_LL3) / (b + Constants.VisionConstants.C1_LL3));
-            double[] x = {a + Constants.VisionConstants.C2_LL3, b + Constants.VisionConstants.C1_LL3}; //, Math.toDegrees(angle)};
+        double[] x = {a - Constants.VisionConstants.C2_LL3, b + Constants.VisionConstants.C1_LL3}; //, Math.toDegrees(angle)};
             return x;
         } else {
             d1 = getDistanceFromRetro();
@@ -87,9 +95,9 @@ public class VisionSubsystem extends SubsystemBase {
             b = Math.cos(Math.toRadians(tx)) * d1;  // y val
 
             //double angle = Math.atan((a + Constants.VisionConstants.C2_LL3) / (b + Constants.VisionConstants.C1_LL3));
-
-            // if its back, i guess we just * -1 on all these values.
-            double[] x = {a + Constants.VisionConstants.C2_LL2, b + Constants.VisionConstants.C1_LL2}; //, Math.toDegrees(angle)};
+            
+            // negative x -> arm is to the right. idk why man 
+        double[] x = {a - Constants.VisionConstants.C2_LL2, b + Constants.VisionConstants.C1_LL2}; //, Math.toDegrees(angle)};
             return x; 
         }
     }

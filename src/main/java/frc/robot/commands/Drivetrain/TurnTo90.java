@@ -23,7 +23,7 @@ public class TurnTo90 extends CommandBase {
 
     public TurnTo90(DrivetrainSubsystem drivetrainSubsystem){
         this.drivetrain = drivetrainSubsystem;
-        controller.setTolerance(0.05);
+        controller.setTolerance(1);
         addRequirements(drivetrainSubsystem);  
 
     }
@@ -42,7 +42,7 @@ public class TurnTo90 extends CommandBase {
         axis = ( (int) lastRot) / 90 -1;
         SmartDashboard.putNumber("Axis error", lastRot - axis * 90 );
         if(lastRot - axis * 90 > 45) axis++ ;
-        desiredAngle = axis * 90;
+        desiredAngle = axis * 90; // desired angle is in degrees
 
         SmartDashboard.putNumber("desired angle", desiredAngle);
 

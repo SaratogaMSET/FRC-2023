@@ -246,9 +246,4 @@ public class CANdleSubsystem extends SubsystemBase {
             return new Color(newRed, newGreen, newBlue);
         }
     }
-
-    @Override
-    public void periodic() {
-        setColor(green);
-    }
 }
