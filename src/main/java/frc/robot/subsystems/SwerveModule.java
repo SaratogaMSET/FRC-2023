@@ -84,6 +84,22 @@ public class SwerveModule implements SwerveModuleIO {
     }
     }
 
+    // public void setDesiredAngleOnly(Rotation2d desiredAngle, boolean optimized) {
+    //     // Set the module to face forwards
+    //     if (optimized) {
+    //         desiredAngle = CTREModuleState.optimize(new SwerveModuleState(1, desiredAngle), getState().angle).angle;
+    //     }
+
+    //     mAngleMotor.set(
+    //             ControlMode.Position,
+    //             Conversions.degreesToFalcon(desiredAngle.getDegrees(), Constants.SwerveConstants.angleGearRatio));
+
+    //     lastAngle = 0;
+
+    //     // Set the drive motor to the specified voltage
+    //     mDriveMotor.stopMotor();
+    // }
+
     public void setAngle(BetterSwerveModuleState desiredState){
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND * 0.01)) ? lastAngle : desiredState.angle; //Prevent rotating module if speed is less then 1%. Prevents Jittering.
         

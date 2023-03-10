@@ -75,11 +75,12 @@ public final class Constants {
         public static final double kIYController = 0.000;
         public static final double kPThetaControllerTrajectory = 0.39 * 1.75 * 2 * 1.2; // 0.39 * 2
         public static final double kDThetaControllerTrajectory = 0.004;
-        public static final double balanceKP = 3.5;
+        public static final double balanceKP = 2.5;
         public static final double balanceGoalDegrees = 0;
         public static final double balanceThresholdDegrees = 1;
-        public static final double balanceBackwardsMultiplier = 1.8;
+        public static final double balanceBackwardsMultiplier = 3.4;
         public static final double balanceDriveTurningDegrees = 2.5;
+        public static final double balance = 15;
 
         public static final double MAX_VELOCITY_METERS_PER_SECOND = (6380.0 / 60.0 *
                 SdsModuleConfigurations.MK4_L2.getDriveReduction() *
@@ -101,6 +102,7 @@ public final class Constants {
                 // Back right
                 new Translation2d(-Drivetrain.DRIVETRAIN_TRACKWIDTH_METERS / 2.0,
                         -Drivetrain.DRIVETRAIN_WHEELBASE_METERS / 2.0));
+
         public final static SwerveDriveKinematics m_kinematics1 = new SwerveDriveKinematics(
                 // Front left
                 new Translation2d(Drivetrain.DRIVETRAIN_TRACKWIDTH_METERS / 2.0,
@@ -195,6 +197,12 @@ public final class Constants {
         public static final double driveKS = (0);
         public static final double driveKV = (0);
         public static final double driveKA = (0);
+
+        public static double balanceKS = 0.5;
+
+        public static double balanceKV = 0.5;
+
+        public static double balanceKA = 0.4;
     }
 
     public static class IntakeConstants {

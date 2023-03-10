@@ -147,6 +147,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
         //swerveOdometry.resetPosition(getRotation2d(), getModulePositions(), pose);
     }
 
+    public void setX(){
+        setModuleStates(new BetterSwerveModuleState[]{
+            new BetterSwerveModuleState(0.1, Rotation2d.fromDegrees(45), 0),
+            new BetterSwerveModuleState(0.1, Rotation2d.fromDegrees(-45), 0),
+            new BetterSwerveModuleState(0.1, Rotation2d.fromDegrees(-45), 0),
+            new BetterSwerveModuleState(0.1, Rotation2d.fromDegrees(45), 0),
+        });
+    }
     public SwerveModuleState[] getModuleStates(){
         SwerveModuleState[] states = new SwerveModuleState[4];
         switch(Constants.currentMode){
