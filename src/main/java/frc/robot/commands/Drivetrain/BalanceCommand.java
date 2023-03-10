@@ -4,6 +4,7 @@ import frc.lib.swerve.BetterSwerveModuleState;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,7 +20,10 @@ public class BalanceCommand extends CommandBase {
   private Rotation2d driveYaw;
   private Rotation2d drivePitch;
   private Rotation2d driveRoll;
-
+  private double currAngle;
+  private double ff;
+  private double currAcc;
+  private double currentAngularVelocity;
   /** Command to use Gyro data to resist the tip angle from the beam - to stabalize and balanace */
   public BalanceCommand(DrivetrainSubsystem m_DrivetrainSubsystem) {
     this.m_DriveSubsystem = m_DrivetrainSubsystem;
@@ -38,11 +42,16 @@ public class BalanceCommand extends CommandBase {
     driveRoll = new Rotation2d(m_DriveSubsystem.m_navx.getRoll());
     drivePitch = new Rotation2d(m_DriveSubsystem.m_navx.getPitch());
     driveYaw = m_DriveSubsystem.getRotation2d();
-    this.currentAngle = driveRoll.getRadians() * driveYaw.getSin() + drivePitch.getRadians() * driveYaw.getCos();
-  
+    LinearFilter xAccelFilter = LinearFilter.movingAverage(5);
+    currAcc = m_DriveSubsystem.m_navx.getWorldLinearAccelX();
+    currAcc = xAccelFilter.calculate(currAcc);
+    currAcc = 180*Math.asin(currAcc/9.81)/Math.PI;
+    ff = Constants.Drivetrain.balanceKS * currAngle + Constants.Drivetrain.balanceKV*currentAngularVelocity + Constants.Drivetrain.balanceKA * currAcc;
+
+    this.currentAngle = driveRoll.getRadians() * driveYaw.getSin() - drivePitch.getRadians() * driveYaw.getCos();
 
     error = Constants.Drivetrain.balanceGoalDegrees - currentAngle;
-    drivePower = -Math.min(Constants.Drivetrain.balanceKP * error, 1);
+    drivePower = -(Math.min(Constants.Drivetrain.balanceKP * error, 1) + ff);
 
     //Robot might need an extra push when going up backwards
     if (drivePower < 0) {
@@ -50,8 +59,8 @@ public class BalanceCommand extends CommandBase {
     }
 
     // Limit the max power
-    if (Math.abs(drivePower) > 0.6) {
-      drivePower = Math.copySign(0.6, drivePower);
+    if (Math.abs(drivePower) > 0.7) {
+      drivePower = Math.copySign(0.7, drivePower);
     }
 
     m_DriveSubsystem.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -68,17 +77,12 @@ public class BalanceCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_DriveSubsystem.drive(new ChassisSpeeds(0.0,0.0,0.0));
-    m_DriveSubsystem.mSwerveMods[3].setAngle(new BetterSwerveModuleState(0.0, new Rotation2d(Math.PI * 1/4),0.0));
-    m_DriveSubsystem.mSwerveMods[2].setAngle(new BetterSwerveModuleState(0.0, new Rotation2d(Math.PI * 3/4),0.0));
-
-    m_DriveSubsystem.mSwerveMods[1].setAngle(new BetterSwerveModuleState(0.0, new Rotation2d(Math.PI * 3/4),0.0));
-    m_DriveSubsystem.mSwerveMods[0].setAngle(new BetterSwerveModuleState(0.0, new Rotation2d(Math.PI * 1/4),0.0));
+    m_DriveSubsystem.setX();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    // return Math.abs(error) < Constants.Drivetrain.balanceDriveTurningDegrees; 
-    return false;
+    return Math.abs(error) < 3; 
   }
 }

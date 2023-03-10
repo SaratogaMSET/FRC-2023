@@ -5,9 +5,14 @@
 package frc.robot;
 
 
+import java.time.Instant;
+import java.util.HashMap;
+
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+import com.pathplanner.lib.auto.BetterSwerveAutoBuilder;
+import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import com.pathplanner.lib.commands.PPSwerveControllerCommandA;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
@@ -28,6 +33,10 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Drivetrain;
+import frc.robot.commands.Arm.ArmPositionCommand;
+import frc.robot.commands.Arm.ArmVoltageCommand;
+import frc.robot.commands.Arm.ArmZeroCommand;
+import frc.robot.commands.Arm.ToggleArmPositionCommand;
 import frc.robot.commands.CANdle.ToggleLEDCommand;
 import frc.robot.commands.Drivetrain.AlignToCone;
 import frc.robot.commands.Drivetrain.BalanceCommand;
@@ -37,6 +46,7 @@ import frc.robot.commands.Drivetrain.TurnTo90;
 import frc.robot.commands.Drivetrain.AlignToCone;
 import frc.robot.commands.Drivetrain.ZeroGyroCommand;
 import frc.robot.subsystems.Vision.VisionSubsystem;
+import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem.Color;
 import frc.robot.subsystems.Claw.ClawIOSparkMax;
@@ -50,14 +60,15 @@ import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-
+  public static HashMap <String, Command> eventMap;
   public final SendableChooser<String> m_autoSwitcher = new SendableChooser<String>();
   public static final String Forward = "Forward";
   public static final String ForwardRotate = "Forward + Rotate";
   public static final String NewPath = "New Path";
-  // public String m_autoSelected;
+  // public String m_autoSelected;  
   public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
   // private final ClawSubsystem m_claw = new ClawSubsystem(new ClawIOSparkMax());
+  private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem();  
   private final CANdleSubsystem m_ledSubsystem = new CANdleSubsystem();
   
@@ -142,25 +153,32 @@ public class RobotContainer {
             
     ));
 
+    m_armSubsystem.setDefaultCommand(
+      new ArmVoltageCommand(
+        m_armSubsystem,
+        () -> modifyAxis(-m_gunner.getY() * 1.5),  //Axes are reverse with this setup, pushing up returns a negative number on both y axes
+        () -> modifyAxis(-m_gunner.getX() * 1.5)
+      ));
+
     // m_claw.setDefaultCommand(new IntakeCommand(m_claw, Direction.CLOSE));
 
-    m_driverController.y().onTrue(new SequentialCommandGroup(
-      new TurnTo90(m_drivetrainSubsystem),
-      new WaitCommand(1),
-      new AlignToCone(m_drivetrainSubsystem, m_visionSubsystem)
-    ));
-
-    m_driverController.rightBumper().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
-
-    m_driverController.rightBumper().whileTrue(
+    // m_driverController.y().onTrue(new SequentialCommandGroup(
+    //   new TurnTo90(m_drivetrainSubsystem),
+    //   new WaitCommand(1),
+    //   new AlignToCone(m_drivetrainSubsystem, m_visionSubsystem)
+    // ));
+    m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
+    m_gunner.button(2).onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
+    m_driverController.leftBumper().whileTrue(
       new DefaultDriveCommand(
             m_drivetrainSubsystem,
             () -> modifyAxis(m_driverController.getLeftX()/2.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
             () -> modifyAxis(-m_driverController.getLeftY()/2.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
             () -> modifyAxis(-m_driverController.getRightX()/2.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND     
     ));
-    
     m_driverController.b().onTrue(new BalanceCommand(m_drivetrainSubsystem));
+
+    
     
     m_driverController.a().toggleOnTrue(new MoveWithClosest90(
       m_drivetrainSubsystem, 
@@ -168,9 +186,18 @@ public class RobotContainer {
       () -> modifyAxis(-m_driverController.getLeftY()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND
     ));
 
-    m_gunner.button(2).onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
+    m_driverController.rightBumper().toggleOnTrue(new ToggleArmPositionCommand(m_armSubsystem, 0.668, 1.08 -0.1524 - 0.0508)); //ready
+    m_driverController.rightBumper().toggleOnFalse(new ArmZeroCommand(m_armSubsystem)); //neutral
+
     m_gunner.button(5).toggleOnFalse(new ToggleLEDCommand(m_ledSubsystem, new Color(242, 60, 0) ));
     m_gunner.button(5).toggleOnTrue(new ToggleLEDCommand(m_ledSubsystem, new Color(184, 0, 185)));
+    
+    m_gunner.button(1).onTrue(new ToggleArmPositionCommand(m_armSubsystem, 1.38- 0.0254, 1.18 + 3 * 0.1524)); //high cone
+    m_gunner.button(9).onTrue(new ArmPositionCommand(m_armSubsystem, 0.97, 0.65)); //middle cone 
+    m_gunner.button(11).onTrue(new ArmPositionCommand(m_armSubsystem, 0.59,   0.25)); //hybrid low for both
+    m_gunner.button(3).onTrue(new ArmPositionCommand(m_armSubsystem, 1.38, 0.96)); //high cube 
+    m_gunner.button(4).onTrue(new ArmPositionCommand(m_armSubsystem, 0.97, 0.65)); //middle cube
+    m_gunner.button(6).onTrue(new ArmPositionCommand(m_armSubsystem, 0.56, 0.17));
   }
 
   private static double deadband(double value, double deadband) {
@@ -222,42 +249,49 @@ public class RobotContainer {
     PathPlannerTrajectory trajectory = PathPlanner.loadPath("Middle Path", 2, 1);
     PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory.getInitialState(), DriverStation.getAlliance());
     
-    PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
-    PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);//FIXME
-    PIDController thetaController = new PIDController(
-          Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
+
+
+    // PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
+    // PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);//FIXME
+    // PIDController thetaController = new PIDController(
+    //       Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
     
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-    xController.reset();
-    yController.reset();
-    thetaController.reset();
-    
+    // thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    // xController.reset();
+    // yController.reset();
+    // thetaController.reset();
+
     //1.0676
-    PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
-      trajectory, 
-      m_drivetrainSubsystem::getPose,
-      Constants.Drivetrain.m_kinematics2,
-      xController,
-      yController,
-      thetaController,
-      m_drivetrainSubsystem::drive,
+
+    BetterSwerveAutoBuilder swerveAutoBuilder = new BetterSwerveAutoBuilder(
+      m_drivetrainSubsystem::getPose, 
+      m_drivetrainSubsystem::resetOdometry, 
+      new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
+      new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
+      new PIDConstants(Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory),
+      m_drivetrainSubsystem::drive, 
+      null, 
       true,
-      m_drivetrainSubsystem
-    );
-      
-    double[] xControllerArray = new double[]{ xController.getP(), xController.getI(), xController.getD()}; 
-    double[] yControllerArray = new double[]{ yController.getP(), yController.getI(), yController.getD()}; 
-    double[] ThetaControllerArray = new double[]{ thetaController.getP(), thetaController.getI(), thetaController.getD()}; 
-    SmartDashboard.putNumberArray("PID X Controller", xControllerArray);
-    SmartDashboard.putNumberArray("PID Y Controller", yControllerArray);
-    SmartDashboard.putNumberArray("PID Theta Controller",ThetaControllerArray);
+      m_drivetrainSubsystem);
+
+    // PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
+    //   trajectory, 
+    //   m_drivetrainSubsystem::getPose,
+    //   Constants.Drivetrain.m_kinematics2,
+    //   xController,
+    //   yController,
+    //   thetaController,
+    //   m_drivetrainSubsystem::drive,
+    //   true,
+    //   m_drivetrainSubsystem
+    // );
     
 
     return new SequentialCommandGroup(
       new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
       new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
       new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
-      swerveTrajectoryFollower.withTimeout(15).andThen(new BalanceCommand(m_drivetrainSubsystem))
+      swerveAutoBuilder.fullAuto(trajectory).withTimeout(15).andThen(new BalanceCommand(m_drivetrainSubsystem))
       );
   }
 
