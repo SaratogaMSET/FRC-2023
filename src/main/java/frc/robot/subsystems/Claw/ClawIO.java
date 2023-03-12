@@ -9,13 +9,10 @@ public interface ClawIO {
     @AutoLog
     public static class ClawIOInputs {
         public double rotations;
-        public double torque;
         public String object;
         public boolean objectSecured;
         public boolean objectDetected;
         public double proximity;
-        public double appliedVoltage;
-        public boolean torqueBuffered;
         public Mechanism2d claw;
     }
 

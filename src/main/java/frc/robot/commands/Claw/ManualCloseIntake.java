@@ -6,26 +6,28 @@ package frc.robot.commands.Claw;
 
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Claw.ClawIOSparkMax;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class ManualCloseIntake extends CommandBase {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final ClawSubsystem m_intake;
+  @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+  private final ClawIOSparkMax m_intake;
   private final double speed;
   private final ClawSubsystem.Objects object;
 
   public static enum Direction {
-    OPEN, 
-    CLOSE, 
+    OPEN,
+    CLOSE,
     IDLE
   }
+
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public ManualCloseIntake(ClawSubsystem subsystem, double speed, ClawSubsystem.Objects object) {
+  public ManualCloseIntake(ClawIOSparkMax subsystem, double speed, ClawSubsystem.Objects object) {
     m_intake = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     this.speed = speed;
@@ -36,12 +38,13 @@ public class ManualCloseIntake extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intake.closeIntake(object);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    m_intake.closeIntake();
+  }
 
   // Called once the command ends or is interrupted.
   @Override

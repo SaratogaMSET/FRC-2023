@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -67,7 +68,7 @@ public class RobotContainer {
   public static final String NewPath = "New Path";
   // public String m_autoSelected;  
   public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
-  // private final ClawSubsystem m_claw = new ClawSubsystem(new ClawIOSparkMax());
+  private final ClawIOSparkMax m_claw = new ClawIOSparkMax();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem();  
   private final CANdleSubsystem m_ledSubsystem = new CANdleSubsystem();
@@ -160,7 +161,10 @@ public class RobotContainer {
         () -> modifyAxis(-m_gunner.getX() * 1.5)
       ));
 
-    // m_claw.setDefaultCommand(new IntakeCommand(m_claw, Direction.CLOSE));
+    m_claw.setDefaultCommand(new InstantCommand(() -> m_claw.setIdle(), m_claw));
+    m_driverController.rightTrigger().whileTrue(new RunCommand(() -> m_claw.manualCloseIntake(), m_claw));
+    m_driverController.leftTrigger().whileTrue(new RunCommand(() -> m_claw.openIntake(), m_claw));
+
 
     // m_driverController.y().onTrue(new SequentialCommandGroup(
     //   new TurnTo90(m_drivetrainSubsystem),
@@ -177,8 +181,6 @@ public class RobotContainer {
             () -> modifyAxis(-m_driverController.getRightX()/2.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND     
     ));
     m_driverController.b().onTrue(new BalanceCommand(m_drivetrainSubsystem));
-
-    
     
     m_driverController.a().toggleOnTrue(new MoveWithClosest90(
       m_drivetrainSubsystem, 
