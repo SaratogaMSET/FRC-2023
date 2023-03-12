@@ -75,7 +75,7 @@ public final class Constants {
         public static final double kIYController = 0.000;
         public static final double kPThetaControllerTrajectory = 0.39 * 1.75 * 2 * 1.2; // 0.39 * 2
         public static final double kDThetaControllerTrajectory = 0.004;
-        public static final double balanceKP = 2.5;
+        public static final double balanceKP = 0.7;
         public static final double balanceGoalDegrees = 0;
         public static final double balanceThresholdDegrees = 1;
         public static final double balanceBackwardsMultiplier = 3.4;
@@ -323,23 +323,38 @@ public final class Constants {
       }
       public final class ArmNodeDictionary{
         public double[] ready_highcone_score = new double[]{1.38, 1.18};
+        public static final double ready_highcone_score_x = 1.38;
+        public static final double ready_highcone_score_y = 1.18;
+
         public double[] ready_midcone_score = new double[]{0.96, 0.66};
-    
+        public static final double ready_midcone_score_x = 0.96;
+        public static final double ready_midcone_score_y = 0.66;
+
         public double[] ready_highcube_score = new double[]{1.38, 0.96};
+        public static final double ready_highcube_score_x = 1.38;
+        public static final double ready_highcube_score_y = 0.96;
+        
         public double[] ready_midcube_score = new double[]{0.97, 0.65};
-    
+        public static final double ready_midcube_score_x = 0.97;
+        public static final double ready_midcube_score_y = 0.65;
+
         public final double[] ready_low_score = new double[]{0.59, 0};
-    
+        public static final double ready_low_score_x  = 0.59;
+        public static final double ready_low_score_y  = 0;
+
         public double[] ready_ground_intake = new double[]{0.56, 0.17};
         public static final double ready_ground_intake_x = 0.56;
         public static final double ready_ground_intake_y = 0.17;
-        public double[] ground_intake = new double[]{0.56, -0.12};
+
+        public double[] ground_intake = new double[]{0.60, -0.1};
         public static final double ground_intake_x = 0.60;
         public static final double ground_intake_y = -0.1;
     
         public double[] ready_arm_score = new double[]{0.668, 1.05};
     
         public double[] ready_double_substation = new double[]{0.668, 1.08 -0.1524 - 0.0508};
+        public static final double ready_double_substation_x = 0.688;
+        public static final double ready_double_substation_y = 1.08 -0.1524 - 0.0508;
         // public double[] pickup_double_substation = new double[]{0.62, 0.90};
       }
 }
