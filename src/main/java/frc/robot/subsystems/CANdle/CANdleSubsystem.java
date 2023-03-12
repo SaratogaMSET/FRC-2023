@@ -94,7 +94,14 @@ public class CANdleSubsystem extends SubsystemBase {
             LEDSegment.FrontRightStrip.setColor(CANdleSubsystem.yellow);
         });
     }
-
+    public Command indicateActiveSide(){
+        return buildSideStripCommand(() -> {
+            LEDSegment.BackRightStrip.setFlowAnimation(CANdleSubsystem.color,0.5);
+            LEDSegment.BackLeftStrip.setFlowAnimation(CANdleSubsystem.color,0.5);
+            LEDSegment.FrontLeftStrip.setFlowAnimation(CANdleSubsystem.color,0.5);
+            LEDSegment.FrontRightStrip.setFlowAnimation(CANdleSubsystem.color,0.5);
+        });
+    }
     public Command indicateCubeCommand() {
         color = purple;
         return buildSideStripCommand(() -> {

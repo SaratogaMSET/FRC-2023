@@ -7,15 +7,30 @@ import org.ejml.simple.SimpleMatrix;
 import frc.robot.controls.ArmInterface;
 
 public class ArmSubsystem extends SubsystemBase {
+    int side = 0;
     public ArmInterface armInterface = new ArmInterface();
     public ArmSubsystem() {
         armInterface.resetMotorEncoders();
     }
-
+    
     public void updateState(){
         armInterface.update_state();
         armInterface.showState();
     }
+
+    public int getSide(){
+        return side;
+    }
+
+    public void setSide(){
+        if(side == 1){
+            side = 0;
+        }
+        if(side == 0){
+            side = 1;
+        }
+    }
+
     public void voltageMotors(double proximal_control_voltage, double distal_control_voltage){
         armInterface.voltageMotors_SimpleFF(proximal_control_voltage, distal_control_voltage);
     }
@@ -125,6 +140,7 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
     public void periodic() {
         updateState();
+        SmartDashboard.putNumber("Side", side);
     }
 
 @Override

@@ -181,6 +181,12 @@ public class RobotContainer {
             () -> modifyAxis(-m_driverController.getRightX()/2.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND     
     ));
     m_driverController.b().onTrue(new BalanceCommand(m_drivetrainSubsystem));
+
+    m_gunner1.button(1).whileTrue(m_ledSubsystem.indicateActiveSide());
+    m_gunner1.button(3).onTrue(m_ledSubsystem.indicateCubeCommand());
+    m_gunner1.button(5).onTrue(m_ledSubsystem.indicateConeCommand());
+   
+    
     
     m_driverController.a().toggleOnTrue(new MoveWithClosest90(
       m_drivetrainSubsystem, 
@@ -242,6 +248,13 @@ public class RobotContainer {
 		return value;
 	}
 
+  public void updateRobotState(){
+    RobotState.armSide = m_armSubsystem.getSide();
+    SmartDashboard.putNumber("side of the arm variety", m_armSubsystem.getSide());
+    SmartDashboard.putNumber("armside", RobotState.armSide);
+    // SmartDashboard.putNumber("prox of the yimity", sensor.getProximity());
+    // SmartDashboard.putBoolean("hall effect", HallEffect.get());
+  }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
