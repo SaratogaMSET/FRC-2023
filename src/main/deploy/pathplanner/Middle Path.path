@@ -17,11 +17,11 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "WaitCommand"
+          "Arm Cube Score"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "after",
-        "waitTime": 2.0
+        "waitTime": 1.0
       }
     },
     {
