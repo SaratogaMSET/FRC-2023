@@ -3,25 +3,8 @@ package frc.robot.subsystems.Arm;
 //import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-
 import org.ejml.simple.SimpleMatrix;
-
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import frc.robot.Constants;
-import frc.robot.controls.ArmDynamics;
 import frc.robot.controls.ArmInterface;
-import frc.robot.controls.ArmMassControl;
-import frc.robot.controls.ArmKinematics;
-import frc.robot.controls.Joint;
-import frc.robot.controls.VelocityFromEncoder;
-import frc.robot.controls.VoltageControl;
 
 public class ArmSubsystem extends SubsystemBase {
     public ArmInterface armInterface = new ArmInterface();
