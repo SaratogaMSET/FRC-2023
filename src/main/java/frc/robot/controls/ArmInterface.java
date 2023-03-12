@@ -284,14 +284,14 @@ public class ArmInterface {
             SmartDashboard.putNumber(motor_encoder_velocity_values + "Distal Right", getMotorEncoderVDistalRight() * radians_to_degrees);
         }
 
-        String motor_encoder_agreement = "Arm Motor + ExtEnc Agreement/";
-        boolean show_motor_encoder_agreement = true;
-        if(show_motor_encoder_agreement){
-            SmartDashboard.putBoolean(motor_encoder_agreement + "Proximal Left", Math.abs(getEncoderProximalLeft() - getMotorEncoderProximalLeft()) < motor_encoder_agreement_tolerance);
-            SmartDashboard.putBoolean(motor_encoder_agreement + "Proximal Right", Math.abs(getEncoderProximalRight() - getMotorEncoderProximalRight()) < motor_encoder_agreement_tolerance);
-            SmartDashboard.putBoolean(motor_encoder_agreement + "Distal Left", Math.abs(getEncoderDistalLeft() - getMotorEncoderDistalLeft()) < motor_encoder_agreement_tolerance);
-            SmartDashboard.putBoolean(motor_encoder_agreement + "Distal Right", Math.abs(getEncoderDistalRight() - getMotorEncoderDistalRight()) < motor_encoder_agreement_tolerance);
-        }
+        // String motor_encoder_agreement = "Arm Motor + ExtEnc Agreement/";
+        // boolean show_motor_encoder_agreement = true;
+        // if(show_motor_encoder_agreement){
+        //     SmartDashboard.putBoolean(motor_encoder_agreement + "Proximal Left", Math.abs(getEncoderProximalLeft() - getMotorEncoderProximalLeft()) < motor_encoder_agreement_tolerance);
+        //     SmartDashboard.putBoolean(motor_encoder_agreement + "Proximal Right", Math.abs(getEncoderProximalRight() - getMotorEncoderProximalRight()) < motor_encoder_agreement_tolerance);
+        //     SmartDashboard.putBoolean(motor_encoder_agreement + "Distal Left", Math.abs(getEncoderDistalLeft() - getMotorEncoderDistalLeft()) < motor_encoder_agreement_tolerance);
+        //     SmartDashboard.putBoolean(motor_encoder_agreement + "Distal Right", Math.abs(getEncoderDistalRight() - getMotorEncoderDistalRight()) < motor_encoder_agreement_tolerance);
+        // }
 
         String arm_perception = "Arm Microstate/";
         boolean show_arm_perception = false;
@@ -309,54 +309,54 @@ public class ArmInterface {
             SmartDashboard.putNumber(arm_perception + veldiv + "Distal Right", getVelocityDistalRight() * radians_to_degrees);
         }
 
-        String macro_view = "Arm State/";
-        boolean show_macroview = true;
-        if(show_macroview){
-            String posdiv = "Pos/";
-            SmartDashboard.putNumber(macro_view + posdiv + "Proximal", getPositionProximal() * radians_to_degrees);
-            SmartDashboard.putNumber(macro_view + posdiv + "Distal", getPositionDistal() * radians_to_degrees);
+        // String macro_view = "Arm State/";
+        // boolean show_macroview = true;
+        // if(show_macroview){
+        //     String posdiv = "Pos/";
+        //     SmartDashboard.putNumber(macro_view + posdiv + "Proximal", getPositionProximal() * radians_to_degrees);
+        //     SmartDashboard.putNumber(macro_view + posdiv + "Distal", getPositionDistal() * radians_to_degrees);
 
-            String veldiv = "Vel/";
-            SmartDashboard.putNumber(macro_view + veldiv + "Proximal", getVelocityProximal() * radians_to_degrees);
-            SmartDashboard.putNumber(macro_view + veldiv + "Distal", getVelocityDistal() * radians_to_degrees);
-        }
+        //     String veldiv = "Vel/";
+        //     SmartDashboard.putNumber(macro_view + veldiv + "Proximal", getVelocityProximal() * radians_to_degrees);
+        //     SmartDashboard.putNumber(macro_view + veldiv + "Distal", getVelocityDistal() * radians_to_degrees);
+        // }
 
-        String erroneous_forces = "Arm Erroneous Forces/";
-        boolean show_erroneous_forces = true;
-        if(show_erroneous_forces){
-            SimpleMatrix feedforward = ArmControl.counteractErroneousForces(state());
-            SmartDashboard.putNumber(erroneous_forces + "Proximal FF", feedforward.get(0));
-            SmartDashboard.putNumber(erroneous_forces + "Distal FF", feedforward.get(1));
+        // String erroneous_forces = "Arm Erroneous Forces/";
+        // boolean show_erroneous_forces = true;
+        // if(show_erroneous_forces){
+        //     SimpleMatrix feedforward = ArmControl.counteractErroneousForces(state());
+        //     SmartDashboard.putNumber(erroneous_forces + "Proximal FF", feedforward.get(0));
+        //     SmartDashboard.putNumber(erroneous_forces + "Distal FF", feedforward.get(1));
 
-            double feedforward_proximal_voltage = VoltageControl.GearedF500Voltage(0.5 * feedforward.get(0), getVelocityProximal(), 0, Constants.ArmParameters.gear_reduction_proximal);
-            double feedforward_distal_voltage = VoltageControl.GearedF500Voltage(0.5 * feedforward.get(1), getVelocityDistal(), 0, Constants.ArmParameters.gear_reduction_distal);
+        //     double feedforward_proximal_voltage = VoltageControl.GearedF500Voltage(0.5 * feedforward.get(0), getVelocityProximal(), 0, Constants.ArmParameters.gear_reduction_proximal);
+        //     double feedforward_distal_voltage = VoltageControl.GearedF500Voltage(0.5 * feedforward.get(1), getVelocityDistal(), 0, Constants.ArmParameters.gear_reduction_distal);
 
-            SmartDashboard.putNumber(erroneous_forces + "Proximal FF Volts", feedforward_proximal_voltage);
-            SmartDashboard.putNumber(erroneous_forces + "Distal FF Volts", feedforward_distal_voltage);
-        }
+        //     SmartDashboard.putNumber(erroneous_forces + "Proximal FF Volts", feedforward_proximal_voltage);
+        //     SmartDashboard.putNumber(erroneous_forces + "Distal FF Volts", feedforward_distal_voltage);
+        // }
 
-        String kinematics = "Arm Kinematics/";
-        boolean show_kinematics = true;
-        if(show_kinematics){
-            String forward = "FWD/";
-            double[] X = Arm.forwardKinematics(getPositionProximal(), getPositionDistal());
-            SmartDashboard.putNumber(kinematics + forward + "X", X[0]);
-            SmartDashboard.putNumber(kinematics + forward + "Y", X[1]);
+        // String kinematics = "Arm Kinematics/";
+        // boolean show_kinematics = true;
+        // if(show_kinematics){
+        //     String forward = "FWD/";
+        //     double[] X = Arm.forwardKinematics(getPositionProximal(), getPositionDistal());
+        //     SmartDashboard.putNumber(kinematics + forward + "X", X[0]);
+        //     SmartDashboard.putNumber(kinematics + forward + "Y", X[1]);
 
-            String inverse = "INV/";
-            double[] Q = Arm.inverseKinematics(X[0], X[1]);
-            SmartDashboard.putBoolean(kinematics + inverse + "Q1", Math.abs(Q[0] - getPositionProximal()) < 0.001);
-            SmartDashboard.putBoolean(kinematics + inverse + "Q2", Math.abs(Q[1] - getPositionDistal()) < 0.001);
-        }
+        //     String inverse = "INV/";
+        //     double[] Q = Arm.inverseKinematics(X[0], X[1]);
+        //     SmartDashboard.putBoolean(kinematics + inverse + "Q1", Math.abs(Q[0] - getPositionProximal()) < 0.001);
+        //     SmartDashboard.putBoolean(kinematics + inverse + "Q2", Math.abs(Q[1] - getPositionDistal()) < 0.001);
+        // }
 
-        String bounds = "Arm Bounds/";
-        boolean show_bounds = true;
-        if(show_bounds){
-            SmartDashboard.putBoolean(bounds + "Proximal Low", getPositionProximal() < Bounds_Proxima[0]);
-            SmartDashboard.putBoolean(bounds + "Proximal High", getPositionProximal() > Bounds_Proxima[1]);
-            SmartDashboard.putBoolean(bounds + "Distal Low", getPositionDistal() < Bounds_Distal[0]);
-            SmartDashboard.putBoolean(bounds + "Distal High", getPositionDistal() > Bounds_Distal[1]);
-        }
+        // String bounds = "Arm Bounds/";
+        // boolean show_bounds = true;
+        // if(show_bounds){
+        //     SmartDashboard.putBoolean(bounds + "Proximal Low", getPositionProximal() < Bounds_Proxima[0]);
+        //     SmartDashboard.putBoolean(bounds + "Proximal High", getPositionProximal() > Bounds_Proxima[1]);
+        //     SmartDashboard.putBoolean(bounds + "Distal Low", getPositionDistal() < Bounds_Distal[0]);
+        //     SmartDashboard.putBoolean(bounds + "Distal High", getPositionDistal() > Bounds_Distal[1]);
+        // }
     }
     public void voltageMotors_SimpleFF(double controlVoltageProxima, double controlVoltageDistal){
         if(getPositionProximal() < Bounds_Proxima[0] && controlVoltageProxima < 0) controlVoltageProxima = 0;
