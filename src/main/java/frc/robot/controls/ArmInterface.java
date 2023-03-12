@@ -41,6 +41,8 @@ public class ArmInterface {
 
     public ArmMassControl ArmControl = new ArmMassControl(proximal, distal);
     public ArmKinematics Arm = new ArmKinematics(proximal, distal);
+    double proximal_kVG = 1.20;
+    double distal_kVG = 0.66;
 
     public ArmInterface(){
         boolean coasted = false;
@@ -364,8 +366,7 @@ public class ArmInterface {
         if(getPositionDistal() < Bounds_Distal[0] && controlVoltageDistal < 0) controlVoltageDistal = 0;
         if(getPositionDistal() > Bounds_Distal[1] && controlVoltageDistal > 0) controlVoltageDistal = 0;
 
-        double proximal_kVG = 1.20;
-        double distal_kVG = 0.66;
+        
 
         double voltage_ff_prox = Math.cos(getPositionProximal()) * proximal_kVG;
         double voltage_ff_dist = Math.cos(getPositionDistal()) * distal_kVG;

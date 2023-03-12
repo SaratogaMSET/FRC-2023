@@ -80,16 +80,17 @@ public class ArmSubsystem extends SubsystemBase {
         SimpleMatrix error = target.minus(state);
 
         double proxKp = 8.2;
-        double distKp = 6.5;
+        double distKp = 7.5;
 
         double proxKd = 0.01;
         double distKd = 0.01;
 
-        double proxKf = 1.30;
+        double proxKf = 0.90;
         double distKf = 1.30;
         double armTolerance = 0.03;
 
-        double maxVoltPerVelocity = 2.5;
+        double maxVoltPerVelocity = 3.0000254;
+        double max_voltage = 6.5;
 
         double voltageProximal = error.get(0) * proxKp + error.get(2) * proxKd;
         double voltageDistal = error.get(1) * distKp + error.get(3) * distKd;
@@ -123,7 +124,6 @@ public class ArmSubsystem extends SubsystemBase {
             voltageDistal = distKp * error.get(1);
         }
 
-        double max_voltage = 6.5;
         if(Math.abs(voltageProximal) > max_voltage){
             voltageProximal = Math.signum(voltageProximal) * max_voltage;
             System.out.println("Feedback Exceeds Proximal");
