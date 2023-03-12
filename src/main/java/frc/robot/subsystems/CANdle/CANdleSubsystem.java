@@ -17,11 +17,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.MathUtils;
 
 public class CANdleSubsystem extends SubsystemBase {
-    private static final CANdle candle1 = new CANdle(60);
-    private static final CANdle candle2 = new CANdle(61);
-    // private static final CANdle candle3 = new CANdle(62);
-    // private static final CANdle candle4 = new CANdle(63);
+    private static final CANdle candle1 = new CANdle(59);
+    private static final CANdle candle2 = new CANdle(60);
+    private static final CANdle candle3 = new CANdle(61);
+    private static final CANdle candle4 = new CANdle(62);
     public static final Color black = new Color(0, 0, 0);
+    public static Color color = new Color(0, 0, 0);
 
     // Game piece colors
     public static final Color yellow = new Color(242, 60, 0);
@@ -42,41 +43,40 @@ public class CANdleSubsystem extends SubsystemBase {
         candleConfiguration.vBatOutputMode = VBatOutputMode.Modulated;
         candle1.configAllSettings(candleConfiguration, 100);
         candle2.configAllSettings(candleConfiguration, 100);
-        // candle3.configAllSettings(candleConfiguration, 100);
-        // candle4.configAllSettings(candleConfiguration, 100);
-        setDefaultCommand(defaultCommand());
+        candle3.configAllSettings(candleConfiguration, 100);
+        candle4.configAllSettings(candleConfiguration, 100);
     }
 
     public void setColor(Color color){
-        // LEDSegment.FrontLeftStrip.setColor(color);
+        LEDSegment.FrontLeftStrip.setColor(color);
         LEDSegment.BackRightStrip.setColor(color);
         LEDSegment.FrontRightStrip.setColor(color);
-        // LEDSegment.BackLeftStrip.setColor(color);
+        LEDSegment.BackLeftStrip.setColor(color);
     }
     public void setBrightness(double percent) {
         candle1.configBrightnessScalar(percent, 100);
         candle2.configBrightnessScalar(percent, 100);
-        // candle3.configBrightnessScalar(percent, 100);
-        // candle4.configBrightnessScalar(percent, 100);
+        candle3.configBrightnessScalar(percent, 100);
+        candle4.configBrightnessScalar(percent, 100);
     }
 
-    public Command defaultCommand() {
-        return runOnce(() -> {
-            // LEDSegment.BatteryIndicator.fullClear();
-            // LEDSegment.PressureIndicator.fullClear();
-            // LEDSegment.MastEncoderIndicator.fullClear();
-            // LEDSegment.BoomEncoderIndicator.fullClear();
-            // LEDSegment.WristEncoderIndicator.fullClear();
+    // public Command defaultCommand() {
+    //     return runOnce(() -> {
+    //         // LEDSegment.BatteryIndicator.fullClear();
+    //         // LEDSegment.PressureIndicator.fullClear();
+    //         // LEDSegment.MastEncoderIndicator.fullClear();
+    //         // LEDSegment.BoomEncoderIndicator.fullClear();
+    //         // LEDSegment.WristEncoderIndicator.fullClear();
 
-            // LEDSegment.FrontLeftStrip.setColor(yellow);
-            LEDSegment.BackRightStrip.setColor(yellow);
-            LEDSegment.FrontRightStrip.setColor(yellow);
-            // LEDSegment.BackLeftStrip.setColor(yellow);
-            // LEDSegment.MainStrip.setColor(orange);
+    //         // LEDSegment.FrontLeftStrip.setColor(yellow);
+    //         LEDSegment.BackRightStrip.setColor(yellow);
+    //         LEDSegment.FrontRightStrip.setColor(yellow);
+    //         // LEDSegment.BackLeftStrip.setColor(yellow);
+    //         // LEDSegment.MainStrip.setColor(orange);
 
-            // runDefaultMainStripAnimation();
-        });
-    }
+    //         // runDefaultMainStripAnimation();
+    //     });
+    // }
 
     public Command clearSegmentCommand(LEDSegment segment) {
         return runOnce(() -> {
@@ -86,19 +86,21 @@ public class CANdleSubsystem extends SubsystemBase {
     }
 
     public Command indicateConeCommand() {
+        color = yellow;
         return buildSideStripCommand(() -> {
             LEDSegment.BackRightStrip.setColor(CANdleSubsystem.yellow);
-            // LEDSegment.BackLeftStrip.setColor(CANdleSubsystem.yellow);
-            // LEDSegment.FrontLeftStrip.setColor(CANdleSubsystem.yellow);
+            LEDSegment.BackLeftStrip.setColor(CANdleSubsystem.yellow);
+            LEDSegment.FrontLeftStrip.setColor(CANdleSubsystem.yellow);
             LEDSegment.FrontRightStrip.setColor(CANdleSubsystem.yellow);
         });
     }
 
     public Command indicateCubeCommand() {
+        color = purple;
         return buildSideStripCommand(() -> {
             LEDSegment.BackRightStrip.setColor(CANdleSubsystem.purple);
-            // LEDSegment.BackLeftStrip.setColor(CANdleSubsystem.purple);
-            // LEDSegment.FrontLeftStrip.setColor(CANdleSubsystem.purple);
+            LEDSegment.BackLeftStrip.setColor(CANdleSubsystem.purple);
+            LEDSegment.FrontLeftStrip.setColor(CANdleSubsystem.purple);
             LEDSegment.FrontRightStrip.setColor(CANdleSubsystem.purple);
         });
     }
@@ -123,10 +125,10 @@ public class CANdleSubsystem extends SubsystemBase {
     // }
 
     public static void runDefaultSideAnimation() {
-        LEDSegment.BackRightStrip.setFadeAnimation(CANdleSubsystem.black, 0.5);
-        // LEDSegment.BackLeftStrip.setFadeAnimation(CANdleSubsystem.black, 0.5);
-        // LEDSegment.FrontLeftStrip.setFadeAnimation(CANdleSubsystem.black, 0.5);
-        LEDSegment.FrontRightStrip.setFadeAnimation(CANdleSubsystem.black, 0.5);
+        LEDSegment.BackRightStrip.setFlowAnimation(CANdleSubsystem.green, 0.5);
+        LEDSegment.BackLeftStrip.setFlowAnimation(CANdleSubsystem.green, 0.5);
+        LEDSegment.FrontLeftStrip.setFlowAnimation(CANdleSubsystem.green, 0.5);
+        LEDSegment.FrontRightStrip.setFlowAnimation(CANdleSubsystem.green, 0.5);
     }
 
     // public static void runDefaultTopAnimation() {
@@ -143,13 +145,10 @@ public class CANdleSubsystem extends SubsystemBase {
         // WristEncoderIndicator(6, 1, -1),
         // DriverStationIndicator(7, 1, -1),
 
-        BackRightStrip(8, 29, 2), // Looking from back to front (arm faces back)
-        // BackTopStrip(62, 33, 3),
-        // BackLeftStrip(8, 29, 4),
-        // FrontLeftStrip(8, 29, 5),
-        // FrontTopStrip(203, 33, 6),
-        
-        FrontRightStrip(8, 29, 7);
+        BackRightStrip(8, 29, 2), 
+        FrontRightStrip(8, 29, 7),
+        BackLeftStrip(8, 29, 7),
+        FrontLeftStrip(8, 29, 3);
         // MainStrip(8, 296, 2);
 
         // 33 on top
@@ -169,15 +168,15 @@ public class CANdleSubsystem extends SubsystemBase {
             clearAnimation();
             candle1.setLEDs(color.red, color.green, color.blue, 0, startIndex, segmentSize);
             candle2.setLEDs(color.red, color.green, color.blue, 0, startIndex, segmentSize);
-            // candle3.setLEDs(color.red, color.green, color.blue, 0, startIndex, segmentSize);
-            // candle4.setLEDs(color.red, color.green, color.blue, 0, startIndex, segmentSize);
+            candle3.setLEDs(color.red, color.green, color.blue, 0, startIndex, segmentSize);
+            candle4.setLEDs(color.red, color.green, color.blue, 0, startIndex, segmentSize);
         }
 
         private void setAnimation(Animation animation) {
             candle1.animate(animation, animationSlot);
             candle2.animate(animation, animationSlot);
-            // candle3.animate(animation, animationSlot);
-            // candle4.animate(animation, animationSlot);
+            candle3.animate(animation, animationSlot);
+            candle4.animate(animation, animationSlot);
         }
 
         public void fullClear() {
@@ -188,8 +187,8 @@ public class CANdleSubsystem extends SubsystemBase {
         public void clearAnimation() {
             candle1.clearAnimation(animationSlot);
             candle2.clearAnimation(animationSlot);
-            // candle3.clearAnimation(animationSlot);
-            // candle4.clearAnimation(animationSlot);
+            candle3.clearAnimation(animationSlot);
+            candle4.clearAnimation(animationSlot);
         }
 
         public void disableLEDs() {
