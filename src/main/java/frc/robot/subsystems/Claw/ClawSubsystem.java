@@ -12,7 +12,7 @@ import frc.robot.LoggedTunableNumber;
 
 public class ClawSubsystem extends SubsystemBase {
   // public static ColorSensorV3 colorSensor;
-  public ClawIO io;
+  public ClawIOSparkMax io;
   public ClawIOInputsAutoLogged inputs = new ClawIOInputsAutoLogged();
   public static double TARGET_VELOCITY = 0.2;
   public static final int INTAKE_DISTANCE_THRESHOLD = 50;
@@ -29,7 +29,7 @@ public class ClawSubsystem extends SubsystemBase {
   }
 
   /** Creates a new ExampleSubsystem. */
-  public ClawSubsystem(ClawIO io) {
+  public ClawSubsystem(ClawIOSparkMax io) {
     this.io = io;
   }
 
@@ -44,7 +44,9 @@ public class ClawSubsystem extends SubsystemBase {
   public void closeIntake() {
     io.closeIntake();
   }
-
+  public void autoCloseIntake(){
+    io.autoCloseIntake();
+  }
   public void closeIntake(ClawSubsystem.Objects object){
     io.closeIntake(object);
   }
