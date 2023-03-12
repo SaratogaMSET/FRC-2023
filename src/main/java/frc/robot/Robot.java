@@ -13,7 +13,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Claw.ClawIOSparkMax;
@@ -94,9 +93,11 @@ public class Robot extends LoggedRobot {
     // and running subsystem periodic() methods. This must be called from the
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
+    m_robotContainer.updateRobotState();
+    // m_claw.closeIntake();
     CommandScheduler.getInstance().run();
     // m_intakeSubsystem.runIntake(m_controller.getLeftY());
-    // m_claw.closeIntake();
+  
     // new Trigger(m_controller::getRightBumper).whileTrue(new IntakeCommand(m_claw, Direction.CLOSE));
     // new Trigger(m_controller::getRightBumper).whileFalse(new IntakeCommand(m_claw, Direction.OPEN));
     // SmartDashboard.putNumber("Proximity", ClawIOSparkMax.colorSensor.getProximity());

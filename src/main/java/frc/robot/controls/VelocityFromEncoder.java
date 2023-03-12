@@ -1,6 +1,5 @@
 package frc.robot.controls;
 
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 
 public class VelocityFromEncoder {
