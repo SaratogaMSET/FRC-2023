@@ -76,6 +76,7 @@ public final class Constants {
         public static final double kPThetaControllerTrajectory = 0.39 * 1.75 * 2 * 1.2; // 0.39 * 2
         public static final double kDThetaControllerTrajectory = 0.004;
         public static final double balanceKP = 0.7;
+        public static final double balanceKD = 0.7;
         public static final double balanceGoalDegrees = 0;
         public static final double balanceThresholdDegrees = 1;
         public static final double balanceBackwardsMultiplier = 3.4;
@@ -209,7 +210,7 @@ public final class Constants {
         public static final int INTAKE_MOTOR = 20;
         public static final double GEAR_RATIO = 1 / 20.0;
         public static final int HALL_EFFECT = 0;
-        public static final double TARGET_VELOCITY = 0.1;       //beverly changed for testing
+        public static final double TARGET_VELOCITY = 0.25;       //beverly changed for testing
         public static final int INTAKE_DISTANCE_THRESHOLD = 50;
         public static final double TORQUE_CONSTANT = 0.01042;
         public static final double RESISTANCE = 12 / (11000 * 2 * 3.14159265 / 60);
@@ -217,8 +218,8 @@ public final class Constants {
         public static final double TORQUE_THRESHOLD = 100;      //beverly changed for testing
         public static final double CLOSING_TORQUE_THRESHOLD = 25;        //beverly changed for testing
         public static final double LOWER_BOUND = -2.5;
-        public static final double CUBE_MEDIUM_BOUND = 10;
-        public static final double CONE_MEDIUM_BOUND = 4.6;     // TODO: Tune value
+        public static final double CUBE_MEDIUM_BOUND = 25;
+        public static final double CONE_MEDIUM_BOUND = 56.4;     // TODO: Tune value
         public static final double UPPER_BOUND = 5;
         public static final double HOLD_VOLTAGE = TARGET_VOLTAGE / 10;
         public static final double AUTO_CONE_DIAMETER = 0.0;

@@ -16,7 +16,7 @@ import frc.robot.subsystems.Claw.ClawSubsystem.Objects;
 public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
     private double[] proximityBuffer = new double[3];
     private int bufferIndex = 0;
-    private double cubeBlueTheshold = 0.2;
+    private double cubeBlueTheshold = 0.27;
     private Objects objectState = Objects.None;
     private Color currentColor;
     boolean previousHallEffect = false;
@@ -39,7 +39,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
 
     public void openIntake() {
         updateIntake();
-        double velocitySetpoint = getHallEffect() || ClawConfig.encoder.getPosition() <= -3.5 ? 0.0
+        double velocitySetpoint = getHallEffect()|| ClawConfig.encoder.getPosition() <= -42 ? 0.0
                 : -Constants.IntakeConstants.TARGET_VELOCITY;
         SmartDashboard.putNumber("Target velocity", velocitySetpoint);
         ClawConfig.motor.set(velocitySetpoint);
@@ -64,11 +64,44 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
     }
 
     private boolean objectInRange() {
-        return proximityValue() > 35;
+        return proximityValue() > 65;
     }
 
     private void resetEncoder() {
         ClawConfig.encoder.setPosition(0);
+    }
+
+    public void autoCloseIntake(){
+        if(objectInRange()){
+        if (!getHallEffect() && previousHallEffect) { 
+            resetEncoder();
+        }
+        previousHallEffect = getHallEffect();
+        double encoderPosition = ClawConfig.encoder.getPosition();
+            if(getObject() == Objects.Cube){
+                if(encoderPosition > IntakeConstants.CUBE_MEDIUM_BOUND){
+                    ClawConfig.motor.set(0.0);
+                }
+                else{
+                    ClawConfig.motor.set(IntakeConstants.TARGET_VELOCITY);
+                }
+            
+             }
+            else if(getObject() == Objects.Cone){
+                if(encoderPosition > IntakeConstants.CONE_MEDIUM_BOUND){
+                    ClawConfig.motor.set(0.0);
+                }
+                else{
+                    ClawConfig.motor.set(IntakeConstants.TARGET_VELOCITY);
+                }
+            }
+            else{
+                ClawConfig.motor.set(IntakeConstants.TARGET_VELOCITY);
+            }
+            SmartDashboard.putBoolean("is object cube", getObject() == Objects.Cube);
+            SmartDashboard.putBoolean("cube bound", encoderPosition > IntakeConstants.CUBE_MEDIUM_BOUND);
+        }
+       
     }
 
     public void manualCloseIntake(){
@@ -78,11 +111,11 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
         }
         previousHallEffect = getHallEffect();
         double encoderPosition = ClawConfig.encoder.getPosition();
-        if(encoderPosition > IntakeConstants.CONE_MEDIUM_BOUND){
+        if(encoderPosition > 50){
             ClawConfig.motor.set(0.0);
         }
         else
-            ClawConfig.motor.set(IntakeConstants.TARGET_VELOCITY);
+            ClawConfig.motor.set(0.25);
     }
 
     public boolean getHallEffect() {
@@ -98,6 +131,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
             else
                 return Objects.Cone;
         } catch (NullPointerException e) {
+            System.out.println("yikes");
         }
         return Objects.None;
     }
@@ -111,7 +145,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
         SmartDashboard.putNumber("Green value", colorSensor.getGreen());
         SmartDashboard.putNumber("Blue value", colorSensor.getBlue());
         SmartDashboard.putBoolean("Hall Effect", getHallEffect());
-        SmartDashboard.putString("Object", objectState.toString());
+        SmartDashboard.putString("Object", getObject().toString());
         SmartDashboard.putBoolean("Object in range", objectInRange());
     }
 
