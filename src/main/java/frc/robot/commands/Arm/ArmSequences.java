@@ -3,9 +3,12 @@ package frc.robot.commands.Arm;
 import java.util.function.IntSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
+import frc.robot.commands.Claw.ManualOpenIntake;
 import frc.robot.subsystems.Arm.ArmSubsystem;
+import frc.robot.subsystems.Claw.ClawIOSparkMax;
 
 public class ArmSequences{
 
@@ -63,9 +66,9 @@ public class ArmSequences{
     public static ArmPositionCommand ready(ArmSubsystem armSubsystem, int side){
         ArmPositionCommand ready;
         if(side > 0){
-            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
+            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, true);
         }else{
-            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, true);
         }
 
         return ready;
@@ -116,7 +119,7 @@ public class ArmSequences{
         return ready.andThen(score).andThen(zero);
     }
 
-    public static SequentialCommandGroup scoreCubeHighNoRetract(ArmSubsystem armSubsystem, int side){
+    public static SequentialCommandGroup scoreCubeHighNoRetract(ArmSubsystem armSubsystem, ClawIOSparkMax m_clawSubsystem,int side){
         ArmPositionCommand ready;
         ArmPositionCommand score;
         if(side > 0){
@@ -126,9 +129,10 @@ public class ArmSequences{
             ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
             score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcube_score_x, Constants.ArmNodeDictionary.ready_highcube_score_y);
         }
-        ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
+        // ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
+        RunCommand openIntake = new RunCommand(()-> m_clawSubsystem.autoCloseIntake());
 
-        return ready.andThen(score);
+        return ready.andThen(score).andThen(openIntake);
     }
 
     public static SequentialCommandGroup scoreConeMid(ArmSubsystem armSubsystem, int side){
@@ -159,5 +163,21 @@ public class ArmSequences{
         ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
 
         return ready.andThen(score).andThen(zero);
+    }
+
+    public static SequentialCommandGroup scoreConeHighNoRetract(ArmSubsystem armSubsystem, ClawIOSparkMax m_clawSubsystem ,int side){
+        ArmPositionCommand ready;
+        ArmPositionCommand score;
+        if(side > 0){
+            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
+            score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y);
+        }else{
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
+            score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y);
+        }
+        // ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
+        RunCommand openIntake = new RunCommand(()-> m_clawSubsystem.autoCloseIntake());
+
+        return ready.andThen(score).andThen(openIntake);
     }
 }

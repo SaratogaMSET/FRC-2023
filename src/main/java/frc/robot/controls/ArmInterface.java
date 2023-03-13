@@ -351,14 +351,14 @@ public class ArmInterface {
         //     SmartDashboard.putBoolean(kinematics + inverse + "Q2", Math.abs(Q[1] - getPositionDistal()) < 0.001);
         // }
 
-        // String bounds = "Arm Bounds/";
-        // boolean show_bounds = true;
-        // if(show_bounds){
-        //     SmartDashboard.putBoolean(bounds + "Proximal Low", getPositionProximal() < Bounds_Proxima[0]);
-        //     SmartDashboard.putBoolean(bounds + "Proximal High", getPositionProximal() > Bounds_Proxima[1]);
-        //     SmartDashboard.putBoolean(bounds + "Distal Low", getPositionDistal() < Bounds_Distal[0]);
-        //     SmartDashboard.putBoolean(bounds + "Distal High", getPositionDistal() > Bounds_Distal[1]);
-        // }
+        String bounds = "Arm Bounds/";
+        boolean show_bounds = true;
+        if(show_bounds){
+            SmartDashboard.putBoolean(bounds + "Proximal Low", getPositionProximal() < Bounds_Proxima[0]);
+            SmartDashboard.putBoolean(bounds + "Proximal High", getPositionProximal() > Bounds_Proxima[1]);
+            SmartDashboard.putBoolean(bounds + "Distal Low", getPositionDistal() < Bounds_Distal[0]);
+            SmartDashboard.putBoolean(bounds + "Distal High", getPositionDistal() > Bounds_Distal[1]);
+        }
     }
     public void voltageMotors_SimpleFF(double controlVoltageProxima, double controlVoltageDistal){
         if(getPositionProximal() < Bounds_Proxima[0] && controlVoltageProxima < 0) controlVoltageProxima = 0;

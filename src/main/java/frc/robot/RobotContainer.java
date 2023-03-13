@@ -87,11 +87,11 @@ public class RobotContainer {
           Math.hypot(Drivetrain.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, Drivetrain.DRIVETRAIN_WHEELBASE_METERS / 2.0);
 
   public HashMap<String, Command> eventMap = new HashMap<>(Map.ofEntries(
-    Map.entry("Score Cone High Backwards", ArmSequences.scoreCubeHighNoRetract(m_armSubsystem, 1)),
+    Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetract(m_armSubsystem, m_claw, 1)),
     Map.entry("Arm Neutral", new ArmZeroCommand(m_armSubsystem)),
     Map.entry("Intake Front", ArmSequences.autonGroundIntake(m_armSubsystem, 0)), 
     Map.entry("Arm Ready", ArmSequences.ready(m_armSubsystem, 1)),
-    Map.entry("Score Cube High Backwards", ArmSequences.scoreCubeHighNoRetract(m_armSubsystem, 1)),
+    Map.entry("Score Cube High Backwards", ArmSequences.scoreCubeHighNoRetract(m_armSubsystem, m_claw,1)),
     Map.entry("Arm Neutral Command", new ArmZeroCommand(m_armSubsystem)),
     Map.entry("Balance", new BalanceCommand(m_drivetrainSubsystem))
     )
@@ -175,20 +175,24 @@ public class RobotContainer {
             m_drivetrainSubsystem,
             () -> modifyAxis(m_driverController.getLeftX()) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
             () -> modifyAxis(-m_driverController.getLeftY()) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> modifyAxis(-m_driverController.getRightX()) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+            () -> modifyAxis(-m_driverController.getRightX()/1.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
             
     ));
 
-    m_armSubsystem.setDefaultCommand(
-      new ArmVoltageCommand(
-        m_armSubsystem,
-        () -> modifyAxis(-modifyAxis(m_gunner1.getY() -0.5 * 1.5), 0.7),  //Axes are reverse with this setup, pushing up returns a negative number on both y axes
-        () -> modifyAxis(-modifyAxis(m_gunner2.getY() -0.5 * 1.5, 0.7))
-      ));
+    // m_armSubsystem.setDefaultCommand(
+    //   new ArmVoltageCommand(
+    //     m_armSubsystem,
+    //     () -> modifyAxis(-modifyAxis(m_gunner1.getY() -0.5 * 1.5), 0.7),  //Axes are reverse with this setup, pushing up returns a negative number on both y axes
+    //     () -> modifyAxis(-modifyAxis(m_gunner2.getY() -0.5 * 1.5, 0.7))
+    //   ));
 
     m_claw.setDefaultCommand(new InstantCommand(() -> m_claw.setIdle(), m_claw));
-    m_driverController.rightTrigger().whileTrue(new RunCommand(() -> m_claw.manualCloseIntake(), m_claw));
+    m_driverController.rightTrigger().toggleOnTrue(new RunCommand(() -> m_claw.autoCloseIntake(), m_claw));
     m_driverController.leftTrigger().whileTrue(new RunCommand(() -> m_claw.openIntake(), m_claw));
+    
+    m_gunner1.button(6).whileTrue(new RunCommand(() -> m_claw.manualCloseIntake(), m_claw));
+    m_gunner1.button(4).whileTrue(new RunCommand(() -> m_claw.openIntake(), m_claw));
+    
 
 
     // m_driverController.y().onTrue(new SequentialCommandGroup(
@@ -197,17 +201,20 @@ public class RobotContainer {
     //   new AlignToCone(m_drivetrainSubsystem, m_visionSubsystem)
     // ));
     m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
+
     m_gunner1.button(2).onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
-    m_driverController.leftBumper().whileTrue(
+
+    m_driverController.x().toggleOnTrue(
       new DefaultDriveCommand(
             m_drivetrainSubsystem,
-            () -> modifyAxis(m_driverController.getLeftX()/2.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> modifyAxis(-m_driverController.getLeftY()/2.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> modifyAxis(-m_driverController.getRightX()/2.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND     
+            () -> modifyAxis(m_driverController.getLeftX()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(-m_driverController.getLeftY()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(-m_driverController.getRightX()/1.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND     
     ));
+    
     m_driverController.b().onTrue(new BalanceCommand(m_drivetrainSubsystem));
 
-    m_gunner1.button(1).whileTrue(m_ledSubsystem.indicateActiveSide());
+    m_gunner1.button(1).toggleOnTrue(m_ledSubsystem.indicateActiveSide());
     m_gunner1.button(3).onTrue(m_ledSubsystem.indicateCubeCommand());
     m_gunner1.button(5).onTrue(m_ledSubsystem.indicateConeCommand());
    
@@ -219,9 +226,9 @@ public class RobotContainer {
       () -> modifyAxis(-m_driverController.getLeftY()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND
     ));
 
-    m_driverController.rightBumper().onTrue(ArmSequences.ready(m_armSubsystem, 0)); 
-    m_driverController.rightBumper().and(m_gunner1.button(1)).onTrue(ArmSequences.ready(m_armSubsystem, 1)); 
-    m_driverController.rightBumper().onFalse(new ArmZeroCommand(m_armSubsystem)); //neutral
+    m_driverController.rightBumper().toggleOnTrue(ArmSequences.ready(m_armSubsystem, 0)); 
+    m_driverController.rightBumper().and(m_gunner1.button(1)).toggleOnTrue(ArmSequences.ready(m_armSubsystem, 1)); 
+    m_driverController.leftBumper().onTrue(new ArmZeroCommand(m_armSubsystem)); //neutral
 
     // m_gunner1.button(3).onTrue(new ToggleArmSide(m_armSubsystem));
    
@@ -239,6 +246,9 @@ public class RobotContainer {
 
     m_gunner1.button(11).onTrue(ArmSequences.lowScore(m_armSubsystem, 0)); 
     m_gunner1.button(11).and(m_gunner1.button(1)).onTrue(ArmSequences.lowScore(m_armSubsystem, 1));
+
+    m_gunner1.button(12).onTrue(ArmSequences.groundIntake(m_armSubsystem, 0)); 
+    m_gunner1.button(12).and(m_gunner1.button(1)).onTrue(ArmSequences.groundIntake(m_armSubsystem, 1));
   }
 
   private static double deadband(double value, double deadband) {
