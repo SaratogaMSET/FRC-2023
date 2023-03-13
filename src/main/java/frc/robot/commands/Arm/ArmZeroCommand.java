@@ -24,12 +24,12 @@ public class ArmZeroCommand extends CommandBase{
 
     @Override
     public boolean isFinished(){
-        double prox_err = armSubsystem.armInterface.getPositionProximal() - Math.PI/2;
-        double dist_err = armSubsystem.armInterface.getPositionDistal() + Math.PI/2;
-        double tolerance = 0.03;
-        if(Math.abs(prox_err) < tolerance && Math.abs(dist_err) < tolerance){
-            return true;
-        }
+        // double prox_err = armSubsystem.armInterface.getPositionProximal() - Math.PI/2;
+        // double dist_err = armSubsystem.armInterface.getPositionDistal() + Math.PI/2;
+        // double tolerance = 0.03;
+        // if(Math.abs(prox_err) < tolerance && Math.abs(dist_err) < tolerance){
+        //     return true;
+        // }
         return false;
     }
 }

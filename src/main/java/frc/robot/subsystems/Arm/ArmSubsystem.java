@@ -72,24 +72,40 @@ public class ArmSubsystem extends SubsystemBase {
 
     //     voltageMotors(voltageProximal, voltageDistal);
     // }
+    double distKvelocity = 0.2;
+    public void distalVelocityToPoint(double target_velocity, double target_distal){
+        double current_velocity = armInterface.getVelocityDistal();
+        double current_position = armInterface.getPositionDistal();
+
+        
+        if(Math.signum(target_distal - current_position) == Math.signum(target_velocity)){
+            double error_proximal = Math.PI/2 - armInterface.getPositionProximal();
+            double error_distal_v = target_velocity - current_velocity;
+            armInterface.voltageMotors_SimpleFF(error_proximal * proxKp, error_distal_v * distKvelocity + Math.signum(target_velocity) * distKf);
+        }else{
+            double error_proximal = Math.PI/2 - armInterface.getPositionProximal();
+            armInterface.voltageMotors_SimpleFF(error_proximal * proxKp, 0);
+        }
+
+    }
+
+    double proxKp = 8.2;
+    double distKp = 7.5;
+
+    double proxKd = 0.01;
+    double distKd = 0.01;
+
+    double proxKf = 0.90;
+    double distKf = 1.30;
+    double armTolerance = 0.03;
+
+    double maxVoltPerVelocity = 3.0000254;
+    double max_voltage = 6.5;
     public void PIDtoAngles(double target_proximal, double target_distal){
         SimpleMatrix target = new SimpleMatrix(new double[][]{{target_proximal}, {target_distal}, {0}, {0}});
         SimpleMatrix state = armInterface.state();
 
         SimpleMatrix error = target.minus(state);
-
-        double proxKp = 8.2;
-        double distKp = 7.5;
-
-        double proxKd = 0.01;
-        double distKd = 0.01;
-
-        double proxKf = 0.90;
-        double distKf = 1.30;
-        double armTolerance = 0.03;
-
-        double maxVoltPerVelocity = 3.0000254;
-        double max_voltage = 6.5;
 
         double voltageProximal = error.get(0) * proxKp + error.get(2) * proxKd;
         double voltageDistal = error.get(1) * distKp + error.get(3) * distKd;

@@ -7,7 +7,7 @@ public class ArmPositionCommand extends CommandBase{
     private final ArmSubsystem armSubsystem;
     private double tX;
     private double tY;
-    private boolean hold = false;
+    private boolean hold = true;
     public ArmPositionCommand(ArmSubsystem armSubsystem, double tX, double tY){
         this.armSubsystem = armSubsystem;
         this.tX = tX;
@@ -30,6 +30,9 @@ public class ArmPositionCommand extends CommandBase{
 
     @Override
     public boolean isFinished(){
+        if(hold){
+            return false;
+        }
         double x_err = tX - armSubsystem.forwardKinematics()[0];
         double y_err = tY - armSubsystem.forwardKinematics()[1];
         double tolerance = 0.03;
@@ -40,5 +43,12 @@ public class ArmPositionCommand extends CommandBase{
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void end(boolean interrupted){
+        if(!interrupted){
+            armSubsystem.voltageMotors(0, 0);
+        }
     }
 }
