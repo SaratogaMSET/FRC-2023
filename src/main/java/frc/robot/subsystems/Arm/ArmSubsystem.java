@@ -9,6 +9,7 @@ import frc.robot.controls.ArmInterface;
 public class ArmSubsystem extends SubsystemBase {
     int side = 0;
     public ArmInterface armInterface = new ArmInterface();
+    public ArmVisualizer armVisualizer = new ArmVisualizer("/Arm", null);
     public ArmSubsystem() {
         armInterface.resetMotorEncoders();
     }
@@ -141,6 +142,7 @@ public class ArmSubsystem extends SubsystemBase {
     public void periodic() {
         updateState();
         SmartDashboard.putNumber("Side", side);
+        armVisualizer.update(armInterface.getPositionProximal(), armInterface.getPositionDistal());
     }
 
 @Override
