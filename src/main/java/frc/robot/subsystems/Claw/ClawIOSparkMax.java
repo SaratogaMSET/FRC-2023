@@ -39,7 +39,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
 
     public void openIntake() {
         updateIntake();
-        double velocitySetpoint = getHallEffect() || ClawConfig.encoder.getPosition() <= -65.7 ? 0.0
+        double velocitySetpoint = getHallEffect()|| ClawConfig.encoder.getPosition() <= -42 ? 0.0
                 : -Constants.IntakeConstants.TARGET_VELOCITY;
         SmartDashboard.putNumber("Target velocity", velocitySetpoint);
         ClawConfig.motor.set(velocitySetpoint);
@@ -79,19 +79,29 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
         previousHallEffect = getHallEffect();
         double encoderPosition = ClawConfig.encoder.getPosition();
             if(getObject() == Objects.Cube){
-            if(encoderPosition > IntakeConstants.CUBE_MEDIUM_BOUND){
-                ClawConfig.motor.set(0.0);
-            }
+                if(encoderPosition > IntakeConstants.CUBE_MEDIUM_BOUND){
+                    ClawConfig.motor.set(0.0);
+                }
+                else{
+                    ClawConfig.motor.set(IntakeConstants.TARGET_VELOCITY);
+                }
+            
              }
             else if(getObject() == Objects.Cone){
                 if(encoderPosition > IntakeConstants.CONE_MEDIUM_BOUND){
                     ClawConfig.motor.set(0.0);
                 }
+                else{
+                    ClawConfig.motor.set(IntakeConstants.TARGET_VELOCITY);
+                }
             }
             else{
                 ClawConfig.motor.set(IntakeConstants.TARGET_VELOCITY);
             }
+            SmartDashboard.putBoolean("is object cube", getObject() == Objects.Cube);
+            SmartDashboard.putBoolean("cube bound", encoderPosition > IntakeConstants.CUBE_MEDIUM_BOUND);
         }
+       
     }
 
     public void manualCloseIntake(){
@@ -101,11 +111,11 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
         }
         previousHallEffect = getHallEffect();
         double encoderPosition = ClawConfig.encoder.getPosition();
-        if(encoderPosition > IntakeConstants.CONE_MEDIUM_BOUND){
+        if(encoderPosition > 50){
             ClawConfig.motor.set(0.0);
         }
         else
-            ClawConfig.motor.set(IntakeConstants.TARGET_VELOCITY);
+            ClawConfig.motor.set(0.25);
     }
 
     public boolean getHallEffect() {
