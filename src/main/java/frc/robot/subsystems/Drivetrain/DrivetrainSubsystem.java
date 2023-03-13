@@ -109,7 +109,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         // chassisSpeeds.vxMetersPerSecond += IpD * omega * (Math.cos(theta)*Math.cos(deltaTheta) - Math.sin(theta)*Math.sin(deltaTheta));
         // chassisSpeeds.vyMetersPerSecond += IpD * omega * (Math.sin(theta)*Math.cos(deltaTheta) + Math.cos(theta)*Math.sin(deltaTheta));
         
-        chassisSpeeds = driftCorrection(chassisSpeeds);
+        // chassisSpeeds = driftCorrection(chassisSpeeds);
         m_chassisSpeeds = chassisSpeeds;
       }    
 
