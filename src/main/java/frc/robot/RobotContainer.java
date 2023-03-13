@@ -187,7 +187,8 @@ public class RobotContainer {
       ));
 
     m_claw.setDefaultCommand(new InstantCommand(() -> m_claw.setIdle(), m_claw));
-    m_driverController.rightTrigger().whileTrue(new RunCommand(() -> m_claw.autoCloseIntake(), m_claw));
+    // m_claw.setDefaultCommand(new RunCommand(() -> m_claw.autoCloseIntake(), m_claw));
+    m_driverController.rightTrigger().whileTrue(new RunCommand(() -> m_claw.manualCloseIntake(), m_claw));
     m_driverController.leftTrigger().whileTrue(new RunCommand(() -> m_claw.openIntake(), m_claw));
 
 
