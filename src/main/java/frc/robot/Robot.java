@@ -49,7 +49,6 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     Logger.getInstance().recordMetadata("FRC-2023", "FRC-2023"); // Set a metadata value
-
     switch (Constants.currentMode) {
       case REAL:
         Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
@@ -72,6 +71,7 @@ public class Robot extends LoggedRobot {
     Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
     ctreConfigs = new CTREConfigs();
     m_robotContainer = new RobotContainer();
+    m_robotContainer.m_claw.setBrakeMode();
   }
 
   /**
@@ -106,6 +106,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
+    m_robotContainer.m_claw.setCoastMode();
   }
 
   @Override
@@ -118,6 +119,7 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void autonomousInit() {
+    m_robotContainer.m_claw.setBrakeMode();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -133,6 +135,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    m_robotContainer.m_claw.setBrakeMode();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove

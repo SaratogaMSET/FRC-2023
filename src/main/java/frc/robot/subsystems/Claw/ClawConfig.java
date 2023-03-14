@@ -9,13 +9,5 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants.IntakeConstants;
 
 public class ClawConfig {
-    public static DigitalInput HallEffect = new DigitalInput(IntakeConstants.HALL_EFFECT);
-    public static CANSparkMax motor = new CANSparkMax(IntakeConstants.INTAKE_MOTOR, MotorType.kBrushless);
-    public static RelativeEncoder encoder = motor.getEncoder();
-    public ClawConfig(){
-        motor.setIdleMode(IdleMode.kBrake);
-        encoder = motor.getEncoder();
-        encoder.setPositionConversionFactor(360.0 / 320 * 3);
-        encoder.setPosition(0);
-    }
+   
 }
