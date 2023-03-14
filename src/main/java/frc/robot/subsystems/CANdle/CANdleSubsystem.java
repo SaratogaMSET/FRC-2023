@@ -12,27 +12,33 @@ import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.SingleFadeAnimation;
 import com.ctre.phoenix.led.StrobeAnimation;
+
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.MathUtils;
 
 public class CANdleSubsystem extends SubsystemBase {
-    private static final CANdle candle1 = new CANdle(59);
-    private static final CANdle candle2 = new CANdle(60);
-    private static final CANdle candle3 = new CANdle(61);
-    private static final CANdle candle4 = new CANdle(62);
+    private static final CANdle candle1 = new CANdle(59); //Front Left
+    private static final CANdle candle2 = new CANdle(60); //Front Right
+    private static final CANdle candle3 = new CANdle(61); //Back Left
+    private static final CANdle candle4 = new CANdle(62); //Back Right
     public static final Color black = new Color(0, 0, 0);
-    public static Color color = new Color(0, 0, 0);
+
+   
 
     // Game piece colors
-    public static final Color yellow = new Color(242, 60, 0);
-    public static final Color purple = new Color(184, 0, 185);
+    private static final Color yellow = new Color(242, 60, 0);
+    private static final Color purple = new Color(184, 0, 185);
 
     // Indicator colors
-    public static final Color white = new Color(255, 230, 220);
-    public static final Color green = new Color(56, 209, 0);
-    public static final Color blue = new Color(8, 32, 255);
-    public static final Color red = new Color(227, 26, 0);
+    private static final Color white = new Color(255, 230, 220);
+    private static final Color green = new Color(56, 209, 0);
+    private static final Color blue = new Color(8, 32, 255);
+    private static final Color red = new Color(227, 26, 0);
+
+    private static Color color = blue;
 
     public CANdleSubsystem() {
         CANdleConfiguration candleConfiguration = new CANdleConfiguration();
@@ -86,29 +92,53 @@ public class CANdleSubsystem extends SubsystemBase {
     }
 
     public Command indicateConeCommand() {
-        color = yellow;
+        CANdleSubsystem.color = CANdleSubsystem.yellow;
+        System.out.println("Color set to yellow");
+        SmartDashboard.putNumber("Color On Cone Command Time", Timer.getFPGATimestamp());
+        LEDSegment.BackLeftStrip.clearAnimation();
+        LEDSegment.BackRightStrip.clearAnimation();
+        LEDSegment.BackRightStrip.clearAnimation();
+        LEDSegment.FrontLeftStrip.clearAnimation();
+        final Color newColor = new Color(CANdleSubsystem.color);
         return buildSideStripCommand(() -> {
-            LEDSegment.BackRightStrip.setColor(CANdleSubsystem.yellow);
-            LEDSegment.BackLeftStrip.setColor(CANdleSubsystem.yellow);
-            LEDSegment.FrontLeftStrip.setColor(CANdleSubsystem.yellow);
-            LEDSegment.FrontRightStrip.setColor(CANdleSubsystem.yellow);
+            
+            LEDSegment.BackRightStrip.setColor(newColor);
+            LEDSegment.BackLeftStrip.setColor(newColor);
+            LEDSegment.FrontLeftStrip.setFlowAnimation(newColor, 0.5);
+            LEDSegment.FrontRightStrip.setFlowAnimation(newColor, 0.5);
         });
     }
     public Command indicateActiveSide(){
-        return buildSideStripCommand(() -> {
-            LEDSegment.BackRightStrip.setFlowAnimation(CANdleSubsystem.color,0.5);
-            LEDSegment.BackLeftStrip.setFlowAnimation(CANdleSubsystem.color,0.5);
-            LEDSegment.FrontLeftStrip.setFlowAnimation(CANdleSubsystem.color,0.5);
-            LEDSegment.FrontRightStrip.setFlowAnimation(CANdleSubsystem.color,0.5);
-        });
+        LEDSegment.BackLeftStrip.clearAnimation();
+        LEDSegment.BackRightStrip.clearAnimation();
+        LEDSegment.BackRightStrip.clearAnimation();
+        LEDSegment.FrontLeftStrip.clearAnimation();
+            return buildSideStripCommand(() -> {
+            
+                LEDSegment.BackRightStrip.setFlowAnimation(blue,0.5);
+                LEDSegment.BackLeftStrip.setFlowAnimation(blue,0.5);
+                LEDSegment.FrontLeftStrip.setColor(blue);
+                LEDSegment.FrontRightStrip.setColor(blue);
+ 
+            });
     }
     public Command indicateCubeCommand() {
-        color = purple;
+        CANdleSubsystem.color = CANdleSubsystem.purple;
+        SmartDashboard.putNumber("Color On Cube Command Time", Timer.getFPGATimestamp());
+        LEDSegment.BackLeftStrip.clearAnimation();
+        LEDSegment.BackRightStrip.clearAnimation();
+        LEDSegment.BackRightStrip.clearAnimation();
+        LEDSegment.FrontLeftStrip.clearAnimation();
+        
+        final Color newColor = new Color(CANdleSubsystem.color);
         return buildSideStripCommand(() -> {
-            LEDSegment.BackRightStrip.setColor(CANdleSubsystem.purple);
-            LEDSegment.BackLeftStrip.setColor(CANdleSubsystem.purple);
-            LEDSegment.FrontLeftStrip.setColor(CANdleSubsystem.purple);
-            LEDSegment.FrontRightStrip.setColor(CANdleSubsystem.purple);
+            System.out.println("Set Color to purple");
+            SmartDashboard.putNumberArray("Color On Cube Command", new double[]{CANdleSubsystem.color.red, CANdleSubsystem.color.green, CANdleSubsystem.color.blue});
+            
+            LEDSegment.BackRightStrip.setColor(newColor);
+            LEDSegment.BackLeftStrip.setColor(newColor);
+            LEDSegment.FrontLeftStrip.setFlowAnimation(newColor, 0.5);
+            LEDSegment.FrontRightStrip.setFlowAnimation(newColor, 0.5);
         });
     }
 
@@ -132,10 +162,10 @@ public class CANdleSubsystem extends SubsystemBase {
     // }
 
     public static void runDefaultSideAnimation() {
-        LEDSegment.BackRightStrip.setFlowAnimation(CANdleSubsystem.green, 0.5);
-        LEDSegment.BackLeftStrip.setFlowAnimation(CANdleSubsystem.green, 0.5);
-        LEDSegment.FrontLeftStrip.setFlowAnimation(CANdleSubsystem.green, 0.5);
-        LEDSegment.FrontRightStrip.setFlowAnimation(CANdleSubsystem.green, 0.5);
+        LEDSegment.BackRightStrip.setColor(CANdleSubsystem.color);
+        LEDSegment.BackLeftStrip.setColor(CANdleSubsystem.color);
+        LEDSegment.FrontLeftStrip.setFlowAnimation(CANdleSubsystem.color, 0.5);
+        LEDSegment.FrontRightStrip.setFlowAnimation(CANdleSubsystem.color, 0.5);
     }
 
     // public static void runDefaultTopAnimation() {
@@ -151,39 +181,34 @@ public class CANdleSubsystem extends SubsystemBase {
         // BoomEncoderIndicator(5, 1, -1),
         // WristEncoderIndicator(6, 1, -1),
         // DriverStationIndicator(7, 1, -1),
-
-        BackRightStrip(8, 29, 2), 
-        FrontRightStrip(8, 29, 7),
-        BackLeftStrip(8, 29, 7),
-        FrontLeftStrip(8, 29, 3);
+        FrontLeftStrip(8, 30, 3, candle1),
+        FrontRightStrip(8, 30, 7, candle2),
+        BackLeftStrip(8, 30, 7, candle3),
+        BackRightStrip(8, 30, 2, candle4);
+        
+        
         // MainStrip(8, 296, 2);
 
-        // 33 on top
-        // 13 past on right side
         public final int startIndex;
         public final int segmentSize;
         public final int animationSlot;
-
+        public final CANdle candle;
         // private enum constructor
-        private LEDSegment(int startIndex, int segmentSize, int animationSlot) {
+        private LEDSegment(int startIndex, int segmentSize, int animationSlot, CANdle candle) {
             this.startIndex = startIndex;
             this.segmentSize = segmentSize;
             this.animationSlot = animationSlot;
+            this.candle = candle; 
         }
+
 
         public void setColor(Color color) {
             clearAnimation();
-            candle1.setLEDs(color.red, color.green, color.blue, 0, startIndex, segmentSize);
-            candle2.setLEDs(color.red, color.green, color.blue, 0, startIndex, segmentSize);
-            candle3.setLEDs(color.red, color.green, color.blue, 0, startIndex, segmentSize);
-            candle4.setLEDs(color.red, color.green, color.blue, 0, startIndex, segmentSize);
+            candle.setLEDs(color.red, color.green, color.blue, 0, startIndex, segmentSize);
         }
 
         private void setAnimation(Animation animation) {
-            candle1.animate(animation, animationSlot);
-            candle2.animate(animation, animationSlot);
-            candle3.animate(animation, animationSlot);
-            candle4.animate(animation, animationSlot);
+            candle.animate(animation, animationSlot);
         }
 
         public void fullClear() {
@@ -192,10 +217,7 @@ public class CANdleSubsystem extends SubsystemBase {
         }
 
         public void clearAnimation() {
-            candle1.clearAnimation(animationSlot);
-            candle2.clearAnimation(animationSlot);
-            candle3.clearAnimation(animationSlot);
-            candle4.clearAnimation(animationSlot);
+            candle.clearAnimation(animationSlot);
         }
 
         public void disableLEDs() {
@@ -237,6 +259,12 @@ public class CANdleSubsystem extends SubsystemBase {
             this.blue = blue;
         }
 
+        public Color(Color color){
+            this.red = color.red;
+            this.green = color.green;
+            this.blue = color.blue;
+        }
+
         /**
          * Highly imperfect way of dimming the LEDs. It does not maintain color or
          * accurately adjust perceived brightness.
@@ -251,5 +279,9 @@ public class CANdleSubsystem extends SubsystemBase {
 
             return new Color(newRed, newGreen, newBlue);
         }
+    }
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumberArray("Color", new double[]{color.red, color.green, color.blue});
     }
 }
