@@ -21,6 +21,8 @@ public class BalanceCommand extends CommandBase {
   private Rotation2d drivePitch;
   private Rotation2d driveRoll;
   private double currAngle;
+  private double prevError;
+  private double errorDT;
   private double ff;
   private double currAcc;
   private double currentAngularVelocity;
@@ -45,13 +47,14 @@ public class BalanceCommand extends CommandBase {
     LinearFilter xAccelFilter = LinearFilter.movingAverage(5);
     currAcc = m_DriveSubsystem.m_navx.getWorldLinearAccelX();
     currAcc = xAccelFilter.calculate(currAcc);
-    currAcc = 180*Math.asin(currAcc/9.81)/Math.PI;
+    currAcc = 180 * Math.asin(currAcc/9.81)/Math.PI;
     ff = Constants.Drivetrain.balanceKS * currAngle + Constants.Drivetrain.balanceKV*currentAngularVelocity + Constants.Drivetrain.balanceKA * currAcc;
 
     this.currentAngle = driveRoll.getRadians() * driveYaw.getSin() - drivePitch.getRadians() * driveYaw.getCos();
-
+    
+    errorDT = (error - prevError)/0.02;
     error = Constants.Drivetrain.balanceGoalDegrees - currentAngle;
-    drivePower = -(Math.min(Constants.Drivetrain.balanceKP * error, 1) + ff);
+    drivePower = -(Math.min(Constants.Drivetrain.balanceKP * error + Constants.Drivetrain.balanceKD + errorDT , 1) + ff);
 
     //Robot might need an extra push when going up backwards
     if (drivePower < 0) {
@@ -68,9 +71,10 @@ public class BalanceCommand extends CommandBase {
       driveYaw));
     
     // Debugging Print Statments
-  SmartDashboard.putNumber("Current Angle: ", currentAngle);
-  SmartDashboard.putNumber("Error " ,error);
-  SmartDashboard.putNumber("Drive Power: " , drivePower);
+    SmartDashboard.putNumber("Current Angle: ", currentAngle);
+    SmartDashboard.putNumber("Error " ,error);
+    SmartDashboard.putNumber("Drive Power: " , drivePower);
+    prevError = error;
   }
 
   // Called once the command ends or is interrupted.
