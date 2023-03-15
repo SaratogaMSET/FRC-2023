@@ -35,7 +35,7 @@ public class ArmInterface {
 
     private final double[] Bounds_Proxima = new double[]{Constants.ArmParameters.proximal_lowbound, Constants.ArmParameters.proximal_highbound};
     private final double[] Bounds_Distal = new double[]{Constants.ArmParameters.distal_lowbound, Constants.ArmParameters.distal_highbound};
-
+    public final double[][] Bounds = {Bounds_Proxima, Bounds_Distal};
     Joint proximal = new Joint(Constants.ArmParameters.proximal_length, Constants.ArmParameters.proximal_mass, Constants.ArmParameters.proximal_inertia, Constants.ArmParameters.proximal_com);
     Joint distal = new Joint(Constants.ArmParameters.distal_length, Constants.ArmParameters.distal_mass, Constants.ArmParameters.distal_inertia, Constants.ArmParameters.distal_com);
 
@@ -241,26 +241,26 @@ public class ArmInterface {
 
     public void showState(){
         double radians_to_degrees = 180 / Math.PI;
-        String raw_values = "Arm Raw Encoders/";
-        boolean show_raw_values = false;
-        if(show_raw_values){
-            SmartDashboard.putNumber(raw_values + "Proximal Left", Encoder_Proximal_Left.getAbsolutePosition()/360);
-            SmartDashboard.putNumber(raw_values + "Proximal Right", Encoder_Proximal_Right.getAbsolutePosition()/360);
-            SmartDashboard.putNumber(raw_values + "Distal Left", Encoder_Distal_Left.getAbsolutePosition()/360);
-            SmartDashboard.putNumber(raw_values + "Distal Right", Encoder_Distal_Right.getAbsolutePosition()/360);
-        }
+        // String raw_values = "Arm Raw Encoders/";
+        // boolean show_raw_values = false;
+        // if(show_raw_values){
+        //     SmartDashboard.putNumber(raw_values + "Proximal Left", Encoder_Proximal_Left.getAbsolutePosition()/360);
+        //     SmartDashboard.putNumber(raw_values + "Proximal Right", Encoder_Proximal_Right.getAbsolutePosition()/360);
+        //     SmartDashboard.putNumber(raw_values + "Distal Left", Encoder_Distal_Left.getAbsolutePosition()/360);
+        //     SmartDashboard.putNumber(raw_values + "Distal Right", Encoder_Distal_Right.getAbsolutePosition()/360);
+        // }
 
-        String encoder_values = "Arm External Encoders/";
-        boolean show_encoder_values = true;
-        if(show_encoder_values){
-            SmartDashboard.putNumber(encoder_values + "Proximal Left", getEncoderProximalLeft() * radians_to_degrees);
-            SmartDashboard.putNumber(encoder_values + "Proximal Right", getEncoderProximalRight() * radians_to_degrees);
-            SmartDashboard.putNumber(encoder_values + "Distal Left", getEncoderDistalLeft() * radians_to_degrees);
-            SmartDashboard.putNumber(encoder_values + "Distal Right", getEncoderDistalRight() * radians_to_degrees);
-        }
+        // String encoder_values = "Arm External Encoders/";
+        // boolean show_encoder_values = true;
+        // if(show_encoder_values){
+        //     SmartDashboard.putNumber(encoder_values + "Proximal Left", getEncoderProximalLeft() * radians_to_degrees);
+        //     SmartDashboard.putNumber(encoder_values + "Proximal Right", getEncoderProximalRight() * radians_to_degrees);
+        //     SmartDashboard.putNumber(encoder_values + "Distal Left", getEncoderDistalLeft() * radians_to_degrees);
+        //     SmartDashboard.putNumber(encoder_values + "Distal Right", getEncoderDistalRight() * radians_to_degrees);
+        // }
 
         String motor_encoder_values = "Arm Motor Encoders/";
-        boolean show_motor_encoder_values = true;
+        boolean show_motor_encoder_values = false;
         if(show_motor_encoder_values){
             SmartDashboard.putNumber(motor_encoder_values + "Proximal Left", getMotorEncoderProximalLeft() * radians_to_degrees);
             SmartDashboard.putNumber(motor_encoder_values + "Proximal Right", getMotorEncoderProximalRight() * radians_to_degrees);
@@ -268,23 +268,23 @@ public class ArmInterface {
             SmartDashboard.putNumber(motor_encoder_values + "Distal Right", getMotorEncoderDistalRight() * radians_to_degrees);
         }
 
-        String encoder_velocity_values = "Arm External Encoder Velocities/";
-        boolean show_encoder_velocity_values = false;
-        if(show_encoder_velocity_values){
-            SmartDashboard.putNumber(encoder_velocity_values + "Proximal Left", getEncoderVProximalLeft() * radians_to_degrees);
-            SmartDashboard.putNumber(encoder_velocity_values + "Proximal Right", getEncoderVProximalRight() * radians_to_degrees);
-            SmartDashboard.putNumber(encoder_velocity_values + "Distal Left", getEncoderVDistalLeft() * radians_to_degrees);
-            SmartDashboard.putNumber(encoder_velocity_values + "Distal Right", getEncoderVDistalRight() * radians_to_degrees);
-        }
+        // String encoder_velocity_values = "Arm External Encoder Velocities/";
+        // boolean show_encoder_velocity_values = false;
+        // if(show_encoder_velocity_values){
+        //     SmartDashboard.putNumber(encoder_velocity_values + "Proximal Left", getEncoderVProximalLeft() * radians_to_degrees);
+        //     SmartDashboard.putNumber(encoder_velocity_values + "Proximal Right", getEncoderVProximalRight() * radians_to_degrees);
+        //     SmartDashboard.putNumber(encoder_velocity_values + "Distal Left", getEncoderVDistalLeft() * radians_to_degrees);
+        //     SmartDashboard.putNumber(encoder_velocity_values + "Distal Right", getEncoderVDistalRight() * radians_to_degrees);
+        // }
 
-        String motor_encoder_velocity_values = "Arm Motor Encoders Velocities/";
-        boolean show_motor_encoder_velocity_values = false;
-        if(show_motor_encoder_velocity_values){
-            SmartDashboard.putNumber(motor_encoder_velocity_values + "Proximal Left", getMotorEncoderVProximalLeft() * radians_to_degrees);
-            SmartDashboard.putNumber(motor_encoder_velocity_values + "Proximal Right", getMotorEncoderVProximalRight() * radians_to_degrees);
-            SmartDashboard.putNumber(motor_encoder_velocity_values + "Distal Left", getMotorEncoderVDistalLeft() * radians_to_degrees);
-            SmartDashboard.putNumber(motor_encoder_velocity_values + "Distal Right", getMotorEncoderVDistalRight() * radians_to_degrees);
-        }
+        // String motor_encoder_velocity_values = "Arm Motor Encoders Velocities/";
+        // boolean show_motor_encoder_velocity_values = false;
+        // if(show_motor_encoder_velocity_values){
+        //     SmartDashboard.putNumber(motor_encoder_velocity_values + "Proximal Left", getMotorEncoderVProximalLeft() * radians_to_degrees);
+        //     SmartDashboard.putNumber(motor_encoder_velocity_values + "Proximal Right", getMotorEncoderVProximalRight() * radians_to_degrees);
+        //     SmartDashboard.putNumber(motor_encoder_velocity_values + "Distal Left", getMotorEncoderVDistalLeft() * radians_to_degrees);
+        //     SmartDashboard.putNumber(motor_encoder_velocity_values + "Distal Right", getMotorEncoderVDistalRight() * radians_to_degrees);
+        // }
 
         // String motor_encoder_agreement = "Arm Motor + ExtEnc Agreement/";
         // boolean show_motor_encoder_agreement = true;
@@ -295,21 +295,21 @@ public class ArmInterface {
         //     SmartDashboard.putBoolean(motor_encoder_agreement + "Distal Right", Math.abs(getEncoderDistalRight() - getMotorEncoderDistalRight()) < motor_encoder_agreement_tolerance);
         // }
 
-        String arm_perception = "Arm Microstate/";
-        boolean show_arm_perception = false;
-        if(show_arm_perception){
-            String posdiv = "Pos/";
-            SmartDashboard.putNumber(arm_perception + posdiv + "Proximal Left", getPositionProximalLeft() * radians_to_degrees);
-            SmartDashboard.putNumber(arm_perception + posdiv + "Proximal Right", getPositionProximalRight() * radians_to_degrees);
-            SmartDashboard.putNumber(arm_perception + posdiv + "Distal Left", getPositionDistalLeft() * radians_to_degrees);
-            SmartDashboard.putNumber(arm_perception + posdiv + "Distal Right", getPositionDistalRight() * radians_to_degrees);
+        // String arm_perception = "Arm Microstate/";
+        // boolean show_arm_perception = false;
+        // if(show_arm_perception){
+        //     String posdiv = "Pos/";
+        //     SmartDashboard.putNumber(arm_perception + posdiv + "Proximal Left", getPositionProximalLeft() * radians_to_degrees);
+        //     SmartDashboard.putNumber(arm_perception + posdiv + "Proximal Right", getPositionProximalRight() * radians_to_degrees);
+        //     SmartDashboard.putNumber(arm_perception + posdiv + "Distal Left", getPositionDistalLeft() * radians_to_degrees);
+        //     SmartDashboard.putNumber(arm_perception + posdiv + "Distal Right", getPositionDistalRight() * radians_to_degrees);
 
-            String veldiv = "Vel/";
-            SmartDashboard.putNumber(arm_perception + veldiv + "Proximal Left", getVelocityProximalLeft() * radians_to_degrees);
-            SmartDashboard.putNumber(arm_perception + veldiv + "Proximal Right", getVelocityProximalRight() * radians_to_degrees);
-            SmartDashboard.putNumber(arm_perception + veldiv + "Distal Left", getVelocityDistalLeft() * radians_to_degrees);
-            SmartDashboard.putNumber(arm_perception + veldiv + "Distal Right", getVelocityDistalRight() * radians_to_degrees);
-        }
+        //     String veldiv = "Vel/";
+        //     SmartDashboard.putNumber(arm_perception + veldiv + "Proximal Left", getVelocityProximalLeft() * radians_to_degrees);
+        //     SmartDashboard.putNumber(arm_perception + veldiv + "Proximal Right", getVelocityProximalRight() * radians_to_degrees);
+        //     SmartDashboard.putNumber(arm_perception + veldiv + "Distal Left", getVelocityDistalLeft() * radians_to_degrees);
+        //     SmartDashboard.putNumber(arm_perception + veldiv + "Distal Right", getVelocityDistalRight() * radians_to_degrees);
+        // }
 
         // String macro_view = "Arm State/";
         // boolean show_macroview = true;
@@ -351,14 +351,15 @@ public class ArmInterface {
         //     SmartDashboard.putBoolean(kinematics + inverse + "Q2", Math.abs(Q[1] - getPositionDistal()) < 0.001);
         // }
 
-        String bounds = "Arm Bounds/";
-        boolean show_bounds = true;
-        if(show_bounds){
-            SmartDashboard.putBoolean(bounds + "Proximal Low", getPositionProximal() < Bounds_Proxima[0]);
-            SmartDashboard.putBoolean(bounds + "Proximal High", getPositionProximal() > Bounds_Proxima[1]);
-            SmartDashboard.putBoolean(bounds + "Distal Low", getPositionDistal() < Bounds_Distal[0]);
-            SmartDashboard.putBoolean(bounds + "Distal High", getPositionDistal() > Bounds_Distal[1]);
-        }
+        // String bounds = "Arm Bounds/";
+        // boolean show_bounds = true;
+        // if(show_bounds){
+        //     SmartDashboard.putBoolean(bounds + "Proximal Low", getPositionProximal() < Bounds_Proxima[0]);
+        //     SmartDashboard.putBoolean(bounds + "Proximal High", getPositionProximal() > Bounds_Proxima[1]);
+        //     SmartDashboard.putBoolean(bounds + "Distal Low", getPositionDistal() < Bounds_Distal[0]);
+        //     SmartDashboard.putBoolean(bounds + "Distal High", getPositionDistal() > Bounds_Distal[1]);
+        // }
+        
     }
     public void voltageMotors_SimpleFF(double controlVoltageProxima, double controlVoltageDistal){
         if(getPositionProximal() < Bounds_Proxima[0] && controlVoltageProxima < 0) controlVoltageProxima = 0;
