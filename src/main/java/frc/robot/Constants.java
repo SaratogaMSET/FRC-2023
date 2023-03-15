@@ -210,7 +210,7 @@ public final class Constants {
         public static final int INTAKE_MOTOR = 20;
         public static final double GEAR_RATIO = 1 / 20.0;
         public static final int HALL_EFFECT = 0;
-        public static final double TARGET_VELOCITY = 0.25;       //beverly changed for testing
+        public static final double TARGET_VELOCITY = 0.625;       //beverly changed for testing
         public static final int INTAKE_DISTANCE_THRESHOLD = 50;
         public static final double TORQUE_CONSTANT = 0.01042;
         public static final double RESISTANCE = 12 / (11000 * 2 * 3.14159265 / 60);
@@ -218,8 +218,8 @@ public final class Constants {
         public static final double TORQUE_THRESHOLD = 100;      //beverly changed for testing
         public static final double CLOSING_TORQUE_THRESHOLD = 25;        //beverly changed for testing
         public static final double LOWER_BOUND = -2.5;
-        public static final double CUBE_MEDIUM_BOUND = 25;
-        public static final double CONE_MEDIUM_BOUND = 56.4;     // TODO: Tune value
+        public static final double CUBE_MEDIUM_BOUND = 50;
+        public static final double CONE_MEDIUM_BOUND = 88.2;     // TODO: Tune value
         public static final double UPPER_BOUND = 5;
         public static final double HOLD_VOLTAGE = TARGET_VOLTAGE / 10;
         public static final double AUTO_CONE_DIAMETER = 0.0;
@@ -323,13 +323,13 @@ public final class Constants {
         public static final double distal_com = 13.56 * inches_to_meters;
       }
       public final class ArmNodeDictionary{
-        public double[] ready_highcone_score = new double[]{1.38, 1.18};
+        public double[] ready_highcone_score = new double[]{1.38 + 0.05, 1.18};
         public static final double ready_highcone_score_x = 1.38;
         public static final double ready_highcone_score_y = 1.18;
 
-        public double[] ready_midcone_score = new double[]{0.96, 0.66};
-        public static final double ready_midcone_score_x = 0.96;
-        public static final double ready_midcone_score_y = 0.66;
+        public double[] ready_midcone_score = new double[]{0.97, 0.65};
+        public static final double ready_midcone_score_x = 0.96 +.1525;
+        public static final double ready_midcone_score_y = 0.66 +.1525;
 
         public double[] ready_highcube_score = new double[]{1.38, 0.96};
         public static final double ready_highcube_score_x = 1.38;
@@ -347,9 +347,13 @@ public final class Constants {
         public static final double ready_ground_intake_x = 0.56;
         public static final double ready_ground_intake_y = 0.17;
 
-        public double[] ground_intake = new double[]{0.60, -0.1};
+        public double[] ground_intake_cube = new double[]{0.60, 0};
         public static final double ground_intake_x = 0.60;
-        public static final double ground_intake_y = -0.1;
+        public static final double ground_intake_y = -0.05;
+
+        public double[] ground_intake_cone = new double[]{0.60, 0};
+        public static final double ground_intake_cone_x = 0.60;
+        public static final double ground_intake_cone_y = -0.15;
     
         public double[] ready_arm_score = new double[]{0.668, 1.05};
     
