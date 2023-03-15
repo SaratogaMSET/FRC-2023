@@ -246,6 +246,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void periodic(){
 
         //Logger.getInstance().recordOutput("CurrentSwerveModuleStates", getModuleStates());
+
         for(int i =0; i < 4; i++){
             mSwerveMods[i].updateInputs(moduleInputs[i]);
         }
@@ -276,14 +277,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
             currentDesiredState[3].angle = previousDesiredState[3].angle;
         }
 
-        for(int i = 0; i < 4; i++){
-            SmartDashboard.putNumber("Mod " + i + " Cancoder", mSwerveMods[i].getCanCoder().getDegrees());
-        //     SmartDashboard.putNumber("Mod " + i + " Integrated", mSwerveMods[i].getPosition().angle.getDegrees());
-        //     SmartDashboard.putNumber("Mod " + i + " Velocity", mSwerveMods[i].getState().speedMetersPerSecond);
-        //     SmartDashboard.putNumber("Desired Module "+ i + " Angle", currentDesiredState[i].angle.getDegrees());   
-        //     SmartDashboard.putNumber("Desired Module "+ i + " Velocity", currentDesiredState[i].speedMetersPerSecond);     
-        }
+        // for(int i = 0; i < 4; i++){
+        //     SmartDashboard.putNumber("Mod " + i + " Cancoder", mSwerveMods[i].getCanCoder().getDegrees());
+        // //     SmartDashboard.putNumber("Mod " + i + " Integrated", mSwerveMods[i].getPosition().angle.getDegrees());
+        // //     SmartDashboard.putNumber("Mod " + i + " Velocity", mSwerveMods[i].getState().speedMetersPerSecond);
+        // //     SmartDashboard.putNumber("Desired Module "+ i + " Angle", currentDesiredState[i].angle.getDegrees());   
+        // //     SmartDashboard.putNumber("Desired Module "+ i + " Velocity", currentDesiredState[i].speedMetersPerSecond);     
+        // }
         
+
         setModuleStates(currentDesiredState);
         //Logger.getInstance().recordOutput("Gyro Rotation2d", new Pose2d(new Translation2d(0,0),m_navx.getRotation2d()));
         //Logger.getInstance().recordOutput("Gyro Yaw", m_navx.getYaw());
@@ -300,10 +302,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
         //swerveOdometry.update(getRotation2d(), getModulePositions());  
         //Logger.getInstance().recordOutput("Odometry", odomFiltered.getEstimatedPosition());
         //lastRotation = new Rotation2d(-gyroInputs.yawPositionRad);
-        m_field.setRobotPose(odomFiltered.getEstimatedPosition());
+        // m_field.setRobotPose(odomFiltered.getEstimatedPosition());
         //if (pose != null) visionPoseEstimates.setRobotPose(pose);
-        SmartDashboard.putData("Field", m_field);
-        SmartDashboard.putNumber("Nav Heading", getNavHeading());
+        // SmartDashboard.putData("Field", m_field);
+        // SmartDashboard.putNumber("Nav Heading", getNavHeading());
         //SmartDashboard.putData("visionEstimate", visionPoseEstimates);
         
     }

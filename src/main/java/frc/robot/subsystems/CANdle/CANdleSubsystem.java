@@ -5,6 +5,8 @@ import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.CANdleConfiguration;
+import com.ctre.phoenix.led.CANdleControlFrame;
+import com.ctre.phoenix.led.CANdleStatusFrame;
 import com.ctre.phoenix.led.ColorFlowAnimation;
 import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 import com.ctre.phoenix.led.LarsonAnimation;
@@ -47,10 +49,20 @@ public class CANdleSubsystem extends SubsystemBase {
         candleConfiguration.stripType = LEDStripType.RGB;
         candleConfiguration.brightnessScalar = 1.0;
         candleConfiguration.vBatOutputMode = VBatOutputMode.Modulated;
-        candle1.configAllSettings(candleConfiguration, 100);
-        candle2.configAllSettings(candleConfiguration, 100);
-        candle3.configAllSettings(candleConfiguration, 100);
-        candle4.configAllSettings(candleConfiguration, 100);
+        candle1.configAllSettings(candleConfiguration, 400);
+        candle2.configAllSettings(candleConfiguration, 400);
+        candle3.configAllSettings(candleConfiguration, 400);
+        candle4.configAllSettings(candleConfiguration, 400);
+
+        candle1.setControlFramePeriod(CANdleControlFrame.CANdle_Control_2_ModulatedVBatOut, 300);
+        candle2.setControlFramePeriod(CANdleControlFrame.CANdle_Control_2_ModulatedVBatOut, 300);
+        candle3.setControlFramePeriod(CANdleControlFrame.CANdle_Control_2_ModulatedVBatOut, 300);
+        candle4.setControlFramePeriod(CANdleControlFrame.CANdle_Control_2_ModulatedVBatOut, 300);
+
+        candle1.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 30000);
+        candle2.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 30000);
+        candle3.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 30000);
+        candle4.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 30000);
     }
 
     public void setColor(Color color){
@@ -124,7 +136,7 @@ public class CANdleSubsystem extends SubsystemBase {
     }
     public Command indicateCubeCommand() {
         CANdleSubsystem.color = CANdleSubsystem.purple;
-        SmartDashboard.putNumber("Color On Cube Command Time", Timer.getFPGATimestamp());
+        // SmartDashboard.putNumber("Color On Cube Command Time", Timer.getFPGATimestamp());
         LEDSegment.BackLeftStrip.clearAnimation();
         LEDSegment.BackRightStrip.clearAnimation();
         LEDSegment.BackRightStrip.clearAnimation();
@@ -132,8 +144,8 @@ public class CANdleSubsystem extends SubsystemBase {
         
         final Color newColor = new Color(CANdleSubsystem.color);
         return buildSideStripCommand(() -> {
-            System.out.println("Set Color to purple");
-            SmartDashboard.putNumberArray("Color On Cube Command", new double[]{CANdleSubsystem.color.red, CANdleSubsystem.color.green, CANdleSubsystem.color.blue});
+            // System.out.println("Set Color to purple");
+            // SmartDashboard.putNumberArray("Color On Cube Command", new double[]{CANdleSubsystem.color.red, CANdleSubsystem.color.green, CANdleSubsystem.color.blue});
             
             LEDSegment.BackRightStrip.setColor(newColor);
             LEDSegment.BackLeftStrip.setColor(newColor);
@@ -175,12 +187,6 @@ public class CANdleSubsystem extends SubsystemBase {
 
     public static enum LEDSegment {
 
-        // BatteryIndicator(0, 2, 0),
-        // PressureIndicator(2, 2, 1),
-        // MastEncoderIndicator(4, 1, -1),
-        // BoomEncoderIndicator(5, 1, -1),
-        // WristEncoderIndicator(6, 1, -1),
-        // DriverStationIndicator(7, 1, -1),
         FrontLeftStrip(8, 30, 3, candle1),
         FrontRightStrip(8, 30, 7, candle2),
         BackLeftStrip(8, 30, 7, candle3),
@@ -282,6 +288,6 @@ public class CANdleSubsystem extends SubsystemBase {
     }
     @Override
     public void periodic() {
-        SmartDashboard.putNumberArray("Color", new double[]{color.red, color.green, color.blue});
+        // SmartDashboard.putNumberArray("Color", new double[]{color.red, color.green, color.blue});
     }
 }

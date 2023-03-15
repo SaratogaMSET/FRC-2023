@@ -13,19 +13,22 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.subsystems.Drivetrain.SwerveModuleIO;
 
+import com.ctre.phoenix.motorcontrol.ControlFrame;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 
 public class SwerveModule implements SwerveModuleIO {
     public int moduleNumber;
     private Rotation2d angleOffset;
     private Rotation2d lastAngle;
 
-    private TalonFX mAngleMotor;
-    private TalonFX mDriveMotor;
-    private CANCoder angleEncoder;
+    public TalonFX mAngleMotor;
+    public TalonFX mDriveMotor;
+    public CANCoder angleEncoder;
 
     SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.Drivetrain.driveKS, Constants.Drivetrain.driveKV, Constants.Drivetrain.driveKA);
 
@@ -35,14 +38,17 @@ public class SwerveModule implements SwerveModuleIO {
         
         /* Angle Encoder Config */
         angleEncoder = new CANCoder(moduleConstants.cancoderID);
+        angleEncoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 100);
         configAngleEncoder();
 
         /* Angle Motor Config */
         mAngleMotor = new TalonFX(moduleConstants.angleMotorID);
+        mAngleMotor.setStatusFramePeriod(StatusFrame.Status_1_General, 30);
         configAngleMotor();
 
         /* Drive Motor Config */
         mDriveMotor = new TalonFX(moduleConstants.driveMotorID);
+        mDriveMotor.setStatusFramePeriod(StatusFrame.Status_1_General, 30);
         configDriveMotor();
 
         lastAngle = getState().angle;
@@ -127,11 +133,13 @@ public class SwerveModule implements SwerveModuleIO {
     public void resetToAbsolute(){
         double absolutePosition = Conversions.degreesToFalcon(getCanCoder().getDegrees() - angleOffset.getDegrees(), Constants.Drivetrain.angleGearRatio);
         mAngleMotor.setSelectedSensorPosition(absolutePosition);
+        
     }
 
     private void configAngleEncoder(){        
         angleEncoder.configFactoryDefault();
         angleEncoder.configAllSettings(Robot.ctreConfigs.swerveCanCoderConfig);
+        // angleEncoder.setStatusFramePeriod(null, moduleNumber);
     }
 
     private void configAngleMotor(){
@@ -164,23 +172,23 @@ public class SwerveModule implements SwerveModuleIO {
         );
     }
 
-    @Override
-    public void updateInputs(SwerveModuleIOInputs inputs) {
+    // @Override
+    // public void updateInputs(SwerveModuleIOInputs inputs) {
         
-        inputs.drivePositionMeters = mDriveMotor.getSelectedSensorVelocity();
-        inputs.driveVelocityMetersPerSec = mDriveMotor.getSelectedSensorVelocity();
-        inputs.driveAppliedVolts = mDriveMotor.getMotorOutputVoltage();
-        inputs.driveCurrentAmps = mDriveMotor.getStatorCurrent();
-        inputs.driveTempCelcius = mDriveMotor.getTemperature();
+    //     inputs.drivePositionMeters = mDriveMotor.getSelectedSensorVelocity();
+    //     inputs.driveVelocityMetersPerSec = mDriveMotor.getSelectedSensorVelocity();
+    //     inputs.driveAppliedVolts = mDriveMotor.getMotorOutputVoltage();
+    //     inputs.driveCurrentAmps = mDriveMotor.getStatorCurrent();
+    //     inputs.driveTempCelcius = mDriveMotor.getTemperature();
 
-        inputs.steerAbsolutePositionRad = angleEncoder.getPosition();
-        inputs.steerAbsoluteVelocityRadPerSec = angleEncoder.getVelocity();
-        inputs.steerPositionRad = mAngleMotor.getSelectedSensorVelocity();
-        inputs.steerVelocityRadPerSec = mAngleMotor.getSelectedSensorVelocity();
-        inputs.steerAppliedVolts = mAngleMotor.getMotorOutputVoltage();
-        inputs.steerCurrentAmps = mAngleMotor.getStatorCurrent();
-        inputs.steerTempCelcius = mAngleMotor.getTemperature();
-    }
+    //     inputs.steerAbsolutePositionRad = angleEncoder.getPosition();
+    //     inputs.steerAbsoluteVelocityRadPerSec = angleEncoder.getVelocity();
+    //     inputs.steerPositionRad = mAngleMotor.getSelectedSensorVelocity();
+    //     inputs.steerVelocityRadPerSec = mAngleMotor.getSelectedSensorVelocity();
+    //     inputs.steerAppliedVolts = mAngleMotor.getMotorOutputVoltage();
+    //     inputs.steerCurrentAmps = mAngleMotor.getStatorCurrent();
+    //     inputs.steerTempCelcius = mAngleMotor.getTemperature();
+    // }
 
 
     
