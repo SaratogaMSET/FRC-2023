@@ -2,6 +2,8 @@ package frc.robot.subsystems.Arm;
 
 //import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.ejml.simple.SimpleMatrix;
 import frc.robot.controls.ArmInterface;
@@ -78,17 +80,17 @@ public class ArmSubsystem extends SubsystemBase {
 
         SimpleMatrix error = target.minus(state);
 
-        double proxKp = 8.2;
-        double distKp = 7.5;
+        double proxKp = 10.2;
+        double distKp = 9.5;
 
-        double proxKd = 0.01;
-        double distKd = 0.01;
+        double proxKd = 0.02;
+        double distKd = 0.02;
 
-        double proxKf = 0.90;
+        double proxKf = 0.80;
         double distKf = 1.30;
         double armTolerance = 0.03;
 
-        double maxVoltPerVelocity = 3.0000254;
+        double maxVoltPerVelocity = 3.5000254;
         double max_voltage = 6.5;
 
         double voltageProximal = error.get(0) * proxKp + error.get(2) * proxKd;
@@ -109,12 +111,12 @@ public class ArmSubsystem extends SubsystemBase {
             voltageDistal = Math.signum(error.get(1)) * (Math.abs(maxVoltPerVelocity * state.get(3)) + distKf);
         }
 
-        if(Math.abs(voltageProximal) < proxKf){
-            voltageProximal = Math.signum(error.get(0)) * proxKf;
-        }
-        if(Math.abs(voltageDistal) < distKf){
-            voltageDistal = Math.signum(error.get(1)) * distKf;
-        }
+        // if(Math.abs(voltageProximal) < proxKf){
+        //     voltageProximal = Math.signum(error.get(0)) * proxKf;
+        // }
+        // if(Math.abs(voltageDistal) < distKf){
+        //     voltageDistal = Math.signum(error.get(1)) * distKf;
+        // }
 
         if(Math.abs(error.get(0)) < armTolerance){
             voltageProximal = proxKp * error.get(0);
@@ -141,8 +143,9 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
     public void periodic() {
         updateState();
-        SmartDashboard.putNumber("Side", side);
+        // SmartDashboard.putNumber("Side", side);
         armVisualizer.update(armInterface.getPositionProximal(), armInterface.getPositionDistal());
+        // armVisualizer.logRectangles("Arm Bounds", armInterface.Bounds, new Color8Bit(Color.kGreen));
     }
 
 @Override
