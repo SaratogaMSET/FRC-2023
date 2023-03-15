@@ -4,53 +4,67 @@
 
 package frc.robot.commands.Claw;
 
+import java.util.function.BooleanSupplier;
+
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Claw.ClawIOSparkMax;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class IntakeCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final ClawSubsystem m_intake;
-
-
-  private Direction direction;
-  public static enum Direction {
-    OPEN, 
-    CLOSE, 
-    IDLE
-  }
+  private final ClawIOSparkMax m_intake;
+  private BooleanSupplier isAuton;
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public IntakeCommand(ClawSubsystem subsystem, Direction direction) {
+  public IntakeCommand(ClawIOSparkMax subsystem) {
     m_intake = subsystem;
+
     // Use addRequirements() here to declare subsystem dependencies.
-    this.direction = direction;
     addRequirements(subsystem);
   }
-
+  
+  public IntakeCommand(ClawIOSparkMax subsystem, BooleanSupplier isAuto){
+    m_intake = subsystem;
+    isAuton = isAuto;
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(subsystem);
+  }
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    switch(direction){
-      case OPEN:
-        m_intake.openIntake();
-        break;
-      case CLOSE:
-        m_intake.closeIntake();
-        break;
-      case IDLE:
-        m_intake.setIdle();
-        break;
-    }
+    // switch(direction){
+    //   case OPEN:
+    //     m_intake.openIntake();
+    //     break;
+    //   case CLOSE:
+    //     m_intake.closeIntake();
+    //     break;
+    //   case IDLE:
+    //     m_intake.setIdle();
+    //     break;
+    // }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    if(!isAuton.getAsBoolean()){
+    if(m_intake.objectInRange()){
+      m_intake.autoCloseIntake();
+    }
+    // else if(!m_intake.getReverseLimitSwitch()){
+    //   m_intake.openIntake();
+    // }
+    else{
+      m_intake.setIdle();
+    }
+  }
+  }
 
   // Called once the command ends or is interrupted.
   @Override

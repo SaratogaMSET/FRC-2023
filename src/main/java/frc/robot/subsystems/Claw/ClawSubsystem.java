@@ -52,8 +52,8 @@ public class ClawSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.getInstance().processInputs("Mechanisms/Claw", inputs);
-    Logger.getInstance().recordOutput("Mechanism/Claw/Limit_Switch", io.getHallEffect());
+    // Logger.getInstance().processInputs("Mechanisms/Claw", inputs);
+    // Logger.getInstance().recordOutput("Mechanism/Claw/Limit_Switch", io.getHallEffect());
     if (targetVelocity.hasChanged(hashCode())) {
       TARGET_VELOCITY = targetVelocity.get();
     }

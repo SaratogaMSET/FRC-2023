@@ -26,11 +26,12 @@ import frc.robot.subsystems.Claw.ClawSubsystem.Objects;
 public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
     private double[] proximityBuffer = new double[3];
     private int bufferIndex = 0;
-    private double cubeBlueTheshold = 0.27;
+    private double cubeBlueTheshold = 0.22;
     private Objects objectState = Objects.None;
     private Color currentColor;
-    boolean previousLimitSwitch = true;
+    public boolean previousLimitSwitch = true;
     public static ColorSensorV3 colorSensor;
+    boolean open = true;
     // public static DigitalInput HallEffect = new DigitalInput(IntakeConstants.HALL_EFFECT);
     public static CANSparkMax motor = new CANSparkMax(IntakeConstants.INTAKE_MOTOR, MotorType.kBrushless);
     public static RelativeEncoder encoder = motor.getEncoder();
@@ -39,6 +40,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
     public ClawIOSparkMax() {
         motor.setIdleMode(IdleMode.kBrake);
         colorSensor = new ColorSensorV3(Port.kOnboard);
+        motor.setControlFramePeriodMs(30);
     }
 
     public void setMotorVoltage(double voltage) {
@@ -70,7 +72,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
         else{ 
             velocitySetpoint = -Constants.IntakeConstants.TARGET_VELOCITY;
         }
-        SmartDashboard.putNumber("Target velocity", velocitySetpoint);
+        // SmartDashboard.putNumber("Target velocity", velocitySetpoint);
         motor.set(velocitySetpoint);
     }
 
@@ -113,6 +115,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
         if(objectInRange()) {
 
             if (!getReverseLimitSwitch() && previousLimitSwitch) { 
+
                 // If the claw is not fully open & if we need to open the claw, open claw
                 openIntake();
                 // previousLimitSwitch = getReverseLimitSwitch();
@@ -142,9 +145,9 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
                     motor.set(0.0);
                 }
 
-                SmartDashboard.putBoolean(print + "Game Piece Object", getObject() == Objects.Cube);
-                SmartDashboard.putBoolean(print + "cube bound", encoderPosition >= IntakeConstants.CUBE_MEDIUM_BOUND-1);
-                SmartDashboard.putBoolean(print + "cone bound", encoderPosition >= IntakeConstants.CONE_MEDIUM_BOUND-1);
+                // SmartDashboard.putBoolean(print + "Game Piece Object", getObject() == Objects.Cube);
+                // SmartDashboard.putBoolean(print + "cube bound", encoderPosition >= IntakeConstants.CUBE_MEDIUM_BOUND-1);
+                // SmartDashboard.putBoolean(print + "cone bound", encoderPosition >= IntakeConstants.CONE_MEDIUM_BOUND-1);
             }
         }
        
@@ -203,15 +206,15 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
     }
     public void updateIntake() {
         SmartDashboard.putNumber("ClawPos", encoder.getPosition());
-        SmartDashboard.putBoolean("Limit Switch", getHallEffect());
+        // SmartDashboard.putBoolean("Limit Switch", getHallEffect());
         SmartDashboard.putNumber("Lidar (from 0-2047)", colorSensor.getProximity());
-        SmartDashboard.putBoolean("Detecting", objectInRange());
-        SmartDashboard.putNumber("Red value", colorSensor.getRed());
-        SmartDashboard.putNumber("Green value", colorSensor.getGreen());
-        SmartDashboard.putNumber("Blue value", colorSensor.getBlue());
-        SmartDashboard.putBoolean("Hall Effect", getHallEffect());
-        SmartDashboard.putString("Object", getObject().toString());
-        SmartDashboard.putBoolean("Object in range", objectInRange());
+        // SmartDashboard.putBoolean("Detecting", objectInRange());
+        // SmartDashboard.putNumber("Red value", colorSensor.getRed());
+        // SmartDashboard.putNumber("Green value", colorSensor.getGreen());
+        // SmartDashboard.putNumber("Blue value", colorSensor.getBlue());
+        // SmartDashboard.putBoolean("Hall Effect", getHallEffect());
+        // SmartDashboard.putString("Object", getObject().toString());
+        // SmartDashboard.putBoolean("Object in range", objectInRange());
         SmartDashboard.putBoolean("Reverse Limit Switch", getReverseLimitSwitch());
         SmartDashboard.putBoolean("Forward Limit Switch", getForwardLimitSwitch());
     }
