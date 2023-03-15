@@ -37,7 +37,8 @@ public class Robot extends LoggedRobot {
   // private TalonFX motor;
   // private Logger logger;
   // private final ClawSubsystem m_claw = new ClawSubsystem(clawSubsystem);
-
+  public Robot(){
+  }
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -96,6 +97,20 @@ public class Robot extends LoggedRobot {
     m_robotContainer.updateRobotState();
     // m_claw.closeIntake();
     CommandScheduler.getInstance().run();
+
+    if(
+      RobotContainer.m_driverController.povDown().getAsBoolean() ||
+      RobotContainer.m_driverController.povDownLeft().getAsBoolean() ||
+      RobotContainer.m_driverController.povDownRight().getAsBoolean() ||
+      RobotContainer.m_driverController.povLeft().getAsBoolean() ||
+      RobotContainer.m_driverController.povRight().getAsBoolean() ||
+      RobotContainer.m_driverController.povUp().getAsBoolean() ||
+      RobotContainer.m_driverController.povUpLeft().getAsBoolean() ||
+      RobotContainer.m_driverController.povUpRight().getAsBoolean()){
+
+        CommandScheduler.getInstance().cancelAll();
+      // CommandScheduler.getInstance().close();
+    }
     // m_intakeSubsystem.runIntake(m_controller.getLeftY());
   
     // new Trigger(m_controller::getRightBumper).whileTrue(new IntakeCommand(m_claw, Direction.CLOSE));
