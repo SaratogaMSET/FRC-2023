@@ -20,8 +20,8 @@
           "Score Cone High Backwards"
         ],
         "executionBehavior": "sequential",
-        "waitBehavior": "after",
-        "waitTime": 0.0
+        "waitBehavior": "deadline",
+        "waitTime": 1.5
       }
     },
     {
@@ -47,8 +47,8 @@
           "Intake Front"
         ],
         "executionBehavior": "sequential",
-        "waitBehavior": "after",
-        "waitTime": 0.0
+        "waitBehavior": "deadline",
+        "waitTime": 1.5
       }
     },
     {
@@ -57,15 +57,15 @@
         "y": 4.338427454632687
       },
       "prevControl": {
-        "x": 1.7953242859073186,
-        "y": 4.977319931652406
+        "x": 2.8567902361499167,
+        "y": 4.603722386264217
       },
       "nextControl": {
-        "x": 1.9182852754390474,
-        "y": 3.2188958577641067
+        "x": 2.8567902361499167,
+        "y": 4.603722386264217
       },
       "holonomicAngle": 0,
-      "isReversal": false,
+      "isReversal": true,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": true,
