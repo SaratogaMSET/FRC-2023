@@ -69,4 +69,23 @@ public class ArmVisualizer {
                 new Rotation3d(0.0, -elbowAngle, 0.0)));
     Logger.getInstance().recordOutput("Mechanism3d/" + logKey, shoulderPose, elbowPose);
   }
+
+  public void logRectangles(String logKey, double[][] rects, Color8Bit color) {
+    var mechanism = new Mechanism2d(4, 3, new Color8Bit(Color.kGray));
+
+    for (int i = 0; i < rects.length; i++) {
+      var rect = rects[i];
+      var root = mechanism.getRoot("Rect" + Integer.toString(i), 2 + rect[0], rect[1]);
+      var bottomLigament =
+          root.append(new MechanismLigament2d("Bottom", rect[2] - rect[0], 0, 1, color));
+      var rightLigament =
+          bottomLigament.append(new MechanismLigament2d("Right", rect[3] - rect[1], 90, 1, color));
+      var topLigament =
+          rightLigament.append(new MechanismLigament2d("Right", rect[2] - rect[0], 90, 1, color));
+      topLigament.append(new MechanismLigament2d("Right", rect[3] - rect[1], 90, 1, color));
+    }
+
+    Logger.getInstance().recordOutput("Mechanism2d/" + logKey, mechanism);
+  }
+  
 }
