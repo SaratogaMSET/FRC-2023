@@ -241,14 +241,14 @@ public class ArmInterface {
 
     public void showState(){
         double radians_to_degrees = 180 / Math.PI;
-        // String raw_values = "Arm Raw Encoders/";
-        // boolean show_raw_values = false;
-        // if(show_raw_values){
-        //     SmartDashboard.putNumber(raw_values + "Proximal Left", Encoder_Proximal_Left.getAbsolutePosition()/360);
-        //     SmartDashboard.putNumber(raw_values + "Proximal Right", Encoder_Proximal_Right.getAbsolutePosition()/360);
-        //     SmartDashboard.putNumber(raw_values + "Distal Left", Encoder_Distal_Left.getAbsolutePosition()/360);
-        //     SmartDashboard.putNumber(raw_values + "Distal Right", Encoder_Distal_Right.getAbsolutePosition()/360);
-        // }
+        String raw_values = "Arm Raw Encoders/";
+        boolean show_raw_values = true;
+        if(show_raw_values){
+            SmartDashboard.putNumber(raw_values + "Proximal Left", Encoder_Proximal_Left.getAbsolutePosition()/360);
+            SmartDashboard.putNumber(raw_values + "Proximal Right", Encoder_Proximal_Right.getAbsolutePosition()/360);
+            SmartDashboard.putNumber(raw_values + "Distal Left", Encoder_Distal_Left.getAbsolutePosition()/360);
+            SmartDashboard.putNumber(raw_values + "Distal Right", Encoder_Distal_Right.getAbsolutePosition()/360);
+        }
 
         // String encoder_values = "Arm External Encoders/";
         // boolean show_encoder_values = true;
@@ -311,17 +311,17 @@ public class ArmInterface {
         //     SmartDashboard.putNumber(arm_perception + veldiv + "Distal Right", getVelocityDistalRight() * radians_to_degrees);
         // }
 
-        // String macro_view = "Arm State/";
-        // boolean show_macroview = true;
-        // if(show_macroview){
-        //     String posdiv = "Pos/";
-        //     SmartDashboard.putNumber(macro_view + posdiv + "Proximal", getPositionProximal() * radians_to_degrees);
-        //     SmartDashboard.putNumber(macro_view + posdiv + "Distal", getPositionDistal() * radians_to_degrees);
+        String macro_view = "Arm State/";
+        boolean show_macroview = true;
+        if(show_macroview){
+            String posdiv = "Pos/";
+            SmartDashboard.putNumber(macro_view + posdiv + "Proximal", getPositionProximal() * radians_to_degrees);
+            SmartDashboard.putNumber(macro_view + posdiv + "Distal", getPositionDistal() * radians_to_degrees);
 
-        //     String veldiv = "Vel/";
-        //     SmartDashboard.putNumber(macro_view + veldiv + "Proximal", getVelocityProximal() * radians_to_degrees);
-        //     SmartDashboard.putNumber(macro_view + veldiv + "Distal", getVelocityDistal() * radians_to_degrees);
-        // }
+            String veldiv = "Vel/";
+            SmartDashboard.putNumber(macro_view + veldiv + "Proximal", getVelocityProximal() * radians_to_degrees);
+            SmartDashboard.putNumber(macro_view + veldiv + "Distal", getVelocityDistal() * radians_to_degrees);
+        }
 
         // String erroneous_forces = "Arm Erroneous Forces/";
         // boolean show_erroneous_forces = true;
@@ -337,19 +337,19 @@ public class ArmInterface {
         //     SmartDashboard.putNumber(erroneous_forces + "Distal FF Volts", feedforward_distal_voltage);
         // }
 
-        // String kinematics = "Arm Kinematics/";
-        // boolean show_kinematics = true;
-        // if(show_kinematics){
-        //     String forward = "FWD/";
-        //     double[] X = Arm.forwardKinematics(getPositionProximal(), getPositionDistal());
-        //     SmartDashboard.putNumber(kinematics + forward + "X", X[0]);
-        //     SmartDashboard.putNumber(kinematics + forward + "Y", X[1]);
+        String kinematics = "Arm Kinematics/";
+        boolean show_kinematics = true;
+        if(show_kinematics){
+            String forward = "FWD/";
+            double[] X = Arm.forwardKinematics(getPositionProximal(), getPositionDistal());
+            SmartDashboard.putNumber(kinematics + forward + "X", X[0]);
+            SmartDashboard.putNumber(kinematics + forward + "Y", X[1]);
 
-        //     String inverse = "INV/";
-        //     double[] Q = Arm.inverseKinematics(X[0], X[1]);
-        //     SmartDashboard.putBoolean(kinematics + inverse + "Q1", Math.abs(Q[0] - getPositionProximal()) < 0.001);
-        //     SmartDashboard.putBoolean(kinematics + inverse + "Q2", Math.abs(Q[1] - getPositionDistal()) < 0.001);
-        // }
+            String inverse = "INV/";
+            double[] Q = Arm.inverseKinematics(X[0], X[1]);
+            SmartDashboard.putBoolean(kinematics + inverse + "Q1", Math.abs(Q[0] - getPositionProximal()) < 0.001);
+            SmartDashboard.putBoolean(kinematics + inverse + "Q2", Math.abs(Q[1] - getPositionDistal()) < 0.001);
+        }
 
         // String bounds = "Arm Bounds/";
         // boolean show_bounds = true;
