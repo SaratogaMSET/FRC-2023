@@ -62,8 +62,8 @@ public class BalanceCommand extends CommandBase {
     }
 
     // Limit the max power
-    if (Math.abs(drivePower) > 0.7) {
-      drivePower = Math.copySign(0.7, drivePower);
+    if (Math.abs(drivePower) > 0.9) {
+      drivePower = Math.copySign(0.9, drivePower);
     }
 
     m_DriveSubsystem.drive(ChassisSpeeds.fromFieldRelativeSpeeds(

@@ -76,7 +76,7 @@ public final class Constants {
         public static final double kPThetaControllerTrajectory = 0.39 * 1.75 * 2 * 1.2; // 0.39 * 2
         public static final double kDThetaControllerTrajectory = 0.004;
         public static final double balanceKP = 0.7;
-        public static final double balanceKD = 0.7;
+        public static final double balanceKD = 0.85;
         public static final double balanceGoalDegrees = 0;
         public static final double balanceThresholdDegrees = 1;
         public static final double balanceBackwardsMultiplier = 3.4;
@@ -210,7 +210,7 @@ public final class Constants {
         public static final int INTAKE_MOTOR = 20;
         public static final double GEAR_RATIO = 1 / 20.0;
         public static final int HALL_EFFECT = 0;
-        public static final double TARGET_VELOCITY = 0.625;       //beverly changed for testing
+        public static final double TARGET_VELOCITY = 0.875;       //beverly changed for testing
         public static final int INTAKE_DISTANCE_THRESHOLD = 50;
         public static final double TORQUE_CONSTANT = 0.01042;
         public static final double RESISTANCE = 12 / (11000 * 2 * 3.14159265 / 60);
@@ -324,7 +324,7 @@ public final class Constants {
       }
       public final class ArmNodeDictionary{
         public double[] ready_highcone_score = new double[]{1.38 + 0.05, 1.18};
-        public static final double ready_highcone_score_x = 1.38;
+        public static final double ready_highcone_score_x = 1.38 + 0.0254;
         public static final double ready_highcone_score_y = 1.18;
 
         public double[] ready_midcone_score = new double[]{0.97, 0.65};
@@ -355,10 +355,10 @@ public final class Constants {
         public static final double ground_intake_cone_x = 0.60;
         public static final double ground_intake_cone_y = -0.15;
     
-        public double[] ready_arm_score = new double[]{0.668, 1.05};
+        public double[] ready_arm_score = new double[]{0.688-0.1, 1.05};
     
         public double[] ready_double_substation = new double[]{0.668, 1.08 -0.1524 - 0.0508};
-        public static final double ready_double_substation_x = 0.688;
+        public static final double ready_double_substation_x = 0.688 -0.1;
         public static final double ready_double_substation_y = 1.08 -0.1524 - 0.0508;
         // public double[] pickup_double_substation = new double[]{0.62, 0.90};
       }

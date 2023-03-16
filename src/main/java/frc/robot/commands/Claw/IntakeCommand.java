@@ -54,16 +54,13 @@ public class IntakeCommand extends CommandBase {
   @Override
   public void execute() {
     if(!isAuton.getAsBoolean()){
-    if(m_intake.objectInRange()){
-      m_intake.autoCloseIntake();
+      if(m_intake.objectInRange()){
+        m_intake.autoCloseIntake();
+      }
     }
-    // else if(!m_intake.getReverseLimitSwitch()){
-    //   m_intake.openIntake();
-    // }
     else{
       m_intake.setIdle();
     }
-  }
   }
 
   // Called once the command ends or is interrupted.

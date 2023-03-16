@@ -6,6 +6,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 
 public class MoveWithClosest90 extends CommandBase {
@@ -14,6 +15,7 @@ public class MoveWithClosest90 extends CommandBase {
     private DrivetrainSubsystem drivetrain;
     DoubleSupplier x;
     DoubleSupplier y;
+    DoubleSupplier armHeight;
     PIDController controller = new PIDController(2,0.0,0.0);
     double xT;
     double yT;
@@ -21,11 +23,13 @@ public class MoveWithClosest90 extends CommandBase {
     double lastRot;
     public MoveWithClosest90(DrivetrainSubsystem drivetrainSubsystem,
         DoubleSupplier translationXSupplier,
-        DoubleSupplier translationYSupplier){
+        DoubleSupplier translationYSupplier,
+        DoubleSupplier armHeight){
         
         this.drivetrain = drivetrainSubsystem;
         this.x = translationXSupplier;
         this.y = translationYSupplier;
+        this.armHeight = armHeight;
         addRequirements(drivetrainSubsystem);  
 
     }
@@ -57,12 +61,29 @@ public class MoveWithClosest90 extends CommandBase {
         double resultY = Math.sin(roboAngle) * magnitude;
         
         double pidValue = controller.calculate(lastRot, desiredAngle) * Math.PI/180;
-        drivetrain.drive(
-            new ChassisSpeeds(
+
+        if(armHeight.getAsDouble() > Constants.ArmNodeDictionary.ready_midcube_score_y){
+            drivetrain.drive(
+                    // ChassisSpeeds.fromFieldRelativeSpeeds(
+                    new ChassisSpeeds(
+                    resultX/2.5,
+                    resultY/2.5,
+                    pidValue)
+                    // m_drivetrainSubsystem.getRotation2d()
+                    // )
+            );
+    }
+        else{
+            drivetrain.drive(
+                // ChassisSpeeds.fromFieldRelativeSpeeds(
+                new ChassisSpeeds(
                 resultX,
                 resultY,
                 pidValue)
+                // m_drivetrainSubsystem.getRotation2d()
+                // )
         );
+        }
        
     }
 

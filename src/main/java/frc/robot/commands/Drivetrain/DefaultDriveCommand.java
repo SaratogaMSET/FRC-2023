@@ -3,6 +3,7 @@ package frc.robot.commands.Drivetrain;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 
 import java.util.function.DoubleSupplier;
@@ -13,18 +14,20 @@ public class DefaultDriveCommand extends CommandBase {
     private final DoubleSupplier m_translationXSupplier;
     private final DoubleSupplier m_translationYSupplier;
     private final DoubleSupplier m_rotationSupplier;
-    
+    private final DoubleSupplier armHeight;
     private double m_translationXTrapezoidal = 0;
     private double m_translationYTrapezoidal = 0;
 
     public DefaultDriveCommand(DrivetrainSubsystem drivetrainSubsystem,
                                DoubleSupplier translationXSupplier,
                                DoubleSupplier translationYSupplier,
-                               DoubleSupplier rotationSupplier) {
+                               DoubleSupplier rotationSupplier,
+                               DoubleSupplier armHeight) {
         this.m_drivetrainSubsystem = drivetrainSubsystem;
         this.m_translationXSupplier = translationXSupplier;
         this.m_translationYSupplier = translationYSupplier;
         this.m_rotationSupplier = rotationSupplier;
+        this.armHeight = armHeight;
 
         addRequirements(drivetrainSubsystem);
     }
@@ -49,7 +52,19 @@ public class DefaultDriveCommand extends CommandBase {
         SmartDashboard.putNumber("m_translationYSupplier", m_translationYTrapezoidal);
         SmartDashboard.putNumber("m_rotationSupplier", m_rotationSupplier.getAsDouble());
         
-        m_drivetrainSubsystem.drive(
+        if(armHeight.getAsDouble() > Constants.ArmNodeDictionary.ready_midcube_score_y){
+            m_drivetrainSubsystem.drive(
+                    // ChassisSpeeds.fromFieldRelativeSpeeds(
+                    new ChassisSpeeds(
+                    resultX/2.5,
+                    resultY/2.5,
+                    m_rotationSupplier.getAsDouble()/1.5 * multiplier)
+                    // m_drivetrainSubsystem.getRotation2d()
+                    // )
+            );
+    }
+        else{
+            m_drivetrainSubsystem.drive(
                 // ChassisSpeeds.fromFieldRelativeSpeeds(
                 new ChassisSpeeds(
                 resultX,
@@ -58,6 +73,7 @@ public class DefaultDriveCommand extends CommandBase {
                 // m_drivetrainSubsystem.getRotation2d()
                 // )
         );
+        }
     }
     @Override
     public void end(boolean interrupted) {

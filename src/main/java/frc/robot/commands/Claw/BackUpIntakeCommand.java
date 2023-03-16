@@ -4,36 +4,67 @@
 
 package frc.robot.commands.Claw;
 
+import java.util.function.BooleanSupplier;
+
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Claw.ClawIOSparkMax;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 
 /** An example command that uses an example subsystem. */
-public class ManualCloseIntake extends CommandBase {
-  @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+public class BackUpIntakeCommand extends CommandBase {
+  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final ClawIOSparkMax m_intake;
-
+  private BooleanSupplier isAuton;
+  private BooleanSupplier enableAutoClose;
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public ManualCloseIntake(ClawIOSparkMax subsystem) {
+  public BackUpIntakeCommand(ClawIOSparkMax subsystem) {
     m_intake = subsystem;
+
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
-
+  
+  public BackUpIntakeCommand(ClawIOSparkMax subsystem, BooleanSupplier isAuto, BooleanSupplier enableAutoClose){
+    m_intake = subsystem;
+    isAuton = isAuto;
+    this.enableAutoClose = enableAutoClose;
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(subsystem);
+  }
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    // switch(direction){
+    //   case OPEN:
+    //     m_intake.openIntake();
+    //     break;
+    //   case CLOSE:
+    //     m_intake.closeIntake();
+    //     break;
+    //   case IDLE:
+    //     m_intake.setIdle();
+    //     break;
+    // }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.autoCloseIntake();
+    if(!isAuton.getAsBoolean()){
+        if(m_intake.objectInRange()){
+            if(enableAutoClose.getAsBoolean()){
+                m_intake.autoCloseIntake();
+        }
+    }
+    else{
+      m_intake.setIdle();
+    }
+  }
   }
 
   // Called once the command ends or is interrupted.

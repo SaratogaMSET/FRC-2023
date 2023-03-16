@@ -70,7 +70,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
             resetEncoder();
         }
         else{ 
-            velocitySetpoint = -Constants.IntakeConstants.TARGET_VELOCITY;
+            velocitySetpoint = -0.625;
         }
         // SmartDashboard.putNumber("Target velocity", velocitySetpoint);
         motor.set(velocitySetpoint);
@@ -113,12 +113,9 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
 
     public void autoCloseIntake(){
         if(objectInRange()) {
-
             if (!getReverseLimitSwitch() && previousLimitSwitch) { 
-
                 // If the claw is not fully open & if we need to open the claw, open claw
                 openIntake();
-                // previousLimitSwitch = getReverseLimitSwitch();
                 return;
             }
             else {
@@ -141,6 +138,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
                         motor.set(IntakeConstants.TARGET_VELOCITY);
                     }
                 }
+
                 else{
                     motor.set(0.0);
                 }
@@ -209,11 +207,11 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
         // SmartDashboard.putBoolean("Limit Switch", getHallEffect());
         SmartDashboard.putNumber("Lidar (from 0-2047)", colorSensor.getProximity());
         // SmartDashboard.putBoolean("Detecting", objectInRange());
-        // SmartDashboard.putNumber("Red value", colorSensor.getRed());
-        // SmartDashboard.putNumber("Green value", colorSensor.getGreen());
-        // SmartDashboard.putNumber("Blue value", colorSensor.getBlue());
+        SmartDashboard.putNumber("Red value", colorSensor.getRed());
+        SmartDashboard.putNumber("Green value", colorSensor.getGreen());
+        SmartDashboard.putNumber("Blue value", colorSensor.getBlue());
         // SmartDashboard.putBoolean("Hall Effect", getHallEffect());
-        // SmartDashboard.putString("Object", getObject().toString());
+        SmartDashboard.putString("Object", getObject().toString());
         // SmartDashboard.putBoolean("Object in range", objectInRange());
         SmartDashboard.putBoolean("Reverse Limit Switch", getReverseLimitSwitch());
         SmartDashboard.putBoolean("Forward Limit Switch", getForwardLimitSwitch());
@@ -228,5 +226,57 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
     @Override
     public void simulationPeriodic() {
         // This method will be called once per scheduler run during simulation
+    }
+
+    public void autoCloseIntakeCube() {
+        if(objectInRange()) {
+
+            if (!getReverseLimitSwitch() && previousLimitSwitch) { 
+
+                // If the claw is not fully open & if we need to open the claw, open claw
+                openIntake();
+                // previousLimitSwitch = getReverseLimitSwitch();
+                return;
+            }
+            else {
+                previousLimitSwitch = false;
+                double encoderPosition = encoder.getPosition();
+                    if(encoderPosition >= IntakeConstants.CUBE_MEDIUM_BOUND-1){
+                        motor.set(0.0);
+                    }
+                    else{
+                        motor.set(IntakeConstants.TARGET_VELOCITY);
+                    }
+                
+                }
+                }
+                else{
+                    motor.set(0.0);
+                }
+
+            }
+    public void autoCloseIntakeCone() {
+        if(objectInRange()) {
+            if (!getReverseLimitSwitch() && previousLimitSwitch) { 
+                // If the claw is not fully open & if we need to open the claw, open claw
+                openIntake();
+                return;
+            }
+            else {
+                previousLimitSwitch = false;
+                double encoderPosition = encoder.getPosition();
+                if(encoderPosition >= IntakeConstants.CUBE_MEDIUM_BOUND-1){
+                        motor.set(0.0);
+                    }
+                    else{
+                        motor.set(IntakeConstants.TARGET_VELOCITY);
+                    }
+                
+            }
+        }
+            else{
+            motor.set(0.0);
+        }
+        
     }
 }

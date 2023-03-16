@@ -41,6 +41,10 @@ public class ArmSubsystem extends SubsystemBase {
         double[] fK = armInterface.Arm.forwardKinematics(armInterface.getPositionProximal(), armInterface.getPositionDistal());
         return new double[]{fK[0], fK[1]};
     }
+    public double getYPosition(){
+        double[] fK = armInterface.Arm.forwardKinematics(armInterface.getPositionProximal(), armInterface.getPositionDistal());
+        return fK[1];
+    }
     public double[] inverseKinematics(double x, double y){
         double[] iK = armInterface.Arm.inverseKinematics(x, y);
         return new double[]{iK[0], iK[1]};
