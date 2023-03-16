@@ -27,7 +27,7 @@ public class CANdleSubsystem extends SubsystemBase {
     private static final CANdle candle3 = new CANdle(61); //Back Left
     private static final CANdle candle4 = new CANdle(62); //Back Right
     public static final Color black = new Color(0, 0, 0);
-
+    private static double prev = 0.0;
    
 
     // Game piece colors
@@ -105,12 +105,11 @@ public class CANdleSubsystem extends SubsystemBase {
 
     public Command indicateConeCommand() {
         CANdleSubsystem.color = CANdleSubsystem.yellow;
-        System.out.println("Color set to yellow");
-        SmartDashboard.putNumber("Color On Cone Command Time", Timer.getFPGATimestamp());
-        LEDSegment.BackLeftStrip.clearAnimation();
-        LEDSegment.BackRightStrip.clearAnimation();
-        LEDSegment.BackRightStrip.clearAnimation();
-        LEDSegment.FrontLeftStrip.clearAnimation();
+        CANdleSubsystem.prev = 0.0;
+        // LEDSegment.BackLeftStrip.clearAnimation();
+        // LEDSegment.BackRightStrip.clearAnimation();
+        // LEDSegment.BackRightStrip.clearAnimation();
+        // LEDSegment.FrontLeftStrip.clearAnimation();
         final Color newColor = new Color(CANdleSubsystem.color);
         return buildSideStripCommand(() -> {
             
@@ -123,24 +122,45 @@ public class CANdleSubsystem extends SubsystemBase {
     public Command indicateActiveSide(){
         LEDSegment.BackLeftStrip.clearAnimation();
         LEDSegment.BackRightStrip.clearAnimation();
-        LEDSegment.BackRightStrip.clearAnimation();
+        LEDSegment.FrontRightStrip.clearAnimation();
         LEDSegment.FrontLeftStrip.clearAnimation();
+
+        LEDSegment.BackLeftStrip.disableLEDs();
+        LEDSegment.BackRightStrip.disableLEDs();
+        LEDSegment.FrontRightStrip.disableLEDs();
+        LEDSegment.FrontLeftStrip.disableLEDs();
+        final double newPrev = prev;
+        // if(newPrev == 1.0){
+            // final Color newColor = new Color(purple);
             return buildSideStripCommand(() -> {
             
-                LEDSegment.BackRightStrip.setFlowAnimation(blue,0.5);
-                LEDSegment.BackLeftStrip.setFlowAnimation(blue,0.5);
+                LEDSegment.BackRightStrip.setFlowAnimation(blue, 0.5);
+                LEDSegment.BackLeftStrip.setFlowAnimation(blue, 0.5);
                 LEDSegment.FrontLeftStrip.setColor(blue);
                 LEDSegment.FrontRightStrip.setColor(blue);
  
-            });
+            // });
+        });
+        // else{
+        //     final Color newColor = new Color(yellow);
+        //     return buildSideStripCommand(() -> {
+            
+        //         LEDSegment.BackRightStrip.setFlowAnimation(newColor, 0.5);
+        //         LEDSegment.BackLeftStrip.setFlowAnimation(newColor, 0.5);
+        //         LEDSegment.FrontLeftStrip.setColor(newColor);
+        //         LEDSegment.FrontRightStrip.setColor(newColor);
+ 
+        //     });
+        // }
     }
     public Command indicateCubeCommand() {
         CANdleSubsystem.color = CANdleSubsystem.purple;
-        // SmartDashboard.putNumber("Color On Cube Command Time", Timer.getFPGATimestamp());
-        LEDSegment.BackLeftStrip.clearAnimation();
-        LEDSegment.BackRightStrip.clearAnimation();
-        LEDSegment.BackRightStrip.clearAnimation();
-        LEDSegment.FrontLeftStrip.clearAnimation();
+        CANdleSubsystem.prev = 1.0;
+
+        // LEDSegment.BackLeftStrip.clearAnimation();
+        // LEDSegment.BackRightStrip.clearAnimation();
+        // LEDSegment.BackRightStrip.clearAnimation();
+        // LEDSegment.FrontLeftStrip.clearAnimation();
         
         final Color newColor = new Color(CANdleSubsystem.color);
         return buildSideStripCommand(() -> {

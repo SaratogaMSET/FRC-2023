@@ -34,10 +34,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -245,8 +248,8 @@ public class RobotContainer {
     m_driverController.b().onTrue(new BalanceCommand(m_drivetrainSubsystem));
 
     m_gunner1.button(1).whileTrue(m_ledSubsystem.indicateActiveSide());
-    m_gunner1.button(3).onTrue(m_ledSubsystem.indicateCubeCommand());
-    m_gunner1.button(5).onTrue(m_ledSubsystem.indicateConeCommand());
+    m_gunner1.button(3).toggleOnTrue(new ConditionalCommand(m_ledSubsystem.indicateConeCommand(), m_ledSubsystem.indicateCubeCommand(), () -> m_gunner1.button(3).getAsBoolean()));
+    // m_gunner1.button(3).toggleOnFalse(m_ledSubsystem.indicateConeCommand());
    
 
     
@@ -259,6 +262,7 @@ public class RobotContainer {
     ));
 
     m_driverController.rightBumper().toggleOnTrue(new ParallelCommandGroup(ArmSequences.ready(m_armSubsystem, 0)));
+    // m_driverController.rightBumper().toggleOnFalse(new ArmZeroCommand(m_armSubsystem));
 
     m_driverController.rightBumper().and(m_gunner1.button(1)).toggleOnTrue(
        new ParallelCommandGroup(ArmSequences.ready(m_armSubsystem, 1) //new DefaultDriveCommand(
