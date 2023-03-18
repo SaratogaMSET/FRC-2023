@@ -35,8 +35,8 @@ public class DefaultDriveCommand extends CommandBase {
     @Override
     public void execute() {
 
-        m_translationXTrapezoidal = (m_translationXSupplier.getAsDouble()-m_translationXTrapezoidal)/6 + m_translationXTrapezoidal;
-        m_translationYTrapezoidal = (m_translationYSupplier.getAsDouble()-m_translationYTrapezoidal)/6 + m_translationYTrapezoidal;
+        m_translationXTrapezoidal = (m_translationXSupplier.getAsDouble()-m_translationXTrapezoidal)/5 + m_translationXTrapezoidal;
+        m_translationYTrapezoidal = (m_translationYSupplier.getAsDouble()-m_translationYTrapezoidal)/5 + m_translationYTrapezoidal;
 
         double magnitude = Math.hypot(m_translationXTrapezoidal, m_translationYTrapezoidal);
 
@@ -51,7 +51,8 @@ public class DefaultDriveCommand extends CommandBase {
         SmartDashboard.putNumber("m_translationXSupplier", m_translationXTrapezoidal);
         SmartDashboard.putNumber("m_translationYSupplier", m_translationYTrapezoidal);
         SmartDashboard.putNumber("m_rotationSupplier", m_rotationSupplier.getAsDouble());
-        
+        SmartDashboard.putNumber("Magnitude", magnitude);
+
         if(armHeight.getAsDouble() > Constants.ArmNodeDictionary.ready_midcube_score_y){
             m_drivetrainSubsystem.drive(
                     // ChassisSpeeds.fromFieldRelativeSpeeds(

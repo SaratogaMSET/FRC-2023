@@ -119,7 +119,18 @@ public class SwerveModule implements SwerveModuleIO {
         mAngleMotor.set(ControlMode.Position, Conversions.degreesToFalcon(angle.getDegrees(), Constants.Drivetrain.angleGearRatio));
         lastAngle = angle;
     }
-
+    public double getVelocity(){
+        return Conversions.falconToMPS(mDriveMotor.getSelectedSensorVelocity(), Constants.Drivetrain.wheelCircumference, Constants.Drivetrain.driveGearRatio);
+    }
+    public double getRPM(){
+        return Conversions.falconToRPM(mDriveMotor.getSelectedSensorVelocity(), Constants.Drivetrain.driveGearRatio);
+    }
+    public double getOutputPercent(){
+        return mDriveMotor.getMotorOutputPercent();
+    }
+    public double getOutputVoltage(){
+        return mDriveMotor.getMotorOutputVoltage();
+    }
     private Rotation2d getAngle(){
         return Rotation2d.fromDegrees(Conversions.falconToDegrees(mAngleMotor.getSelectedSensorPosition(), Constants.Drivetrain.angleGearRatio));
     }

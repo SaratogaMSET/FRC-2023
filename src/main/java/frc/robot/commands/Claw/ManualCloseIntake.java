@@ -33,7 +33,7 @@ public class ManualCloseIntake extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.autoCloseIntake();
+    m_intake.manualCloseIntake();
   }
 
   // Called once the command ends or is interrupted.

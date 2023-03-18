@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Drivetrain;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.Matrix;
@@ -247,8 +249,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         //Logger.getInstance().recordOutput("CurrentSwerveModuleStates", getModuleStates());
 
-        for(int i =0; i < 4; i++){
+        for(int i = 0; i < 4; i++){
             mSwerveMods[i].updateInputs(moduleInputs[i]);
+            SmartDashboard.putNumber(i + "Motor Output Percent", mSwerveMods[i].getOutputPercent());
+            SmartDashboard.putNumber(i + "Motor Output Voltage", mSwerveMods[i].getOutputVoltage());
+            SmartDashboard.putNumber(i + "Velocity", mSwerveMods[i].getVelocity());
+            SmartDashboard.putNumber(i + "RPM" , mSwerveMods[i].getRPM());
+            Logger.getInstance().recordOutput(i + "Motor Output Percent", mSwerveMods[i].getOutputPercent());
+            Logger.getInstance().recordOutput(i + "Motor Output Voltage", mSwerveMods[i].getOutputVoltage());
+
         }
         //Logger.getInstance().recordOutput("Before Correction", Constants.Drivetrain.m_kinematics.toSwerveModuleStates(m_chassisSpeeds));
         //ChassisSpeeds speeds = driftCorrection(m_chassisSpeeds);

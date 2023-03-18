@@ -195,9 +195,9 @@ public final class Constants {
          * Drive Motor Characterization Values
          * Divide SYSID values by 12 to convert from volts to percent output for CTRE
          */
-        public static final double driveKS = (0);
-        public static final double driveKV = (0);
-        public static final double driveKA = (0);
+        public static final double driveKS = (0)/12;
+        public static final double driveKV = (0)/12;
+        public static final double driveKA = (0)/12;
 
         public static double balanceKS = 0.5;
 
@@ -210,16 +210,16 @@ public final class Constants {
         public static final int INTAKE_MOTOR = 20;
         public static final double GEAR_RATIO = 1 / 20.0;
         public static final int HALL_EFFECT = 0;
-        public static final double TARGET_VELOCITY = 0.875;       //beverly changed for testing
+        public static final double TARGET_VELOCITY = 0.875;   
         public static final int INTAKE_DISTANCE_THRESHOLD = 50;
         public static final double TORQUE_CONSTANT = 0.01042;
         public static final double RESISTANCE = 12 / (11000 * 2 * 3.14159265 / 60);
         public static final double TARGET_VOLTAGE = 1;
-        public static final double TORQUE_THRESHOLD = 100;      //beverly changed for testing
-        public static final double CLOSING_TORQUE_THRESHOLD = 25;        //beverly changed for testing
+        public static final double TORQUE_THRESHOLD = 100;      
+        public static final double CLOSING_TORQUE_THRESHOLD = 25;       
         public static final double LOWER_BOUND = -2.5;
-        public static final double CUBE_MEDIUM_BOUND = 50;
-        public static final double CONE_MEDIUM_BOUND = 88.2;     // TODO: Tune value
+        public static final double CUBE_MEDIUM_BOUND = 56;
+        public static final double CONE_MEDIUM_BOUND = 102.78;
         public static final double UPPER_BOUND = 5;
         public static final double HOLD_VOLTAGE = TARGET_VOLTAGE / 10;
         public static final double AUTO_CONE_DIAMETER = 0.0;
@@ -238,7 +238,7 @@ public final class Constants {
         public static final double H1_LL3 = 0.273; // METERS, 0.3429 on board, 0.489 on floudner.
         public static final double A1_LL3 = 20; // limelight angle!
 
-        public static final double C1_LL3 = 0.323; //vrt / y value check the picture Idk why govind called it that
+        public static final double C1_LL3 = 0.323; //vrt / y value check the picture 
         public static final double C2_LL3 = 0.228; // horizontal / x value check the picture :??????
         
         /* LL2 Data */
@@ -246,7 +246,7 @@ public final class Constants {
         public static final double H1_LL2 = 0.279; // METERS, 0.3429 on board, 0.489 on floudner.
         public static final double A1_LL2 = 20; // limelight angle!
 
-        public static final double C1_LL2 = 0.314; //vrt / y value check the picture Idk why govind called it that
+        public static final double C1_LL2 = 0.314; //vrt / y value check the picture
         public static final double C2_LL2 = 0.244; // horizontal / x value check the picture :??????
 
         //goals 
@@ -328,7 +328,7 @@ public final class Constants {
         public static final double ready_highcone_score_y = 1.18;
 
         public double[] ready_midcone_score = new double[]{0.97, 0.65};
-        public static final double ready_midcone_score_x = 0.96 +.1525;
+        public static final double ready_midcone_score_x = 0.96 +.1525-0.04;
         public static final double ready_midcone_score_y = 0.66 +.1525;
 
         public double[] ready_highcube_score = new double[]{1.38, 0.96};
@@ -336,6 +336,7 @@ public final class Constants {
         public static final double ready_highcube_score_y = 0.96;
         
         public double[] ready_midcube_score = new double[]{0.97, 0.65};
+        
         public static final double ready_midcube_score_x = 0.97;
         public static final double ready_midcube_score_y = 0.65;
 
@@ -359,7 +360,7 @@ public final class Constants {
     
         public double[] ready_double_substation = new double[]{0.668, 1.08 -0.1524 - 0.0508};
         public static final double ready_double_substation_x = 0.688 -0.1;
-        public static final double ready_double_substation_y = 1.08 -0.1524 - 0.0508;
+        public static final double ready_double_substation_y = 1.08 -0.1524 - 0.0508 - 0.04;
         // public double[] pickup_double_substation = new double[]{0.62, 0.90};
       }
 }

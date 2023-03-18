@@ -60,6 +60,7 @@ import frc.robot.commands.Claw.ManualOpenIntake;
 import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.DefaultDriveCommand;
 import frc.robot.commands.Drivetrain.MoveWithClosest90;
+import frc.robot.commands.Drivetrain.TunableBalanceCommand;
 import frc.robot.commands.Drivetrain.ZeroGyroCommand;
 import frc.robot.subsystems.Vision.VisionSubsystem;
 import frc.robot.subsystems.Arm.ArmSubsystem;
@@ -80,9 +81,10 @@ public class RobotContainer {
   public static final String OneAndBalance = "One And Balance";
   public static final String OneAndBalanceBottom = "One And Balance Bottom";
   public static final String TwoPieceTop = "Cone Preload and Cube score Top";
-  public static final String OnePiece = "One Piece";
+  public static final String OnePiece = "One Piece and Community";
   public static final String OnePlusHalf = "Score, get One more and Balance Bottom";
   // public String m_autoSelected;  
+  public static final String OneAndNothing = "One Score and Nothing";
   public final SendableChooser<Boolean> autoCloseChooser = new SendableChooser<Boolean>();
   public static final Boolean disableAutoClose = false;
   public static final Boolean enableAutoClose = true;
@@ -161,8 +163,9 @@ public class RobotContainer {
 
     
     // m_autoSwitcher.addOption(Rotate, Rotate);
-    m_autoSwitcher.setDefaultOption(OnePiece, OnePiece);
+    m_autoSwitcher.setDefaultOption(OneAndNothing, OneAndNothing);
     m_autoSwitcher.addOption(OneAndBalance, OneAndBalance);
+    m_autoSwitcher.addOption(OnePiece, OnePiece);
     m_autoSwitcher.addOption(TwoPieceTop, TwoPieceTop);
     m_autoSwitcher.addOption(OneAndBalanceBottom, OneAndBalanceBottom);
     m_autoSwitcher.addOption(OnePlusHalf, OnePlusHalf);
@@ -201,8 +204,8 @@ public class RobotContainer {
     
     m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
             m_drivetrainSubsystem,
-            () -> modifyAxis(m_driverController.getLeftX()) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> modifyAxis(-m_driverController.getLeftY()) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(m_driverController.getLeftX() * 1.2) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(-m_driverController.getLeftY() * 1.2) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
             () -> modifyAxis(-m_driverController.getRightX()/1.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
             () -> m_armSubsystem.getYPosition()
     ));
@@ -210,8 +213,8 @@ public class RobotContainer {
     m_armSubsystem.setDefaultCommand(
       new ArmVoltageCommand(
         m_armSubsystem,
-        () -> modifyAxis(-modifyAxis(m_gunner1.getY() -0.5 * 1.5), 0.7),  //Axes are reverse with this setup, pushing up returns a negative number on both y axes
-        () -> modifyAxis(-modifyAxis(m_gunner1.getX() -0.5 * 1.5, 0.7))
+        () -> m_gunner1.getY(),  //Axes are reverse with this setup, pushing up returns a negative number on both y axes
+        () -> m_gunner1.getX()
       ));
 
     // m_claw.setDefaultCommand(new InstantCommand(()-> m_claw.setIdle(), m_claw));
@@ -223,9 +226,10 @@ public class RobotContainer {
     m_driverController.rightTrigger().toggleOnTrue(new RunCommand(() -> m_claw.autoCloseIntake(), m_claw));
     m_driverController.leftTrigger().whileTrue(new RunCommand(() -> m_claw.openIntake(), m_claw));
     
-    m_gunner1.button(6).whileTrue(new RunCommand(() -> m_claw.manualCloseIntake(), m_claw));
+    m_gunner1.button(6).whileTrue(new ManualCloseIntake(m_claw));
     m_gunner1.button(4).whileTrue(new RunCommand(() -> m_claw.openIntake(), m_claw));
     
+    m_driverController.x().onTrue(new InstantCommand(()->m_drivetrainSubsystem.setX(), m_drivetrainSubsystem));
 
 
     // m_driverController.y().onTrue(new SequentialCommandGroup(
@@ -245,7 +249,8 @@ public class RobotContainer {
     //         () -> modifyAxis(-m_driverController.getRightX()/1.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND     
     // ));
     
-    m_driverController.b().onTrue(new BalanceCommand(m_drivetrainSubsystem));
+    m_driverController.b().onTrue(new SequentialCommandGroup(
+      new TunableBalanceCommand(m_drivetrainSubsystem)));
 
     m_gunner1.button(1).whileTrue(m_ledSubsystem.indicateActiveSide());
     m_gunner1.button(3).toggleOnTrue(new ConditionalCommand(m_ledSubsystem.indicateConeCommand(), m_ledSubsystem.indicateCubeCommand(), () -> m_gunner1.button(3).getAsBoolean()));
@@ -256,8 +261,8 @@ public class RobotContainer {
     
     m_driverController.a().toggleOnTrue(new MoveWithClosest90(
       m_drivetrainSubsystem, 
-      () -> modifyAxis(m_driverController.getLeftX()) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-      () -> modifyAxis(-m_driverController.getLeftY()) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+      () -> modifyAxis(m_driverController.getLeftX()* 1.2) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+      () -> modifyAxis(-m_driverController.getLeftY()*1.2) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
       () -> m_armSubsystem.getYPosition()
     ));
 
@@ -274,7 +279,9 @@ public class RobotContainer {
     m_driverController.leftBumper().onTrue(new ArmZeroCommand(m_armSubsystem)); //neutral
 
     // m_gunner1.button(3).onTrue(new ToggleArmSide(m_armSubsystem));
-   
+    m_gunner1.button(5).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 0));
+    m_gunner1.button(5).and(m_gunner1.button(1)).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 1));
+
     m_gunner1.button(7).onTrue(ArmSequences.scoreConeHighNoRetract(m_armSubsystem, m_claw, 0));
     m_gunner1.button(7).and(m_gunner1.button(1)).onTrue(ArmSequences.scoreConeHighNoRetract(m_armSubsystem, m_claw, 1)); 
 
@@ -531,7 +538,7 @@ public class RobotContainer {
         // new ArmZeroCommand(m_armSubsystem),
         new SequentialCommandGroup(
           new BalanceCommand(m_drivetrainSubsystem),
-          new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.5, 0, 0).withTimeout(1.1),
+          new AutoRunCommand(m_drivetrainSubsystem, -((6 * 0.1524)/1.5), 0, 0).withTimeout(1.1),
           new InstantCommand(()-> m_drivetrainSubsystem.setX())
         )
         )
@@ -583,6 +590,63 @@ public class RobotContainer {
         new ParallelCommandGroup(
         new ArmZeroAutoCommand(m_armSubsystem),
         swerveTrajectoryFollower
+        )
+        // ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 0),
+        // new ParallelCommandGroup(
+        // new ArmZeroCommand(m_armSubsystem),
+        // new SequentialCommandGroup(
+        //   new BalanceCommand(m_drivetrainSubsystem),
+        //   new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.5, 0, 0).withTimeout(1.1),
+        //   new InstantCommand(()-> m_drivetrainSubsystem.setX())
+        // )
+        // )
+      )
+    );
+  }
+  public Command getOnePieceCommandOnly(){
+    // PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("One Piece", 4, 1);
+    // PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
+
+
+    // PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
+    // PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);//FIXME
+    // PIDController thetaController = new PIDController(
+    //       Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
+    
+    // thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    // xController.reset();
+    // yController.reset();
+    // thetaController.reset();
+
+    // PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
+    //   trajectory1, 
+    //   m_drivetrainSubsystem::getPose,
+    //   Constants.Drivetrain.m_kinematics2,
+    //   xController,
+    //   yController,
+    //   thetaController,
+    //   m_drivetrainSubsystem::drive,
+    //   true,
+    //   m_drivetrainSubsystem
+    // );
+    
+
+    return new SequentialCommandGroup(
+      new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
+      new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
+      // new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
+      // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
+      // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
+      new SequentialCommandGroup(
+        ArmSequences.scoreConeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 1),
+        new WaitCommand(0.65),
+        // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
+        // new RunCommand(()->m_claw.openIntake(), m_claw).withTimeout(0.5)
+        new ManualOpenIntake(m_claw),
+        // new InstantCommand(()->SmartDashboard.putBoolean("Claw Opened", false)),
+        new ParallelCommandGroup(
+        new ArmZeroAutoCommand(m_armSubsystem)
+        // swerveTrajectoryFollower
         )
         // ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 0),
         // new ParallelCommandGroup(
@@ -680,6 +744,8 @@ public class RobotContainer {
         getTwoPieceTopCommand();
       case OnePlusHalf:
         return getTwoPieceAndBalanceBottomCommand();
+      case OneAndNothing:
+        return getOnePieceCommandOnly();
       default:
         return getOnePieceCommand();
     }

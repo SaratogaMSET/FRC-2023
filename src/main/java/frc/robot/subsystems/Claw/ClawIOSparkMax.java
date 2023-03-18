@@ -113,9 +113,9 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
 
     public void autoCloseIntake(){
         if(objectInRange()) {
-            if (!getReverseLimitSwitch() && previousLimitSwitch) { 
+            if (!getReverseLimitSwitch() && previousLimitSwitch) {  //&&previousLimitSwitch
                 // If the claw is not fully open & if we need to open the claw, open claw
-                openIntake();
+                // openIntake();
                 return;
             }
             else {
@@ -151,6 +151,9 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
        
     }
 
+    // public void closeIntakeManualCone(){
+    //     if
+    // }
     public void manualCloseIntake(){
         // if (!getReverseLimitSwitch() && previousLimitSwitch) { 
         //     resetEncoder();

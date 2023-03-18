@@ -20,9 +20,14 @@ public class ArmVoltageCommand extends CommandBase{
 
     @Override
     public void execute(){
-        pMotorVoltage = pMotorVoltageSupplier.getAsDouble();
-        dMotorVoltage = dMotorVoltageSupplier.getAsDouble();
-        armSubsystem.voltageMotors(pMotorVoltage, dMotorVoltage);
+    //     if(Math.abs(pMotorVoltageSupplier.getAsDouble()-0.5) > 0.25 && Math.abs(dMotorVoltageSupplier.getAsDouble()-0.5) > 0.25)
+    //      armSubsystem.voltageMotors(1, 1);
+    //    else if(Math.abs(pMotorVoltageSupplier.getAsDouble()-0.5) > 0.25)
+    //     armSubsystem.voltageMotors(1, 0);
+    //     else if(Math.abs(dMotorVoltageSupplier.getAsDouble()-0.5) > 0.25)
+    //     armSubsystem.voltageMotors(0, 1);
+    //     else{ armSubsystem.voltageMotors(0, 0);} 
+    armSubsystem.voltageMotors(0, 0);
     }  
      
     @Override
