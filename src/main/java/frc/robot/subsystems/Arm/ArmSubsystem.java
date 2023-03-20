@@ -94,7 +94,7 @@ public class ArmSubsystem extends SubsystemBase {
         double distKf = 1.30;
         double armTolerance = 0.03;
 
-        double maxVoltPerVelocity = 3.5000254;
+        double maxVoltPerVelocity = 2.5000254;
         double max_voltage = 6.5;
 
         double voltageProximal = error.get(0) * proxKp + error.get(2) * proxKd;

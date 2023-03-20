@@ -268,7 +268,7 @@ public class ClawIOSparkMax extends SubsystemBase implements ClawIO {
             else {
                 previousLimitSwitch = false;
                 double encoderPosition = encoder.getPosition();
-                if(encoderPosition >= IntakeConstants.CUBE_MEDIUM_BOUND-1){
+                if(encoderPosition >= IntakeConstants.CONE_MEDIUM_BOUND-1){
                         motor.set(0.0);
                     }
                     else{

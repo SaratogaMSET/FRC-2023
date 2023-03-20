@@ -45,7 +45,7 @@ public class ManualOpenIntake extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(m_intake.getReverseLimitSwitch() || m_intake.encoder.getPosition() <= 0) 
+    if(m_intake.getReverseLimitSwitch()) 
       return true;
 
     return false;
