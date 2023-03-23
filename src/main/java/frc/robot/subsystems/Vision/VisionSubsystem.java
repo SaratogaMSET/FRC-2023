@@ -46,6 +46,11 @@ public class VisionSubsystem extends SubsystemBase {
         return getTable().getEntry("tv").getInteger(0) == 1;
     }
 
+    public long getTagId(){
+        if (getPipeline() != 0) return -1;
+        return getTable().getEntry("tid").getInteger(-1);
+    }
+
     /* Retroreflective(NOT USEFUL) */
 
     public double getTX(){
@@ -85,8 +90,8 @@ public class VisionSubsystem extends SubsystemBase {
             a = Math.sin(Math.toRadians(tx)) * d1;  // x val 
             b = Math.cos(Math.toRadians(tx)) * d1;  // y val
 
-            //double angle = Math.atan((a + Constants.VisionConstants.C2_LL3) / (b + Constants.VisionConstants.C1_LL3));
-        double[] x = {a - Constants.VisionConstants.C2_LL3, b + Constants.VisionConstants.C1_LL3}; //, Math.toDegrees(angle)};
+            double angle = Math.atan((a - Constants.VisionConstants.C2_LL3) / (b + Constants.VisionConstants.C1_LL3));
+        double[] x = {a - Constants.VisionConstants.C2_LL3, b + Constants.VisionConstants.C1_LL3, Math.toDegrees(angle)};
             return x;
         } else {
             d1 = getDistanceFromRetro();
@@ -94,10 +99,10 @@ public class VisionSubsystem extends SubsystemBase {
             a = Math.sin(Math.toRadians(tx)) * d1;  // x val 
             b = Math.cos(Math.toRadians(tx)) * d1;  // y val
 
-            //double angle = Math.atan((a + Constants.VisionConstants.C2_LL3) / (b + Constants.VisionConstants.C1_LL3));
+            double angle = Math.atan((a - Constants.VisionConstants.C2_LL3) / (b + Constants.VisionConstants.C1_LL3));
             
             // negative x -> arm is to the right. idk why man 
-        double[] x = {a - Constants.VisionConstants.C2_LL2, b + Constants.VisionConstants.C1_LL2}; //, Math.toDegrees(angle)};
+        double[] x = {a - Constants.VisionConstants.C2_LL2, b + Constants.VisionConstants.C1_LL2, Math.toDegrees(angle)};
             return x; 
         }
     }

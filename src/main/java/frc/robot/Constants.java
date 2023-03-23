@@ -4,15 +4,20 @@
 
 package frc.robot;
 
+import java.util.HashMap;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.lib.swerve.SwerveDriveKinematics2;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
+
+import java.util.Map;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -204,6 +209,84 @@ public final class Constants {
         public static double balanceKV = 0.5;
 
         public static double balanceKA = 0.4;
+
+        // public static class ScoringTag{
+
+        //         private int tagNum;
+        //         public ScoringTag(int tagNum){
+        //                 if (tagNum < 1 || tagNum > 8) this.tagNum = 0;
+        //                 else this.tagNum = tagNum;
+        //         }       
+
+        //         public enum ScoringPositions{
+        //                 CENTER, RIGHT, LEFT;
+        //         }
+        // }
+
+        public static enum ScoringTag{
+                APRILTAG1, APRILTAG2, APRILTAG3, APRILTAG6, APRILTAG7, APRILTAG8;
+        }
+
+        public static final Map<Long, ScoringTag> tagConversion = Map.ofEntries(
+                /* i have no clue how to do this w/ deprecating */
+                Map.entry(new Long(1), ScoringTag.APRILTAG1),
+                Map.entry(new Long(2), ScoringTag.APRILTAG2),
+                Map.entry(new Long(3), ScoringTag.APRILTAG3),
+                Map.entry(new Long(6), ScoringTag.APRILTAG6),
+                Map.entry(new Long(7), ScoringTag.APRILTAG7),
+                Map.entry(new Long(8), ScoringTag.APRILTAG8)
+        );
+
+        public static final Map<ScoringTag, Pose2d[]> ScoringMap = Map.ofEntries(
+                //TODO fill in actual coordinates, degrees, choose how we wanna do the arrays. [left, center, right]?
+                /* 8 */
+                Map.entry(ScoringTag.APRILTAG8, 
+                        new Pose2d[] {
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180))
+                        }),
+
+                /* 7 */
+                Map.entry(ScoringTag.APRILTAG7, 
+                        new Pose2d[] {
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180))
+                        }),
+
+                /* 6 */
+                Map.entry(ScoringTag.APRILTAG6, 
+                        new Pose2d[] {
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180))
+                        }),
+
+                /* 3 */
+                Map.entry(ScoringTag.APRILTAG3, 
+                        new Pose2d[] {
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180))
+                        }),
+
+                /* 2 */
+                Map.entry(ScoringTag.APRILTAG2, 
+                        new Pose2d[] {
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180))
+                        }),
+
+                /* 1 */
+                Map.entry(ScoringTag.APRILTAG1, 
+                        new Pose2d[] {
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+                                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180))
+                        })
+        );
     }
 
     public static class IntakeConstants {
