@@ -54,7 +54,7 @@ import frc.robot.commands.Drivetrain.ZeroGyroCommand;
 import frc.robot.subsystems.Vision.VisionSubsystem;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem;
-import frc.robot.subsystems.Claw.ClawIOSparkMax;
+import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 
 /**
@@ -78,7 +78,7 @@ public class RobotContainer {
   public static final Boolean enableAutoClose = true;
 
   
-  public final ClawIOSparkMax m_claw = new ClawIOSparkMax();
+  public final ClawSubsystem m_claw = new ClawSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   public final static VisionSubsystem m_visionSubsystem = new VisionSubsystem();
   public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();  
@@ -212,11 +212,11 @@ public class RobotContainer {
       ()-> DriverStation.isAutonomous(),
       ()-> autoCloseChooser.getSelected()));
 
-    m_driverController.rightTrigger().toggleOnTrue(new RunCommand(() -> m_claw.autoCloseIntake(), m_claw));
-    m_driverController.leftTrigger().whileTrue(new RunCommand(() -> m_claw.openIntake(), m_claw));
+    m_driverController.rightTrigger().toggleOnTrue(new RunCommand(() -> m_claw.autoCloseClaw(), m_claw));
+    m_driverController.leftTrigger().whileTrue(new RunCommand(() -> m_claw.openClaw(), m_claw));
     
     m_gunner1.button(6).whileTrue(new ManualCloseIntake(m_claw));
-    m_gunner1.button(4).whileTrue(new RunCommand(() -> m_claw.openIntake(), m_claw));
+    m_gunner1.button(4).whileTrue(new RunCommand(() -> m_claw.openClaw(), m_claw));
     
     m_driverController.x().onTrue(new InstantCommand(()->m_drivetrainSubsystem.setX(), m_drivetrainSubsystem));
 

@@ -6,19 +6,19 @@ package frc.robot.commands.Claw;
 
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Claw.ClawIOSparkMax;
+import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class ManualOpenIntake extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final ClawIOSparkMax m_intake;
+  private final ClawSubsystem m_intake;
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public ManualOpenIntake(ClawIOSparkMax subsystem) {
+  public ManualOpenIntake(ClawSubsystem subsystem) {
     m_intake = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
@@ -33,7 +33,7 @@ public class ManualOpenIntake extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.openIntake();
+    m_intake.openClaw();
   }
 
   // Called once the command ends or is interrupted.
@@ -45,7 +45,7 @@ public class ManualOpenIntake extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(m_intake.getReverseLimitSwitch()) 
+    if(m_intake.isClawFullyOpen()) 
       return true;
 
     return false;

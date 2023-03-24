@@ -3,7 +3,7 @@ package frc.robot.subsystems.Claw;
 import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import frc.robot.subsystems.Claw.ClawSubsystem.Objects;
+import frc.robot.subsystems.Claw.ClawSubsystem.GamePiece;
 
 public interface ClawIO {
     @AutoLog
@@ -23,7 +23,7 @@ public interface ClawIO {
     public default void setMotorVoltage(double volts) {}
 
     /** Open the intake using torque spike */
-    public default void openIntake() {}
+    public default void openClaw() {}
 
     /**  */
     public default void setIdle() {}
@@ -32,7 +32,7 @@ public interface ClawIO {
         return false;
     }
 
-    public default void closeIntake(Objects object){}
+    public default void closeIntake(GamePiece object){}
 
     public default double closeIntake() {
         return 0.0;

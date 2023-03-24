@@ -6,20 +6,20 @@ package frc.robot.commands.Claw;
 
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Claw.ClawIOSparkMax;
+import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class ManualCloseIntake extends CommandBase {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-  private final ClawIOSparkMax m_intake;
+  private final ClawSubsystem m_intake;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public ManualCloseIntake(ClawIOSparkMax subsystem) {
+  public ManualCloseIntake(ClawSubsystem subsystem) {
     m_intake = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
@@ -33,7 +33,7 @@ public class ManualCloseIntake extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.manualCloseIntake();
+    m_intake.manualCloseClaw();
   }
 
   // Called once the command ends or is interrupted.

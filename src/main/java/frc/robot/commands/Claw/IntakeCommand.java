@@ -8,27 +8,27 @@ import java.util.function.BooleanSupplier;
 
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Claw.ClawIOSparkMax;
+import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class IntakeCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final ClawIOSparkMax m_intake;
+  private final ClawSubsystem m_intake;
   private BooleanSupplier isAuton;
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public IntakeCommand(ClawIOSparkMax subsystem) {
+  public IntakeCommand(ClawSubsystem subsystem) {
     m_intake = subsystem;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
   
-  public IntakeCommand(ClawIOSparkMax subsystem, BooleanSupplier isAuto){
+  public IntakeCommand(ClawSubsystem subsystem, BooleanSupplier isAuto){
     m_intake = subsystem;
     isAuton = isAuto;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -54,8 +54,8 @@ public class IntakeCommand extends CommandBase {
   @Override
   public void execute() {
     if(!isAuton.getAsBoolean()){
-      if(m_intake.objectInRange()){
-        m_intake.autoCloseIntake();
+      if(m_intake.isGamepieceInRange()){
+        m_intake.autoCloseClaw();
       }
     }
     else{
