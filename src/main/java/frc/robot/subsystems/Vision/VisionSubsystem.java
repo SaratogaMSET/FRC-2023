@@ -21,7 +21,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     public VisionSubsystem() {}
 
-    private NetworkTable getTable(){
+    public NetworkTable getTable(){
         if (ll3.getEntry("tv").getInteger(0) == 1){
             SmartDashboard.putNumber("check", 1);
             return ll3;

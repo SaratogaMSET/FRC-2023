@@ -11,7 +11,7 @@ public class TurnToCone extends CommandBase{
 
     private final DrivetrainSubsystem m_drivetrain; 
     private final VisionSubsystem m_visionSubsystem;
-    PIDController controller = new PIDController(0.5, 0, 0.01);
+    PIDController controller = new PIDController(0.5, 0, 0.05);
 
     double pidValue;
 
@@ -25,6 +25,7 @@ public class TurnToCone extends CommandBase{
     @Override
     public void initialize(){
         controller.enableContinuousInput(-180, 180);
+        m_visionSubsystem.setPipeline(2);
     }
 
     @Override

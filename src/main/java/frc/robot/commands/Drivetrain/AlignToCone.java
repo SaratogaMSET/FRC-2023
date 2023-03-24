@@ -11,6 +11,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.Constants.Vision;
 
+@Deprecated
 public class AlignToCone extends CommandBase{
     private final PIDController xController; // yController, angController;
     private final DrivetrainSubsystem m_drivetrainSubsystem;
@@ -36,12 +37,12 @@ public class AlignToCone extends CommandBase{
     @Override
     public void initialize() {
         xController.setSetpoint(0); 
+        if (m_visionSubsystem.getPipeline() < 1) m_visionSubsystem.setPipeline(2);
     }
-
     @Override
     public void execute() {
 
-        if (m_visionSubsystem.getPipeline() < 1) return;
+     
         this.xVel = xController.calculate(-m_visionSubsystem.getOffsetTo2DOFBase()[0], 0.0);
         SmartDashboard.putNumber("asdf", xVel);
         if (xVel > 3) {
@@ -57,6 +58,7 @@ public class AlignToCone extends CommandBase{
         //m_drivetrainSubsystem.drive(new ChassisSpeeds(0, -xVel, 0));
     }
 
+    
     @Override
     public void end(boolean interrupted) {
         m_drivetrainSubsystem.drive(new ChassisSpeeds());

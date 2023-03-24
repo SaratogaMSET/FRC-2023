@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.swerve.BetterSwerveModuleState;
 import frc.lib.swerve.SwerveDriveKinematics2;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.SwerveModule;
 
 public class DrivetrainSubsystem extends SubsystemBase {
@@ -67,8 +68,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
         m_navx.zeroYaw();
         //zeroGyroscope();  
         resetModulesToAbsolute();     
-
+        try{
+            visionData = RobotContainer.m_visionSubsystem.getTable();
+        }
+        catch(Exception e){
         visionData = NetworkTableInstance.getDefault().getTable("limelight");
+        }
 
         stateSTD.set(0, 0, 0.01); stateSTD.set(1, 0, 0.01); stateSTD.set(2, 0, 0.01); //Tune Values
         visDataSTD.set(0, 0, 0.99); visDataSTD.set(1, 0, 0.99); visDataSTD.set(2, 0, 0.99);

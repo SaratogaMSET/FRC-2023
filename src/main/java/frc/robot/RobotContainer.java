@@ -15,58 +15,46 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
-import com.pathplanner.lib.auto.BetterSwerveAutoBuilder;
-import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.commands.PPSwerveControllerCommandA;
-import com.revrobotics.ColorSensorV3;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Drivetrain;
-import frc.robot.Constants.IntakeConstants;
-import frc.robot.commands.Arm.ArmPositionCommand;
 import frc.robot.commands.Arm.ArmSequences;
 import frc.robot.commands.Arm.ArmVoltageCommand;
 import frc.robot.commands.Arm.ArmZeroAutoCommand;
 import frc.robot.commands.Arm.ArmZeroCommand;
-import frc.robot.commands.Arm.ToggleArmSide;
 import frc.robot.commands.Auton.AutoRunCommand;
 import frc.robot.commands.Claw.BackUpIntakeCommand;
-import frc.robot.commands.Claw.IntakeCommand;
 import frc.robot.commands.Claw.ManualCloseIntake;
 import frc.robot.commands.Claw.ManualOpenIntake;
 import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.DefaultDriveCommand;
 import frc.robot.commands.Drivetrain.MoveWithClosest90;
 import frc.robot.commands.Drivetrain.TunableBalanceCommand;
+import frc.robot.commands.Drivetrain.TurnToCone;
 import frc.robot.commands.Drivetrain.ZeroGyroCommand;
 import frc.robot.subsystems.Vision.VisionSubsystem;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem;
 import frc.robot.subsystems.Claw.ClawIOSparkMax;
-import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 
 /**
@@ -89,10 +77,11 @@ public class RobotContainer {
   public static final Boolean disableAutoClose = false;
   public static final Boolean enableAutoClose = true;
 
-  public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
+  
   public final ClawIOSparkMax m_claw = new ClawIOSparkMax();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
-  private final VisionSubsystem m_visionSubsystem = new VisionSubsystem();  
+  public final static VisionSubsystem m_visionSubsystem = new VisionSubsystem();
+  public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();  
   private final CANdleSubsystem m_ledSubsystem = new CANdleSubsystem();
   // private final ClawSubsystem m_clawSubsystem = new ClawSubsystem(new ClawIOSparkMax());
   
@@ -239,7 +228,7 @@ public class RobotContainer {
     // ));
     m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
 
-    m_gunner1.button(2).onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
+    m_gunner1.button(2).onTrue(new TurnToCone(m_drivetrainSubsystem, m_visionSubsystem));
 
     // m_driverController.x().toggleOnTrue(
     //   new DefaultDriveCommand(
@@ -255,9 +244,6 @@ public class RobotContainer {
     m_gunner1.button(1).whileTrue(m_ledSubsystem.indicateActiveSide());
     m_gunner1.button(3).toggleOnTrue(new ConditionalCommand(m_ledSubsystem.indicateConeCommand(), m_ledSubsystem.indicateCubeCommand(), () -> m_gunner1.button(3).getAsBoolean()));
     // m_gunner1.button(3).toggleOnFalse(m_ledSubsystem.indicateConeCommand());
-   
-
-    
     
     m_driverController.a().toggleOnTrue(new MoveWithClosest90(
       m_drivetrainSubsystem, 
@@ -489,7 +475,7 @@ public class RobotContainer {
 
   }
   public Command getOnePieceAndBalanceCommand(){
-    PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("Middle Path", 2, 3);
+    PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("Middle Path", 2, 1); // 2 3
     PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
 
 
@@ -547,7 +533,7 @@ public class RobotContainer {
   }
 
   public Command getOnePieceAndBalanceBringArmBackCommand(){
-    PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("Middle Path", 2, 3);
+    PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("Middle Path", 2, 1); // 2 3 
     PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
 
 
