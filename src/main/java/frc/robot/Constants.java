@@ -293,7 +293,7 @@ public final class Constants {
         public static final int INTAKE_MOTOR = 20;
         public static final double GEAR_RATIO = 1 / 20.0;
         public static final int HALL_EFFECT = 0;
-        public static final double TARGET_VELOCITY = 0.875;   
+        public static final double TARGET_VELOCITY = 1; //0.875 
         public static final int INTAKE_DISTANCE_THRESHOLD = 50;
         public static final double TORQUE_CONSTANT = 0.01042;
         public static final double RESISTANCE = 12 / (11000 * 2 * 3.14159265 / 60);

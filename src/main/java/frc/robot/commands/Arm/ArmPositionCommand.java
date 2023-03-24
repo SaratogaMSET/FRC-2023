@@ -30,7 +30,14 @@ public class ArmPositionCommand extends CommandBase{
         this.hold = hold;
         addRequirements(armSubsystem);
     }   
-
+    public ArmPositionCommand(ArmSubsystem armSubsystem, double tX, double tY, boolean hold, double tolerance){
+        this.armSubsystem = armSubsystem;
+        this.tX = tX;
+        this.tY = tY;
+        this.hold = hold;
+        this.tolerance = tolerance;
+        addRequirements(armSubsystem);
+    }   
     @Override
     public void execute(){
         double[] iK = armSubsystem.inverseKinematics(tX, tY);
