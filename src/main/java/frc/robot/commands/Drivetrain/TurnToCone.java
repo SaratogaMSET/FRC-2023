@@ -11,14 +11,14 @@ public class TurnToCone extends CommandBase{
 
     private final DrivetrainSubsystem m_drivetrain; 
     private final VisionSubsystem m_visionSubsystem;
-    PIDController controller = new PIDController(0.5, 0, 0.05);
+    PIDController controller = new PIDController(0.5, 0, 0.1);
 
     double pidValue;
 
     public TurnToCone(DrivetrainSubsystem drivetrainSubsystem, VisionSubsystem visionSubsystem){
         this.m_drivetrain = drivetrainSubsystem;
         this.m_visionSubsystem = visionSubsystem;
-        controller.setTolerance(0.4);
+        controller.setTolerance(0.4); //0.4
         addRequirements(drivetrainSubsystem, visionSubsystem);  
 
     }
@@ -34,9 +34,9 @@ public class TurnToCone extends CommandBase{
         pidValue = controller.calculate(m_visionSubsystem.getOffsetTo2DOFBase()[2], 0); //-> to radians
 
         if (pidValue > 1) {
-            pidValue = 1;
+            pidValue = 0.5;
         } else if (pidValue < -1){
-            pidValue = -1;
+            pidValue = -0.5;
         }
 
         SmartDashboard.putNumber("pidvalue", pidValue);

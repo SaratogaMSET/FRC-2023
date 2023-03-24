@@ -252,26 +252,26 @@ public class RobotContainer {
       () -> m_armSubsystem.getYPosition()
     ));
 
-    m_driverController.rightBumper().toggleOnTrue(new ParallelCommandGroup(ArmSequences.ready(m_armSubsystem, 0)));
+    m_driverController.rightBumper().toggleOnTrue(ArmSequences.ready(m_armSubsystem, m_claw, 0));
     // m_driverController.rightBumper().toggleOnFalse(new ArmZeroCommand(m_armSubsystem));
 
     m_driverController.rightBumper().and(m_gunner1.button(1)).toggleOnTrue(
-       new ParallelCommandGroup(ArmSequences.ready(m_armSubsystem, 1) //new DefaultDriveCommand(
+       new ParallelCommandGroup(ArmSequences.ready(m_armSubsystem, m_claw ,1) //new DefaultDriveCommand(
       //   m_drivetrainSubsystem,
       //   () -> modifyAxis(m_driverController.getLeftX()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
       //   () -> modifyAxis(-m_driverController.getLeftY()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
       //   () -> modifyAxis(-m_driverController.getRightX()/1.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
     ));
-    m_driverController.leftBumper().onTrue(new ArmZeroCommand(m_armSubsystem)); //neutral
+    m_driverController.leftBumper().onTrue(new ArmZeroAutoCommand(m_armSubsystem)); //neutral
 
     // m_gunner1.button(3).onTrue(new ToggleArmSide(m_armSubsystem));
-    m_gunner1.button(5).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 0));
-    m_gunner1.button(5).and(m_gunner1.button(1)).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 1));
+    m_gunner1.button(5).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, m_claw, 0));
+    m_gunner1.button(5).and(m_gunner1.button(1)).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, m_claw,  1));
 
-    m_gunner1.button(7).onTrue(ArmSequences.scoreConeHighNoRetract(m_armSubsystem, m_claw, 0));
+    m_gunner1.button(7).onTrue(ArmSequences.scoreConeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 0));
     m_gunner1.button(7).and(m_gunner1.button(1)).onTrue(ArmSequences.scoreConeHighNoRetract(m_armSubsystem, m_claw, 1)); 
 
-    m_gunner1.button(8).onTrue(ArmSequences.scoreCubeHighNoRetract(m_armSubsystem,m_claw, 0));
+    m_gunner1.button(8).onTrue(ArmSequences.scoreCubeHighNoRetractHighTolerance(m_armSubsystem,m_claw, 0));
     m_gunner1.button(8).and(m_gunner1.button(1)).onTrue(ArmSequences.scoreCubeHighNoRetract(m_armSubsystem, m_claw, 1)); 
     
 
