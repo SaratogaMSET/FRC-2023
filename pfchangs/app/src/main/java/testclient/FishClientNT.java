@@ -18,16 +18,14 @@ public class FishClientNT {
 
     private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
-    public final NetworkTable limelightTable = inst.getTable("limelight"); // this is so scuffed aaaaaaa
-
     private final NetworkTable visionTable = inst.getTable("vision");
     private final IntegerSubscriber visionIDSub = visionTable.getIntegerTopic("id").subscribe(-1);
     private final BooleanSubscriber hasTargetsSub = visionTable.getBooleanTopic("hasTargets").subscribe(false);
     private final IntegerSubscriber tagIDSub = visionTable.getIntegerTopic("tagID").subscribe(-1);
     private final DoubleArraySubscriber distanceSub = visionTable.getDoubleArrayTopic("distances").subscribe(
-        new double[]{-1, -1, -1, -1, -1, -1, -1, -1});
+            new double[] { -1, -1, -1, -1, -1, -1, -1, -1 });
     private final DoubleArraySubscriber camposeSub = visionTable.getDoubleArrayTopic("campose").subscribe(
-        new double[3]);
+            new double[3]);
 
     private final NetworkTable odomTable = inst.getTable("odom");
     private final IntegerSubscriber odomIDSub = odomTable.getIntegerTopic("id").subscribe(-1);
@@ -64,16 +62,15 @@ public class FishClientNT {
 
     private RobotData readNTData() {
         return new RobotData(
-            (int) visionIDSub.get(), 
-            hasTargetsSub.get(), 
-            (int) tagIDSub.get(), 
-            distanceSub.get(), 
-            camposeSub.get(),
-            (int) odomIDSub.get(),
-            odomXSub.get(),
-            odomYSub.get(),
-            odomWSub.get()
-        );
+                (int) visionIDSub.get(),
+                hasTargetsSub.get(),
+                (int) tagIDSub.get(),
+                distanceSub.get(),
+                camposeSub.get(),
+                (int) odomIDSub.get(),
+                odomXSub.get(),
+                odomYSub.get(),
+                odomWSub.get());
     }
 
     private void publishEstimate(int id, Pose2d pose) {
@@ -86,7 +83,8 @@ public class FishClientNT {
 
     public void startAMCL() {
         System.out.println("Starting AMCL.");
-        while (odomIDSub.get() == -1) {}
+        while (odomIDSub.get() == -1) {
+        }
         System.out.println("Received first measurement!");
 
         amcl.resetMCL();
@@ -101,35 +99,32 @@ public class FishClientNT {
                 RobotData latestData = readNTData();
                 prevOdomPose = currentOdomPose;
                 currentOdomPose = new Pose2d(
-                    latestData.odom.x, 
-                    latestData.odom.y, 
-                    new Rotation2d(latestData.odom.w)
-                );
+                        latestData.odom.x,
+                        latestData.odom.y,
+                        new Rotation2d(latestData.odom.w));
                 poseDeltas = new Pose2d(
-                    currentOdomPose.getX() - prevOdomPose.getX(),
-                    currentOdomPose.getY() - prevOdomPose.getY(),
-                    currentOdomPose.getRotation().minus(prevOdomPose.getRotation())
-                );
+                        currentOdomPose.getX() - prevOdomPose.getX(),
+                        currentOdomPose.getY() - prevOdomPose.getY(),
+                        currentOdomPose.getRotation().minus(prevOdomPose.getRotation()));
 
                 if (latestData.vision.hasTargets && latestData.odom.id == latestData.vision.id) {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     amcl.tagScanning(latestData.vision.tagID, latestData.vision.distances, latestData.vision.campose);
                     publishEstimate(latestData.odom.id, amcl.getWeightedAverage().toPose2d(
-                        Constants.FIELD_WIDTH_OFFSET,
-                        Constants.FIELD_HEIGHT_OFFSET,
-                        Constants.ROTATION_OFFSET
-                    ));
+                            Constants.FIELD_WIDTH_OFFSET,
+                            Constants.FIELD_HEIGHT_OFFSET,
+                            Constants.ROTATION_OFFSET));
                 } else {
                     amcl.updateOdometry(poseDeltas.getX(), poseDeltas.getY(), poseDeltas.getRotation().getRadians());
                     publishEstimate(latestData.odom.id, amcl.getWeightedAverage().toPose2d(
-                        Constants.FIELD_WIDTH_OFFSET,
-                        Constants.FIELD_HEIGHT_OFFSET,
-                        Constants.ROTATION_OFFSET
-                    ));
+                            Constants.FIELD_WIDTH_OFFSET,
+                            Constants.FIELD_HEIGHT_OFFSET,
+                            Constants.ROTATION_OFFSET));
                 }
             } else {
                 System.out.println("Connection dropped!");
-                while (odomIDSub.get() == -1) {}
+                while (odomIDSub.get() == -1) {
+                }
                 System.out.println("Connection reestablished! Resetting AMCL...");
                 amcl.resetMCL();
                 System.out.println("Reinitialized AMCL!");

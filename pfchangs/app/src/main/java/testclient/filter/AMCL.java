@@ -41,24 +41,23 @@ public class AMCL {
 
     public void init() {
         Random r = new Random();
-        
+
         nParticles = Constants.FilterConstants.NUM_PARTICLES;
         for (int i = 0; i < nParticles; ++i) {
             particles.add(new Particle(
-                r.nextDouble(-Constants.FIELD_WIDTH_OFFSET, 
-                    Constants.FIELD_WIDTH - Constants.FIELD_WIDTH_OFFSET), 
-                r.nextDouble(-Constants.FIELD_HEIGHT_OFFSET, 
-                    Constants.FIELD_HEIGHT - Constants.FIELD_HEIGHT_OFFSET), 
-                r.nextDouble(Math.PI * 2), 
-                1 / nParticles
-            ));
+                    r.nextDouble(-Constants.FIELD_WIDTH_OFFSET,
+                            Constants.FIELD_WIDTH - Constants.FIELD_WIDTH_OFFSET),
+                    r.nextDouble(-Constants.FIELD_HEIGHT_OFFSET,
+                            Constants.FIELD_HEIGHT - Constants.FIELD_HEIGHT_OFFSET),
+                    r.nextDouble(Math.PI * 2),
+                    1 / nParticles));
         }
 
         mGaussX = 0.1; // meters, 0.15
         mGaussW = 0.1; // radians, 0.2
         vGaussW = 0.15; // (degrees) radians, 0.15
         vGaussY = 0.1; // meters, 0.1
-        mGaussY =  0.1; // meters, 0.15
+        mGaussY = 0.1; // meters, 0.15
         mclASlow = 0.01; // 0.01
         useAdaptiveParticles = false;
         mclAFast = 0.1; // 0.1
@@ -66,9 +65,10 @@ public class AMCL {
     }
 
     /**
-     * @param angle The particle's angle
-     * @param setpoint The known angle to compare <code>angle</code> against (usually from Limelight measurements)
-     * @param angleIsRadians Whether or not <code>angle</code> is in radians
+     * @param angle             The particle's angle
+     * @param setpoint          The known angle to compare <code>angle</code>
+     *                          against (usually from Limelight measurements)
+     * @param angleIsRadians    Whether or not <code>angle</code> is in radians
      * @param setpointIsRadians Whether or not <code>setpoint</code> is in radians
      * @return
      */
@@ -85,13 +85,15 @@ public class AMCL {
         setpoint = Math.abs(setpoint);
 
         angle %= (2 * Math.PI);
-        if (angle < 0) angle += 2 * Math.PI;
+        if (angle < 0)
+            angle += 2 * Math.PI;
         return MathX.Gaussian(setpoint, vGaussW, angle);
     }
 
     /**
-     * @param angle The particle's angle in radians
-     * @param setpoint The known angle to compare <code>angle</code> against in radians
+     * @param angle    The particle's angle in radians
+     * @param setpoint The known angle to compare <code>angle</code> against in
+     *                 radians
      * @return
      */
     private double headingErr(double angle, double setpoint) {
@@ -112,12 +114,11 @@ public class AMCL {
     }
 
     public void setNoise(
-        double mGaussX, 
-        double mGaussY, 
-        double mGaussW, 
-        double vGaussX, 
-        double vGaussY
-    ) {
+            double mGaussX,
+            double mGaussY,
+            double mGaussW,
+            double vGaussX,
+            double vGaussY) {
         this.mGaussX = mGaussX;
         this.mGaussY = mGaussY;
         this.mGaussW = mGaussW;
@@ -126,26 +127,24 @@ public class AMCL {
     }
 
     public void setMCLParams(
-        double mclAFast,
-        double mclASlow
-    ) {
+            double mclAFast,
+            double mclASlow) {
         this.mclAFast = mclAFast;
         this.mclASlow = mclASlow;
     }
 
     public void resetMCL() {
         Random r = new Random();
-        
+
         nParticles = Constants.FilterConstants.NUM_PARTICLES;
         for (int i = 0; i < nParticles; ++i) {
             particles.add(new Particle(
-                r.nextDouble(-Constants.FIELD_WIDTH_OFFSET, 
-                    Constants.FIELD_WIDTH - Constants.FIELD_WIDTH_OFFSET), 
-                r.nextDouble(-Constants.FIELD_HEIGHT_OFFSET, 
-                    Constants.FIELD_HEIGHT - Constants.FIELD_HEIGHT_OFFSET), 
-                r.nextDouble(Math.PI * 2), 
-                1 / nParticles
-            ));
+                    r.nextDouble(-Constants.FIELD_WIDTH_OFFSET,
+                            Constants.FIELD_WIDTH - Constants.FIELD_WIDTH_OFFSET),
+                    r.nextDouble(-Constants.FIELD_HEIGHT_OFFSET,
+                            Constants.FIELD_HEIGHT - Constants.FIELD_HEIGHT_OFFSET),
+                    r.nextDouble(Math.PI * 2),
+                    1 / nParticles));
         }
     }
 
@@ -161,21 +160,26 @@ public class AMCL {
             p.w += dw + r.nextGaussian(0, mGaussW);
 
             p.w %= (2 * Math.PI);
-            if (p.w < 0) p.w += 2 * Math.PI;
+            if (p.w < 0)
+                p.w += 2 * Math.PI;
 
-            if (p.x > Constants.FIELD_WIDTH - Constants.FIELD_WIDTH_OFFSET) p.x = Constants.FIELD_WIDTH - Constants.FIELD_WIDTH_OFFSET;
-            else if (p.x < 0 - Constants.FIELD_WIDTH_OFFSET) p.x = 0 - Constants.FIELD_WIDTH_OFFSET;
+            if (p.x > Constants.FIELD_WIDTH - Constants.FIELD_WIDTH_OFFSET)
+                p.x = Constants.FIELD_WIDTH - Constants.FIELD_WIDTH_OFFSET;
+            else if (p.x < 0 - Constants.FIELD_WIDTH_OFFSET)
+                p.x = 0 - Constants.FIELD_WIDTH_OFFSET;
 
-            if (p.y > Constants.FIELD_HEIGHT - Constants.FIELD_HEIGHT_OFFSET) p.y = Constants.FIELD_HEIGHT - Constants.FIELD_HEIGHT_OFFSET;
-            else if (p.y < 0 - Constants.FIELD_HEIGHT_OFFSET) p.y = 0 - Constants.FIELD_HEIGHT_OFFSET;
+            if (p.y > Constants.FIELD_HEIGHT - Constants.FIELD_HEIGHT_OFFSET)
+                p.y = Constants.FIELD_HEIGHT - Constants.FIELD_HEIGHT_OFFSET;
+            else if (p.y < 0 - Constants.FIELD_HEIGHT_OFFSET)
+                p.y = 0 - Constants.FIELD_HEIGHT_OFFSET;
         }
     }
 
     public void tagScanning(int id, double[] dists, double[] campose) {
         for (int i = 0; i < dists.length; ++i) {
             if (dists[i] > 0) {
-                distances.put(i + 1, 
-                    new TagDistance(Constants.TAG_ARR[i].x, Constants.TAG_ARR[i].y, dists[i]));
+                distances.put(i + 1,
+                        new TagDistance(Constants.TAG_ARR[i].x, Constants.TAG_ARR[i].y, dists[i]));
             }
         }
 
@@ -202,10 +206,9 @@ public class AMCL {
                 p.weight = prob;
 
                 if (useHeading && id > 1) {
-                    cmpsProb = headingErr(p.w, 
-                        (campose[2] + Math.toRadians(Constants.TAG_ARR[id - 1].z)) % (2 * Math.PI) +
-                                MathX.normalDistribution(0, vGaussW)
-                    );
+                    cmpsProb = headingErr(p.w,
+                            (campose[2] + Math.toRadians(Constants.TAG_ARR[id - 1].z)) % (2 * Math.PI) +
+                                    MathX.normalDistribution(0, vGaussW));
                     p.weight *= cmpsProb;
                 }
                 sumWeight += p.weight;
@@ -241,13 +244,12 @@ public class AMCL {
             SmartDashboard.putNumber("resetprob", resetProb);
             if (MathX.bernoulliDistribution(resetProb)) {
                 newParticles.add(new Particle(
-                    random.nextDouble(-Constants.FIELD_WIDTH_OFFSET, 
-                        Constants.FIELD_WIDTH - Constants.FIELD_WIDTH_OFFSET), 
-                    random.nextDouble(-Constants.FIELD_HEIGHT_OFFSET, 
-                        Constants.FIELD_HEIGHT - Constants.FIELD_HEIGHT_OFFSET), 
-                    random.nextDouble(Math.PI * 2), 
-                    1 / Constants.FilterConstants.NUM_PARTICLES
-                ));
+                        random.nextDouble(-Constants.FIELD_WIDTH_OFFSET,
+                                Constants.FIELD_WIDTH - Constants.FIELD_WIDTH_OFFSET),
+                        random.nextDouble(-Constants.FIELD_HEIGHT_OFFSET,
+                                Constants.FIELD_HEIGHT - Constants.FIELD_HEIGHT_OFFSET),
+                        random.nextDouble(Math.PI * 2),
+                        1 / Constants.FilterConstants.NUM_PARTICLES));
             } else {
                 double U = r + ((double) j / nParticles);
                 while (U > c) {
@@ -290,8 +292,10 @@ public class AMCL {
 
         if (useAdaptiveParticles) {
             cf = (dist / nParticles) / 18.38067;
-            if (cf >= 0.08) nParticles = cf * Constants.FilterConstants.NUM_PARTICLES;
-            else nParticles = Constants.FilterConstants.MIN_PARTICLES;
+            if (cf >= 0.08)
+                nParticles = cf * Constants.FilterConstants.NUM_PARTICLES;
+            else
+                nParticles = Constants.FilterConstants.MIN_PARTICLES;
         } else {
             nParticles = Constants.FilterConstants.NUM_PARTICLES;
         }
@@ -369,7 +373,8 @@ public class AMCL {
     @Override
     public String toString() {
         String res = "";
-        for (var p : particles) res += p + "\n";
+        for (var p : particles)
+            res += p + "\n";
         return res;
     }
 }

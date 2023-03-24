@@ -11,14 +11,14 @@ public class Constants {
 
     public static final int NUM_TAGS = 8;
     public static final Point3[] TAG_ARR = {
-        new Point3(Tags.ID_1.x, Tags.ID_1.y, Tags.ID_1.z),
-        new Point3(Tags.ID_2.x, Tags.ID_2.y, Tags.ID_2.z),
-        new Point3(Tags.ID_3.x, Tags.ID_3.y, Tags.ID_3.z),
-        new Point3(Tags.ID_4.x, Tags.ID_4.y, Tags.ID_4.z),
-        new Point3(Tags.ID_5.x, Tags.ID_5.y, Tags.ID_5.z),
-        new Point3(Tags.ID_6.x, Tags.ID_6.y, Tags.ID_6.z),
-        new Point3(Tags.ID_7.x, Tags.ID_7.y, Tags.ID_7.z),
-        new Point3(Tags.ID_8.x, Tags.ID_8.y, Tags.ID_8.z)
+            new Point3(Tags.ID_1.x, Tags.ID_1.y, Tags.ID_1.z),
+            new Point3(Tags.ID_2.x, Tags.ID_2.y, Tags.ID_2.z),
+            new Point3(Tags.ID_3.x, Tags.ID_3.y, Tags.ID_3.z),
+            new Point3(Tags.ID_4.x, Tags.ID_4.y, Tags.ID_4.z),
+            new Point3(Tags.ID_5.x, Tags.ID_5.y, Tags.ID_5.z),
+            new Point3(Tags.ID_6.x, Tags.ID_6.y, Tags.ID_6.z),
+            new Point3(Tags.ID_7.x, Tags.ID_7.y, Tags.ID_7.z),
+            new Point3(Tags.ID_8.x, Tags.ID_8.y, Tags.ID_8.z)
     };
 
     public static enum Tags {

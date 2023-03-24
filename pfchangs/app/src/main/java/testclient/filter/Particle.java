@@ -27,9 +27,8 @@ public class Particle {
 
     public Pose2d toPose2d(double xOffset, double yOffset, double radOffset) {
         return new Pose2d(
-            new Translation2d(x + xOffset, y + yOffset),
-            new Rotation2d(w + radOffset)
-        );
+                new Translation2d(x + xOffset, y + yOffset),
+                new Rotation2d(w + radOffset));
     }
 
     public Particle clone() {

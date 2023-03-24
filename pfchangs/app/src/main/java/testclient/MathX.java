@@ -12,18 +12,19 @@ public class MathX {
      * @param y2 The second point's y-coordinate
      * @return Euclidean distance between (x1, y1) and (x2, y2)
      */
-    public static double distance(double x1, double y1, double x2, double y2) { 
+    public static double distance(double x1, double y1, double x2, double y2) {
         return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
     }
 
     /**
-     * @param mu Mean of the distribution
+     * @param mu    Mean of the distribution
      * @param sigma Standard deviation of the distribution
      * @param x
      * @return
      */
-    public static double Gaussian(double mu, double sigma, double x) {       
-        return Math.exp(-(Math.pow(mu - x, 2)) / Math.pow(sigma, 2) / 2.0) / Math.sqrt(2.0 * Math.PI * Math.pow(sigma, 2));
+    public static double Gaussian(double mu, double sigma, double x) {
+        return Math.exp(-(Math.pow(mu - x, 2)) / Math.pow(sigma, 2) / 2.0)
+                / Math.sqrt(2.0 * Math.PI * Math.pow(sigma, 2));
     }
 
     public static double normalDistribution(Random r, double mean, double stddev) {
@@ -36,7 +37,9 @@ public class MathX {
 
     /**
      * Constrains <code>x</code> between <code>min</code> and <code>max</code>
-     * @param x The value to constrain between <code>min</code> and <code>max</code>
+     * 
+     * @param x   The value to constrain between <code>min</code> and
+     *            <code>max</code>
      * @param min The minimum value of <code>x</code>
      * @param max The maximum value of <code>x</code>
      * @return The constrained <code>x</code> value
