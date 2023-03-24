@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.commands.Claw.ManualOpenIntake;
 import frc.robot.subsystems.Arm.ArmSubsystem;
-import frc.robot.subsystems.Claw.ClawIO;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 
 public class ArmSequences{

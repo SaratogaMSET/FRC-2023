@@ -18,13 +18,13 @@ public class TurnToCone extends CommandBase{
     public TurnToCone(DrivetrainSubsystem drivetrainSubsystem, VisionSubsystem visionSubsystem){
         this.m_drivetrain = drivetrainSubsystem;
         this.m_visionSubsystem = visionSubsystem;
-        controller.setTolerance(0.4); //0.4
+        controller.setTolerance(Math.PI/60); //0.4
         addRequirements(drivetrainSubsystem, visionSubsystem);  
 
     }
     @Override
     public void initialize(){
-        controller.enableContinuousInput(-180, 180);
+        controller.enableContinuousInput(-Math.PI, Math.PI);
         m_visionSubsystem.setPipeline(2);
     }
 
@@ -69,7 +69,7 @@ public class TurnToCone extends CommandBase{
     @Override
     public boolean isFinished(){
         // if(Math.abs(drivetrain.getRotation2d().getDegrees()-desiredAngle)<3) return true;
-        if(pidValue == 0) return true;
+        if(Math.abs(controller.calculate(m_visionSubsystem.getOffsetTo2DOFBase()[2], 0)) < Math.PI/60) return true;
         else return false;
     }
 }

@@ -333,8 +333,8 @@ public final class Constants {
         public static final double C2_LL2 = 0.244; // horizontal / x value check the picture :??????
 
         //goals 
-        public static final double H2a = 1.1736; //Low goal = 0.628, high goal = 1.17
-        public static final double H2b = 0.638; //height of low goal
+        public static final double H2a = 1.1136; //Low goal = 0.628, high goal = 1.17
+        public static final double H2b = 0.578; //height of low goal
 
     }
 

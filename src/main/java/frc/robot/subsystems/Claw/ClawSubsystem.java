@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 
 public class ClawSubsystem 
-    extends SubsystemBase implements ClawIO {
+    extends SubsystemBase{
         
     private double[] proximityBuffer = new double[3];
     private int bufferIndex = 0;
@@ -42,12 +42,12 @@ public class ClawSubsystem
         motor.setControlFramePeriodMs(30);
     }
 
-    public void updateInputs(ClawIOInputsAutoLogged inputs) {
-        inputs.rotations = encoder.getPosition();
-        inputs.objectDetected = isGamepieceInRange();
-        inputs.proximity = getProximityValue();
-        inputs.object = getGamePieceType().toString();
-    }
+    // public void updateInputs(ClawIOInputsAutoLogged inputs) {
+    //     inputs.rotations = encoder.getPosition();
+    //     inputs.objectDetected = isGamepieceInRange();
+    //     inputs.proximity = getProximityValue();
+    //     inputs.object = getGamePieceType().toString();
+    // }
     
     public void setBrakeMode(){
         motor.setIdleMode(IdleMode.kBrake);
