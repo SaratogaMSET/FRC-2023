@@ -4,6 +4,7 @@ import java.util.function.IntSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
@@ -81,9 +82,9 @@ public class ArmSequences{
     public static ArmPositionCommand readyMoreForward(ArmSubsystem armSubsystem, int side){
         ArmPositionCommand ready;
         if(side > 0){
-            ready = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.ready_double_substation_x + ((0.125 + 0.09))/2), Constants.ArmNodeDictionary.ready_double_substation_y, true);
+            ready = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.ready_double_substation_x + ((0.125 + 0.09))/2), Constants.ArmNodeDictionary.ready_double_substation_y + 0.1, true);
         }else{
-            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x + ((0.125 + 0.09))/2, Constants.ArmNodeDictionary.ready_double_substation_y, true);
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x + ((0.125 + 0.09))/2, Constants.ArmNodeDictionary.ready_double_substation_y + 0.1, true);
         }
 
         return ready;
@@ -109,10 +110,10 @@ public class ArmSequences{
         ArmPositionCommand ready;
         ArmPositionCommand score;
         if(side > 0){
-            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_ground_intake_x, Constants.ArmNodeDictionary.ready_ground_intake_y);
+            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_ground_intake_x, Constants.ArmNodeDictionary.ready_ground_intake_y, 0.25);
             score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_low_score_x, Constants.ArmNodeDictionary.ready_low_score_y);
         }else{
-            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_ground_intake_x, Constants.ArmNodeDictionary.ready_ground_intake_y);
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_ground_intake_x, Constants.ArmNodeDictionary.ready_ground_intake_y, 0.25);
             score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_low_score_x, Constants.ArmNodeDictionary.ready_low_score_y);
         }
         ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
@@ -142,10 +143,10 @@ public class ArmSequences{
         ArmPositionCommand ready;
         ArmPositionCommand score;
         if(side > 0){
-            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
+            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_midcube_score_x, Constants.ArmNodeDictionary.ready_midcube_score_y);
         }else{
-            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_midcube_score_x, Constants.ArmNodeDictionary.ready_midcube_score_y);
         }
         ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
@@ -176,10 +177,10 @@ public class ArmSequences{
         ArmPositionCommand ready;
         ArmPositionCommand score;
         if(side > 0){
-            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
+            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_highcube_score_x, Constants.ArmNodeDictionary.ready_highcube_score_y);
         }else{
-            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcube_score_x, Constants.ArmNodeDictionary.ready_highcube_score_y);
         }
         // ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
@@ -193,10 +194,10 @@ public class ArmSequences{
         ArmPositionCommand ready;
         ArmPositionCommand score;
         if(side > 0){
-            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
+            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_midcone_score_x, Constants.ArmNodeDictionary.ready_midcone_score_y);
         }else{
-            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_midcone_score_x, Constants.ArmNodeDictionary.ready_midcone_score_y);
         }
         ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
@@ -209,10 +210,10 @@ public class ArmSequences{
         ArmPositionCommand ready;
         ArmPositionCommand score;
         if(side > 0){
-            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
+            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_midcone_score_x, Constants.ArmNodeDictionary.ready_midcone_score_y);
         }else{
-            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_midcone_score_x, Constants.ArmNodeDictionary.ready_midcone_score_y);
         }
         ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
@@ -225,7 +226,7 @@ public class ArmSequences{
         ArmPositionCommand ready;
         ArmPositionCommand score;
         if(side > 0){
-            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.1);
+            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y);
         }else{
             ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.1);
@@ -241,27 +242,27 @@ public class ArmSequences{
         ArmPositionCommand ready;
         ArmPositionCommand score;
         if(side > 0) {
-            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
+            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y);
         } else {
-            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y);
         }
         // ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
-        RunCommand openIntake = new RunCommand(()-> m_clawSubsystem.openIntake());
+        ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openIntake()).until(()-> m_clawSubsystem.getReverseLimitSwitch());
 
         // return ready.andThen(score).andThen(openIntake);
-        return ready.andThen(score);
+        return ready.andThen(score).andThen(openIntake);
     }
 
     public static SequentialCommandGroup scoreConeHighNoRetractHighTolerance(ArmSubsystem armSubsystem, ClawIOSparkMax m_clawSubsystem ,int side){
         ArmPositionCommand ready;
         ArmPositionCommand score;
         if(side > 0) {
-            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.07);
+            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, 0.07);
         } else {
-            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.07);
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, 0.07);
         }
         // ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
@@ -275,10 +276,10 @@ public class ArmSequences{
         ArmPositionCommand ready;
         ArmPositionCommand score;
         if(side > 0) {
-            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.07);
+            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_highcube_score_x, Constants.ArmNodeDictionary.ready_highcube_score_y, 0.07);
         } else {
-            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.07);
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcube_score_x, Constants.ArmNodeDictionary.ready_highcube_score_y, 0.07);
         }
         // ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
