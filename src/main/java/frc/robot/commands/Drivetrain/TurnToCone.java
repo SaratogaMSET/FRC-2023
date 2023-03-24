@@ -11,20 +11,20 @@ public class TurnToCone extends CommandBase{
 
     private final DrivetrainSubsystem m_drivetrain; 
     private final VisionSubsystem m_visionSubsystem;
-    PIDController controller = new PIDController(0.5, 0, 0.1);
+    PIDController controller = new PIDController(0.5, 0, 0);
 
     double pidValue;
 
     public TurnToCone(DrivetrainSubsystem drivetrainSubsystem, VisionSubsystem visionSubsystem){
         this.m_drivetrain = drivetrainSubsystem;
         this.m_visionSubsystem = visionSubsystem;
-        controller.setTolerance(Math.PI/60); //0.4
+        controller.setTolerance(0.4); //0.4
         addRequirements(drivetrainSubsystem, visionSubsystem);  
 
     }
     @Override
     public void initialize(){
-        controller.enableContinuousInput(-Math.PI, Math.PI);
+        controller.enableContinuousInput(-180, 180);
         m_visionSubsystem.setPipeline(2);
     }
 
@@ -34,9 +34,9 @@ public class TurnToCone extends CommandBase{
         pidValue = controller.calculate(m_visionSubsystem.getOffsetTo2DOFBase()[2], 0); //-> to radians
 
         if (pidValue > 1) {
-            pidValue = 0.5;
+            pidValue = 1;
         } else if (pidValue < -1){
-            pidValue = -0.5;
+            pidValue = -1;
         }
 
         SmartDashboard.putNumber("pidvalue", pidValue);
@@ -69,7 +69,9 @@ public class TurnToCone extends CommandBase{
     @Override
     public boolean isFinished(){
         // if(Math.abs(drivetrain.getRotation2d().getDegrees()-desiredAngle)<3) return true;
-        if(Math.abs(controller.calculate(m_visionSubsystem.getOffsetTo2DOFBase()[2], 0)) < Math.PI/60) return true;
+
+        if (Math.abs(pidValue) < 0.3) return true;
+        //if(Math.abs(controller.calculate(m_visionSubsystem.getOffsetTo2DOFBase()[2], 0)) < Math.PI/60) return true;
         else return false;
     }
 }
