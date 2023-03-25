@@ -1,7 +1,5 @@
 package frc.robot.subsystems.Vision;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
