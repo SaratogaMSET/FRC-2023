@@ -19,24 +19,28 @@ public class TurnToCone extends CommandBase{
         this.m_drivetrain = drivetrainSubsystem;
         this.m_visionSubsystem = visionSubsystem;
         controller.setTolerance(0.4); //0.4
+        // controller.setTolerance(Math.PI / 450); //0.4 in radians
         addRequirements(drivetrainSubsystem, visionSubsystem);  
 
     }
     @Override
     public void initialize(){
-        controller.enableContinuousInput(-180, 180);
+        // controller.enableContinuousInput(-180, 180);
+        // controller.enableContinuousInput(-Math.PI, Math.PI);
         m_visionSubsystem.setPipeline(2);
     }
 
     @Override
     public void execute(){
 
-        pidValue = controller.calculate(m_visionSubsystem.getOffsetTo2DOFBase()[2], 0); //-> to radians
+        // pidValue = controller.calculate(m_visionSubsystem.getOffsetTo2DOFBase()[2], 0); //-> to radians
+        pidValue = controller.calculate(Math.toRadians(m_visionSubsystem.getOffsetTo2DOFBase()[2]), 0); //-> to radians
 
-        if (pidValue > 1) {
-            pidValue = 1;
-        } else if (pidValue < -1){
-            pidValue = -1;
+        int limit = 2;
+        if (pidValue > limit) {
+            pidValue = limit;
+        } else if (pidValue < -limit){
+            pidValue = -limit;
         }
 
         SmartDashboard.putNumber("pidvalue", pidValue);
@@ -51,6 +55,8 @@ public class TurnToCone extends CommandBase{
         // } else if (pidValue < 0){
         //     pidValue = 0.3;
         // }
+
+        //pid value of <0.5 is too little to power the dt!
 
         m_drivetrain.drive(
             new ChassisSpeeds(

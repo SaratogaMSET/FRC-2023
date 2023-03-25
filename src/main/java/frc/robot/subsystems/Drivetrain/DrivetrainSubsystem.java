@@ -1,8 +1,15 @@
 package frc.robot.subsystems.Drivetrain;
 
+import java.util.List;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
+import com.pathplanner.lib.commands.PPSwerveControllerCommandA;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -90,6 +97,51 @@ public class DrivetrainSubsystem extends SubsystemBase {
         else return new Pose2d(new Translation2d(arr[0] + (8.24), arr[1] + 4.065), Rotation2d.fromDegrees(arr[5]));
     }
 
+
+      
+    public PathPlannerTrajectory generateTrajectory(Pose2d targetPose){
+        Pose2d currentPose = odomFiltered.getEstimatedPosition();  
+
+        Translation2d currentPosition = 
+            new Translation2d(currentPose.getX(), currentPose.getY());
+        Translation2d desiredPosition = 
+            new Translation2d(targetPose.getX(), targetPose.getY());
+        Rotation2d driveAngle = desiredPosition.minus(currentPosition).getAngle();
+
+        PathPlannerTrajectory trajectory = PathPlanner.generatePath(
+            new PathConstraints(1, 1),
+            List.of(
+                new PathPoint(currentPosition, driveAngle, this.getRotation2d()), // drive angle doesn't matter i think?
+                new PathPoint(desiredPosition, driveAngle, targetPose.getRotation()) // in radians
+            ));
+        return trajectory;
+    }
+
+    public PPSwerveControllerCommandA driveToPose(){
+        /* TODO Implement hashers */
+        PathPlannerTrajectory trajectory = generateTrajectory(new Pose2d(new Translation2d(1, 1), new Rotation2d()));
+
+        PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
+        PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);//FIXME
+        PIDController thetaController = new PIDController(
+              Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
+        
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        xController.reset();
+        yController.reset();
+        thetaController.reset();
+        
+        return new PPSwerveControllerCommandA(
+            trajectory, 
+            this::getPose, 
+            xController, 
+            yController, 
+            thetaController, 
+            this::drive, 
+            false, 
+            this);
+    }
+    
     public Rotation2d getRotation2d() {
         // if(gyroInputs.connected){
             return Rotation2d.fromDegrees(-Math.toDegrees(getNavHeading()));
