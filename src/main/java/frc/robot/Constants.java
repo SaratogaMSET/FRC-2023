@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.util.HashMap;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 
@@ -229,12 +227,12 @@ public final class Constants {
 
         public static final Map<Long, ScoringTag> tagConversion = Map.ofEntries(
                 /* i have no clue how to do this w/ deprecating */
-                Map.entry(new Long(1), ScoringTag.APRILTAG1),
-                Map.entry(new Long(2), ScoringTag.APRILTAG2),
-                Map.entry(new Long(3), ScoringTag.APRILTAG3),
-                Map.entry(new Long(6), ScoringTag.APRILTAG6),
-                Map.entry(new Long(7), ScoringTag.APRILTAG7),
-                Map.entry(new Long(8), ScoringTag.APRILTAG8)
+                Map.entry(Long.valueOf(1), ScoringTag.APRILTAG1),
+                Map.entry(Long.valueOf(2), ScoringTag.APRILTAG2),
+                Map.entry(Long.valueOf(3), ScoringTag.APRILTAG3),
+                Map.entry(Long.valueOf(6), ScoringTag.APRILTAG6),
+                Map.entry(Long.valueOf(7), ScoringTag.APRILTAG7),
+                Map.entry(Long.valueOf(8), ScoringTag.APRILTAG8)
         );
 
         public static final Map<ScoringTag, Pose2d[]> ScoringMap = Map.ofEntries(
@@ -339,6 +337,16 @@ public final class Constants {
     }
 
     public static class Vision {
+        // Where "left" and "right" are defined from the POV of the corresnponding alliance's driver
+        public static enum FieldZones {
+            RedLeft,
+            RedMid,
+            RedRight,
+            BlueLeft,
+            BlueMid,
+            BlueRight
+        }
+
         public static final int LED = 3;
         public static final double H1 = 5; // distance between limelight and ground (height of limelight mount)
         public static final double H2 = 107; // height of target
@@ -357,7 +365,17 @@ public final class Constants {
         public static final double apriltagtoMidVertical = 0.15875;
         public static final double apriltagtoHighVertical = 0.73025;
 
+        // TODO replace with actual values
+        public static final Map<FieldZones, Pose2d> ZONE_TO_TARGET_POSE = Map.ofEntries(
+            Map.entry(FieldZones.RedLeft, new Pose2d(new Translation2d(0, 0), new Rotation2d(0))),
+            Map.entry(FieldZones.RedMid, new Pose2d(new Translation2d(0, 0), new Rotation2d(0))),
+            Map.entry(FieldZones.RedRight, new Pose2d(new Translation2d(0, 0), new Rotation2d(0))),
+            Map.entry(FieldZones.BlueLeft, new Pose2d(new Translation2d(0, 0), new Rotation2d(0))),
+            Map.entry(FieldZones.BlueMid, new Pose2d(new Translation2d(0, 0), new Rotation2d(0))),
+            Map.entry(FieldZones.BlueRight, new Pose2d(new Translation2d(0, 0), new Rotation2d(0)))
+        );
     }
+
     public final class ArmParameters{
         //Positive X Axis defined as the front face of the robot, going from back (battery) to front (roborio)
         //Positive Y axis defined as the axis perpendicular to the ground

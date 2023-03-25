@@ -207,7 +207,6 @@ public class RobotContainer {
         () -> m_gunner1.getX()
       ));
 
-
     m_claw.setDefaultCommand(new BackUpIntakeCommand(
       m_claw, 
       ()-> DriverStation.isAutonomous(),
@@ -220,7 +219,6 @@ public class RobotContainer {
     m_gunner1.button(4).whileTrue(new RunCommand(() -> m_claw.openClaw(), m_claw));
     
     m_driverController.x().onTrue(new InstantCommand(()->m_drivetrainSubsystem.setX(), m_drivetrainSubsystem));
-
 
     // m_driverController.y().onTrue(new SequentialCommandGroup(
     //   new TurnTo90(m_drivetrainSubsystem),

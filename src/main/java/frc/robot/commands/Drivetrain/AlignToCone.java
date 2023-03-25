@@ -41,10 +41,9 @@ public class AlignToCone extends CommandBase{
         xController.setSetpoint(0); 
         if (m_visionSubsystem.getPipeline() < 1) m_visionSubsystem.setPipeline(2);
     }
+
     @Override
     public void execute() {
-
-     
         this.xVel = xController.calculate(-m_visionSubsystem.getOffsetTo2DOFBase()[0], 0.0);
         SmartDashboard.putNumber("asdf", xVel);
         double veloL = 2;
