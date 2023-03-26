@@ -11,6 +11,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 
+import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import java.util.function.Supplier;
 import frc.lib.math.GeomUtil;
 import frc.robot.Constants;
@@ -71,7 +72,7 @@ public class DriveToPose extends CommandBase {
   public void execute() {
     running = true;
       driveController.setConstraints(
-          new TrapezoidProfile.Constraints(1.3, 0.7));
+          new TrapezoidProfile.Constraints(2, 0.75));
       driveController.setTolerance(0.1);
       thetaController.setP(4);
       thetaController.setD(0.0);
@@ -118,6 +119,10 @@ public class DriveToPose extends CommandBase {
     drive.setX();
   }
 
+  @Override
+  public boolean isFinished() {
+      return atGoal();
+  }
   /** Checks if the robot is stopped at the final pose. */
   public boolean atGoal() {
     return running && driveController.atGoal() && thetaController.atGoal();

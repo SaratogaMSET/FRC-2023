@@ -70,12 +70,17 @@ public final class Constants {
          */
         public static final double DRIVETRAIN_WHEELBASE_METERS = 0.4953;
 
-        public static final double kPXController = 19.2; // 0.6
+        public static final double kPXController = 19.2; 
+
+        public static final double kPxAlign = 14;
+
         public static final double kIXController = 0.000;
         public static final double kPThetaController = 0.075;
 
         public static final double kPYController = 14.5; // 1
         public static final double kIYController = 0.000;
+        public static final double kPYAlign = 11;
+
         public static final double kPThetaControllerTrajectory = 0.39 * 1.75 * 2 * 1.2; // 0.39 * 2
         public static final double kDThetaControllerTrajectory = 0.004;
         public static final double balanceKP = 0.7;
@@ -439,6 +444,9 @@ public final class Constants {
         public double[] ground_intake_cube = new double[]{0.60, 0};
         public static final double ground_intake_x = 0.60;
         public static final double ground_intake_y = -0.05;
+
+        public static final double auton_intake_x = 1.45;
+        public static final double auton_intake_y = -0.14;
 
         public double[] ground_intake_cone = new double[]{0.60, 0};
         public static final double ground_intake_cone_x = 0.60;
