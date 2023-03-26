@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.util.MathUtils;
 import frc.robot.Constants;
@@ -34,23 +35,18 @@ public class AlignCommand extends CommandBase {
         try {
             m_currentPose = m_drivetrainSubsystem.getPose();
             if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
-                m_targetPose = Constants.Vision.RED_INITIAL_TARGET_POSE.plus(new Transform2d(
-                        new Translation2d(0, Constants.Vision.Y_OFFSET_RED
-                                * (int) (m_currentPose.getY() / Constants.Vision.Y_OFFSET_RED)),
-                        new Rotation2d()));
+                m_targetPose = new Pose2d(Constants.Vision.RED_INITIAL_TARGET_POSE.getX(), Constants.Vision.RED_INITIAL_TARGET_POSE.getY() + Constants.Vision.Y_OFFSET_RED * (int) (m_currentPose.getY() / Constants.Vision.Y_OFFSET_RED), Constants.Vision.RED_INITIAL_TARGET_POSE.getRotation());
             } else if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-                m_targetPose = Constants.Vision.RED_INITIAL_TARGET_POSE.plus(new Transform2d(
-                        new Translation2d(0, Constants.Vision.Y_OFFSET_BLUE
-                                * (int) (m_currentPose.getY() / Constants.Vision.Y_OFFSET_BLUE)),
-                        new Rotation2d()));
+                m_targetPose = new Pose2d(Constants.Vision.BLUE_INITIAL_TARGET_POSE.getX(), Constants.Vision.BLUE_INITIAL_TARGET_POSE.getY() + -Constants.Vision.Y_OFFSET_BLUE * (int) (m_currentPose.getY() / Constants.Vision.Y_OFFSET_BLUE), Constants.Vision.BLUE_INITIAL_TARGET_POSE.getRotation());
             }
+            SmartDashboard.putNumberArray("Target pose", new double[]{m_targetPose.getX(), m_targetPose.getY(), m_targetPose.getRotation().getRadians()});
             m_drivetrainSubsystem.drive(
                     // it's so bad ahahahahahahahaha just kill me
                     new ChassisSpeeds(
-                            pid.calculate(m_currentPose.getX(), m_targetPose.getX()),
-                            pid.calculate(m_currentPose.getY(), m_targetPose.getY()),
+                            pid.calculate(m_currentPose.getX(), m_targetPose.getX()) / 2,
+                            pid.calculate(m_currentPose.getY(), m_targetPose.getY()) / 2,
                             pid.calculate(m_currentPose.getRotation().getRadians(),
-                                    m_targetPose.getRotation().getRadians())));
+                                    m_targetPose.getRotation().getRadians()) / 2));
         } catch (Exception e) {
             System.out.println("Alignment failed. Exception: ");
             e.printStackTrace();

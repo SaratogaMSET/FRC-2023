@@ -52,6 +52,7 @@ import frc.robot.commands.Drivetrain.TunableBalanceCommand;
 import frc.robot.commands.Drivetrain.TurnTo90;
 import frc.robot.commands.Drivetrain.TurnToCone;
 import frc.robot.commands.Drivetrain.ZeroGyroCommand;
+import frc.robot.commands.Vision.AlignCommand;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
@@ -227,11 +228,7 @@ public class RobotContainer {
     // ));
     m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
 
-    m_gunner1.button(2).onTrue(new DriveToPose(m_drivetrainSubsystem, new Pose2d(new Translation2d(3,1), new Rotation2d(0))));
-    // m_gunner1.button(2).onTrue( new SequentialCommandGroup(
-    //   new TurnTo90(m_drivetrainSubsystem),
-    //   new AlignToCone(m_drivetrainSubsystem, m_visionSubsystem)
-    // ));
+    m_gunner1.button(2).onTrue(new AlignCommand(m_drivetrainSubsystem));
 
     // m_driverController.x().toggleOnTrue(
     //   new DefaultDriveCommand(
