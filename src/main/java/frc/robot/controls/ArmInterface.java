@@ -1,17 +1,13 @@
 package frc.robot.controls;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import com.ctre.phoenix.sensors.CANCoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import frc.robot.Constants;
-import frc.robot.Constants.ArmParameters;
-
 import org.ejml.simple.SimpleMatrix;
+
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.CANCoder;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 
 public class ArmInterface {
     double motor_encoder_agreement_tolerance = 0.03;

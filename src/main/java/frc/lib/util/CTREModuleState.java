@@ -3,7 +3,6 @@ package frc.lib.util;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.swerve.BetterSwerveModuleState;
-import frc.lib.swerve.BetterSwerveModuleState;
 
 public class CTREModuleState {
 

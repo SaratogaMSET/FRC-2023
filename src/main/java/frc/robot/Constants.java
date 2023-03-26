@@ -362,8 +362,8 @@ public final class Constants {
 
         // TODO replace with actual values
         // Where 0 starts from the corresponding alliance color's right side
-        public static final Pose2d RED_INITIAL_TARGET_POSE = new Pose2d(new Translation2d(2.04245, 0.59764), new Rotation2d(-2.96931));
-        public static final double Y_OFFSET_RED = 0.5588; // meters
+        public static final Pose2d INITIAL_TARGET_POSE = new Pose2d(new Translation2d(2.04245, 0.59764), new Rotation2d(-2.96931));
+        public static final double Y_OFFSET = 0.5588; // meters
         public static final Pose2d BLUE_INITIAL_TARGET_POSE = new Pose2d(new Translation2d(14.4993, 7.41606), new Rotation2d(-2.96931 + Math.PI / 180));
         public static final double Y_OFFSET_BLUE = -0.5588; // meters
         public static final double ALIGNMENT_ALLOWED_TOLERANCE_TRANSLATIONAL = 0.1; // meters

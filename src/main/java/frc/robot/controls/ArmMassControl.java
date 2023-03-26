@@ -1,18 +1,20 @@
 package frc.robot.controls;
 
-import edu.wpi.first.math.controller.ControlAffinePlantInversionFeedforward;
-import edu.wpi.first.math.controller.LinearQuadraticRegulator;
-import edu.wpi.first.math.numbers.*;
-import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.system.NumericalJacobian;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.VecBuilder;
-
 import java.util.function.BiFunction;
 
 import org.ejml.simple.SimpleMatrix;
+
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.controller.LinearQuadraticRegulator;
+import edu.wpi.first.math.numbers.N0;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.numbers.N4;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.NumericalJacobian;
 
 public class ArmMassControl {
     public ArmDynamics Arm;

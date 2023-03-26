@@ -2,7 +2,6 @@ package frc.robot.util.drivers;
 
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
-import com.ctre.phoenix.sensors.CANCoderFaults;
 
 import edu.wpi.first.wpilibj.Timer;
 
