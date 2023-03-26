@@ -85,16 +85,16 @@ public class ArmSubsystem extends SubsystemBase {
         SimpleMatrix error = target.minus(state);
 
         double proxKp = 10.2;
-        double distKp = 9.5; //9.5
+        double distKp = 9.5;
 
-        double proxKd = 0.042; //0.02 0.035
+        double proxKd = 0.02;
         double distKd = 0.02;
 
         double proxKf = 0.80;
         double distKf = 1.30;
         double armTolerance = 0.03;
 
-        double maxVoltPerVelocity = 2.5000254;
+        double maxVoltPerVelocity = 2.5000254; //Was 3.5 <------------- CHANGE THIS
         double max_voltage = 6.5;
 
         double voltageProximal = error.get(0) * proxKp + error.get(2) * proxKd;

@@ -358,6 +358,21 @@ public final class Constants {
         public static final double apriltagtoHighVertical = 0.73025;
 
     }
+    public final class GroundIntake{
+        public static final int actuator_ID = 999;
+        public static final int intake_ID = 9999;
+        
+        public static final int encoder_ID = 99999;
+        
+        public static final double encoder_offset = 0.01;
+
+        public static final double x_offset = 0;
+        public static final double y_offset = 0;
+        public static final double length = 0;
+
+        public static final double highbound = Math.PI/2;
+        public static final double lowbound = 0;
+    }
     public final class ArmParameters{
         //Positive X Axis defined as the front face of the robot, going from back (battery) to front (roborio)
         //Positive Y axis defined as the axis perpendicular to the ground
