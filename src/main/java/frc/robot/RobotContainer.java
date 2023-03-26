@@ -21,6 +21,8 @@ import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -48,6 +50,7 @@ import frc.robot.commands.Claw.ManualOpenIntake;
 import frc.robot.commands.Drivetrain.AlignToCone;
 import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.DefaultDriveCommand;
+import frc.robot.commands.Drivetrain.DriveToPose;
 import frc.robot.commands.Drivetrain.MoveWithClosest90;
 import frc.robot.commands.Drivetrain.TunableBalanceCommand;
 import frc.robot.commands.Drivetrain.TurnTo90;
@@ -214,7 +217,7 @@ public class RobotContainer {
       ()-> DriverStation.isAutonomous(),
       ()-> autoCloseChooser.getSelected()));
 
-    m_driverController.rightTrigger().toggleOnTrue(new RunCommand(() -> m_claw.autoCloseClaw(), m_claw));
+    m_driverController.rightTrigger().toggleOnTrue(new RunCommand(() -> m_claw.manualCloseClaw(), m_claw));
     m_driverController.leftTrigger().whileTrue(new RunCommand(() -> m_claw.openClaw(), m_claw));
     
     m_gunner1.button(6).whileTrue(new ManualCloseIntake(m_claw));
@@ -230,10 +233,11 @@ public class RobotContainer {
     // ));
     m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
 
-    m_gunner1.button(2).onTrue( new SequentialCommandGroup(
-      new TurnTo90(m_drivetrainSubsystem),
-      new AlignToCone(m_drivetrainSubsystem, m_visionSubsystem)
-    )); //new TurnToCone(m_drivetrainSubsystem, m_visionSubsystem));
+    m_gunner1.button(2).onTrue(new DriveToPose(m_drivetrainSubsystem, new Pose2d(new Translation2d(3,1), new Rotation2d(0))));
+    // m_gunner1.button(2).onTrue( new SequentialCommandGroup(
+    //   new TurnTo90(m_drivetrainSubsystem),
+    //   new AlignToCone(m_drivetrainSubsystem, m_visionSubsystem)
+    // ));
 
     // m_driverController.x().toggleOnTrue(
     //   new DefaultDriveCommand(
@@ -257,21 +261,24 @@ public class RobotContainer {
       () -> m_armSubsystem.getYPosition()
     ));
 
-    m_driverController.rightBumper().toggleOnTrue(ArmSequences.ready(m_armSubsystem, m_claw, 0));
+     m_driverController.rightBumper().onTrue(//new ConditionalCommand(
+      ArmSequences.ready(m_armSubsystem, 0) //,
+      // new ArmZeroAutoCommand(m_armSubsystem), 
+      // () -> m_driverController.rightBumper().getAsBoolean()
+      ); //);
     // m_driverController.rightBumper().toggleOnFalse(new ArmZeroCommand(m_armSubsystem));
 
-    m_driverController.rightBumper().and(m_gunner1.button(1)).toggleOnTrue(
-       new ParallelCommandGroup(ArmSequences.ready(m_armSubsystem, m_claw ,1) //new DefaultDriveCommand(
-      //   m_drivetrainSubsystem,
-      //   () -> modifyAxis(m_driverController.getLeftX()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-      //   () -> modifyAxis(-m_driverController.getLeftY()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-      //   () -> modifyAxis(-m_driverController.getRightX()/1.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
-    ));
+    m_driverController.rightBumper().and(m_gunner1.button(1)).onTrue(
+      // new ConditionalCommand(
+       ArmSequences.ready(m_armSubsystem, 1)//,
+      //  new ArmZeroAutoCommand(m_armSubsystem), 
+      //  () -> m_driverController.rightBumper().getAsBoolean()
+       );//);
     m_driverController.leftBumper().onTrue(new ArmZeroAutoCommand(m_armSubsystem)); //neutral
 
     // m_gunner1.button(3).onTrue(new ToggleArmSide(m_armSubsystem));
-    m_gunner1.button(5).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, m_claw, 0));
-    m_gunner1.button(5).and(m_gunner1.button(1)).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, m_claw,  1));
+    m_gunner1.button(5).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 0));
+    m_gunner1.button(5).and(m_gunner1.button(1)).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 1));
 
     m_gunner1.button(7).onTrue(ArmSequences.scoreConeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 0));
     m_gunner1.button(7).and(m_gunner1.button(1)).onTrue(ArmSequences.scoreConeHighNoRetract(m_armSubsystem, m_claw, 1)); 

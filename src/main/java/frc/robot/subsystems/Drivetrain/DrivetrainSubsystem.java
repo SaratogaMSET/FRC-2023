@@ -308,6 +308,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         for(int i = 0; i < 4; i++){
             mSwerveMods[i].updateInputs(moduleInputs[i]);
+            SmartDashboard.putNumber(i + "cancoder", mSwerveMods[i].getCanCoder().getDegrees());
             SmartDashboard.putNumber(i + "Motor Output Percent", mSwerveMods[i].getOutputPercent());
             SmartDashboard.putNumber(i + "Motor Output Voltage", mSwerveMods[i].getOutputVoltage());
             SmartDashboard.putNumber(i + "Velocity", mSwerveMods[i].getVelocity());
@@ -357,6 +358,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         //Logger.getInstance().recordOutput("Gyro Yaw", m_navx.getYaw());
 
         odomFiltered.update(getRotation2d(), getModulePositions());
+        double[] pos = new double[]{odomFiltered.getEstimatedPosition().getX(), odomFiltered.getEstimatedPosition().getY(), odomFiltered.getEstimatedPosition().getRotation().getDegrees()};
+        SmartDashboard.putNumberArray("Odom", pos);
         lastPose = odomFiltered.getEstimatedPosition();
         Pose2d pose = getVisionPose2d();
         if (pose != null){ 
