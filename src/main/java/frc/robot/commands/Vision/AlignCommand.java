@@ -31,7 +31,7 @@ public class AlignCommand extends CommandBase {
             if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
                 m_targetPose = new Pose2d(Constants.Vision.RED_INITIAL_TARGET_POSE.getX(), Constants.Vision.RED_INITIAL_TARGET_POSE.getY() + Constants.Vision.Y_OFFSET_RED * (int) (m_currentPose.getY() / Constants.Vision.Y_OFFSET_RED), Constants.Vision.RED_INITIAL_TARGET_POSE.getRotation());
             } else if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-                m_targetPose = new Pose2d(Constants.Vision.BLUE_INITIAL_TARGET_POSE.getX(), -Constants.Vision.BLUE_INITIAL_TARGET_POSE.getY() +  Constants.Vision.Y_OFFSET_BLUE * (int) (m_currentPose.getY() / Constants.Vision.Y_OFFSET_BLUE), Constants.Vision.BLUE_INITIAL_TARGET_POSE.getRotation());
+                m_targetPose = new Pose2d(Constants.Vision.BLUE_INITIAL_TARGET_POSE.getX(), Constants.Vision.BLUE_INITIAL_TARGET_POSE.getY() +  Constants.Vision.Y_OFFSET_BLUE * (int) (m_currentPose.getY() / Constants.Vision.Y_OFFSET_BLUE), Constants.Vision.BLUE_INITIAL_TARGET_POSE.getRotation());
             }
             SmartDashboard.putNumberArray("Target pose", new double[]{m_targetPose.getX(), m_targetPose.getY(), m_targetPose.getRotation().getRadians()});
             new DriveToPoseTrajectory(m_drivetrainSubsystem, m_targetPose).schedule();
