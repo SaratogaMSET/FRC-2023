@@ -129,7 +129,7 @@ private final PPHolonomicDriveController holonomicDriveController = new PPHolono
 
   @Override
   public boolean isFinished() {
-    return /*trajectory == null  || */ timer.hasElapsed(trajectory.getTotalTimeSeconds()) /*|| atGoal()*/;
+    return /*trajectory == null  || */ timer.hasElapsed(trajectory.getTotalTimeSeconds()) && running/*|| atGoal()*/;
   }
   /** Checks if the robot is stopped at the final pose. */
   public boolean atGoal() {

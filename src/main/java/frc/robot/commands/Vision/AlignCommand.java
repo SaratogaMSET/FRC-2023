@@ -27,21 +27,35 @@ public class AlignCommand extends CommandBase {
         try {
             m_currentPose = m_drivetrainSubsystem.getPose();
             if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
-                m_targetPose = new Pose2d(m_currentPose.getX(), Constants.Vision.RED_INITIAL_TARGET_POSE.getY() + Constants.Vision.Y_OFFSET_RED * (int) (m_currentPose.getY() / Constants.Vision.Y_OFFSET_RED), Constants.Vision.RED_INITIAL_TARGET_POSE.getRotation());
+                System.out.println("We are not blue.");
+                m_targetPose = new Pose2d(m_currentPose.getX(),
+                        Constants.Vision.RED_INITIAL_TARGET_POSE.getY()
+                                + Constants.Vision.Y_OFFSET_RED * (int) ((m_currentPose.getY()
+                                        - Constants.Vision.ALIGNMENT_ALLOWED_TOLERANCE_TRANSLATIONAL)
+                                        / Constants.Vision.Y_OFFSET_RED),
+                        Constants.Vision.RED_INITIAL_TARGET_POSE.getRotation());
             } else if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-                m_targetPose = new Pose2d(m_currentPose.getX(), Constants.Vision.BLUE_INITIAL_TARGET_POSE.getY() +  Constants.Vision.Y_OFFSET_BLUE * (int) (m_currentPose.getY() / Constants.Vision.Y_OFFSET_BLUE), Constants.Vision.BLUE_INITIAL_TARGET_POSE.getRotation());
+                System.out.println("We are blue.");
+                m_targetPose = new Pose2d(m_currentPose.getX(),
+                        Constants.Vision.RED_INITIAL_TARGET_POSE.getY()
+                                + Constants.Vision.Y_OFFSET_RED * (int) ((m_currentPose.getY()
+                                        - Constants.Vision.ALIGNMENT_ALLOWED_TOLERANCE_TRANSLATIONAL)
+                                        / Constants.Vision.Y_OFFSET_RED),
+                        Constants.Vision.BLUE_INITIAL_TARGET_POSE.getRotation());
             }
-            SmartDashboard.putNumberArray("Target pose", new double[]{m_targetPose.getX(), m_targetPose.getY(), m_targetPose.getRotation().getRadians()});
+            SmartDashboard.putNumberArray("Target pose",
+                    new double[] { m_targetPose.getX(), m_targetPose.getY(), m_targetPose.getRotation().getRadians() });
             new DriveToPoseTrajectory(m_drivetrainSubsystem, m_targetPose).schedule();
         } catch (Exception e) {
-            System.out.println("Alignment failed. Exception: "); //TODO: Put an Alert on SmartDashboard and Shuffleboard
+            System.out.println("Alignment failed. Exception: "); // TODO: Put an Alert on SmartDashboard and
+                                                                 // Shuffleboard
             e.printStackTrace();
         }
     }
 
     @Override
     public void execute() {
-       
+
     }
 
     @Override
@@ -53,11 +67,15 @@ public class AlignCommand extends CommandBase {
     @Override
     public boolean isFinished() {
         // TODO what're our actual margins of error?
-        double translationMargin = 0.1;
-        double rotationMargin = 0.1;
+
         var delta = m_targetPose.minus(m_currentPose);
-        return MathUtils.isInRange(Math.abs(delta.getX()), -translationMargin, translationMargin) &&
-                MathUtils.isInRange(Math.abs(delta.getY()), -translationMargin, translationMargin) &&
-                MathUtils.isInRange(Math.abs(delta.getRotation().getRadians()), -rotationMargin, rotationMargin);
+        return MathUtils.isInRange(Math.abs(delta.getX()), -Constants.Vision.ALIGNMENT_ALLOWED_TOLERANCE_TRANSLATIONAL,
+                Constants.Vision.ALIGNMENT_ALLOWED_TOLERANCE_TRANSLATIONAL) &&
+                MathUtils.isInRange(Math.abs(delta.getY()), -Constants.Vision.ALIGNMENT_ALLOWED_TOLERANCE_TRANSLATIONAL,
+                        Constants.Vision.ALIGNMENT_ALLOWED_TOLERANCE_TRANSLATIONAL)
+                &&
+                MathUtils.isInRange(Math.abs(delta.getRotation().getRadians()),
+                        -Constants.Vision.ALIGNMENT_ALLOWED_TOLERANCE_ROTATIONAL,
+                        Constants.Vision.ALIGNMENT_ALLOWED_TOLERANCE_ROTATIONAL);
     }
 }
