@@ -286,8 +286,8 @@ public class RobotContainer {
     m_gunner1.button(11).onTrue(ArmSequences.groundIntakeCone(m_armSubsystem, m_claw,  0)); 
     m_gunner1.button(11).and(m_gunner1.button(1)).onTrue(ArmSequences.groundIntakeCone(m_armSubsystem, m_claw, 1));
 
-    m_gunner1.button(12).onTrue(ArmSequences.groundIntake(m_armSubsystem, m_claw, 0)); 
-    m_gunner1.button(12).and(m_gunner1.button(1)).onTrue(ArmSequences.groundIntake(m_armSubsystem, m_claw, 1));
+    m_gunner1.button(12).onTrue(ArmSequences.autonGroundIntake(m_armSubsystem, m_claw, 0)); 
+    m_gunner1.button(12).and(m_gunner1.button(1)).onTrue(ArmSequences.autonGroundIntake(m_armSubsystem, m_claw, 1));
   }
 
   private static double deadband(double value, double deadband) {

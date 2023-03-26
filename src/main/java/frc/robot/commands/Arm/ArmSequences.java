@@ -29,17 +29,17 @@ public class ArmSequences{
         return ready.andThen(intake);
     }  
     
-    public static SequentialCommandGroup autonGroundIntake(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem ,int side){
+    public static ArmPositionCommand autonGroundIntake(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem ,int side){
         ArmPositionCommand intake;
         if(side > 0){
-            intake = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.ground_intake_x + 0.1524), Constants.ArmNodeDictionary.ground_intake_y + (0.1524/2));
+            intake = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.auton_intake_x), Constants.ArmNodeDictionary.auton_intake_y );
         }else{
-            intake = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ground_intake_x +  0.1524, Constants.ArmNodeDictionary.ground_intake_y + (0.1524/2));
+            intake = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.auton_intake_x , Constants.ArmNodeDictionary.auton_intake_y);
         }
         ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
         RunCommand closeIntake = new RunCommand(()-> m_clawSubsystem.manualCloseClaw());
         // return intake.andThen(closeIntake).andThen(zero);
-        return intake.andThen(zero);
+        return intake;//.andThen(zero);
     }
 
     public static ArmPositionCommand ready(ArmSubsystem armSubsystem, int side){
