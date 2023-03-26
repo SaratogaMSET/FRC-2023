@@ -45,10 +45,11 @@ public class AlignCommand extends CommandBase {
             }
             SmartDashboard.putNumberArray("Target pose",
                     new double[] { m_targetPose.getX(), m_targetPose.getY(), m_targetPose.getRotation().getRadians() });
+            SmartDashboard.putBoolean("Align command status: ", true);
             new DriveToPoseTrajectory(m_drivetrainSubsystem, m_targetPose).schedule();
         } catch (Exception e) {
-            System.out.println("Alignment failed. Exception: "); // TODO: Put an Alert on SmartDashboard and
-                                                                 // Shuffleboard
+            SmartDashboard.putBoolean("Align command status: ", false);
+            System.out.println("Alignment failed. Exception: ");
             e.printStackTrace();
         }
     }
