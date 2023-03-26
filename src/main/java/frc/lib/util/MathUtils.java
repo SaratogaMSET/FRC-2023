@@ -6,22 +6,17 @@ public class MathUtils {
     }
 
     public static double ensureRange(double value, double minValue, double maxValue) {
-        if (minValue > value) {
-            return minValue;
-        } else if (maxValue < value) {
-            return maxValue;
-        } else {
-            return value;
-        }
+        return Math.max(minValue, Math.min(value, maxValue));
     }
 
+
+    /**
+     * @param value
+     * @param minValue
+     * @param maxValue
+     * @return Whether or not <code>value</code> is in the range [<code>minValue</code>, <code>maxValue</code>)
+     */
     public static boolean isInRange(double value, double minValue, double maxValue) {
-        if (minValue > value) {
-            return false;
-        } else if (maxValue < value) {
-            return false;
-        } else {
-            return true;
-        }
+        return minValue <= value && value < maxValue;
     }
 }

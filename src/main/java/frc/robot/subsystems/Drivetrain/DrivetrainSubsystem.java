@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.swerve.BetterSwerveModuleState;
 import frc.lib.swerve.SwerveDriveKinematics2;
+import frc.lib.util.MathUtils;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.SwerveModule;
@@ -195,7 +196,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         for(SwerveModule mod : mSwerveMods){
             mod.setDesiredState(desiredStates[mod.moduleNumber], false);
         }
-    } 
+    }
 
     public Pose2d getPose() {
         return odomFiltered.getEstimatedPosition();
@@ -362,14 +363,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SmartDashboard.putNumberArray("Odom", pos);
         lastPose = odomFiltered.getEstimatedPosition();
         Pose2d pose = getVisionPose2d();
-        if (pose != null){ 
-            
+        if (pose != null){
             double timestamp = Timer.getFPGATimestamp() - (visionData.getEntry("tl").getDouble(0) + 11) / 1000;
             odomFiltered.addVisionMeasurement(pose, timestamp);
         }
 
         //swerveOdometry.update(getRotation2d(), getModulePositions());  
-        //Logger.getInstance().recordOutput("Odometry", odomFiltered.getEstimatedPosition());
+        Logger.getInstance().recordOutput("UKF Odometry", odomFiltered.getEstimatedPosition());
+        var asdf = odomFiltered.getEstimatedPosition();
+        SmartDashboard.putNumberArray("UKF Coords", new double[]{asdf.getX(), asdf.getY(), asdf.getRotation().getRadians()});
         //lastRotation = new Rotation2d(-gyroInputs.yawPositionRad);
         // m_field.setRobotPose(odomFiltered.getEstimatedPosition());
         //if (pose != null) visionPoseEstimates.setRobotPose(pose);

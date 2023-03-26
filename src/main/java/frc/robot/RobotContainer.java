@@ -5,11 +5,7 @@
 package frc.robot;
 
 
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -56,11 +52,12 @@ import frc.robot.commands.Drivetrain.TunableBalanceCommand;
 import frc.robot.commands.Drivetrain.TurnTo90;
 import frc.robot.commands.Drivetrain.TurnToCone;
 import frc.robot.commands.Drivetrain.ZeroGyroCommand;
-import frc.robot.subsystems.Vision.VisionSubsystem;
+import frc.robot.commands.Vision.AlignCommand;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
+import frc.robot.subsystems.Vision.VisionSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -211,7 +208,6 @@ public class RobotContainer {
         () -> m_gunner1.getX()
       ));
 
-
     m_claw.setDefaultCommand(new BackUpIntakeCommand(
       m_claw, 
       ()-> DriverStation.isAutonomous(),
@@ -225,7 +221,6 @@ public class RobotContainer {
     
     m_driverController.x().onTrue(new InstantCommand(()->m_drivetrainSubsystem.setX(), m_drivetrainSubsystem));
 
-
     // m_driverController.y().onTrue(new SequentialCommandGroup(
     //   new TurnTo90(m_drivetrainSubsystem),
     //   new WaitCommand(1),
@@ -233,11 +228,7 @@ public class RobotContainer {
     // ));
     m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
 
-    m_gunner1.button(2).onTrue(new DriveToPose(m_drivetrainSubsystem, new Pose2d(new Translation2d(3,1), new Rotation2d(0))));
-    // m_gunner1.button(2).onTrue( new SequentialCommandGroup(
-    //   new TurnTo90(m_drivetrainSubsystem),
-    //   new AlignToCone(m_drivetrainSubsystem, m_visionSubsystem)
-    // ));
+    m_gunner1.button(2).onTrue(new AlignCommand(m_drivetrainSubsystem));
 
     // m_driverController.x().toggleOnTrue(
     //   new DefaultDriveCommand(

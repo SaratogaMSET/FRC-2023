@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.util.HashMap;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 
@@ -229,12 +227,12 @@ public final class Constants {
 
         public static final Map<Long, ScoringTag> tagConversion = Map.ofEntries(
                 /* i have no clue how to do this w/ deprecating */
-                Map.entry(new Long(1), ScoringTag.APRILTAG1),
-                Map.entry(new Long(2), ScoringTag.APRILTAG2),
-                Map.entry(new Long(3), ScoringTag.APRILTAG3),
-                Map.entry(new Long(6), ScoringTag.APRILTAG6),
-                Map.entry(new Long(7), ScoringTag.APRILTAG7),
-                Map.entry(new Long(8), ScoringTag.APRILTAG8)
+                Map.entry(Long.valueOf(1), ScoringTag.APRILTAG1),
+                Map.entry(Long.valueOf(2), ScoringTag.APRILTAG2),
+                Map.entry(Long.valueOf(3), ScoringTag.APRILTAG3),
+                Map.entry(Long.valueOf(6), ScoringTag.APRILTAG6),
+                Map.entry(Long.valueOf(7), ScoringTag.APRILTAG7),
+                Map.entry(Long.valueOf(8), ScoringTag.APRILTAG8)
         );
 
         public static final Map<ScoringTag, Pose2d[]> ScoringMap = Map.ofEntries(
@@ -357,7 +355,14 @@ public final class Constants {
         public static final double apriltagtoMidVertical = 0.15875;
         public static final double apriltagtoHighVertical = 0.73025;
 
+        // TODO replace with actual values
+        // Where 0 starts from the corresponding alliance color's right side
+        public static final Pose2d RED_INITIAL_TARGET_POSE = new Pose2d(new Translation2d(2.04245, 0.59764), new Rotation2d(-2.96931));
+        public static final double Y_OFFSET_RED = 0.5588; // meters
+        public static final Pose2d BLUE_INITIAL_TARGET_POSE = new Pose2d(new Translation2d(14.4993, 7.41606), new Rotation2d(-2.96931 + 180 / Math.PI)); // TODO
+        public static final double Y_OFFSET_BLUE = -0.5588; // meters
     }
+
     public final class ArmParameters{
         //Positive X Axis defined as the front face of the robot, going from back (battery) to front (roborio)
         //Positive Y axis defined as the axis perpendicular to the ground
