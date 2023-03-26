@@ -2,20 +2,17 @@ package frc.robot.commands.Vision;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.util.MathUtils;
 import frc.robot.Constants;
+import frc.robot.commands.Drivetrain.DriveToPose;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 
 public class AlignCommand extends CommandBase {
     private final DrivetrainSubsystem m_drivetrainSubsystem;
-    private final PIDController pid = new PIDController(2, 0.0, 0.0);
 
     private Pose2d m_currentPose;
     private Pose2d m_targetPose;
@@ -40,13 +37,7 @@ public class AlignCommand extends CommandBase {
                 m_targetPose = new Pose2d(Constants.Vision.BLUE_INITIAL_TARGET_POSE.getX(), Constants.Vision.BLUE_INITIAL_TARGET_POSE.getY() + -Constants.Vision.Y_OFFSET_BLUE * (int) (m_currentPose.getY() / Constants.Vision.Y_OFFSET_BLUE), Constants.Vision.BLUE_INITIAL_TARGET_POSE.getRotation());
             }
             SmartDashboard.putNumberArray("Target pose", new double[]{m_targetPose.getX(), m_targetPose.getY(), m_targetPose.getRotation().getRadians()});
-            m_drivetrainSubsystem.drive(
-                    // it's so bad ahahahahahahahaha just kill me
-                    new ChassisSpeeds(
-                            pid.calculate(m_currentPose.getX(), m_targetPose.getX()) / 2,
-                            pid.calculate(m_currentPose.getY(), m_targetPose.getY()) / 2,
-                            pid.calculate(m_currentPose.getRotation().getRadians(),
-                                    m_targetPose.getRotation().getRadians()) / 2));
+            new DriveToPose(m_drivetrainSubsystem, m_targetPose).schedule();
         } catch (Exception e) {
             System.out.println("Alignment failed. Exception: ");
             e.printStackTrace();
