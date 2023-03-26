@@ -38,7 +38,6 @@ import frc.lib.swerve.SwerveDriveKinematics2;
 import frc.lib.util.MathUtils;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.Constants.Vision.FieldZones;
 import frc.robot.subsystems.SwerveModule;
 
 public class DrivetrainSubsystem extends SubsystemBase {
@@ -196,38 +195,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void setModuleStates(BetterSwerveModuleState[] desiredStates) {
         for(SwerveModule mod : mSwerveMods){
             mod.setDesiredState(desiredStates[mod.moduleNumber], false);
-        }
-    }
-
-    public Constants.Vision.FieldZones getFieldZone() throws Exception {
-        // If we know which alliance we're on, we only care about y-values for
-        // pose --> zone conversion
-        // Or is it x?
-        double robotY = getPose().getY();
-
-        if (DriverStation.getAlliance().equals(DriverStation.Alliance.Red)) {
-            // TODO replace with actual values
-            if (MathUtils.isInRange(robotY, 0, 1)) {
-                return FieldZones.RedLeft;
-            } else if (MathUtils.isInRange(robotY, 1, 2)) {
-                return FieldZones.RedMid;
-            } else if (MathUtils.isInRange(robotY, 2, 3)) {
-                return FieldZones.RedRight;
-            } else {
-                throw new Exception("Pose to field zone conversion failed: failed to find valid robot y-value.");
-            }
-        } else if (DriverStation.getAlliance().equals(DriverStation.Alliance.Blue)) {
-            if (MathUtils.isInRange(robotY, 0, 1)) {
-                return FieldZones.BlueLeft;
-            } else if (MathUtils.isInRange(robotY, 1, 2)) {
-                return FieldZones.BlueMid;
-            } else if (MathUtils.isInRange(robotY, 2, 3)) {
-                return FieldZones.BlueRight;
-            } else {
-                throw new Exception("Pose to field zone conversion failed: failed to find valid robot y-value.");
-            }
-        } else {
-            throw new Exception("Pose to field zone conversion failed: failed to get valid alliance color.");
         }
     }
 
@@ -396,14 +363,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SmartDashboard.putNumberArray("Odom", pos);
         lastPose = odomFiltered.getEstimatedPosition();
         Pose2d pose = getVisionPose2d();
-        if (pose != null){ 
-            
+        if (pose != null){
             double timestamp = Timer.getFPGATimestamp() - (visionData.getEntry("tl").getDouble(0) + 11) / 1000;
             odomFiltered.addVisionMeasurement(pose, timestamp);
         }
 
         //swerveOdometry.update(getRotation2d(), getModulePositions());  
-        //Logger.getInstance().recordOutput("Odometry", odomFiltered.getEstimatedPosition());
+        Logger.getInstance().recordOutput("UKF Odometry", odomFiltered.getEstimatedPosition());
+        var asdf = odomFiltered.getEstimatedPosition();
+        SmartDashboard.putNumberArray("UKF Coords", new double[]{asdf.getX(), asdf.getY(), asdf.getRotation().getRadians()});
         //lastRotation = new Rotation2d(-gyroInputs.yawPositionRad);
         // m_field.setRobotPose(odomFiltered.getEstimatedPosition());
         //if (pose != null) visionPoseEstimates.setRobotPose(pose);

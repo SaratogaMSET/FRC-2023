@@ -337,16 +337,6 @@ public final class Constants {
     }
 
     public static class Vision {
-        // Where "left" and "right" are defined from the POV of the corresnponding alliance's driver
-        public static enum FieldZones {
-            RedLeft,
-            RedMid,
-            RedRight,
-            BlueLeft,
-            BlueMid,
-            BlueRight
-        }
-
         public static final int LED = 3;
         public static final double H1 = 5; // distance between limelight and ground (height of limelight mount)
         public static final double H2 = 107; // height of target
@@ -366,14 +356,11 @@ public final class Constants {
         public static final double apriltagtoHighVertical = 0.73025;
 
         // TODO replace with actual values
-        public static final Map<FieldZones, Pose2d> ZONE_TO_TARGET_POSE = Map.ofEntries(
-            Map.entry(FieldZones.RedLeft, new Pose2d(new Translation2d(0, 0), new Rotation2d(0))),
-            Map.entry(FieldZones.RedMid, new Pose2d(new Translation2d(0, 0), new Rotation2d(0))),
-            Map.entry(FieldZones.RedRight, new Pose2d(new Translation2d(0, 0), new Rotation2d(0))),
-            Map.entry(FieldZones.BlueLeft, new Pose2d(new Translation2d(0, 0), new Rotation2d(0))),
-            Map.entry(FieldZones.BlueMid, new Pose2d(new Translation2d(0, 0), new Rotation2d(0))),
-            Map.entry(FieldZones.BlueRight, new Pose2d(new Translation2d(0, 0), new Rotation2d(0)))
-        );
+        // Where 0 starts from the corresponding alliance color's right side
+        public static final Pose2d RED_INITIAL_TARGET_POSE = new Pose2d(new Translation2d(2.04245, 0.59764), new Rotation2d(-2.96931));
+        public static final double Y_OFFSET_RED = 0.5588; // meters
+        public static final Pose2d BLUE_INITIAL_TARGET_POSE = new Pose2d(new Translation2d(14.4993, 7.41606), new Rotation2d(-2.96931 + 180 / Math.PI)); // TODO
+        public static final double Y_OFFSET_BLUE = -0.5588; // meters
     }
 
     public final class ArmParameters{
