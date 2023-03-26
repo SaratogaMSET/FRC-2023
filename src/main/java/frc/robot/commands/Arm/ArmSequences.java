@@ -42,25 +42,23 @@ public class ArmSequences{
         return intake.andThen(zero);
     }
 
-    public static SequentialCommandGroup ready(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem,int side){
+    public static ArmPositionCommand ready(ArmSubsystem armSubsystem, int side){
         ArmPositionCommand ready;
         if(side > 0){
-            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, true, 0.05);
+            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, true);
         }else{
-            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, true, 0.05);
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, true);
         }
-        ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
-        return ready.andThen(openIntake);
+        return ready;
     }
-    public static SequentialCommandGroup readyMoreForward(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem, int side){
+    public static ArmPositionCommand readyMoreForward(ArmSubsystem armSubsystem ,int side){
         ArmPositionCommand ready;
         if(side > 0){
-            ready = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.ready_double_substation_x + ((0.125 + 0.09))/2), Constants.ArmNodeDictionary.ready_double_substation_y + 0.1,true, 0.05);
+            ready = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.ready_double_substation_x + ((0.125 + 0.09))/2), Constants.ArmNodeDictionary.ready_double_substation_y + 0.1,true);
         }else{
-            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x + ((0.125 + 0.09))/2, Constants.ArmNodeDictionary.ready_double_substation_y + 0.1, true, 0.05);
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x + ((0.125 + 0.09))/2, Constants.ArmNodeDictionary.ready_double_substation_y + 0.1, true);
         }
-        ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
-        return ready.andThen(openIntake);
+        return ready;
     }
 
     public static SequentialCommandGroup lowScore(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem, int side){
