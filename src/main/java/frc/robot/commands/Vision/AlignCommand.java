@@ -1,6 +1,5 @@
 package frc.robot.commands.Vision;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -8,7 +7,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.util.MathUtils;
 import frc.robot.Constants;
-import frc.robot.commands.Drivetrain.DriveToPose;
 import frc.robot.commands.Drivetrain.DriveToPoseTrajectory;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 
@@ -29,9 +27,9 @@ public class AlignCommand extends CommandBase {
         try {
             m_currentPose = m_drivetrainSubsystem.getPose();
             if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
-                m_targetPose = new Pose2d(Constants.Vision.RED_INITIAL_TARGET_POSE.getX(), Constants.Vision.RED_INITIAL_TARGET_POSE.getY() + Constants.Vision.Y_OFFSET_RED * (int) (m_currentPose.getY() / Constants.Vision.Y_OFFSET_RED), Constants.Vision.RED_INITIAL_TARGET_POSE.getRotation());
+                m_targetPose = new Pose2d(m_currentPose.getX(), Constants.Vision.RED_INITIAL_TARGET_POSE.getY() + Constants.Vision.Y_OFFSET_RED * (int) (m_currentPose.getY() / Constants.Vision.Y_OFFSET_RED), Constants.Vision.RED_INITIAL_TARGET_POSE.getRotation());
             } else if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-                m_targetPose = new Pose2d(Constants.Vision.BLUE_INITIAL_TARGET_POSE.getX(), Constants.Vision.BLUE_INITIAL_TARGET_POSE.getY() +  Constants.Vision.Y_OFFSET_BLUE * (int) (m_currentPose.getY() / Constants.Vision.Y_OFFSET_BLUE), Constants.Vision.BLUE_INITIAL_TARGET_POSE.getRotation());
+                m_targetPose = new Pose2d(m_currentPose.getX(), Constants.Vision.BLUE_INITIAL_TARGET_POSE.getY() +  Constants.Vision.Y_OFFSET_BLUE * (int) (m_currentPose.getY() / Constants.Vision.Y_OFFSET_BLUE), Constants.Vision.BLUE_INITIAL_TARGET_POSE.getRotation());
             }
             SmartDashboard.putNumberArray("Target pose", new double[]{m_targetPose.getX(), m_targetPose.getY(), m_targetPose.getRotation().getRadians()});
             new DriveToPoseTrajectory(m_drivetrainSubsystem, m_targetPose).schedule();
