@@ -25,12 +25,12 @@ public class ArmSequences{
         return ready.andThen(intake);
     }  
     
-    public static ArmPositionCommand autonGroundIntake(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem ,int side){
+    public static ArmPositionCommand autonGroundIntake(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem, int side){
         ArmPositionCommand intake;
         if(side > 0){
-            intake = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.auton_intake_x), Constants.ArmNodeDictionary.auton_intake_y );
+            intake = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.auton_intake_x), Constants.ArmNodeDictionary.auton_intake_y, 0.05);
         }else{
-            intake = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.auton_intake_x , Constants.ArmNodeDictionary.auton_intake_y);
+            intake = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.auton_intake_x , Constants.ArmNodeDictionary.auton_intake_y, 0.05);
         }
         ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
         RunCommand closeIntake = new RunCommand(()-> m_clawSubsystem.manualCloseClaw());

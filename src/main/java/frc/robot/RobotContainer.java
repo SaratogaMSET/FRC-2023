@@ -38,6 +38,7 @@ import frc.robot.commands.Arm.ArmVoltageCommand;
 import frc.robot.commands.Arm.ArmZeroAutoCommand;
 import frc.robot.commands.Arm.ArmZeroCommand;
 import frc.robot.commands.Auton.AutoRunCommand;
+import frc.robot.commands.Auton.AutonSequences;
 import frc.robot.commands.Claw.BackUpIntakeCommand;
 import frc.robot.commands.Claw.ManualCloseIntake;
 import frc.robot.commands.Claw.ManualOpenIntake;
@@ -69,6 +70,9 @@ public class RobotContainer {
   public static final String OnePlusHalf = "Score, get One more and Balance Bottom";
   // public String m_autoSelected;  
   public static final String OneAndNothing = "One Score and Nothing";
+  public static final String PhyscoBehavior = "TEST PATH FOR TOP 2 GAME PIECE ONLY";
+  public static final String BalanceMobilityBonus = "Middle Balance Mobilty";
+
   public final SendableChooser<Boolean> autoCloseChooser = new SendableChooser<Boolean>();
   public static final Boolean disableAutoClose = false;
   public static final Boolean enableAutoClose = true;
@@ -92,33 +96,6 @@ public class RobotContainer {
 
   public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
           Math.hypot(Drivetrain.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, Drivetrain.DRIVETRAIN_WHEELBASE_METERS / 2.0);
-
-  // public HashMap<String, Command> eventMap = new HashMap<>(
-  //   Map.ofEntries(
-  //   Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetract(m_armSubsystem, m_claw, 1)),
-  //   Map.entry("Arm Neutral", new ArmZeroCommand(m_armSubsystem)),
-  //   Map.entry("Intake Front", ArmSequences.autonGroundIntake(m_armSubsystem, m_claw, 0)), 
-  //   Map.entry("Arm Ready", ArmSequences.ready(m_armSubsystem, 1)),
-  //   Map.entry("Score Cube High Backwards", ArmSequences.scoreCubeHighNoRetract(m_armSubsystem, m_claw,1)),
-  //   Map.entry("Arm Neutral Command", new ArmZeroCommand(m_armSubsystem)),
-  //   Map.entry("Balance", new BalanceCommand(m_drivetrainSubsystem))
-  //   )
-  //   );
-  
-  //1.0676
-  // BetterSwerveAutoBuilder swerveAutoBuilder = new BetterSwerveAutoBuilder(
-  //   m_drivetrainSubsystem::getPose, 
-  //   m_drivetrainSubsystem::resetOdometry, 
-  //   new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
-  //   new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
-  //   new PIDConstants(Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory),
-  //   m_drivetrainSubsystem::drive, 
-  //   eventMap, 
-  //   true,
-  //   m_drivetrainSubsystem);
-
-  List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Test Path", new PathConstraints(2, 3), new PathConstraints(2, 3), new PathConstraints(2, 3), new PathConstraints(2, 1));
-  // public Command build = swerveAutoBuilder.fullAuto(trajectory);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -154,6 +131,8 @@ public class RobotContainer {
     m_autoSwitcher.addOption(TwoPieceTop, TwoPieceTop);
     m_autoSwitcher.addOption(OneAndBalanceBottom, OneAndBalanceBottom);
     m_autoSwitcher.addOption(OnePlusHalf, OnePlusHalf);
+    m_autoSwitcher.addOption(BalanceMobilityBonus, BalanceMobilityBonus);
+    m_autoSwitcher.addOption(PhyscoBehavior, PhyscoBehavior);
     
     
     autoCloseChooser.setDefaultOption("Disable the Auto Close", disableAutoClose);
@@ -339,434 +318,7 @@ public class RobotContainer {
     // SmartDashboard.putNumber("prox of the yimity", sensor.getProximity());
     // SmartDashboard.putBoolean("hall effect", HallEffect.get());
   }
-  public Command getTwoPieceAndBalanceBottomCommand(){
-    PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("Bottom Path Part 1", new PathConstraints(2, 1.5));
-    PathPlannerTrajectory trajectory2 = PathPlanner.loadPath("Bottom Path Part 2", new PathConstraints(2, 3));
-    PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
 
-
-    PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
-    PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);//FIXME
-    PIDController thetaController = new PIDController(
-          Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
-    
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-    xController.reset();
-    yController.reset();
-    thetaController.reset();
-
-    PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
-      trajectory1, 
-      m_drivetrainSubsystem::getPose,
-      Constants.Drivetrain.m_kinematics2,
-      xController,
-      yController,
-      thetaController,
-      m_drivetrainSubsystem::drive,
-      true,
-      m_drivetrainSubsystem
-    );
-    
-    PPSwerveControllerCommandA swerveTrajectoryFollower1 = new PPSwerveControllerCommandA(
-      trajectory2, 
-      m_drivetrainSubsystem::getPose,
-      Constants.Drivetrain.m_kinematics2,
-      xController,
-      yController,
-      thetaController,
-      m_drivetrainSubsystem::drive,
-      true,
-      m_drivetrainSubsystem
-    );
-
-    return new SequentialCommandGroup(
-      new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
-      new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
-      new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
-      // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
-      // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
-      new SequentialCommandGroup(
-        ArmSequences.scoreConeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 1),
-        new WaitCommand(0.65),
-        // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
-        // new RunCommand(()->m_claw.openIntake(), m_claw).withTimeout(0.5)
-        new ManualOpenIntake(m_claw),
-        // new InstantCommand(()->SmartDashboard.putBoolean("Claw Opened", false)),
-        new ParallelCommandGroup(
-        new ArmZeroAutoCommand(m_armSubsystem),
-        swerveTrajectoryFollower
-        ),
-        ArmSequences.groundIntake(m_armSubsystem, m_claw, 0),
-        new ManualCloseIntake(m_claw).withTimeout(0.5),
-        swerveTrajectoryFollower1,
-        // ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 0),
-        new ParallelCommandGroup(
-        // new ArmZeroCommand(m_armSubsystem),
-        new SequentialCommandGroup(
-          new BalanceCommand(m_drivetrainSubsystem),
-          new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.5, 0, 0).withTimeout(0.9), //TODO: tune
-          new InstantCommand(()-> m_drivetrainSubsystem.setX())
-        )
-        )
-      )
-    );
-
-}
-
-  public Command getOnePieceAndBalanceBottomCommand(){
-      PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("Bottom Path", new PathConstraints(2, 1.5));
-      PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
-  
-  
-      PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
-      PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);//FIXME
-      PIDController thetaController = new PIDController(
-            Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
-      
-      thetaController.enableContinuousInput(-Math.PI, Math.PI);
-      xController.reset();
-      yController.reset();
-      thetaController.reset();
-  
-      PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
-        trajectory1, 
-        m_drivetrainSubsystem::getPose,
-        Constants.Drivetrain.m_kinematics2,
-        xController,
-        yController,
-        thetaController,
-        m_drivetrainSubsystem::drive,
-        true,
-        m_drivetrainSubsystem
-      );
-      
-  
-      return new SequentialCommandGroup(
-        new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
-        new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
-        new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
-        // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
-        // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
-        new SequentialCommandGroup(
-          ArmSequences.scoreConeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 1),
-          new WaitCommand(0.65),
-          // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
-          // new RunCommand(()->m_claw.openIntake(), m_claw).withTimeout(0.5)
-          new ManualOpenIntake(m_claw),
-          // new InstantCommand(()->SmartDashboard.putBoolean("Claw Opened", false)),
-          new ParallelCommandGroup(
-          new ArmZeroAutoCommand(m_armSubsystem),
-          swerveTrajectoryFollower
-          ),
-          // ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 0),
-          new ParallelCommandGroup(
-          // new ArmZeroCommand(m_armSubsystem),
-          new SequentialCommandGroup(
-            new BalanceCommand(m_drivetrainSubsystem),
-            new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.5, 0, 0).withTimeout(0.9), //TODO: tune 
-            new InstantCommand(()-> m_drivetrainSubsystem.setX())
-          )
-          )
-        )
-      );
-
-  }
-  public Command getOnePieceAndBalanceCommand(){
-    PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("Middle Path", 2, 1); // 2 3
-    PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
-
-
-    PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); 
-    PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);
-    PIDController thetaController = new PIDController(
-          Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
-    
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-    xController.reset();
-    yController.reset();
-    thetaController.reset();
-
-    PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
-      trajectory1, 
-      m_drivetrainSubsystem::getPose,
-      Constants.Drivetrain.m_kinematics2,
-      xController,
-      yController,
-      thetaController,
-      m_drivetrainSubsystem::drive,
-      true,
-      m_drivetrainSubsystem
-    );
-    
-
-    return new SequentialCommandGroup(
-      new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
-      new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
-      new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
-      // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
-      // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
-      new SequentialCommandGroup(
-        ArmSequences.scoreConeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 1),
-        new WaitCommand(0.65),
-        // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
-        // new RunCommand(()->m_claw.openIntake(), m_claw).withTimeout(0.5)
-        new ManualOpenIntake(m_claw),
-        // new InstantCommand(()->SmartDashboard.putBoolean("Claw Opened", false)),
-        new ParallelCommandGroup(
-        new ArmZeroAutoCommand(m_armSubsystem),
-        swerveTrajectoryFollower
-        ),
-        // ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 1),
-        new ParallelCommandGroup(
-        // new ArmZeroCommand(m_armSubsystem),
-        new SequentialCommandGroup(
-          new BalanceCommand(m_drivetrainSubsystem),
-          new AutoRunCommand(m_drivetrainSubsystem, -((6 * 0.1524)/1.5), 0, 0).withTimeout(0.9), //TODO: tune 
-          new InstantCommand(()-> m_drivetrainSubsystem.setX())
-        )
-        )
-      )
-    );
-  }
-
-  public Command getOnePieceAndBalanceBringArmBackCommand(){
-    PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("Middle Path", 2, 1); // 2 3 
-    PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
-
-
-    PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
-    PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);//FIXME
-    PIDController thetaController = new PIDController(
-          Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
-    
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-    xController.reset();
-    yController.reset();
-    thetaController.reset();
-
-    PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
-      trajectory1, 
-      m_drivetrainSubsystem::getPose,
-      Constants.Drivetrain.m_kinematics2,
-      xController,
-      yController,
-      thetaController,
-      m_drivetrainSubsystem::drive,
-      true,
-      m_drivetrainSubsystem
-    );
-    
-
-    return new SequentialCommandGroup(
-      new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
-      new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
-      new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
-      // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
-      // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
-      new SequentialCommandGroup(
-        ArmSequences.scoreConeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 1),
-        new WaitCommand(0.65),
-        // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
-        // new RunCommand(()->m_claw.openIntake(), m_claw).withTimeout(0.5)
-        new ManualOpenIntake(m_claw),
-        // new InstantCommand(()->SmartDashboard.putBoolean("Claw Opened", false)),
-        new ParallelCommandGroup(
-        new ArmZeroAutoCommand(m_armSubsystem),
-        swerveTrajectoryFollower
-        ),
-        ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 1),
-        new ParallelCommandGroup(
-        new ArmZeroCommand(m_armSubsystem),
-        new SequentialCommandGroup(
-          new BalanceCommand(m_drivetrainSubsystem),
-          new AutoRunCommand(m_drivetrainSubsystem, -((6 * 0.1524)/1.5), 0, 0).withTimeout(0.9), //TODO: tune 
-          new InstantCommand(()-> m_drivetrainSubsystem.setX())
-        )
-        )
-      )
-    );
-  }
-
-  public Command getOnePieceCommand(){
-    PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("One Piece", 4, 1);
-    PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
-
-
-    PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
-    PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);//FIXME
-    PIDController thetaController = new PIDController(
-          Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
-    
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-    xController.reset();
-    yController.reset();
-    thetaController.reset();
-
-    PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
-      trajectory1, 
-      m_drivetrainSubsystem::getPose,
-      Constants.Drivetrain.m_kinematics2,
-      xController,
-      yController,
-      thetaController,
-      m_drivetrainSubsystem::drive,
-      true,
-      m_drivetrainSubsystem
-    );
-    
-
-    return new SequentialCommandGroup(
-      new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
-      new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
-      new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
-      // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
-      // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
-      new SequentialCommandGroup(
-        ArmSequences.scoreConeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 1),
-        new WaitCommand(0.65),
-        // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
-        // new RunCommand(()->m_claw.openIntake(), m_claw).withTimeout(0.5)
-        new ManualOpenIntake(m_claw),
-        // new InstantCommand(()->SmartDashboard.putBoolean("Claw Opened", false)),
-        new ParallelCommandGroup(
-        new ArmZeroAutoCommand(m_armSubsystem),
-        swerveTrajectoryFollower
-        )
-        // ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 0),
-        // new ParallelCommandGroup(
-        // new ArmZeroCommand(m_armSubsystem),
-        // new SequentialCommandGroup(
-        //   new BalanceCommand(m_drivetrainSubsystem),
-        //   new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.5, 0, 0).withTimeout(1.1),
-        //   new InstantCommand(()-> m_drivetrainSubsystem.setX())
-        // )
-        // )
-      )
-    );
-  }
-  public Command getOnePieceCommandOnly(){
-    // PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("One Piece", 4, 1);
-    // PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
-
-
-    // PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
-    // PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);//FIXME
-    // PIDController thetaController = new PIDController(
-    //       Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
-    
-    // thetaController.enableContinuousInput(-Math.PI, Math.PI);
-    // xController.reset();
-    // yController.reset();
-    // thetaController.reset();
-
-    // PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
-    //   trajectory1, 
-    //   m_drivetrainSubsystem::getPose,
-    //   Constants.Drivetrain.m_kinematics2,
-    //   xController,
-    //   yController,
-    //   thetaController,
-    //   m_drivetrainSubsystem::drive,
-    //   true,
-    //   m_drivetrainSubsystem
-    // );
-    
-
-    return new SequentialCommandGroup(
-      new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
-      new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
-      // new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
-      // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
-      // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
-      new SequentialCommandGroup(
-        ArmSequences.scoreConeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 1),
-        new WaitCommand(0.65),
-        // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
-        // new RunCommand(()->m_claw.openIntake(), m_claw).withTimeout(0.5)
-        new ManualOpenIntake(m_claw),
-        // new InstantCommand(()->SmartDashboard.putBoolean("Claw Opened", false)),
-        new ParallelCommandGroup(
-        new ArmZeroAutoCommand(m_armSubsystem)
-        // swerveTrajectoryFollower
-        )
-        // ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 0),
-        // new ParallelCommandGroup(
-        // new ArmZeroCommand(m_armSubsystem),
-        // new SequentialCommandGroup(
-        //   new BalanceCommand(m_drivetrainSubsystem),
-        //   new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.5, 0, 0).withTimeout(1.1),
-        //   new InstantCommand(()-> m_drivetrainSubsystem.setX())
-        // )
-        // )
-      )
-    );
-  }
-
-  public Command getTwoPieceTopCommand(){
-    PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("Top Path Part 1", 2, 3);
-    PathPlannerTrajectory trajectory2 = PathPlanner.loadPath("Top Path Part 2", 2, 3);
-
-    PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
-
-
-    PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
-    PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);//FIXME
-    PIDController thetaController = new PIDController(
-          Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
-    
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-    xController.reset();
-    yController.reset();
-    thetaController.reset();
-
-    PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
-      trajectory1, 
-      m_drivetrainSubsystem::getPose,
-      Constants.Drivetrain.m_kinematics2,
-      xController,
-      yController,
-      thetaController,
-      m_drivetrainSubsystem::drive,
-      true,
-      m_drivetrainSubsystem
-    );
-    PPSwerveControllerCommandA swerveTrajectoryFollower1 = new PPSwerveControllerCommandA(
-      trajectory2, 
-      m_drivetrainSubsystem::getPose,
-      Constants.Drivetrain.m_kinematics2,
-      xController,
-      yController,
-      thetaController,
-      m_drivetrainSubsystem::drive,
-      true,
-      m_drivetrainSubsystem
-    );
-
-    
-
-    return new SequentialCommandGroup(
-      new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
-      new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
-      new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
-      // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
-      // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
-      new SequentialCommandGroup(
-        ArmSequences.scoreConeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 1),
-        new WaitCommand(0.5),
-        // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
-        // new RunCommand(()->m_claw.openIntake(), m_claw).withTimeout(0.5)
-        new ManualOpenIntake(m_claw),
-        // new InstantCommand(()->SmartDashboard.putBoolean("Claw Opened", false)),
-        new ArmZeroAutoCommand(m_armSubsystem),
-        swerveTrajectoryFollower,
-        ArmSequences.groundIntake(m_armSubsystem, m_claw, 0),
-        new ArmZeroAutoCommand(m_armSubsystem),
-        swerveTrajectoryFollower1,
-        ArmSequences.scoreCubeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 1)
-        // new BalanceCommand(m_drivetrainSubsystem)
-      )
-    );
-  }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -776,19 +328,23 @@ public class RobotContainer {
     String selected = m_autoSwitcher.getSelected();
     switch(selected){
       case OnePiece:
-        return getOnePieceCommand();
+        return AutonSequences.getOnePieceCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case OneAndBalance:
-        return getOnePieceAndBalanceBringArmBackCommand();
+        return AutonSequences.getOnePieceAndBalanceBringArmBackCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case OneAndBalanceBottom:
-        return getOnePieceAndBalanceBottomCommand();
+        return AutonSequences.getOnePieceAndBalanceBottomCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case TwoPieceTop:
-        getTwoPieceTopCommand();
+        AutonSequences.getTwoPieceTopCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case OnePlusHalf:
-        return getTwoPieceAndBalanceBottomCommand();
+        return AutonSequences.getTwoPieceAndBalanceBottomCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case OneAndNothing:
-        return getOnePieceCommandOnly();
+        return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, m_claw);
+      case BalanceMobilityBonus:
+        return AutonSequences.getOnePieceBalanceMobilityBonus(m_drivetrainSubsystem, m_armSubsystem, m_claw);
+      case PhyscoBehavior:
+          return AutonSequences.getTwoPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       default:
-        return getOnePieceCommand();
+        return AutonSequences.getOnePieceCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
     }
   }
 

@@ -20,22 +20,22 @@
           "Score Cone High Backwards"
         ],
         "executionBehavior": "sequential",
-        "waitBehavior": "deadline",
-        "waitTime": 1.5
+        "waitBehavior": "after",
+        "waitTime": 0.0
       }
     },
     {
       "anchorPoint": {
-        "x": 6.481733791592584,
-        "y": 4.617291569652584
+        "x": 5.7,
+        "y": 4.62117676318686
       },
       "prevControl": {
-        "x": 5.718336547293487,
-        "y": 4.617291569652584
+        "x": 4.936602755700903,
+        "y": 4.62117676318686
       },
       "nextControl": {
-        "x": 5.718336547293487,
-        "y": 4.617291569652584
+        "x": 4.936602755700903,
+        "y": 4.62117676318686
       },
       "holonomicAngle": 0,
       "isReversal": true,
@@ -44,25 +44,26 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "Intake Front"
+          "Intake Front",
+          "Close Claw"
         ],
-        "executionBehavior": "sequential",
+        "executionBehavior": "parallel",
         "waitBehavior": "deadline",
-        "waitTime": 1.5
+        "waitTime": 3.0
       }
     },
     {
       "anchorPoint": {
-        "x": 1.84,
-        "y": 4.338427454632687
+        "x": 1.9738075205317076,
+        "y": 4.350083035235515
       },
       "prevControl": {
-        "x": 2.8567902361499167,
-        "y": 4.603722386264217
+        "x": 2.9905977566816255,
+        "y": 4.615377966867045
       },
       "nextControl": {
-        "x": 2.8567902361499167,
-        "y": 4.603722386264217
+        "x": 2.9905977566816255,
+        "y": 4.615377966867045
       },
       "holonomicAngle": 0,
       "isReversal": true,
@@ -80,16 +81,16 @@
     },
     {
       "anchorPoint": {
-        "x": 2.6174159240679593,
-        "y": 2.95
+        "x": 2.365632187861598,
+        "y": 2.78
       },
       "prevControl": {
-        "x": 2.1170277738740175,
-        "y": 2.95
+        "x": 1.8652440376676562,
+        "y": 2.78
       },
       "nextControl": {
-        "x": 3.1570417994649613,
-        "y": 2.95
+        "x": 2.9052580632586,
+        "y": 2.78
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -107,12 +108,12 @@
     },
     {
       "anchorPoint": {
-        "x": 3.85,
-        "y": 2.95
+        "x": 3.9388456294273704,
+        "y": 2.78
       },
       "prevControl": {
-        "x": 2.997845368603523,
-        "y": 2.95
+        "x": 3.0866909980308934,
+        "y": 2.78
       },
       "nextControl": null,
       "holonomicAngle": 0,
@@ -148,6 +149,12 @@
       "position": 1.7727272727272725,
       "names": [
         "Arm Ready"
+      ]
+    },
+    {
+      "position": 1.2688920454545451,
+      "names": [
+        "Zero the Arm"
       ]
     }
   ]
