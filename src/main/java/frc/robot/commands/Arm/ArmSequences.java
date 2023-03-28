@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
@@ -235,6 +236,23 @@ public class ArmSequences{
 
         // return ready.andThen(score).andThen(openIntake);
         return ready.andThen(score).andThen(openIntake);
+    }
+
+    public static SequentialCommandGroup scoreConeHighNoRetractHighToleranceAuton(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem ,int side){
+        ArmPositionCommand ready;
+        ArmPositionCommand score;
+        if(side > 0) {
+            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
+            score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, 0.07);
+        } else {
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
+            score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, 0.07);
+        }
+        // ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
+        ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
+
+        // return ready.andThen(score).andThen(openIntake);
+        return ready.andThen(score).andThen(new WaitCommand(0.15)).andThen(openIntake); //0.25
     }
 
     public static SequentialCommandGroup scoreCubeHighNoRetractHighTolerance(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem ,int side){

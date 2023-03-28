@@ -18,14 +18,15 @@ import frc.lib.util.SwerveModuleConstants;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.subsystems.Drivetrain.SwerveModuleIO;
+import frc.robot.util.drivers.LazyTalonFX;
 
 public class SwerveModule implements SwerveModuleIO {
     public int moduleNumber;
     private Rotation2d angleOffset;
     private Rotation2d lastAngle;
 
-    public TalonFX mAngleMotor;
-    public TalonFX mDriveMotor;
+    public LazyTalonFX mAngleMotor;
+    public LazyTalonFX mDriveMotor;
     public CANCoder angleEncoder;
 
     SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.Drivetrain.driveKS, Constants.Drivetrain.driveKV, Constants.Drivetrain.driveKA);
@@ -40,12 +41,12 @@ public class SwerveModule implements SwerveModuleIO {
         configAngleEncoder();
 
         /* Angle Motor Config */
-        mAngleMotor = new TalonFX(moduleConstants.angleMotorID);
+        mAngleMotor = new LazyTalonFX(moduleConstants.angleMotorID);
         mAngleMotor.setStatusFramePeriod(StatusFrame.Status_1_General, 30);
         configAngleMotor();
 
         /* Drive Motor Config */
-        mDriveMotor = new TalonFX(moduleConstants.driveMotorID);
+        mDriveMotor = new LazyTalonFX(moduleConstants.driveMotorID);
         mDriveMotor.setStatusFramePeriod(StatusFrame.Status_1_General, 30);
         configDriveMotor();
 

@@ -375,7 +375,7 @@ public class AutonSequences {
       public static Command getTwoPieceBalanceAutoBuilder(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ClawSubsystem m_claw){
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
-          Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 1)),
+          Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, m_claw, 1)),
           Map.entry("Arm Neutral", new ArmZeroCommand(m_armSubsystem)),
           Map.entry("Intake Front", ArmSequences.autonGroundIntake(m_armSubsystem, m_claw, 0)), 
           Map.entry("Close Claw", new RunCommand( ()-> m_claw.autoCloseClaw(), m_claw)),
@@ -383,6 +383,8 @@ public class AutonSequences {
           Map.entry("Arm Ready", ArmSequences.ready(m_armSubsystem, 1)),
           Map.entry("Score Cube High Backwards", ArmSequences.scoreCubeHighNoRetractHighTolerance(m_armSubsystem, m_claw,1)),
           Map.entry("Arm Neutral Command", new ArmZeroCommand(m_armSubsystem)),
+          Map.entry("Low Score Backwards", ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 1)),
+          Map.entry("Arm Zero", new ArmZeroAutoCommand(m_armSubsystem)),
           Map.entry("Balance", new BalanceCommand(m_drivetrainSubsystem))
           )
           );
@@ -399,7 +401,7 @@ public class AutonSequences {
           true,
           m_drivetrainSubsystem);
 
-        List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Top Path", new PathConstraints(2, 3), new PathConstraints(2, 3), new PathConstraints(2, 3), new PathConstraints(2, 1));
+        List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Top Path", new PathConstraints(4, 3), new PathConstraints(2, 1.5), new PathConstraints(2, 3));
         Command build = swerveAutoBuilder.fullAuto(trajectory);
         return build;
       }

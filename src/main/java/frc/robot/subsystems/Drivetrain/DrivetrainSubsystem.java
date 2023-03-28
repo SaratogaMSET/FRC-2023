@@ -79,7 +79,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
             visionData = RobotContainer.m_visionSubsystem.getTable();
         }
         catch(Exception e){
-        visionData = NetworkTableInstance.getDefault().getTable("limelight");
+            visionData = NetworkTableInstance.getDefault().getTable("limelight");
+            e.printStackTrace();
         }
 
         stateSTD.set(0, 0, 0.01); stateSTD.set(1, 0, 0.01); stateSTD.set(2, 0, 0.01); //Tune Values
@@ -304,7 +305,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     @Override
     public void periodic(){
 
-        //Logger.getInstance().recordOutput("CurrentSwerveModuleStates", getModuleStates());
+        Logger.getInstance().recordOutput("CurrentSwerveModuleStates", getModuleStates());
 
         for(int i = 0; i < 4; i++){
             mSwerveMods[i].updateInputs(moduleInputs[i]);
@@ -362,7 +363,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SmartDashboard.putNumberArray("Odom", pos);
         lastPose = odomFiltered.getEstimatedPosition();
         Pose2d pose = getVisionPose2d();
-        if (pose != null){
+        if (pose != null && DriverStation.isTeleop()){
             double timestamp = Timer.getFPGATimestamp() - (visionData.getEntry("tl").getDouble(0) + 11) / 1000;
             odomFiltered.addVisionMeasurement(pose, timestamp);
         }

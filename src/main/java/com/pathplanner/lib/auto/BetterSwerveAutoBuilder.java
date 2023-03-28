@@ -2,6 +2,8 @@ package com.pathplanner.lib.auto;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+import com.pathplanner.lib.commands.PPSwerveControllerCommandA;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -207,7 +209,7 @@ public class BetterSwerveAutoBuilder extends BaseAutoBuilder {
   @Override
   public CommandBase followPath(PathPlannerTrajectory trajectory) {
     if (useKinematics) {
-      return new PPSwerveControllerCommand(
+      return new PPSwerveControllerCommandA(
           trajectory,
           poseSupplier,
           kinematics,
@@ -218,7 +220,7 @@ public class BetterSwerveAutoBuilder extends BaseAutoBuilder {
           useAllianceColor,
           driveRequirements);
     } else {
-      return new PPSwerveControllerCommand(
+      return new PPSwerveControllerCommandA(
           trajectory,
           poseSupplier,
           pidControllerFromConstants(xConstants),
