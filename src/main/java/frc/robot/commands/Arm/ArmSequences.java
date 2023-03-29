@@ -72,7 +72,7 @@ public class ArmSequences{
         RunCommand openIntake = new RunCommand(()-> m_clawSubsystem.openClaw());
 
         // return ready.andThen(score).andThen(openIntake).andThen(zero);
-        return ready.andThen(score).andThen(zero);
+        return ready.andThen(score);
     }
     public static SequentialCommandGroup lowScoreNoRetract(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem, int side){
         ArmPositionCommand ready;
@@ -88,7 +88,7 @@ public class ArmSequences{
         ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
 
         // return ready.andThen(score).andThen(openIntake).andThen(zero);
-        return ready.andThen(score).andThen(openIntake);
+        return ready.andThen(score);
     }
 
     public static SequentialCommandGroup scoreCubeMid(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem,int side){
@@ -104,7 +104,7 @@ public class ArmSequences{
         ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
         RunCommand openIntake = new RunCommand(()-> m_clawSubsystem.openClaw());
         // return ready.andThen(score).andThen(openIntake).andThen(zero);
-        return ready.andThen(score).andThen(zero);
+        return ready.andThen(score);
     }
 
     public static SequentialCommandGroup scoreCubeMidNoRetract(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem,int side){
@@ -120,7 +120,7 @@ public class ArmSequences{
         ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
         ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
         // return ready.andThen(score).andThen(openIntake).andThen(zero);
-        return ready.andThen(score).andThen(openIntake);
+        return ready.andThen(score);
     }
 
     public static SequentialCommandGroup scoreCubeHigh(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem,int side){
@@ -136,7 +136,7 @@ public class ArmSequences{
         ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
         RunCommand openIntake = new RunCommand(()-> m_clawSubsystem.openClaw());
         // return ready.andThen(score).andThen(openIntake).andThen(zero);
-        return ready.andThen(score).andThen(zero);
+        return ready.andThen(score);
         
     }
     public static SequentialCommandGroup scoreCubeHighNoRetract(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem,int side){
@@ -153,7 +153,7 @@ public class ArmSequences{
         ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
 
         // return ready.andThen(score).andThen(openIntake);
-        return ready.andThen(score).andThen(openIntake);
+        return ready.andThen(score);
     }
 
     public static SequentialCommandGroup scoreConeMid(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem,int side){
@@ -169,7 +169,7 @@ public class ArmSequences{
         ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
         RunCommand openIntake = new RunCommand(()-> m_clawSubsystem.openClaw());
         // return ready.andThen(score).andThen(openIntake).andThen(zero);
-        return ready.andThen(score).andThen(zero);
+        return ready.andThen(score);
     }
 
     public static SequentialCommandGroup scoreConeMidNoRetract(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem,int side){
@@ -185,7 +185,7 @@ public class ArmSequences{
         ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
         ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
         // return ready.andThen(score).andThen(openIntake).andThen(zero);
-        return ready.andThen(score).andThen(openIntake);
+        return ready.andThen(score);
     }
 
     public static SequentialCommandGroup scoreConeHigh(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem ,int side){
@@ -201,7 +201,7 @@ public class ArmSequences{
         ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
         RunCommand openIntake = new RunCommand(()-> m_clawSubsystem.openClaw());
         // return ready.andThen(score).andThen(openIntake).andThen(zero);
-         return ready.andThen(score).andThen(zero);
+         return ready.andThen(score);
     }
 
     public static SequentialCommandGroup scoreConeHighNoRetract(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem ,int side){
@@ -218,7 +218,7 @@ public class ArmSequences{
         ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
 
         // return ready.andThen(score).andThen(openIntake);
-        return ready.andThen(score).andThen(openIntake);
+        return ready.andThen(score);
     }
 
     public static SequentialCommandGroup scoreConeHighNoRetractHighTolerance(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem ,int side){
@@ -232,10 +232,10 @@ public class ArmSequences{
             score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, 0.07);
         }
         // ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
-        ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
+        // ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
 
         // return ready.andThen(score).andThen(openIntake);
-        return ready.andThen(score).andThen(openIntake);
+        return ready.andThen(score);
     }
 
     public static SequentialCommandGroup scoreConeHighNoRetractHighToleranceAuton(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem ,int side){
@@ -256,6 +256,22 @@ public class ArmSequences{
     }
 
     public static SequentialCommandGroup scoreCubeHighNoRetractHighTolerance(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem ,int side){
+        ArmPositionCommand ready;
+        ArmPositionCommand score;
+        if(side > 0) {
+            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
+            score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_highcube_score_x, Constants.ArmNodeDictionary.ready_highcube_score_y, 0.07);
+        } else {
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
+            score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcube_score_x, Constants.ArmNodeDictionary.ready_highcube_score_y, 0.07);
+        }
+        // ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
+        ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
+
+        // return ready.andThen(score).andThen(openIntake);
+        return ready.andThen(score);
+    }
+    public static SequentialCommandGroup scoreCubeHighNoRetractHighToleranceAuton(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem ,int side){
         ArmPositionCommand ready;
         ArmPositionCommand score;
         if(side > 0) {

@@ -244,10 +244,10 @@ public class RobotContainer {
     m_gunner1.button(5).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 0));
     m_gunner1.button(5).and(m_gunner1.button(1)).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 1));
 
-    m_gunner1.button(7).onTrue(ArmSequences.scoreConeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 0));
+    m_gunner1.button(7).onTrue(ArmSequences.scoreConeHighNoRetract(m_armSubsystem, m_claw, 0));
     m_gunner1.button(7).and(m_gunner1.button(1)).onTrue(ArmSequences.scoreConeHighNoRetract(m_armSubsystem, m_claw, 1)); 
 
-    m_gunner1.button(8).onTrue(ArmSequences.scoreCubeHighNoRetractHighTolerance(m_armSubsystem,m_claw, 0));
+    m_gunner1.button(8).onTrue(ArmSequences.scoreCubeHighNoRetract(m_armSubsystem,m_claw, 0));
     m_gunner1.button(8).and(m_gunner1.button(1)).onTrue(ArmSequences.scoreCubeHighNoRetract(m_armSubsystem, m_claw, 1)); 
     
 

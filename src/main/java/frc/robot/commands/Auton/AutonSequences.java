@@ -381,7 +381,7 @@ public class AutonSequences {
           Map.entry("Close Claw", new RunCommand( ()-> m_claw.autoCloseClaw(), m_claw)),
           Map.entry("Zero the Arm", new ArmZeroAutoCommand(m_armSubsystem)),
           Map.entry("Arm Ready", ArmSequences.ready(m_armSubsystem, 1)),
-          Map.entry("Score Cube High Backwards", ArmSequences.scoreCubeHighNoRetractHighTolerance(m_armSubsystem, m_claw,1)),
+          Map.entry("Score Cube High Backwards", ArmSequences.scoreCubeHighNoRetractHighToleranceAuton(m_armSubsystem, m_claw,1)),
           Map.entry("Arm Neutral Command", new ArmZeroCommand(m_armSubsystem)),
           Map.entry("Low Score Backwards", ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 1)),
           Map.entry("Arm Zero", new ArmZeroAutoCommand(m_armSubsystem)),
