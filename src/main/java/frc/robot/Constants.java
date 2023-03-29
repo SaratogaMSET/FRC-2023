@@ -419,11 +419,11 @@ public final class Constants {
       }
       public final class ArmNodeDictionary{
         public double[] ready_highcone_score = new double[]{1.38 + 0.05, 1.18};
-        public static final double ready_highcone_score_x = 1.38 + 0.0254;
+        public static final double ready_highcone_score_x = 1.38;
         public static final double ready_highcone_score_y = 1.18;
 
         public double[] ready_midcone_score = new double[]{0.97, 0.65};
-        public static final double ready_midcone_score_x = 0.96 +.1525-0.04;
+        public static final double ready_midcone_score_x = 0.96 +.1525-0.08;
         public static final double ready_midcone_score_y = 0.66 +.1525;
 
         public double[] ready_highcube_score = new double[]{1.38, 0.96};
@@ -448,7 +448,7 @@ public final class Constants {
         public static final double ground_intake_y = -0.05;
 
         public static final double auton_intake_x = 1.45;
-        public static final double auton_intake_y = -0.14;
+        public static final double auton_intake_y = -0.14 - 0.05 - 0.05;
 
         public double[] ground_intake_cone = new double[]{0.60, 0};
         public static final double ground_intake_cone_x = 0.60;
@@ -458,7 +458,7 @@ public final class Constants {
     
         public double[] ready_double_substation = new double[]{0.668, 1.08 -0.1524 - 0.0508};
         public static final double ready_double_substation_x = 0.688 -0.1;
-        public static final double ready_double_substation_y = 1.08 -0.1524 - 0.0508 - 0.04;
+        public static final double ready_double_substation_y = 1.08 -0.1524 - 0.0254 - 0.04;
         // public double[] pickup_double_substation = new double[]{0.62, 0.90};
       }
 }
