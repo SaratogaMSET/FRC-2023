@@ -1,11 +1,11 @@
 {
   "image": "mcr.microsoft.com/devcontainers/universal:2",
-  "postCreateCommand": "cd /opt && wget 'https://github.com/wpilibsuite/vscode-wpilib/releases/download/v2023.2.1/vscode-wpilib-2023.2.1.vsix'",
+  "postCreateCommand": "cd /opt && wget 'https://github.com/wpilibsuite/vscode-wpilib/releases/download/v2023.4.3/vscode-wpilib-2023.2.1.vsix'",
   "features": {
   },
   "customizations": {
     "vscode": {
-      "extensions": ["vscjava.vscode-java-pack","vscjava.vscode-gradle","redhat.java","vscjava.vscode-java-dependency","/opt/vscode-wpilib-2023.2.1.vsix"]
+      "extensions": ["vscjava.vscode-java-pack","vscjava.vscode-gradle","redhat.java","vscjava.vscode-java-dependency","/opt/vscode-wpilib-2023.4.3.vsix"]
     }
   }
 }
