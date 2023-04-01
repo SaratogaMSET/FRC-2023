@@ -1,6 +1,6 @@
-//LimelightHelpers v1.2.0 (Feb 13, 2023)
+//LimelightHelpers v1.2.1 (March 1, 2023)
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.Vision;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -521,7 +521,7 @@ public class LimelightHelpers {
     }
 
     public static double[] getBotPose_TargetSpace(String limelightName) {
-        return getLimelightNTDoubleArray(limelightName, "botpose_targetSpace");
+        return getLimelightNTDoubleArray(limelightName, "botpose_targetspace");
     }
 
     public static double[] getCameraPose_TargetSpace(String limelightName) {
