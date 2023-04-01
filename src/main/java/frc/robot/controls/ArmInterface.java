@@ -12,17 +12,17 @@ import frc.robot.Constants;
 public class ArmInterface {
     double motor_encoder_agreement_tolerance = 0.03;
 
-    WPI_TalonFX Proximal_Left = new WPI_TalonFX(Constants.ArmParameters.proximal_left_ID);
-    WPI_TalonFX Proximal_Right = new WPI_TalonFX(Constants.ArmParameters.proximal_right_ID);
+    WPI_TalonFX Proximal_Left = new WPI_TalonFX(Constants.ArmParameters.proximal_left_ID, "649-Hammerhead-CANivore");
+    WPI_TalonFX Proximal_Right = new WPI_TalonFX(Constants.ArmParameters.proximal_right_ID, "649-Hammerhead-CANivore");
 
-    WPI_TalonFX Distal_Left = new WPI_TalonFX(Constants.ArmParameters.distal_left_ID);
-    WPI_TalonFX Distal_Right = new WPI_TalonFX(Constants.ArmParameters.distal_right_ID);
+    WPI_TalonFX Distal_Left = new WPI_TalonFX(Constants.ArmParameters.distal_left_ID, "649-Hammerhead-CANivore");
+    WPI_TalonFX Distal_Right = new WPI_TalonFX(Constants.ArmParameters.distal_right_ID, "649-Hammerhead-CANivore");
     
-    CANCoder Encoder_Proximal_Left = new CANCoder(Constants.ArmParameters.encoder_proximal_left_ID);
-    CANCoder Encoder_Proximal_Right = new CANCoder(Constants.ArmParameters.encoder_proximal_right_ID);
+    CANCoder Encoder_Proximal_Left = new CANCoder(Constants.ArmParameters.encoder_proximal_left_ID, "649-Hammerhead-CANivore");
+    CANCoder Encoder_Proximal_Right = new CANCoder(Constants.ArmParameters.encoder_proximal_right_ID, "649-Hammerhead-CANivore");
 
-    CANCoder Encoder_Distal_Left = new CANCoder(Constants.ArmParameters.encoder_distal_left_ID);
-    CANCoder Encoder_Distal_Right = new CANCoder(Constants.ArmParameters.encoder_distal_right_ID);
+    CANCoder Encoder_Distal_Left = new CANCoder(Constants.ArmParameters.encoder_distal_left_ID, "649-Hammerhead-CANivore");
+    CANCoder Encoder_Distal_Right = new CANCoder(Constants.ArmParameters.encoder_distal_right_ID, "649-Hammerhead-CANivore");
 
     VelocityFromEncoder EncoderV_Proximal_Left = new VelocityFromEncoder(getEncoderProximalLeft(), 7);
     VelocityFromEncoder EncoderV_Proximal_Right = new VelocityFromEncoder(getEncoderProximalRight(), 7);
@@ -246,14 +246,14 @@ public class ArmInterface {
             SmartDashboard.putNumber(raw_values + "Distal Right", Encoder_Distal_Right.getAbsolutePosition()/360);
         }
 
-        // String encoder_values = "Arm External Encoders/";
-        // boolean show_encoder_values = true;
-        // if(show_encoder_values){
-        //     SmartDashboard.putNumber(encoder_values + "Proximal Left", getEncoderProximalLeft() * radians_to_degrees);
-        //     SmartDashboard.putNumber(encoder_values + "Proximal Right", getEncoderProximalRight() * radians_to_degrees);
-        //     SmartDashboard.putNumber(encoder_values + "Distal Left", getEncoderDistalLeft() * radians_to_degrees);
-        //     SmartDashboard.putNumber(encoder_values + "Distal Right", getEncoderDistalRight() * radians_to_degrees);
-        // }
+        String encoder_values = "Arm External Encoders/";
+        boolean show_encoder_values = true;
+        if(show_encoder_values){
+            SmartDashboard.putNumber(encoder_values + "Proximal Left", getEncoderProximalLeft());
+            SmartDashboard.putNumber(encoder_values + "Proximal Right", getEncoderProximalRight());
+            SmartDashboard.putNumber(encoder_values + "Distal Left", getEncoderDistalLeft());
+            SmartDashboard.putNumber(encoder_values + "Distal Right", getEncoderDistalRight());
+        }
 
         String motor_encoder_values = "Arm Motor Encoders/";
         boolean show_motor_encoder_values = false;

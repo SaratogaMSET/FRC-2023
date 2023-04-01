@@ -304,8 +304,8 @@ public final class Constants {
         public static final double TORQUE_THRESHOLD = 100;      
         public static final double CLOSING_TORQUE_THRESHOLD = 25;       
         public static final double LOWER_BOUND = -2.5;
-        public static final double CUBE_MEDIUM_BOUND = 56;
-        public static final double CONE_MEDIUM_BOUND = 102.78;
+        public static final double CUBE_MEDIUM_BOUND = (52 * 0.6) ;
+        public static final double CONE_MEDIUM_BOUND = 102.78 * 0.6;
         public static final double UPPER_BOUND = 5;
         public static final double HOLD_VOLTAGE = TARGET_VOLTAGE / 10;
         public static final double AUTO_CONE_DIAMETER = 0.0;
@@ -313,6 +313,22 @@ public final class Constants {
         public static final double AUTO_KP = 0.0;
         public static final double AUTO_KI = 0.0;
         public static final double AUTO_KD = 0.0;
+    }
+
+    public final class GroundIntake{
+        public static final int actuator_ID = 57;
+        public static final int intake_ID = 22;
+        
+        public static final int encoder_ID = 40;
+        
+        public static final double encoder_offset = 223.506;
+
+        public static final double x_offset = 0;
+        public static final double y_offset = 0;
+        public static final double length = 0;
+
+        public static final double highbound = 5;
+        public static final double lowbound = 90;
     }
 
     public static Mode getMode() {
@@ -331,7 +347,7 @@ public final class Constants {
 
         public static final double H1_LL2 = 0.279; // METERS, 0.3429 on board, 0.489 on floudner.
         public static final double A1_LL2 = 20; // limelight angle!
-
+ 
         public static final double C1_LL2 = 0.314; //vrt / y value check the picture
         public static final double C2_LL2 = 0.244; // horizontal / x value check the picture :??????
 
@@ -388,10 +404,10 @@ public final class Constants {
         public static final int encoder_distal_left_ID = 13;
         public static final int encoder_distal_right_ID = 10;
     
-        public static final double encoder_proximal_left_offset = 0.775;
-        public static final double encoder_proximal_right_offset = 0.25;
-        public static final double encoder_distal_left_offset = 0.511;
-        public static final double encoder_distal_right_offset = 0.759;
+        public static final double encoder_proximal_left_offset = 0.67;
+        public static final double encoder_proximal_right_offset = 0.227;
+        public static final double encoder_distal_left_offset = 0.513;
+        public static final double encoder_distal_right_offset = 0.75;
     
         public static final double gear_reduction_proximal = (68.0 / 16) * (68.0 / 8) * (48.0 / 14);
         public static final double gear_reduction_distal = (68.0 / 16) * (68.0 / 8) * (48.0 / 16);
@@ -454,8 +470,11 @@ public final class Constants {
         public static final double ground_intake_cone_x = 0.60;
         public static final double ground_intake_cone_y = -0.15;
     
+        public static final double pick_up_ground_intake_x = 0.48;
+        public static final double pick_up_ground_intake_y = 0.089;
+
         public double[] ready_arm_score = new double[]{0.688-0.1, 1.05};
-    
+        
         public double[] ready_double_substation = new double[]{0.668, 1.08 -0.1524 - 0.0508};
         public static final double ready_double_substation_x = 0.688 -0.1;
         public static final double ready_double_substation_y = 1.08 -0.1524 - 0.0254 - 0.04;

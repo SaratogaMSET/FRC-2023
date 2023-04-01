@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 
@@ -25,8 +26,8 @@ public class SwerveModule implements SwerveModuleIO {
     private Rotation2d angleOffset;
     private Rotation2d lastAngle;
 
-    public LazyTalonFX mAngleMotor;
-    public LazyTalonFX mDriveMotor;
+    public WPI_TalonFX mAngleMotor;
+    public WPI_TalonFX mDriveMotor;
     public CANCoder angleEncoder;
 
     SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.Drivetrain.driveKS, Constants.Drivetrain.driveKV, Constants.Drivetrain.driveKA);
@@ -37,17 +38,14 @@ public class SwerveModule implements SwerveModuleIO {
         
         /* Angle Encoder Config */
         angleEncoder = new CANCoder(moduleConstants.cancoderID);
-        angleEncoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 100);
         configAngleEncoder();
 
         /* Angle Motor Config */
-        mAngleMotor = new LazyTalonFX(moduleConstants.angleMotorID);
-        mAngleMotor.setStatusFramePeriod(StatusFrame.Status_1_General, 30);
+        mAngleMotor = new WPI_TalonFX(moduleConstants.angleMotorID);
         configAngleMotor();
 
         /* Drive Motor Config */
-        mDriveMotor = new LazyTalonFX(moduleConstants.driveMotorID);
-        mDriveMotor.setStatusFramePeriod(StatusFrame.Status_1_General, 30);
+        mDriveMotor = new WPI_TalonFX(moduleConstants.driveMotorID);
         configDriveMotor();
 
         lastAngle = getState().angle;

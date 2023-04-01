@@ -20,10 +20,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.MathUtils;
 
 public class CANdleSubsystem extends SubsystemBase {
-    private static final CANdle candle1 = new CANdle(59); //Front Left
-    private static final CANdle candle2 = new CANdle(60); //Front Right
-    private static final CANdle candle3 = new CANdle(61); //Back Left
-    private static final CANdle candle4 = new CANdle(62); //Back Right
+    private static final CANdle candle1 = new CANdle(59, "649-Hammerhead-CANivore"); //Front Left
+    private static final CANdle candle2 = new CANdle(60, "649-Hammerhead-CANivore"); //Front Right
+    private static final CANdle candle3 = new CANdle(61, "649-Hammerhead-CANivore"); //Back Left
+    private static final CANdle candle4 = new CANdle(62, "649-Hammerhead-CANivore"); //Back Right
     public static final Color black = new Color(0, 0, 0);
     private static double prev = 0.0;
    

@@ -30,7 +30,7 @@ public class ArmPositionCommand extends CommandBase{
         this.hold = hold;
         addRequirements(armSubsystem);
     }   
-    public ArmPositionCommand(ArmSubsystem armSubsystem, double tX, double tY, boolean hold, double tolerance){
+    public ArmPositionCommand(ArmSubsystem armSubsystem, double tX, double tY, double tolerance, boolean hold){
         this.armSubsystem = armSubsystem;
         this.tX = tX;
         this.tY = tY;

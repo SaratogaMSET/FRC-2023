@@ -65,7 +65,7 @@ public class ClawSubsystem
             resetEncoder();
         }
         else{ 
-            closeVelocity = -1.0;
+            closeVelocity = -0.6;
         }
         motor.set(closeVelocity);
     }
