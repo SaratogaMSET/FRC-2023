@@ -55,7 +55,8 @@ import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
-import frc.robot.subsystems.GroundIntake.IntakeSubsystem;
+import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
+import frc.robot.subsystems.GroundIntake.RollerSubsystem;
 import frc.robot.subsystems.Vision.VisionSubsystem;
 
 /**
@@ -87,7 +88,8 @@ public class RobotContainer {
   public final static VisionSubsystem m_visionSubsystem = new VisionSubsystem();
   public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();  
   private final CANdleSubsystem m_ledSubsystem = new CANdleSubsystem();
-  private final IntakeSubsystem gIntakeSubsystem = new IntakeSubsystem();
+  private final ActuatorSubsystem gIntakeSubsystem = new ActuatorSubsystem();
+  private final RollerSubsystem rollers = new RollerSubsystem();
   // private final ClawSubsystem m_clawSubsystem = new ClawSubsystem(new ClawIOSparkMax());
   
   public static final double pi = Math.PI;
@@ -205,8 +207,10 @@ public class RobotContainer {
     //   new AlignToCone(m_drivetrainSubsystem, m_visionSubsystem)
     // ));
     m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
-
-    m_gunner1.button(2).whileTrue(new ManualSetAngle(gIntakeSubsystem, 90));
+    gIntakeSubsystem.setDefaultCommand(new RunCommand(()->gIntakeSubsystem.tuneGravityCompensation(), gIntakeSubsystem));
+    m_gunner1.button(2).whileTrue(
+      new ParallelCommandGroup(new ManualSetAngle(gIntakeSubsystem, 90), new ManualRunIntakeCommand(rollers, 0.7)))
+      .onFalse(new ParallelCommandGroup(new ManualSetAngle(gIntakeSubsystem, 10), new ManualRunIntakeCommand(rollers, 0.0)));
 
     // m_driverController.x().toggleOnTrue(
     //   new DefaultDriveCommand(

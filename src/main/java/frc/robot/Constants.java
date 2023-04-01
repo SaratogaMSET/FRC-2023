@@ -328,7 +328,7 @@ public final class Constants {
         public static final double length = 0;
 
         public static final double highbound = 5;
-        public static final double lowbound = 90;
+        public static final double lowbound = 110;
     }
 
     public static Mode getMode() {
