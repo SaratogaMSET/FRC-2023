@@ -70,6 +70,25 @@ public class ClawSubsystem
         motor.set(closeVelocity);
     }
 
+    public boolean hasAcquiredGamePiece(){
+        if(isGamepieceInRange() &&
+            getGamePieceType() == GamePiece.Cone &&
+            getConeTolerance()) return true;
+
+        else if(isGamepieceInRange() &&
+            getGamePieceType() == GamePiece.Cube &&
+            getCubeTolerance()){
+    
+            return true;
+        }
+        return false; 
+    }
+    public boolean getConeTolerance(){
+       return encoder.getPosition() >= IntakeConstants.CONE_MEDIUM_BOUND - 1;
+    }
+    public boolean getCubeTolerance(){
+        return encoder.getPosition() >= IntakeConstants.CUBE_MEDIUM_BOUND - 1;
+     }
     public void setIdle() {
         motor.set(0.0);
         startedAutoClose = false;

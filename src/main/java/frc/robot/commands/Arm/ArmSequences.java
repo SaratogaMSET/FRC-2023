@@ -1,13 +1,18 @@
 package frc.robot.commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
+import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
+import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
+import frc.robot.subsystems.GroundIntake.RollerSubsystem;
 
 public class ArmSequences{
 
@@ -26,17 +31,16 @@ public class ArmSequences{
         return ready.andThen(intake);
     }  
     
-    public static ArmPositionCommand autonGroundIntake(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem, int side){
+    public static ArmPositionCommand autonGroundIntake(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem, ActuatorSubsystem actuator,int side){
         ArmPositionCommand intake;
         if(side > 0){
             intake = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.auton_intake_x), Constants.ArmNodeDictionary.auton_intake_y, 0.05);
+            
+            return intake;
         }else{
             intake = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.auton_intake_x , Constants.ArmNodeDictionary.auton_intake_y, 0.05);
+            return intake;
         }
-        ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
-        RunCommand closeIntake = new RunCommand(()-> m_clawSubsystem.manualCloseClaw());
-        // return intake.andThen(closeIntake).andThen(zero);
-        return intake;//.andThen(zero);
     }
 
     public static ArmPositionCommand ready(ArmSubsystem armSubsystem, int side){
@@ -188,20 +192,22 @@ public class ArmSequences{
         return ready.andThen(score);
     }
 
-    public static SequentialCommandGroup scoreConeHigh(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem ,int side){
+    public static SequentialCommandGroup scoreConeHigh(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem, int side){
         ArmPositionCommand ready;
         ArmPositionCommand score;
+
         if(side > 0){
             ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
             score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, true);
+            
         }else{
             ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.1);
             score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, true);
+            
         }
-        ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
-        RunCommand openIntake = new RunCommand(()-> m_clawSubsystem.openClaw());
+        return ready.andThen(score);
         // return ready.andThen(score).andThen(openIntake).andThen(zero);
-         return ready.andThen(score);
+        
     }
 
     public static SequentialCommandGroup scoreConeHighNoRetract(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem ,int side){
@@ -303,13 +309,19 @@ public class ArmSequences{
         return ready.andThen(intake);
     }
 
-    public static Command groundIntakeTest(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem, int side) {
+    public static Command groundIntakeTest(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem, ActuatorSubsystem actuator, RollerSubsystem rollers,int side) {
         ArmPositionCommand ready;
         ArmPositionCommand intake;
         if(side > 0){
             intake = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.pick_up_ground_intake_x, Constants.ArmNodeDictionary.pick_up_ground_intake_y, true);
+            
         }else{
             intake = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.pick_up_ground_intake_x, Constants.ArmNodeDictionary.pick_up_ground_intake_y, true);
+            ManualSetAngle dropIntake = new ManualSetAngle(actuator, 95);
+            
+            ManualRunIntakeCommand runRollers = new ManualRunIntakeCommand(rollers, 0.5 );
+
+            return (dropIntake.alongWith(runRollers).alongWith(intake)).until(()->m_clawSubsystem.hasAcquiredGamePiece());
         }
         // return ready.andThen(intake).andThen(closeIntake).andThen(zero);
         return intake;

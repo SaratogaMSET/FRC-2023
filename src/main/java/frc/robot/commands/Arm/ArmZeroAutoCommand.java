@@ -15,7 +15,7 @@ public class ArmZeroAutoCommand extends CommandBase{
         double[] position = armSubsystem.forwardKinematics();
         double minY = 0.057;
         if(position[1] < minY){
-            double[] armAngles = armSubsystem.inverseKinematics(position[0], minY + 0.2);
+            double[] armAngles = armSubsystem.inverseKinematics(position[0], minY + 0.35); //0.2 
             armSubsystem.PIDtoAngles(armAngles[0], armAngles[1]);
         }else{
             armSubsystem.PIDtoAngles(Math.PI/2, -Math.PI/2);

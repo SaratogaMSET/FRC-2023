@@ -32,6 +32,8 @@ import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
+import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
+import frc.robot.subsystems.GroundIntake.RollerSubsystem;
 
 public class AutonSequences {
 
@@ -372,12 +374,12 @@ public class AutonSequences {
         );
       }
 
-      public static Command getTwoPieceBalanceAutoBuilder(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ClawSubsystem m_claw){
+      public static Command getTwoPieceBalanceAutoBuilder(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuator, RollerSubsystem rollers, ClawSubsystem m_claw){
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
           Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, m_claw, 1)),
           Map.entry("Arm Neutral", new ArmZeroCommand(m_armSubsystem)),
-          Map.entry("Intake Front", ArmSequences.autonGroundIntake(m_armSubsystem, m_claw, 0)), 
+          Map.entry("Intake Front", ArmSequences.groundIntakeTest(m_armSubsystem, m_claw, actuator, rollers, 0)), 
           Map.entry("Close Claw", new RunCommand( ()-> m_claw.autoCloseClaw(), m_claw)),
           Map.entry("Zero the Arm", new ArmZeroAutoCommand(m_armSubsystem)),
           Map.entry("Arm Ready", ArmSequences.ready(m_armSubsystem, 1)),

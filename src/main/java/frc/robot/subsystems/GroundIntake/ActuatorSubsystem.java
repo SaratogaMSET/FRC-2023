@@ -22,7 +22,7 @@ public class ActuatorSubsystem extends SubsystemBase {
     CANCoder Encoder = new CANCoder(Constants.GroundIntake.encoder_ID,  "649-Hammerhead-CANivore");
     double previousError = 0;
     public double k_G = 0.0648; //0.0648
-    double k_P = 0.6;
+    double k_P = 0.65;
     double k_D = 0.003;
     double k_PUp = 0.7;
     PIDController controller = new PIDController(k_P,0,k_D);
@@ -79,7 +79,7 @@ public class ActuatorSubsystem extends SubsystemBase {
         Actuator.setVoltage(voltage);
     }
 
-    boolean detect_collision(double[] ee_cartesian, double radius){
+    public boolean detect_collision(double[] ee_cartesian, double radius){
         double distance = Math.hypot(ee_cartesian[0] - get_xy()[0], ee_cartesian[1] - get_xy()[1]);
 
         return Math.abs(distance) < radius;
@@ -93,6 +93,7 @@ public class ActuatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Ground Intake Angle", get_position_degrees());
         SmartDashboard.putNumber("Actuator Voltage", Actuator.getMotorOutputVoltage());
         SmartDashboard.putNumber("Gravity", k_G * Math.sin(get_position() - Math.toRadians(25)));
+        SmartDashboard.putNumberArray("Intake Coors", get_xy());
         
     }
 }

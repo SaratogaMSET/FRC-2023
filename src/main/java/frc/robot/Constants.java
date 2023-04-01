@@ -323,9 +323,9 @@ public final class Constants {
         
         public static final double encoder_offset = 223.506;
 
-        public static final double x_offset = 0;
-        public static final double y_offset = 0;
-        public static final double length = 0;
+        public static final double x_offset = 0.26;
+        public static final double y_offset = 0.4;
+        public static final double length = 0.3302;
 
         public static final double highbound = 5;
         public static final double lowbound = 110;
