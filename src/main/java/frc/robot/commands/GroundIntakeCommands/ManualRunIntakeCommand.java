@@ -26,6 +26,9 @@ public class ManualRunIntakeCommand extends CommandBase {
 
     @Override
     public boolean isFinished(){
+        if(speed>0){
+            return roller.objectInRoller();
+        }
         return false;
     }
 }

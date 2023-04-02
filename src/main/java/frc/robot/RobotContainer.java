@@ -4,18 +4,9 @@
 
 package frc.robot;
 
-
-import java.util.List;
-
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
-import com.pathplanner.lib.commands.PPSwerveControllerCommandA;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -33,17 +24,14 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Drivetrain;
-import frc.robot.Constants.GroundIntake;
 import frc.robot.commands.Arm.ArmSequences;
 import frc.robot.commands.Arm.ArmVoltageCommand;
 import frc.robot.commands.Arm.ArmZeroAutoCommand;
 import frc.robot.commands.Arm.ArmZeroCommand;
-import frc.robot.commands.Auton.AutoRunCommand;
 import frc.robot.commands.Auton.AutonSequences;
+import frc.robot.commands.CANdle.StrobeCommand;
 import frc.robot.commands.Claw.BackUpIntakeCommand;
 import frc.robot.commands.Claw.ManualCloseIntake;
-import frc.robot.commands.Claw.ManualOpenIntake;
-import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.DefaultDriveCommand;
 import frc.robot.commands.Drivetrain.MoveWithClosest90;
 import frc.robot.commands.Drivetrain.TunableBalanceCommand;
@@ -193,8 +181,10 @@ public class RobotContainer {
       ()-> DriverStation.isAutonomous(),
       ()-> autoCloseChooser.getSelected()));
 
-    m_driverController.rightTrigger().whileTrue(new ManualCloseIntake(m_claw));
-    m_driverController.leftTrigger().whileTrue(new RunCommand(() -> m_claw.openClaw(), m_claw));
+      m_ledSubsystem.setDefaultCommand(
+        new StrobeCommand(m_ledSubsystem, m_claw));
+    // m_driverController.rightTrigger().whileTrue(new ManualCloseIntake(m_claw));
+    // m_driverController.leftTrigger().whileTrue(new RunCommand(() -> m_claw.openClaw(), m_claw));
     
     m_gunner1.button(6).whileTrue(new ManualCloseIntake(m_claw));
     m_gunner1.button(4).whileTrue(new RunCommand(() -> m_claw.openClaw(), m_claw));
@@ -208,9 +198,7 @@ public class RobotContainer {
     // ));
     m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
     actuatorSubsystem.setDefaultCommand(new RunCommand(()->actuatorSubsystem.tuneGravityCompensation(), actuatorSubsystem));
-    m_gunner1.button(2).whileTrue(
-      new ParallelCommandGroup(new ManualSetAngle(actuatorSubsystem, 95), new ManualRunIntakeCommand(rollers, 0.7)))
-      .onFalse(new ParallelCommandGroup(new ManualSetAngle(actuatorSubsystem, 10), new ManualRunIntakeCommand(rollers, 0.0)));
+    
 
     // m_driverController.x().toggleOnTrue(
     //   new DefaultDriveCommand(
@@ -223,7 +211,7 @@ public class RobotContainer {
     m_driverController.b().onTrue(new SequentialCommandGroup(
       new TunableBalanceCommand(m_drivetrainSubsystem)));
 
-    m_gunner1.button(1).whileTrue(m_ledSubsystem.indicateActiveSide());
+    // m_gunner1.button(1).whileTrue(m_ledSubsystem.indicateActiveSide());
     m_gunner1.button(3).toggleOnTrue(new ConditionalCommand(m_ledSubsystem.indicateConeCommand(), m_ledSubsystem.indicateCubeCommand(), () -> m_gunner1.button(3).getAsBoolean()));
     // m_gunner1.button(3).toggleOnFalse(m_ledSubsystem.indicateConeCommand());
     
@@ -249,12 +237,12 @@ public class RobotContainer {
        );//);
     m_driverController.leftBumper().onTrue(
     new ParallelCommandGroup(
-      new ArmZeroAutoCommand(m_armSubsystem),
+      new ArmZeroCommand(m_armSubsystem),
       new SequentialCommandGroup(
-        new WaitCommand(0.3),
+        // new WaitCommand(0.3),
         new ParallelCommandGroup(
-        new ManualRunIntakeCommand(rollers, 0),
-        new ManualSetAngle(actuatorSubsystem, 10)
+        new ManualRunIntakeCommand(rollers, 0) //,
+        // new ManualSetAngle(actuatorSubsystem, 10)
         )
       )
     )
@@ -279,10 +267,21 @@ public class RobotContainer {
     m_gunner1.button(11).onTrue(ArmSequences.groundIntakeCone(m_armSubsystem, m_claw,  1)); // TODO: make 0 when collision detection working
     m_gunner1.button(11).and(m_gunner1.button(1)).onTrue(ArmSequences.groundIntakeCone(m_armSubsystem, m_claw, 1));
 
-    m_gunner1.button(12).whileTrue(ArmSequences.groundIntakeTest(m_armSubsystem, m_claw, actuatorSubsystem, rollers, 0))
-    .onFalse(new ManualRunIntakeCommand(rollers,0)); 
-    m_gunner1.button(12).and(m_gunner1.button(1)).whileTrue(ArmSequences.groundIntakeTest(m_armSubsystem, m_claw, actuatorSubsystem, rollers, 1))
-    .onFalse(new ManualRunIntakeCommand(rollers,0));
+    m_gunner1.button(1).whileTrue(
+      new ParallelCommandGroup(new ManualSetAngle(actuatorSubsystem, 90), new ManualRunIntakeCommand(rollers, 0.7).until( ()-> (m_claw.isGamepieceInRange() && m_claw.getGamePieceType() != null))))
+      .onFalse(new ParallelCommandGroup(new ManualSetAngle(actuatorSubsystem, 10), new ManualRunIntakeCommand(rollers, 0.0)));
+
+      m_gunner1.button(2).whileTrue(
+        new ManualRunIntakeCommand(rollers, -0.7)) //)
+        .onFalse(new ManualRunIntakeCommand(rollers, 0.0));
+
+      m_gunner1.button(12).whileTrue(
+        new ManualRunIntakeCommand(rollers, -1)) //)
+        .onFalse(new ManualRunIntakeCommand(rollers, 0.0));
+    // m_gunner1.button(12).whileTrue(ArmSequences.groundIntakeTest(m_armSubsystem, m_claw, actuatorSubsystem, rollers, 0))
+    // .onFalse(new ManualRunIntakeCommand(rollers,0)); 
+    // m_gunner1.button(12).and(m_gunner1.button(1)).whileTrue(ArmSequences.groundIntakeTest(m_armSubsystem, m_claw, actuatorSubsystem, rollers, 1))
+    // .onFalse(new ManualRunIntakeCommand(rollers,0));
   }
 
   private static double deadband(double value, double deadband) {

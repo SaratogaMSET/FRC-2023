@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.Constants.ArmNodeDictionary;
 import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
 import frc.robot.subsystems.Arm.ArmSubsystem;
@@ -316,14 +317,22 @@ public class ArmSequences{
             intake = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.pick_up_ground_intake_x, Constants.ArmNodeDictionary.pick_up_ground_intake_y, true);
             
         }else{
+            ArmPositionCommand intakeReady = new ArmPositionCommand(armSubsystem, ArmNodeDictionary.pick_up_ready_position_x, ArmNodeDictionary.pick_up_ready_position_y, 0.05);
             intake = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.pick_up_ground_intake_x, Constants.ArmNodeDictionary.pick_up_ground_intake_y, true);
             ManualSetAngle dropIntake = new ManualSetAngle(actuator, 95);
             
             ManualRunIntakeCommand runRollers = new ManualRunIntakeCommand(rollers, 0.5 );
 
-            return (dropIntake.alongWith(runRollers).alongWith(intake)).until(()->m_clawSubsystem.hasAcquiredGamePiece());
+            // return (dropIntake.alongWith(runRollers).alongWith(new SequentialCommandGroup(intakeReady, intake))).until(()-> (m_clawSubsystem.isGamepieceInRange() && m_clawSubsystem.getGamePieceType() != null));
+            return new SequentialCommandGroup(intakeReady, intake).until(()-> (m_clawSubsystem.isGamepieceInRange() && m_clawSubsystem.getGamePieceType() != null));
         }
         // return ready.andThen(intake).andThen(closeIntake).andThen(zero);
         return intake;
+    }
+
+    public static Command ZeroArm(ArmSubsystem armSubsystem){
+        ArmPositionCommand intakeReady = new ArmPositionCommand(armSubsystem, ArmNodeDictionary.pick_up_ready_position_x, ArmNodeDictionary.pick_up_ready_position_y + 0.15, 0.1);
+        ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
+        return intakeReady.andThen(zero);
     }
 }

@@ -320,6 +320,8 @@ public final class Constants {
         public static final int intake_ID = 22;
         
         public static final int encoder_ID = 40;
+
+        public static final int IR_GATE = 1;
         
         public static final double encoder_offset = 223.506;
 
@@ -470,7 +472,10 @@ public final class Constants {
         public static final double ground_intake_cone_x = 0.60;
         public static final double ground_intake_cone_y = -0.15;
     
-        public static final double pick_up_ground_intake_x = 0.48;
+        public static final double pick_up_ready_position_x = 0.6;
+        public static final double pick_up_ready_position_y = 0.3;
+
+        public static final double pick_up_ground_intake_x = 0.55; //0.48
         public static final double pick_up_ground_intake_y = 0.089;
 
         public double[] ready_arm_score = new double[]{0.688-0.1, 1.05};

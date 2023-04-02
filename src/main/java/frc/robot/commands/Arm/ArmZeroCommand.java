@@ -13,7 +13,13 @@ public class ArmZeroCommand extends CommandBase{
     @Override
     public void execute(){
         double[] position = armSubsystem.forwardKinematics();
-        double minY = 0.057;
+        double minY = 0.057 + 0.02;
+
+        double groundintake_minY = minY + 0.2;
+        // if(position[0] > 0 && position[1] < groundintake_minY){
+        //     double[] armAngles = armSubsystem.inverseKinematics(position[0], groundintake_minY + 0.1);
+        //     armSubsystem.PIDtoAngles(armAngles[0], armAngles[1]);
+        // }
         if(position[1] < minY){
             double[] armAngles = armSubsystem.inverseKinematics(position[0], minY + 0.2);
             armSubsystem.PIDtoAngles(armAngles[0], armAngles[1]);
@@ -29,12 +35,12 @@ public class ArmZeroCommand extends CommandBase{
 
     @Override
     public boolean isFinished(){
-        // double prox_err = armSubsystem.armInterface.getPositionProximal() - Math.PI/2;
-        // double dist_err = armSubsystem.armInterface.getPositionDistal() + Math.PI/2;
-        // double tolerance = 0.03;
-        // if(Math.abs(prox_err) < tolerance && Math.abs(dist_err) < tolerance){
-        //     return true;
-        // }
+        double prox_err = armSubsystem.armInterface.getPositionProximal() - Math.PI/2;
+        double dist_err = armSubsystem.armInterface.getPositionDistal() + Math.PI/2;
+        double tolerance = 0.03;
+        if(Math.abs(prox_err) < tolerance && Math.abs(dist_err) < tolerance){
+            return true;
+        }
         return false;
     }
 }

@@ -11,14 +11,14 @@ import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 
-public class ClawSubsystem 
-    extends SubsystemBase{
+public class ClawSubsystem extends SubsystemBase{
         
     private double[] proximityBuffer = new double[3];
     private int bufferIndex = 0;
@@ -29,6 +29,11 @@ public class ClawSubsystem
     public CANSparkMax motor = new CANSparkMax(IntakeConstants.INTAKE_MOTOR, MotorType.kBrushless);
     public RelativeEncoder encoder = motor.getEncoder();
     String print = "Claw/"; 
+
+    /* TODO make state enums */
+    private boolean acquired = false;
+    private boolean flash = false;
+    public double time;
 
     public static enum GamePiece {
         Cone,
@@ -42,13 +47,22 @@ public class ClawSubsystem
         motor.setControlFramePeriodMs(30);
     }
 
-    // public void updateInputs(ClawIOInputsAutoLogged inputs) {
-    //     inputs.rotations = encoder.getPosition();
-    //     inputs.objectDetected = isGamepieceInRange();
-    //     inputs.proximity = getProximityValue();
-    //     inputs.object = getGamePieceType().toString();
-    // }
-    
+    /* true = we got a game piece. False = we don't */
+    public boolean isGamepieceAcquired(){
+        return acquired;
+    }
+
+    public double getTime(){
+        return time;
+    }
+
+    public boolean getFlash(){
+        return flash;
+    }
+    public void setFlash(boolean x){
+        flash = x;
+    }
+
     public void setBrakeMode(){
         motor.setIdleMode(IdleMode.kBrake);
     }
@@ -68,6 +82,8 @@ public class ClawSubsystem
             closeVelocity = -0.6;
         }
         motor.set(closeVelocity);
+        acquired = false;
+        flash = false;
     }
 
     public boolean hasAcquiredGamePiece(){
@@ -122,6 +138,9 @@ public class ClawSubsystem
                 if (getGamePieceType() == GamePiece.Cube) {
                     if(encoderPosition >= IntakeConstants.CUBE_MEDIUM_BOUND - 1) {
                         motor.set(0.0);
+                        acquired = true;
+                        flash = true;
+                        // time = Timer.getFPGATimestamp();
                     } else {
                         motor.set(IntakeConstants.TARGET_VELOCITY);
                     }
@@ -129,6 +148,9 @@ public class ClawSubsystem
                 } else if (getGamePieceType() == GamePiece.Cone) {
                     if (encoderPosition >= IntakeConstants.CONE_MEDIUM_BOUND - 1) {
                         motor.set(0.0);
+                        acquired = true;
+                        flash = true;
+                        // time = Timer.getFPGATimestamp();
                     } else {
                         motor.set(IntakeConstants.TARGET_VELOCITY);
                     }
@@ -147,7 +169,7 @@ public class ClawSubsystem
         }
     }
 
-    private GamePiece getGamePieceType() {
+    public GamePiece getGamePieceType() {
         currentColor = colorSensor.getColor();
         if (currentColor == null) {
             return GamePiece.None;
@@ -187,6 +209,8 @@ public class ClawSubsystem
     public void periodic() {
         // This method will be called once per scheduler run
         updateClawTelemetry();
+        // if (Timer.getFPGATimestamp() - time > 2) flash = false;
+        SmartDashboard.putNumber("TIME IS DOOOMED", time);
     }
 
     @Override

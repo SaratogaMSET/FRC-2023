@@ -22,7 +22,7 @@ public class ActuatorSubsystem extends SubsystemBase {
     CANCoder Encoder = new CANCoder(Constants.GroundIntake.encoder_ID,  "649-Hammerhead-CANivore");
     double previousError = 0;
     public double k_G = 0.0648; //0.0648
-    double k_P = 0.65;
+    double k_P = 0.85; //0.65
     double k_D = 0.003;
     double k_PUp = 0.7;
     PIDController controller = new PIDController(k_P,0,k_D);
@@ -70,7 +70,7 @@ public class ActuatorSubsystem extends SubsystemBase {
             Actuator.setVoltage((k_PUp * error * power) - gravity);
         }
         else{
-            Actuator.setVoltage((k_P* error * power));
+            Actuator.setVoltage((k_P * error * power));
         }
         SmartDashboard.putNumber("Intake Error",  (k_P * error * power));
 } 

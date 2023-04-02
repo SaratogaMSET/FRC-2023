@@ -1,5 +1,9 @@
 package frc.robot.subsystems.CANdle;
 
+import java.util.function.BooleanSupplier;
+
+import javax.swing.text.Segment;
+
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
@@ -15,9 +19,11 @@ import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.SingleFadeAnimation;
 import com.ctre.phoenix.led.StrobeAnimation;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.MathUtils;
+import frc.robot.RobotContainer;
 
 public class CANdleSubsystem extends SubsystemBase {
     private static final CANdle candle1 = new CANdle(59, "649-Hammerhead-CANivore"); //Front Left
@@ -39,6 +45,9 @@ public class CANdleSubsystem extends SubsystemBase {
     private static final Color red = new Color(227, 26, 0);
 
     private static Color color = blue;
+
+    // private boolean flash = true; // i'll detail the logic later if it works. 
+    // private double time;
 
     public CANdleSubsystem() {
         CANdleConfiguration candleConfiguration = new CANdleConfiguration();
@@ -62,6 +71,13 @@ public class CANdleSubsystem extends SubsystemBase {
         candle3.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 30000);
         candle4.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 30000);
     }
+
+    // public boolean getFlash(){
+    //     return flash;
+    // }
+    // public void setFlash(boolean x){
+    //     flash = x;
+    // }
 
     public void setColor(Color color){
         LEDSegment.FrontLeftStrip.setColor(color);
@@ -101,6 +117,41 @@ public class CANdleSubsystem extends SubsystemBase {
         });
     }
 
+    public void strobe(){
+
+        // if (RobotContainer.m_claw.getFlash() == false){
+        //     LEDSegment.BackRightStrip.clearAnimation();
+        //     LEDSegment.BackLeftStrip.clearAnimation();
+        //     idle();
+        //     return;
+        // }
+
+        // SmartDashboard.putBoolean("flash", flash);
+
+        Color newColor = new Color(CANdleSubsystem.color);    
+
+        LEDSegment.BackRightStrip.setColor(green);
+        LEDSegment.BackLeftStrip.setColor(green);
+        LEDSegment.FrontLeftStrip.setFlowAnimation(green, 0.5);
+        LEDSegment.FrontRightStrip.setFlowAnimation(green, 0.5);
+    }
+
+    public Command strobeCommand(){
+
+        final Color newColor = new Color(CANdleSubsystem.color);        
+
+            return idleCommand(() -> {
+                LEDSegment.BackRightStrip.setColor(green);
+                LEDSegment.BackLeftStrip.setColor(green);
+                LEDSegment.FrontLeftStrip.setFlowAnimation(green, 0.5);
+                LEDSegment.FrontRightStrip.setFlowAnimation(green, 0.5);
+            }).withTimeout(2);
+    }
+
+    private Command idleCommand(Runnable runnable){
+        return run(runnable);
+    }
+
     public Command indicateConeCommand() {
         CANdleSubsystem.color = CANdleSubsystem.yellow;
         CANdleSubsystem.prev = 0.0;
@@ -108,13 +159,13 @@ public class CANdleSubsystem extends SubsystemBase {
         // LEDSegment.BackRightStrip.clearAnimation();
         // LEDSegment.BackRightStrip.clearAnimation();
         // LEDSegment.FrontLeftStrip.clearAnimation();
-        final Color newColor = new Color(CANdleSubsystem.color);
+        Color newColor = new Color(CANdleSubsystem.color);
         return buildSideStripCommand(() -> {
             
-            LEDSegment.BackRightStrip.setColor(newColor);
-            LEDSegment.BackLeftStrip.setColor(newColor);
-            LEDSegment.FrontLeftStrip.setFlowAnimation(newColor, 0.5);
-            LEDSegment.FrontRightStrip.setFlowAnimation(newColor, 0.5);
+            LEDSegment.BackRightStrip.setFlowAnimation(newColor, 0.5);
+            LEDSegment.BackLeftStrip.setFlowAnimation(newColor, 0.5);
+            LEDSegment.FrontLeftStrip.setColor(newColor);
+            LEDSegment.FrontRightStrip.setColor(newColor);
         });
     }
     public Command indicateActiveSide(){
@@ -165,14 +216,14 @@ public class CANdleSubsystem extends SubsystemBase {
             // System.out.println("Set Color to purple");
             // SmartDashboard.putNumberArray("Color On Cube Command", new double[]{CANdleSubsystem.color.red, CANdleSubsystem.color.green, CANdleSubsystem.color.blue});
             
-            LEDSegment.BackRightStrip.setColor(newColor);
-            LEDSegment.BackLeftStrip.setColor(newColor);
-            LEDSegment.FrontLeftStrip.setFlowAnimation(newColor, 0.5);
-            LEDSegment.FrontRightStrip.setFlowAnimation(newColor, 0.5);
+            LEDSegment.BackRightStrip.setFlowAnimation(newColor, 0.5);
+            LEDSegment.BackLeftStrip.setFlowAnimation(newColor, 0.5);
+            LEDSegment.FrontLeftStrip.setColor(newColor);
+            LEDSegment.FrontRightStrip.setColor(newColor);
         });
     }
-
-    private Command buildSideStripCommand(Runnable runnable) {
+    public Command buildSideStripCommand(Runnable runnable) {
+        // if(runnable == null) return run(CANdleSubsystem::runDefaultSideAnimation);
         return startEnd(runnable, CANdleSubsystem::runDefaultSideAnimation);
         // return run(runnable).finallyDo((interrupted) -> {
         //     runDefaultSideAnimation();
@@ -189,13 +240,36 @@ public class CANdleSubsystem extends SubsystemBase {
     // public static void runDefaultMainStripAnimation() {
     //     runDefaultSideAnimation();
     //     runDefaultTopAnimation();
-    // }
+    // }s
+
+    public void idle(){
+
+        // LEDSegment.BackLeftStrip.fullClear();
+        // LEDSegment.BackRightStrip.fullClear();
+        // LEDSegment.FrontRightStrip.fullClear();
+        // LEDSegment.FrontLeftStrip.fullClear();
+
+        Color newColor = new Color(CANdleSubsystem.color);
+
+        LEDSegment.BackRightStrip.setFlowAnimation(newColor, 0.5);
+        LEDSegment.BackLeftStrip.setFlowAnimation(newColor, 0.5);
+
+        LEDSegment.FrontLeftStrip.setColor(newColor);
+        LEDSegment.FrontRightStrip.setColor(newColor);
+    }
 
     public static void runDefaultSideAnimation() {
-        LEDSegment.BackRightStrip.setColor(CANdleSubsystem.color);
-        LEDSegment.BackLeftStrip.setColor(CANdleSubsystem.color);
-        LEDSegment.FrontLeftStrip.setFlowAnimation(CANdleSubsystem.color, 0.5);
-        LEDSegment.FrontRightStrip.setFlowAnimation(CANdleSubsystem.color, 0.5);
+
+        // LEDSegment.BackLeftStrip.fullClear();
+        // LEDSegment.BackRightStrip.fullClear();
+        // LEDSegment.FrontRightStrip.fullClear();
+        // LEDSegment.FrontLeftStrip.fullClear();
+
+
+        LEDSegment.BackRightStrip.setFlowAnimation(CANdleSubsystem.color, 0.5);
+        LEDSegment.BackLeftStrip.setFlowAnimation(CANdleSubsystem.color, 0.5);
+        LEDSegment.FrontLeftStrip.setColor(CANdleSubsystem.color);
+        LEDSegment.FrontRightStrip.setColor(CANdleSubsystem.color);
     }
 
     // public static void runDefaultTopAnimation() {
@@ -207,7 +281,7 @@ public class CANdleSubsystem extends SubsystemBase {
 
         FrontLeftStrip(8, 30, 3, candle1),
         FrontRightStrip(8, 30, 7, candle2),
-        BackLeftStrip(8, 30, 7, candle3),
+        BackLeftStrip(8, 30, 8, candle3),
         BackRightStrip(8, 30, 2, candle4);
         
         
