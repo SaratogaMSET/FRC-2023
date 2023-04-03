@@ -11,12 +11,13 @@ import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.hal.simulation.EncoderDataJNI;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.ClawConstants;
 
 public class ClawSubsystem extends SubsystemBase{
         
@@ -26,7 +27,7 @@ public class ClawSubsystem extends SubsystemBase{
     private Color currentColor;
     public boolean startedAutoClose = false;
     public ColorSensorV3 colorSensor;
-    public CANSparkMax motor = new CANSparkMax(IntakeConstants.INTAKE_MOTOR, MotorType.kBrushless);
+    public CANSparkMax motor = new CANSparkMax(ClawConstants.INTAKE_MOTOR, MotorType.kBrushless);
     public RelativeEncoder encoder = motor.getEncoder();
     String print = "Claw/"; 
 
@@ -44,7 +45,7 @@ public class ClawSubsystem extends SubsystemBase{
     public ClawSubsystem() {
         motor.setIdleMode(IdleMode.kBrake);
         colorSensor = new ColorSensorV3(Port.kOnboard);
-        motor.setControlFramePeriodMs(30);
+        motor.setSmartCurrentLimit(30);
     }
 
     /* true = we got a game piece. False = we don't */
@@ -69,6 +70,32 @@ public class ClawSubsystem extends SubsystemBase{
 
     public void setCoastMode(){
         motor.setIdleMode(IdleMode.kCoast);
+    }
+
+    public void openClawScaled(){ //OWEN MOMENT
+        updateClawTelemetry();
+        if(isClawFullyClosed()){
+            encoder.setPosition(ClawConstants.forwardLimitEncoderPosition); //TODO:tune
+        }
+        double closeVelocity = 0.0;
+        if(isClawFullyOpen()) {
+            closeVelocity = 0.0;
+            resetEncoder();
+        }
+        else{ 
+            if(encoder.getPosition() > ClawConstants.encoderScaleActivation){
+                closeVelocity = -1.0;
+            }
+            else if(encoder.getPosition() > ClawConstants.encoderScaleDeactivation){
+                closeVelocity = .05 * (0.0 - encoder.getPosition());
+            }
+            else{
+                closeVelocity = -0.6; //TODO: tune 
+            }
+        }
+        motor.set(closeVelocity);
+        acquired = false;
+        flash = false;
     }
 
     public void openClaw() {
@@ -100,10 +127,10 @@ public class ClawSubsystem extends SubsystemBase{
         return false; 
     }
     public boolean getConeTolerance(){
-       return encoder.getPosition() >= IntakeConstants.CONE_MEDIUM_BOUND - 1;
+       return encoder.getPosition() >= ClawConstants.CONE_MEDIUM_BOUND - 1;
     }
     public boolean getCubeTolerance(){
-        return encoder.getPosition() >= IntakeConstants.CUBE_MEDIUM_BOUND - 1;
+        return encoder.getPosition() >= ClawConstants.CUBE_MEDIUM_BOUND - 1;
      }
     public void setIdle() {
         motor.set(0.0);
@@ -130,29 +157,30 @@ public class ClawSubsystem extends SubsystemBase{
     }
 
     public void autoCloseClaw() {
+        encoder.setPosition(0.0);
         if(isGamepieceInRange()) {
             if (isClawFullyOpen() || startedAutoClose) {
                 // Either the claw is fully open or we had previously started auto close.
                 startedAutoClose = true;
                 double encoderPosition = encoder.getPosition();
                 if (getGamePieceType() == GamePiece.Cube) {
-                    if(encoderPosition >= IntakeConstants.CUBE_MEDIUM_BOUND - 1) {
+                    if(encoderPosition >= ClawConstants.CUBE_MEDIUM_BOUND - 1) {
                         motor.set(0.0);
                         acquired = true;
                         flash = true;
                         // time = Timer.getFPGATimestamp();
                     } else {
-                        motor.set(IntakeConstants.TARGET_VELOCITY);
+                        motor.set(ClawConstants.TARGET_VELOCITY);
                     }
                 
                 } else if (getGamePieceType() == GamePiece.Cone) {
-                    if (encoderPosition >= IntakeConstants.CONE_MEDIUM_BOUND - 1) {
+                    if (encoderPosition >= ClawConstants.CONE_MEDIUM_BOUND - 1) {
                         motor.set(0.0);
                         acquired = true;
                         flash = true;
                         // time = Timer.getFPGATimestamp();
                     } else {
-                        motor.set(IntakeConstants.TARGET_VELOCITY);
+                        motor.set(ClawConstants.TARGET_VELOCITY);
                     }
                 } else {
                     motor.set(0.0);
@@ -165,7 +193,7 @@ public class ClawSubsystem extends SubsystemBase{
         if (isClawFullyClosed()) {
             motor.set(0.0);
         } else {
-            motor.set(IntakeConstants.TARGET_VELOCITY);
+            motor.set(ClawConstants.TARGET_VELOCITY);
         }
     }
 
