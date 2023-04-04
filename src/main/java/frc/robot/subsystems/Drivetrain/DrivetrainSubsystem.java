@@ -37,6 +37,7 @@ import frc.lib.swerve.BetterSwerveModuleState;
 import frc.lib.swerve.SwerveDriveKinematics2;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.Constants.Drivetrain;
 import frc.robot.subsystems.SwerveModule;
 
 public class DrivetrainSubsystem extends SubsystemBase {
@@ -49,7 +50,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private final PIDController driftCorrectionPID = new PIDController(0.1, 0.00, 0.000);
     public ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);    
     //private SwerveDriveOdometry swerveOdometry;
-
+    public ChassisSpeeds previouChassisSpeeds = new ChassisSpeeds(0.0,0.0,0.0);
+    ChassisSpeeds speeds = new ChassisSpeeds(0.0,0.0,0.0);
     private Field2d m_field = new Field2d();
 
     private NetworkTable visionData;
@@ -300,6 +302,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
         for(SwerveModule mod : mSwerveMods){
             mod.resetToAbsolute();
         }
+    }
+
+    public ChassisSpeeds limitVelocity(ChassisSpeeds chassisSpeeds){
+        speeds.vxMetersPerSecond = Math.max(-Drivetrain.allowedMaxAcceleration, Math.min(Drivetrain.allowedMaxAcceleration, chassisSpeeds.vxMetersPerSecond));
+        speeds.vyMetersPerSecond = Math.max(-Drivetrain.allowedMaxAcceleration, Math.min(Drivetrain.allowedMaxAcceleration, chassisSpeeds.vyMetersPerSecond));
+        speeds.omegaRadiansPerSecond = Math.max(-Drivetrain.allowedMaxAcceleration, Math.min(Drivetrain.allowedMaxAcceleration, chassisSpeeds.omegaRadiansPerSecond));
+        return speeds;
     }
 
     @Override

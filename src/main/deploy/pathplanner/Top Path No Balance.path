@@ -76,44 +76,17 @@
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "deadline",
-        "waitTime": 0.25
+        "waitTime": 0.75
       }
     },
     {
       "anchorPoint": {
-        "x": 2.37,
-        "y": 2.98
+        "x": 3.78349587601953,
+        "y": 4.75240352390427
       },
       "prevControl": {
-        "x": 1.9061542823780093,
-        "y": 2.9889890779781565
-      },
-      "nextControl": {
-        "x": 2.8941338362555857,
-        "y": 2.969842571040116
-      },
-      "holonomicAngle": 180.0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": false,
-      "stopEvent": {
-        "names": [
-          "Low Score Backwards"
-        ],
-        "executionBehavior": "sequential",
-        "waitBehavior": "none",
-        "waitTime": 0.0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 3.49,
-        "y": 2.970085487045974
-      },
-      "prevControl": {
-        "x": 2.6378453686035233,
-        "y": 2.970085487045974
+        "x": 3.7548483549304605,
+        "y": 4.75240352390427
       },
       "nextControl": null,
       "holonomicAngle": 180.0,
@@ -122,46 +95,41 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "Balance"
-        ],
-        "executionBehavior": "sequential",
-        "waitBehavior": "minimum",
-        "waitTime": 2.0
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
       }
     }
   ],
-  "maxVelocity": 4.0,
-  "maxAcceleration": 3.0,
-  "isReversed": null,
   "markers": [
     {
-      "position": 0.054971590909090894,
+      "position": 0.057421875000000046,
       "names": [
         "Arm Neutral"
       ]
     },
     {
-      "position": 1.2688920454545451,
-      "names": [
-        "Zero Roller Speed"
-      ]
-    },
-    {
-      "position": 0.5196022727272726,
+      "position": 0.52,
       "names": [
         "Intake Front",
         "Run Rollers"
       ]
     },
     {
-      "position": 0.6244318181818184,
+      "position": 0.62,
       "names": [
         "Run Rollers"
       ]
     },
     {
-      "position": 1.3700284090909083,
+      "position": 1.27,
+      "names": [
+        "Zero Roller Speed"
+      ]
+    },
+    {
+      "position": 1.37,
       "names": [
         "Zero Intake"
       ]

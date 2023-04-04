@@ -34,7 +34,7 @@ public class StrobeCommand extends CommandBase {
     public void execute(){
 
         // if (m_led)
-        if (m_claw.isGamepieceAcquired() && m_claw.getFlash()){
+        if (m_claw.hasAcquiredGamePiece()){
             candle.strobe();
             // try {
             //     wait(2000);

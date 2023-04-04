@@ -7,6 +7,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.Constants.ArmNodeDictionary;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 
 public class MoveWithClosest90 extends CommandBase {
@@ -16,6 +17,7 @@ public class MoveWithClosest90 extends CommandBase {
     DoubleSupplier x;
     DoubleSupplier y;
     DoubleSupplier armHeight;
+    DoubleSupplier actuatorHeight;
     PIDController controller = new PIDController(2,0.0,0.0);
     double xT;
     double yT;
@@ -24,12 +26,14 @@ public class MoveWithClosest90 extends CommandBase {
     public MoveWithClosest90(DrivetrainSubsystem drivetrainSubsystem,
         DoubleSupplier translationXSupplier,
         DoubleSupplier translationYSupplier,
-        DoubleSupplier armHeight){
+        DoubleSupplier armHeight,
+        DoubleSupplier actuatorHeight){
         
         this.drivetrain = drivetrainSubsystem;
         this.x = translationXSupplier;
         this.y = translationYSupplier;
         this.armHeight = armHeight;
+        this.actuatorHeight = actuatorHeight;
         addRequirements(drivetrainSubsystem);  
 
     }
@@ -61,30 +65,44 @@ public class MoveWithClosest90 extends CommandBase {
         double resultY = Math.sin(roboAngle) * magnitude;
         
         double pidValue = controller.calculate(lastRot, desiredAngle) * Math.PI/180;
+        double armY = armHeight.getAsDouble();
+        // double minArmHeight = 0.3;
+        // double maxArmHeight = 1.18;
+        // double iLerp = (armY - minArmHeight) /(minArmHeight - maxArmHeight);
+        // double divider  = Math.max(0.0, Math.min(1.0, iLerp)) * 2.5;
 
-        if(armHeight.getAsDouble() > Constants.ArmNodeDictionary.ready_midcube_score_y){
+        if(armHeight.getAsDouble() > ArmNodeDictionary.ready_midcube_score_y){
+
+            drivetrain.drive(
+                // ChassisSpeeds.fromFieldRelativeSpeeds(
+                new ChassisSpeeds(
+                resultX/2.25,
+                resultY/2.25,
+                pidValue)
+                );
+     }
+    else if(actuatorHeight.getAsDouble() > 50){
+        drivetrain.drive(
+            // ChassisSpeeds.fromFieldRelativeSpeeds(
+            new ChassisSpeeds(
+            resultX/1.5,
+            resultY/1.5,
+            pidValue)
+            // m_drivetrainSubsystem.getRotation2d()
+            // )
+        );
+            }
+        else{
             drivetrain.drive(
                     // ChassisSpeeds.fromFieldRelativeSpeeds(
                     new ChassisSpeeds(
-                    resultX/2.5,
-                    resultY/2.5,
+                    resultX,
+                    resultY,
                     pidValue)
                     // m_drivetrainSubsystem.getRotation2d()
                     // )
             );
-    }
-        else{
-            drivetrain.drive(
-                // ChassisSpeeds.fromFieldRelativeSpeeds(
-                new ChassisSpeeds(
-                resultX,
-                resultY,
-                pidValue)
-                // m_drivetrainSubsystem.getRotation2d()
-                // )
-        );
         }
-       
     }
 
     @Override

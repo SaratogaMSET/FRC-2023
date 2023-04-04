@@ -56,9 +56,9 @@ public class ArmSequences{
     public static ArmPositionCommand readyMoreForward(ArmSubsystem armSubsystem ,int side){
         ArmPositionCommand ready;
         if(side > 0){
-            ready = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.ready_double_substation_x + ((0.125 + 0.09))/2), Constants.ArmNodeDictionary.ready_double_substation_y + 0.1,true);
+            ready = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.ready_double_substation_x + ((0.125 + 0.09))/2), Constants.ArmNodeDictionary.ready_double_substation_y,true);
         }else{
-            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x + ((0.125 + 0.09))/2, Constants.ArmNodeDictionary.ready_double_substation_y + 0.1, true);
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x + ((0.125 + 0.09))/2, Constants.ArmNodeDictionary.ready_double_substation_y, true);
         }
         return ready;
     }

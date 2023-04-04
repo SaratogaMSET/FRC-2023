@@ -5,19 +5,23 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.GroundIntake;
 import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
 
-public class ManualSetAngle extends CommandBase {
+public class ManualSetAngleDriver extends CommandBase {
     
     ActuatorSubsystem gIntakeSubsystem;
+    double prevError;
+    double errorDT;
+    double error;
     double angle =0;
     boolean hold = false;
-    public ManualSetAngle(ActuatorSubsystem gIntakeSubsystem, double angle, boolean hold){
+    double errorSum;
+    public ManualSetAngleDriver(ActuatorSubsystem gIntakeSubsystem, double angle, boolean hold){
         this.gIntakeSubsystem = gIntakeSubsystem;
         this.angle = angle;
         this.hold = hold;
         addRequirements(gIntakeSubsystem);
     }
 
-    public ManualSetAngle(ActuatorSubsystem gIntakeSubsystem, double angle){
+    public ManualSetAngleDriver(ActuatorSubsystem gIntakeSubsystem, double angle){
         this.gIntakeSubsystem = gIntakeSubsystem;
         this.angle = angle;
         addRequirements(gIntakeSubsystem);
@@ -25,12 +29,22 @@ public class ManualSetAngle extends CommandBase {
 
     @Override
     public void execute(){
+
         if(gIntakeSubsystem.getCurrent() > GroundIntake.currentLimit){
             gIntakeSubsystem.setVoltageActuator(0);
         }
         else{
-            gIntakeSubsystem.set_angle(angle, 100);
-            SmartDashboard.putBoolean("Command running", true);
+            if(Math.abs(angle - gIntakeSubsystem.get_position_degrees()) > 3){
+                errorDT = (error - prevError)/0.02;
+                error = angle - gIntakeSubsystem.get_position_degrees();
+                errorSum += error;
+                gIntakeSubsystem.set_angle(angle, 100, errorSum, errorDT);
+                SmartDashboard.putBoolean("Command running", true);
+                prevError = error;
+            }
+            else{
+                gIntakeSubsystem.tuneGravityCompensation();
+            }
         }
     }
 

@@ -30,6 +30,10 @@ public class ClawSubsystem extends SubsystemBase{
     public CANSparkMax motor = new CANSparkMax(ClawConstants.INTAKE_MOTOR, MotorType.kBrushless);
     public RelativeEncoder encoder = motor.getEncoder();
     String print = "Claw/"; 
+    private boolean hasZeroedEncoder = false;
+    double minVelocity = 0.1;
+    double maxVelocity = 0.85;
+    double curve = 0.5;
 
     /* TODO make state enums */
     private boolean acquired = false;
@@ -48,7 +52,7 @@ public class ClawSubsystem extends SubsystemBase{
         motor.setSmartCurrentLimit(30);
     }
 
-    /* true = we got a game piece. False = we don't */
+    /* true = we got  a game piece. False = we don't */
     public boolean isGamepieceAcquired(){
         return acquired;
     }
@@ -72,46 +76,6 @@ public class ClawSubsystem extends SubsystemBase{
         motor.setIdleMode(IdleMode.kCoast);
     }
 
-    public void openClawScaled(){ //OWEN MOMENT
-        updateClawTelemetry();
-        if(isClawFullyClosed()){
-            encoder.setPosition(ClawConstants.forwardLimitEncoderPosition); //TODO:tune
-        }
-        double closeVelocity = 0.0;
-        if(isClawFullyOpen()) {
-            closeVelocity = 0.0;
-            resetEncoder();
-        }
-        else{ 
-            if(encoder.getPosition() > ClawConstants.encoderScaleActivation){
-                closeVelocity = -1.0;
-            }
-            else if(encoder.getPosition() > ClawConstants.encoderScaleDeactivation){
-                closeVelocity = .05 * (0.0 - encoder.getPosition());
-            }
-            else{
-                closeVelocity = -0.6; //TODO: tune 
-            }
-        }
-        motor.set(closeVelocity);
-        acquired = false;
-        flash = false;
-    }
-
-    public void openClaw() {
-        updateClawTelemetry();
-        double closeVelocity = 0.0;
-        if(isClawFullyOpen()) {
-            closeVelocity = 0.0;
-            resetEncoder();
-        }
-        else{ 
-            closeVelocity = -0.6;
-        }
-        motor.set(closeVelocity);
-        acquired = false;
-        flash = false;
-    }
 
     public boolean hasAcquiredGamePiece(){
         if(isGamepieceInRange() &&
@@ -154,10 +118,37 @@ public class ClawSubsystem extends SubsystemBase{
 
     private void resetEncoder() {
         encoder.setPosition(0);
+    }  
+
+    public void openClaw() {
+        updateClawTelemetry();
+        double closeVelocity = 0.0;
+        if(isClawFullyOpen()) {
+            closeVelocity = 0.0; 
+            hasZeroedEncoder = true; // NEW
+            resetEncoder();
+        }
+        else{ 
+            //closeVelocity = -0.6;
+
+            //NEW:
+           
+            if(encoder.getPosition() < 40
+            ){
+                closeVelocity = -0.25;
+            }
+            else{
+                closeVelocity = -0.5;
+            }
+            //end new code
+        }
+        motor.set(closeVelocity);
+        acquired = false;
+        flash = false;
     }
 
+
     public void autoCloseClaw() {
-        encoder.setPosition(0.0);
         if(isGamepieceInRange()) {
             if (isClawFullyOpen() || startedAutoClose) {
                 // Either the claw is fully open or we had previously started auto close.
@@ -170,7 +161,11 @@ public class ClawSubsystem extends SubsystemBase{
                         flash = true;
                         // time = Timer.getFPGATimestamp();
                     } else {
-                        motor.set(ClawConstants.TARGET_VELOCITY);
+                        double encoderPositionRatio = (0.0-encoder.getPosition()) / (0.0-ClawConstants.CUBE_MEDIUM_BOUND);
+                        encoderPositionRatio = 1 - Math.max(0.0, Math.min(encoderPositionRatio, 1.0));
+                        encoderPositionRatio = Math.pow(encoderPositionRatio, curve);
+                        encoderPositionRatio = Math.max(minVelocity, Math.min(encoderPositionRatio, maxVelocity));
+                        motor.set(encoderPositionRatio);
                     }
                 
                 } else if (getGamePieceType() == GamePiece.Cone) {
@@ -180,7 +175,11 @@ public class ClawSubsystem extends SubsystemBase{
                         flash = true;
                         // time = Timer.getFPGATimestamp();
                     } else {
-                        motor.set(ClawConstants.TARGET_VELOCITY);
+                        double encoderPositionRatio = (0.0-encoder.getPosition()) / (0.0-ClawConstants.CONE_MEDIUM_BOUND);
+                        encoderPositionRatio = 1 - Math.max(0.0, Math.min(encoderPositionRatio, 1.0));
+                        encoderPositionRatio = Math.pow(encoderPositionRatio, curve);
+                        encoderPositionRatio = Math.max(minVelocity, Math.min(encoderPositionRatio, maxVelocity));
+                        motor.set(encoderPositionRatio);
                     }
                 } else {
                     motor.set(0.0);
@@ -193,7 +192,11 @@ public class ClawSubsystem extends SubsystemBase{
         if (isClawFullyClosed()) {
             motor.set(0.0);
         } else {
-            motor.set(ClawConstants.TARGET_VELOCITY);
+            double encoderPositionRatio = (0.0-encoder.getPosition()) / (0.0-ClawConstants.CONE_MEDIUM_BOUND);
+            encoderPositionRatio = 1 - Math.max(0.0, Math.min(encoderPositionRatio, 1.0));
+            encoderPositionRatio = Math.pow(encoderPositionRatio, curve);
+            encoderPositionRatio = Math.max(minVelocity, Math.min(encoderPositionRatio, maxVelocity));
+            motor.set(encoderPositionRatio);
         }
     }
 
@@ -221,7 +224,7 @@ public class ClawSubsystem extends SubsystemBase{
     public void updateClawTelemetry() {
         SmartDashboard.putNumber("ClawPos", encoder.getPosition());
         // SmartDashboard.putBoolean("Limit Switch", getHallEffect());
-        SmartDashboard.putNumber("Lidar (from 0-2047)", colorSensor.getProximity());
+        SmartDashboard.putBoolean("Is Object in Range", isGamepieceInRange());
         // SmartDashboard.putBoolean("Detecting", objectInRange());
         SmartDashboard.putNumber("Red value", colorSensor.getRed());
         SmartDashboard.putNumber("Green value", colorSensor.getGreen());
@@ -229,8 +232,8 @@ public class ClawSubsystem extends SubsystemBase{
         // SmartDashboard.putBoolean("Hall Effect", getHallEffect());
         SmartDashboard.putString("Object", getGamePieceType().toString());
         // SmartDashboard.putBoolean("Object in range", objectInRange());
-        SmartDashboard.putBoolean("Reverse Limit Switch", isClawFullyOpen());
-        SmartDashboard.putBoolean("Forward Limit Switch", isClawFullyClosed());
+        SmartDashboard.putBoolean("Is Claw Fully Open", isClawFullyOpen());
+        SmartDashboard.putBoolean("Is Claw Fully Closed", isClawFullyClosed());
     }
 
     @Override

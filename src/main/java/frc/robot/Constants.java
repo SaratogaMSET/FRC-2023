@@ -144,7 +144,7 @@ public final class Constants {
             public static final int driveMotorID = 36;
             public static final int angleMotorID = 37;
             public static final int canCoderID = 47;
-            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(357.19 + 180));
+            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(357.19 - 1.24 + 180));
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -154,7 +154,7 @@ public final class Constants {
             public static final int driveMotorID = 32;
             public static final int angleMotorID = 33;
             public static final int canCoderID = 43;
-            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(312.45));
+            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(312.45-3.16 + 1.853));
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -164,7 +164,7 @@ public final class Constants {
             public static final int driveMotorID = 30;
             public static final int angleMotorID = 31;
             public static final int canCoderID = 41;
-            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(349.54));
+            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(349.54 + 2.54));
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -212,6 +212,8 @@ public final class Constants {
         public static double balanceKV = 0.5;
 
         public static double balanceKA = 0.4;
+
+        public static int allowedMaxAcceleration = 5/2;
 
         // public static class ScoringTag{
 
@@ -292,28 +294,12 @@ public final class Constants {
         );
     }
 
-    public static class IntakeConstants {
+    public static class ClawConstants {
         public static final int INTAKE_MOTOR = 20;
-        public static final double GEAR_RATIO = 1 / 20.0;
-        public static final int HALL_EFFECT = 0;
         public static final double TARGET_VELOCITY = 1; //0.875 
-        public static final int INTAKE_DISTANCE_THRESHOLD = 50;
-        public static final double TORQUE_CONSTANT = 0.01042;
-        public static final double RESISTANCE = 12 / (11000 * 2 * 3.14159265 / 60);
-        public static final double TARGET_VOLTAGE = 1;
-        public static final double TORQUE_THRESHOLD = 100;      
-        public static final double CLOSING_TORQUE_THRESHOLD = 25;       
-        public static final double LOWER_BOUND = -2.5;
         public static final double CUBE_MEDIUM_BOUND = (52 * 0.6) ;
-        public static final double CONE_MEDIUM_BOUND = 102.78 * 0.6;
-        public static final double UPPER_BOUND = 5;
-        public static final double HOLD_VOLTAGE = TARGET_VOLTAGE / 10;
-        public static final double AUTO_CONE_DIAMETER = 0.0;
-        public static final double AUTO_CUBE_DIAMETER = 0.0;
-        public static final double AUTO_KP = 0.0;
-        public static final double AUTO_KI = 0.0;
-        public static final double AUTO_KD = 0.0;
-    }
+        public static final double CONE_MEDIUM_BOUND = 56.83;
+}
 
     public final class GroundIntake{
         public static final int actuator_ID = 57;
@@ -331,6 +317,8 @@ public final class Constants {
 
         public static final double highbound = 5;
         public static final double lowbound = 110;
+
+        public static final double currentLimit = 52; 
     }
 
     public static Mode getMode() {
@@ -343,7 +331,7 @@ public final class Constants {
         public static final double A1_LL3 = 20; // limelight angle!
 
         public static final double C1_LL3 = 0.323; //vrt / y value check the picture 
-        public static final double C2_LL3 = 0.228; // horizontal / x value check the picture :??????
+        public static final double C2_LL3 = -0.228; // horizontal / x value check the picture :??????
         
         /* LL2 Data */
 

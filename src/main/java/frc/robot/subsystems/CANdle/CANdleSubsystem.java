@@ -130,10 +130,10 @@ public class CANdleSubsystem extends SubsystemBase {
 
         Color newColor = new Color(CANdleSubsystem.color);    
 
-        LEDSegment.BackRightStrip.setColor(green);
-        LEDSegment.BackLeftStrip.setColor(green);
-        LEDSegment.FrontLeftStrip.setFlowAnimation(green, 0.5);
-        LEDSegment.FrontRightStrip.setFlowAnimation(green, 0.5);
+        LEDSegment.BackRightStrip.setFlowAnimation(green, 0.5);
+        LEDSegment.BackLeftStrip.setFlowAnimation(green, 0.5);
+        LEDSegment.FrontLeftStrip.setColor(green);
+        LEDSegment.FrontRightStrip.setColor(green);
     }
 
     public Command strobeCommand(){
@@ -141,10 +141,10 @@ public class CANdleSubsystem extends SubsystemBase {
         final Color newColor = new Color(CANdleSubsystem.color);        
 
             return idleCommand(() -> {
-                LEDSegment.BackRightStrip.setColor(green);
-                LEDSegment.BackLeftStrip.setColor(green);
-                LEDSegment.FrontLeftStrip.setFlowAnimation(green, 0.5);
-                LEDSegment.FrontRightStrip.setFlowAnimation(green, 0.5);
+                LEDSegment.BackRightStrip.setFlowAnimation(green, 0.5);
+            LEDSegment.BackLeftStrip.setFlowAnimation(green, 0.5);
+            LEDSegment.FrontLeftStrip.setColor(green);
+            LEDSegment.FrontRightStrip.setColor(green);
             }).withTimeout(2);
     }
 

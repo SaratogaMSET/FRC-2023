@@ -28,14 +28,18 @@ import frc.robot.commands.Arm.ArmSequences;
 import frc.robot.commands.Arm.ArmVoltageCommand;
 import frc.robot.commands.Arm.ArmZeroAutoCommand;
 import frc.robot.commands.Arm.ArmZeroCommand;
+import frc.robot.commands.Arm.ArmZeroStickyCommand;
+import frc.robot.commands.Auton.AutoRunCommand;
 import frc.robot.commands.Auton.AutonSequences;
 import frc.robot.commands.CANdle.StrobeCommand;
 import frc.robot.commands.Claw.BackUpIntakeCommand;
 import frc.robot.commands.Claw.ManualCloseIntake;
+import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.DefaultDriveCommand;
 import frc.robot.commands.Drivetrain.MoveWithClosest90;
 import frc.robot.commands.Drivetrain.TunableBalanceCommand;
 import frc.robot.commands.Drivetrain.ZeroGyroCommand;
+import frc.robot.commands.GroundIntakeCommands.ActuatorDefaultCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
 import frc.robot.commands.Vision.AlignCommand;
@@ -56,15 +60,17 @@ import frc.robot.subsystems.Vision.VisionSubsystem;
 public class RobotContainer {
   // public static HashMap <String, Command> eventMap = new HashMap<>();
   public final SendableChooser<String> m_autoSwitcher = new SendableChooser<String>();
-  public static final String OneAndBalance = "One And Balance";
-  public static final String OneAndBalanceBottom = "One And Balance Bottom";
-  public static final String TwoPieceTop = "Cone Preload and Cube score Top";
-  public static final String OnePiece = "One Piece and Community";
+  public static final String OneAndBalance = "One And Balance Middle";
+  public static final String OneAndBalanceBottom = "One And Balance Bump Side";
+  public static final String TwoPieceTop = "Cone Preload and Cube score Barrier Side";
+  public static final String OnePiece = "One Piece + Community Bonus Anywhere but Middle";
   public static final String OnePlusHalf = "Score, get One more and Balance Bottom";
   // public String m_autoSelected;  
-  public static final String OneAndNothing = "One Score and Nothing";
-  public static final String PhyscoBehavior = "TEST PATH FOR TOP 2 GAME PIECE ONLY";
-  public static final String BalanceMobilityBonus = "Middle Balance Mobilty";
+  public static final String OneAndNothing = "One Score and NOTHING ELSE";
+  public static final String PhyscoBehavior = "Two Piece + Balance Barrier Side";
+  public static final String TwoPieceNoBalance = "Two Piece No Balance Barrier Side";
+  public static final String ThreePiece = "Three Piece Test Path Barrier Side";
+  public static final String BalanceMobilityBonus = "Middle Balance + Mobilty Bonus";
 
   public final SendableChooser<Boolean> autoCloseChooser = new SendableChooser<Boolean>();
   public static final Boolean disableAutoClose = false;
@@ -123,15 +129,17 @@ public class RobotContainer {
     m_autoSwitcher.setDefaultOption(OneAndNothing, OneAndNothing);
     m_autoSwitcher.addOption(OneAndBalance, OneAndBalance);
     m_autoSwitcher.addOption(OnePiece, OnePiece);
-    m_autoSwitcher.addOption(TwoPieceTop, TwoPieceTop);
+    // m_autoSwitcher.addOption(TwoPieceTop, TwoPieceTop);
     m_autoSwitcher.addOption(OneAndBalanceBottom, OneAndBalanceBottom);
-    m_autoSwitcher.addOption(OnePlusHalf, OnePlusHalf);
+    // m_autoSwitcher.addOption(OnePlusHalf, OnePlusHalf);
     m_autoSwitcher.addOption(BalanceMobilityBonus, BalanceMobilityBonus);
     m_autoSwitcher.addOption(PhyscoBehavior, PhyscoBehavior);
+    m_autoSwitcher.addOption(TwoPieceNoBalance, TwoPieceNoBalance);
+    m_autoSwitcher.addOption(ThreePiece, ThreePiece);
     
     
-    autoCloseChooser.setDefaultOption("Disable the Auto Close", disableAutoClose);
-    autoCloseChooser.addOption("Don't Disable Auto Close", enableAutoClose);
+    autoCloseChooser.setDefaultOption("DISABLE the Auto Close", disableAutoClose);
+    autoCloseChooser.addOption("ENABLE Auto Close", enableAutoClose);
 
     // m_field = new Field2d();
     SmartDashboard.putData(m_autoSwitcher);
@@ -165,8 +173,9 @@ public class RobotContainer {
             m_drivetrainSubsystem,
             () -> modifyAxis(m_driverController.getLeftX() * 1.2) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
             () -> modifyAxis(-m_driverController.getLeftY() * 1.2) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> modifyAxis(-m_driverController.getRightX()/1.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
-            () -> m_armSubsystem.getYPosition()
+            () -> modifyAxis(-m_driverController.getRightX()/1.4) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
+            () -> m_armSubsystem.getYPosition(),
+            ()-> actuatorSubsystem.get_position_degrees()
     ));
 
     m_armSubsystem.setDefaultCommand(
@@ -197,7 +206,7 @@ public class RobotContainer {
     //   new AlignToCone(m_drivetrainSubsystem, m_visionSubsystem)
     // ));
     m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
-    actuatorSubsystem.setDefaultCommand(new RunCommand(()->actuatorSubsystem.tuneGravityCompensation(), actuatorSubsystem));
+    actuatorSubsystem.setDefaultCommand(new ActuatorDefaultCommand(actuatorSubsystem));
     
 
     // m_driverController.x().toggleOnTrue(
@@ -209,7 +218,14 @@ public class RobotContainer {
     // ));
     
     m_driverController.b().onTrue(new SequentialCommandGroup(
-      new TunableBalanceCommand(m_drivetrainSubsystem)));
+      new DefaultDriveCommand(
+            m_drivetrainSubsystem,
+            () -> modifyAxis(m_driverController.getLeftX()/2.25) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(-m_driverController.getLeftY()/2.25) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(-m_driverController.getRightX()/2.25) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
+            ()-> m_armSubsystem.getYPosition(),
+            ()-> actuatorSubsystem.get_position_degrees()     
+    )));
 
     // m_gunner1.button(1).whileTrue(m_ledSubsystem.indicateActiveSide());
     m_gunner1.button(3).toggleOnTrue(new ConditionalCommand(m_ledSubsystem.indicateConeCommand(), m_ledSubsystem.indicateCubeCommand(), () -> m_gunner1.button(3).getAsBoolean()));
@@ -219,9 +235,11 @@ public class RobotContainer {
       m_drivetrainSubsystem, 
       () -> modifyAxis(m_driverController.getLeftX()* 1.2) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
       () -> modifyAxis(-m_driverController.getLeftY()*1.2) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-      () -> m_armSubsystem.getYPosition()
+      () -> m_armSubsystem.getYPosition(),
+      () -> actuatorSubsystem.get_position_degrees()
     ));
-
+    m_driverController.leftTrigger().onTrue(
+      (new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.9, 0, 0).withTimeout(1)));
      m_driverController.rightBumper().onTrue(//new ConditionalCommand(
       ArmSequences.ready(m_armSubsystem, 1) //,
       // new ArmZeroAutoCommand(m_armSubsystem), 
@@ -237,12 +255,12 @@ public class RobotContainer {
        );//);
     m_driverController.leftBumper().onTrue(
     new ParallelCommandGroup(
-      new ArmZeroCommand(m_armSubsystem),
+      new ArmZeroStickyCommand(m_armSubsystem),
       new SequentialCommandGroup(
         // new WaitCommand(0.3),
         new ParallelCommandGroup(
-        new ManualRunIntakeCommand(rollers, 0) //,
-        // new ManualSetAngle(actuatorSubsystem, 10)
+        new ManualRunIntakeCommand(rollers, 0),
+        new ManualSetAngle(actuatorSubsystem, 10)
         )
       )
     )
@@ -268,11 +286,11 @@ public class RobotContainer {
     m_gunner1.button(11).and(m_gunner1.button(1)).onTrue(ArmSequences.groundIntakeCone(m_armSubsystem, m_claw, 1));
 
     m_gunner1.button(1).whileTrue(
-      new ParallelCommandGroup(new ManualSetAngle(actuatorSubsystem, 90), new ManualRunIntakeCommand(rollers, 0.7).until( ()-> (m_claw.isGamepieceInRange() && m_claw.getGamePieceType() != null))))
+      new ParallelCommandGroup(new ManualSetAngle(actuatorSubsystem, 95), new ManualRunIntakeCommand(rollers, 0.7))) //.until( ()-> (m_claw.isGamepieceInRange() && m_claw.getGamePieceType() != null))))
       .onFalse(new ParallelCommandGroup(new ManualSetAngle(actuatorSubsystem, 10), new ManualRunIntakeCommand(rollers, 0.0)));
 
       m_gunner1.button(2).whileTrue(
-        new ManualRunIntakeCommand(rollers, -0.7)) //)
+        new ManualRunIntakeCommand(rollers, -0.5)) //)
         .onFalse(new ManualRunIntakeCommand(rollers, 0.0));
 
       m_gunner1.button(12).whileTrue(
@@ -355,7 +373,7 @@ public class RobotContainer {
       case OneAndBalanceBottom:
         return AutonSequences.getOnePieceAndBalanceBottomCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case TwoPieceTop:
-        AutonSequences.getTwoPieceTopCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
+        return AutonSequences.getTwoPieceTopCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case OnePlusHalf:
         return AutonSequences.getTwoPieceAndBalanceBottomCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case OneAndNothing:
@@ -364,6 +382,10 @@ public class RobotContainer {
         return AutonSequences.getOnePieceBalanceMobilityBonus(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case PhyscoBehavior:
           return AutonSequences.getTwoPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
+      case TwoPieceNoBalance:
+        return AutonSequences.getTwoPieceNoBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers ,m_claw);
+      case ThreePiece:
+        return AutonSequences.getThreePieceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       default:
         return AutonSequences.getOnePieceCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
     }

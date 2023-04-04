@@ -67,11 +67,9 @@ public class BalanceCommand extends CommandBase {
     if (Math.abs(drivePower) > 0.9) {
       drivePower = Math.copySign(0.9, drivePower);
     }
-
-    m_DriveSubsystem.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
-      new ChassisSpeeds(0, drivePower, 0),
-      driveYaw));
-    
+      m_DriveSubsystem.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
+        new ChassisSpeeds(0, drivePower, 0),
+        driveYaw));
     // Debugging Print Statments
     SmartDashboard.putNumber("Current Angle: ", currentAngle);
     SmartDashboard.putNumber("Error " ,error);
@@ -89,6 +87,6 @@ public class BalanceCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(error) < 3; 
+    return Math.abs(error) < 3;
   }
 }

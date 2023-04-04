@@ -89,7 +89,7 @@ public class TunableBalanceCommand extends CommandBase {
     
     errorDT = (error - prevError)/0.02;
     error = Constants.Drivetrain.balanceGoalDegrees - currentAngle;
-    drivePower = -(Math.min(p * error + d * errorDT , 1) + ff);
+    drivePower = (Math.min(p * error + d * errorDT , 1) + ff);
 
     //Robot might need an extra push when going up backwards
     if (drivePower < 0) {
@@ -99,12 +99,10 @@ public class TunableBalanceCommand extends CommandBase {
     // Limit the max power
     if (Math.abs(drivePower) > 0.9) {
       drivePower = Math.copySign(0.9, drivePower);
-    }
-
-    m_DriveSubsystem.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
-      new ChassisSpeeds(0, drivePower, 0),
-      driveYaw));
-    
+    } 
+      m_DriveSubsystem.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
+        new ChassisSpeeds(0, drivePower, 0),
+        driveYaw));
     // Debugging Print Statments
     SmartDashboard.putNumber("Current Angle: ", currentAngle);
     SmartDashboard.putNumber("Error " ,error);
@@ -122,6 +120,6 @@ public class TunableBalanceCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(error) < 3; 
+    return Math.abs(error) <3;
   }
 }
