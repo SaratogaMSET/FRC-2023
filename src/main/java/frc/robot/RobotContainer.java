@@ -42,6 +42,7 @@ import frc.robot.commands.Drivetrain.ZeroGyroCommand;
 import frc.robot.commands.GroundIntakeCommands.ActuatorDefaultCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
+import frc.robot.commands.GroundIntakeCommands.ManualSetAngleDriver;
 import frc.robot.commands.Vision.AlignCommand;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem;
@@ -285,9 +286,10 @@ public class RobotContainer {
     m_gunner1.button(11).onTrue(ArmSequences.groundIntakeCone(m_armSubsystem, m_claw,  1)); // TODO: make 0 when collision detection working
     m_gunner1.button(11).and(m_gunner1.button(1)).onTrue(ArmSequences.groundIntakeCone(m_armSubsystem, m_claw, 1));
 
+
     m_gunner1.button(1).whileTrue(
-      new ParallelCommandGroup(new ManualSetAngle(actuatorSubsystem, 95), new ManualRunIntakeCommand(rollers, 0.7))) //.until( ()-> (m_claw.isGamepieceInRange() && m_claw.getGamePieceType() != null))))
-      .onFalse(new ParallelCommandGroup(new ManualSetAngle(actuatorSubsystem, 10), new ManualRunIntakeCommand(rollers, 0.0)));
+      new ParallelCommandGroup(new ManualSetAngleDriver(actuatorSubsystem, 95), new ManualRunIntakeCommand(rollers, 0.7))) //.until( ()-> (m_claw.isGamepieceInRange() && m_claw.getGamePieceType() != null))))
+      .onFalse(new ParallelCommandGroup(new ManualSetAngleDriver(actuatorSubsystem, 10), new ManualRunIntakeCommand(rollers, 0.0)));
 
       m_gunner1.button(2).whileTrue(
         new ManualRunIntakeCommand(rollers, -0.5)) //)

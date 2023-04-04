@@ -17,11 +17,11 @@ public class ActuatorDefaultCommand extends CommandBase{
 
     @Override
     public void execute(){
-        if(actuator.getCurrent() > GroundIntake.currentLimit){
-            actuator.setVoltageActuator(0);
-        }
-        else{
+        // if(actuator.getCurrent() > GroundIntake.currentLimit){
+        //     actuator.setVoltageActuator(0);
+        // }
+        // else{
             actuator.tuneGravityCompensation();
-        }
+        // }
     }
 }

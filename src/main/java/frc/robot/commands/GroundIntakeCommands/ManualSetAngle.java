@@ -25,18 +25,15 @@ public class ManualSetAngle extends CommandBase {
 
     @Override
     public void execute(){
-        if(gIntakeSubsystem.getCurrent() > GroundIntake.currentLimit){
-            gIntakeSubsystem.setVoltageActuator(0);
-        }
-        else{
+        // else{
             gIntakeSubsystem.set_angle(angle, 100);
-            SmartDashboard.putBoolean("Command running", true);
-        }
+            // SmartDashboard.putBoolean("Command running", true);
+        // }
     }
 
     @Override
     public void end(boolean interrupted){
-        SmartDashboard.putBoolean("Command running", false);
+        // SmartDashboard.putBoolean("Command running", false);
         // if(interrupted){
         //     new ManualSetAngle(gIntakeSubsystem, 10).schedule();
         // }

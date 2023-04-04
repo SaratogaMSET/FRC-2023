@@ -23,6 +23,8 @@ public class MoveWithClosest90 extends CommandBase {
     double yT;
     int axis = 0;
     double lastRot;
+    double minArmValue = 0.3; 
+    double maxArmValue = 1.18; 
     public MoveWithClosest90(DrivetrainSubsystem drivetrainSubsystem,
         DoubleSupplier translationXSupplier,
         DoubleSupplier translationYSupplier,
@@ -71,16 +73,21 @@ public class MoveWithClosest90 extends CommandBase {
         // double iLerp = (armY - minArmHeight) /(minArmHeight - maxArmHeight);
         // double divider  = Math.max(0.0, Math.min(1.0, iLerp)) * 2.5;
 
-        if(armHeight.getAsDouble() > ArmNodeDictionary.ready_midcube_score_y){
-
-            drivetrain.drive(
-                // ChassisSpeeds.fromFieldRelativeSpeeds(
-                new ChassisSpeeds(
-                resultX/2.25,
-                resultY/2.25,
-                pidValue)
+        if(armY > 0.3){      
+            if(armHeight.getAsDouble() > minArmValue) {//start slow                 Constants.ArmNodeDictionary.ready_midcube_score_y){
+                double iLerp = (armY - minArmValue) / (minArmValue - maxArmValue); //inverse linear interpolation to get from 0 to 1 between min and max arm heights
+                double speedMultiplier = 1 + Math.max(0.0, Math.min(1.0, iLerp)) * (1.5); //clamp it actually between 0 to 1 in case oops! incident
+                drivetrain.drive(
+                        // ChassisSpeeds.fromFieldRelativeSpeeds(
+                        new ChassisSpeeds(
+                        resultX/speedMultiplier,
+                        resultY/speedMultiplier,
+                        pidValue)
+                        // m_drivetrainSubsystem.getRotation2d()
+                        // )
                 );
-     }
+         }
+        }
     else if(actuatorHeight.getAsDouble() > 50){
         drivetrain.drive(
             // ChassisSpeeds.fromFieldRelativeSpeeds(

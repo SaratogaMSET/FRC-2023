@@ -32,6 +32,7 @@ import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.TunableBalanceCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
+import frc.robot.commands.GroundIntakeCommands.ManualSetAngleDriver;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
@@ -105,7 +106,7 @@ public class AutonSequences {
             // new ArmZeroCommand(m_armSubsystem),
             new SequentialCommandGroup(
               new BalanceCommand(m_drivetrainSubsystem),
-              new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.5, 0, 0).withTimeout(0.9), //TODO: tune
+              new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.45, 0, 0).withTimeout(1), //TODO: tune
               new InstantCommand(()-> m_drivetrainSubsystem.setX())
             )
             )
@@ -162,7 +163,7 @@ public class AutonSequences {
               // new ArmZeroCommand(m_armSubsystem),
               new SequentialCommandGroup(
                 new TunableBalanceCommand(m_drivetrainSubsystem),
-                new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.8, 0, 0).withTimeout(1), //TODO: tune 
+                new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.45, 0, 0).withTimeout(1), //TODO: tune 
                 new InstantCommand(()-> m_drivetrainSubsystem.setX())
               )
               )
@@ -218,7 +219,7 @@ public class AutonSequences {
             // new ArmZeroCommand(m_armSubsystem),
             new SequentialCommandGroup(
               new TunableBalanceCommand(m_drivetrainSubsystem),
-              new AutoRunCommand(m_drivetrainSubsystem, -((6 * 0.1524)/1.8), 0, 0).withTimeout(1), //TODO: tune 
+              new AutoRunCommand(m_drivetrainSubsystem, -((6 * 0.1524)/1.45), 0, 0).withTimeout(1), //TODO: tune 
               new InstantCommand(()-> m_drivetrainSubsystem.setX())
             )
             )
@@ -276,7 +277,7 @@ public class AutonSequences {
             new ArmZeroCommand(m_armSubsystem),
             new SequentialCommandGroup(
               new BalanceCommand(m_drivetrainSubsystem),
-              new AutoRunCommand(m_drivetrainSubsystem, -((6 * 0.1524)/1.8), 0, 0).withTimeout(1), //TODO: tune 
+              new AutoRunCommand(m_drivetrainSubsystem, -((6 * 0.1524)/1.45), 0, 0).withTimeout(1), //TODO: tune 
               new InstantCommand(()-> m_drivetrainSubsystem.setX())
             )
             )
@@ -312,7 +313,7 @@ public class AutonSequences {
         List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Middle Path Builder", new PathConstraints(1, 1));
         Command build = swerveAutoBuilder.fullAuto(trajectory);
         // ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds((6 * 0.1524)/1.5, 0, 0, m_drivetrainSubsystem.getRotation2d());
-        return build.andThen(new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.55, 0, 0).withTimeout(1)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
+        return build.andThen(new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.45, 0, 0).withTimeout(1)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
 
       }
     
@@ -416,11 +417,15 @@ public class AutonSequences {
           Map.ofEntries(
           Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, m_claw, 1)),
           Map.entry("Arm Neutral", new ArmZeroCommand(m_armSubsystem)),
-          Map.entry("Intake Front", new ManualSetAngle(actuator, 95)),
+          Map.entry("Intake Front", new ManualSetAngleDriver(actuator, 95)),
           Map.entry("Run Rollers", new ManualRunIntakeCommand(rollers, 0.7)),
-          Map.entry("Zero Intake", new ManualSetAngle(actuator, 10)),
+          Map.entry("Zero Intake", new ManualSetAngleDriver(actuator, 10)),
           Map.entry("Zero Roller Speed", new ManualRunIntakeCommand(rollers, 0.0)),
-          Map.entry("Score Low", new ManualRunIntakeCommand(rollers, -0.7))
+          Map.entry("Score Low", new ManualRunIntakeCommand(rollers, -0.7)),
+          Map.entry("Down Intake", new ManualSetAngleDriver(actuator, 95)),
+          Map.entry("Running Rollers", new ManualRunIntakeCommand(rollers, 0.7)),
+          Map.entry("Intake Up", new ManualSetAngleDriver(actuator, 10)),
+          Map.entry("Stop Rollers",  new ManualRunIntakeCommand(rollers, 0.0) )
           )
        );
         
@@ -446,9 +451,9 @@ public class AutonSequences {
           Map.ofEntries(
           Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, m_claw, 1)),
           Map.entry("Arm Neutral", new ArmZeroCommand(m_armSubsystem)),
-          Map.entry("Intake Front", new ManualSetAngle(actuator, 95)),
+          Map.entry("Intake Front", new ManualSetAngleDriver(actuator, 95)),
           Map.entry("Run Rollers", new ManualRunIntakeCommand(rollers, 0.7)),
-          Map.entry("Zero Intake", new ManualSetAngle(actuator, 10)),
+          Map.entry("Zero Intake", new ManualSetAngleDriver(actuator, 10)),
           Map.entry("Zero Roller Speed", new ManualRunIntakeCommand(rollers, 0.0)),
           Map.entry("Score Low", new ManualRunIntakeCommand(rollers, -0.7)),
           // Map.entry("Arm Neutral Command", new ArmZeroCommand(m_armSubsystem)),
@@ -470,9 +475,9 @@ public class AutonSequences {
           true,
           m_drivetrainSubsystem);
 
-        List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Top Path", new PathConstraints(4, 3), new PathConstraints(2, 1.5), new PathConstraints(2, 3));
+        List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Top Path", new PathConstraints(4, 3), new PathConstraints(2, 1.5), new PathConstraints(3, 4));
         Command build = swerveAutoBuilder.fullAuto(trajectory);
-        return build.andThen(new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.55, 0, 0).withTimeout(1)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
+        return build.andThen(new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.45, 0, 0).withTimeout(1)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
       }
       public static SequentialCommandGroup getOnePieceCommandOnly(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ClawSubsystem m_claw){
         // PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("One Piece", 4, 1);
@@ -509,11 +514,7 @@ public class AutonSequences {
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           new SequentialCommandGroup(
-            ArmSequences.scoreConeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 1),
-            new WaitCommand(0.65),
-            // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
-            // new RunCommand(()->m_claw.openIntake(), m_claw).withTimeout(0.5)
-            new ManualOpenIntake(m_claw),
+            ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, m_claw, 1),
             // new InstantCommand(()->SmartDashboard.putBoolean("Claw Opened", false)),
             new ParallelCommandGroup(
             new ArmZeroAutoCommand(m_armSubsystem)

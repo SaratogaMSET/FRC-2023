@@ -28,29 +28,29 @@ public class ManualSetAngleDriver extends CommandBase {
     }
 
     @Override
+    public void initialize(){
+        errorSum =0;
+        errorDT = 0;
+    }
+    @Override
     public void execute(){
 
-        if(gIntakeSubsystem.getCurrent() > GroundIntake.currentLimit){
-            gIntakeSubsystem.setVoltageActuator(0);
-        }
-        else{
-            if(Math.abs(angle - gIntakeSubsystem.get_position_degrees()) > 3){
-                errorDT = (error - prevError)/0.02;
-                error = angle - gIntakeSubsystem.get_position_degrees();
-                errorSum += error;
-                gIntakeSubsystem.set_angle(angle, 100, errorSum, errorDT);
-                SmartDashboard.putBoolean("Command running", true);
-                prevError = error;
-            }
-            else{
-                gIntakeSubsystem.tuneGravityCompensation();
-            }
-        }
+        // if(gIntakeSubsystem.getCurrent() > GroundIntake.currentLimit){
+        //     gIntakeSubsystem.setVoltageActuator(0);
+        // }
+        // else{
+            error = angle - gIntakeSubsystem.get_position_degrees();
+            errorDT = (error - prevError)/0.02;
+            errorSum += error;
+            gIntakeSubsystem.set_angle(angle, 100, errorSum, errorDT);
+            SmartDashboard.putBoolean("Command running", true);
+            prevError = error;
+        // }
     }
 
     @Override
     public void end(boolean interrupted){
-        SmartDashboard.putBoolean("Command running", false);
+        // SmartDashboard.putBoolean("Command running", false);
         // if(interrupted){
         //     new ManualSetAngle(gIntakeSubsystem, 10).schedule();
         // }
@@ -60,6 +60,9 @@ public class ManualSetAngleDriver extends CommandBase {
     public boolean isFinished(){
         // if(Math.abs(angle - gIntakeSubsystem.get_position_degrees()) < 3)
         // return true;
+        // if(gIntakeSubsystem.getVoltage() < GroundIntake.voltageLimit){
+        //     return true;
+        // }
         return false;
     }
 }

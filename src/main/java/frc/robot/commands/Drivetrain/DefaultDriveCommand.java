@@ -17,6 +17,8 @@ public class DefaultDriveCommand extends CommandBase {
     private final DoubleSupplier m_rotationSupplier;
     private final DoubleSupplier armHeight;
     private final DoubleSupplier actuatorHeight;
+    // double minArmValue = 0.3; 
+    // double maxArmValue = 1.18; 
     private double m_translationXTrapezoidal = 0;
     private double m_translationYTrapezoidal = 0;
 
@@ -56,17 +58,23 @@ public class DefaultDriveCommand extends CommandBase {
         SmartDashboard.putNumber("m_translationYSupplier", m_translationYTrapezoidal);
         SmartDashboard.putNumber("m_rotationSupplier", m_rotationSupplier.getAsDouble());
         SmartDashboard.putNumber("Magnitude", magnitude);
+        double armY = armHeight.getAsDouble(); 
 
-         if(armHeight.getAsDouble() > ArmNodeDictionary.ready_midcube_score_y){
-
+        if(armY > 0.3){      
+            // if(armHeight.getAsDouble() > minArmValue) {//start slow                 Constants.ArmNodeDictionary.ready_midcube_score_y){
+            //     double iLerp = (armY - minArmValue) / (minArmValue - maxArmValue); //inverse linear interpolation to get from 0 to 1 between min and max arm heights
+            //     double speedMultiplier = 1 + Math.max(0.0, Math.min(1.0, iLerp)) * (1.5); //clamp it actually between 0 to 1 in case oops! incident
                 m_drivetrainSubsystem.drive(
-                    // ChassisSpeeds.fromFieldRelativeSpeeds(
-                    new ChassisSpeeds(
-                    resultX/2.25,
-                    resultY/2.25,
-                    m_rotationSupplier.getAsDouble()/1.5 * multiplier)
-                    );
+                        // ChassisSpeeds.fromFieldRelativeSpeeds(
+                        new ChassisSpeeds(
+                        resultX/2.5,
+                        resultY/2.5,
+                        m_rotationSupplier.getAsDouble()/1.5 * multiplier)
+                        // m_drivetrainSubsystem.getRotation2d()
+                        // )
+                );
          }
+        // }
         else if(actuatorHeight.getAsDouble() > 50){
             m_drivetrainSubsystem.drive(
                 // ChassisSpeeds.fromFieldRelativeSpeeds(

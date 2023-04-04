@@ -58,12 +58,12 @@
         "y": 4.2673342117517565
       },
       "prevControl": {
-        "x": 3.4458319663167134,
-        "y": 5.130195104140209
+        "x": 3.790169211694356,
+        "y": 5.395310600826004
       },
       "nextControl": {
-        "x": 3.4458319663167134,
-        "y": 5.130195104140209
+        "x": 3.790169211694356,
+        "y": 5.395310600826004
       },
       "holonomicAngle": 180.0,
       "isReversal": true,
@@ -81,16 +81,19 @@
     },
     {
       "anchorPoint": {
-        "x": 3.78349587601953,
-        "y": 4.75240352390427
+        "x": 6.379826144186187,
+        "y": 4.232990217392865
       },
       "prevControl": {
-        "x": 3.7548483549304605,
-        "y": 4.75240352390427
+        "x": 6.375675359218042,
+        "y": 4.232990217392865
       },
-      "nextControl": null,
-      "holonomicAngle": 180.0,
-      "isReversal": false,
+      "nextControl": {
+        "x": 6.375675359218042,
+        "y": 4.232990217392865
+      },
+      "holonomicAngle": -45.0,
+      "isReversal": true,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
@@ -100,8 +103,36 @@
         "waitBehavior": "none",
         "waitTime": 0
       }
+    },
+    {
+      "anchorPoint": {
+        "x": 7.275852735850952,
+        "y": 3.3584094931254835
+      },
+      "prevControl": {
+        "x": 7.291867942143324,
+        "y": 3.3505155887430424
+      },
+      "nextControl": null,
+      "holonomicAngle": -45.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "Intake Up",
+          "Stop Rollers"
+        ],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
     }
   ],
+  "maxVelocity": 2.0,
+  "maxAcceleration": 3.0,
+  "isReversed": null,
   "markers": [
     {
       "position": 0.057421875000000046,
@@ -132,6 +163,13 @@
       "position": 1.37,
       "names": [
         "Zero Intake"
+      ]
+    },
+    {
+      "position": 3.3214488636363644,
+      "names": [
+        "Down Intake",
+        "Running Rollers"
       ]
     }
   ]
