@@ -129,7 +129,6 @@ public class ActuatorSubsystem extends SubsystemBase {
             Actuator.setVoltage((k_PUp * error * power) - gravity);
         }
         else{
-            Actuator.setVoltage(((k_P * error + k_I * integralError + k_D * velocityError)* power)- gravity);
             
             double outputVoltage = (k_P * error + k_I * integralError + k_D * velocityError- gravity) * power;
             SmartDashboard.putNumber("More Pain", outputVoltage );
