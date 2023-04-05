@@ -30,7 +30,9 @@ public class ManualRunIntakeCommand extends CommandBase {
         if(roller.objectInRoller()){
             roller.set_intake(0.02);
         }
-        roller.set_intake(0);
+        else{
+            roller.set_intake(0);
+        }
     }
 
     @Override
