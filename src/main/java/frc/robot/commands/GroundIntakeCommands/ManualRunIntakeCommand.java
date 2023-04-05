@@ -8,12 +8,18 @@ public class ManualRunIntakeCommand extends CommandBase {
     
     RollerSubsystem roller;
     double speed =0;
+    boolean useIRGate = true;
     public ManualRunIntakeCommand(RollerSubsystem rollerSubsystem, double speed){
         this.roller = rollerSubsystem;
         this.speed = speed;
         addRequirements(rollerSubsystem);
     }
-
+    public ManualRunIntakeCommand(RollerSubsystem rollerSubsystem, double speed, boolean IRGate){
+        this.roller = rollerSubsystem;
+        this.speed = speed;
+        this.useIRGate = IRGate;
+        addRequirements(rollerSubsystem);
+    }
     @Override
     public void execute(){
         roller.set_intake(speed);
@@ -30,7 +36,9 @@ public class ManualRunIntakeCommand extends CommandBase {
     @Override
     public boolean isFinished(){
         if(speed>0){
+            if(useIRGate){
             return roller.objectInRoller();
+            }
         }
         return false;
     }

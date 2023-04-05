@@ -296,8 +296,8 @@ public class RobotContainer {
         .onFalse(new ManualRunIntakeCommand(rollers, 0.0));
 
       m_gunner1.button(12).whileTrue(
-        new ManualRunIntakeCommand(rollers, -1)) //)
-        .onFalse(new ManualRunIntakeCommand(rollers, 0.0));
+        new ManualRunIntakeCommand(rollers, 0.25, false)
+      );
     // m_gunner1.button(12).whileTrue(ArmSequences.groundIntakeTest(m_armSubsystem, m_claw, actuatorSubsystem, rollers, 0))
     // .onFalse(new ManualRunIntakeCommand(rollers,0)); 
     // m_gunner1.button(12).and(m_gunner1.button(1)).whileTrue(ArmSequences.groundIntakeTest(m_armSubsystem, m_claw, actuatorSubsystem, rollers, 1))
