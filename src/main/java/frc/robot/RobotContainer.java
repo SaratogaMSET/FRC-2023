@@ -65,7 +65,7 @@ public class RobotContainer {
   public static final String OneAndBalanceBottom = "One And Balance Bump Side";
   public static final String TwoPieceTop = "Cone Preload and Cube score Barrier Side";
   public static final String OnePiece = "One Piece + Community Bonus Anywhere but Middle";
-  public static final String OnePlusHalf = "Score, get One more and Balance Bottom";
+  public static final String OnePlusHalf = "Score, get One more and Balance Bump Side";
   // public String m_autoSelected;  
   public static final String OneAndNothing = "One Score and NOTHING ELSE";
   public static final String PhyscoBehavior = "Two Piece + Balance Barrier Side";
@@ -132,7 +132,7 @@ public class RobotContainer {
     m_autoSwitcher.addOption(OnePiece, OnePiece);
     // m_autoSwitcher.addOption(TwoPieceTop, TwoPieceTop);
     m_autoSwitcher.addOption(OneAndBalanceBottom, OneAndBalanceBottom);
-    // m_autoSwitcher.addOption(OnePlusHalf, OnePlusHalf);
+    m_autoSwitcher.addOption(OnePlusHalf, OnePlusHalf);
     m_autoSwitcher.addOption(BalanceMobilityBonus, BalanceMobilityBonus);
     m_autoSwitcher.addOption(PhyscoBehavior, PhyscoBehavior);
     m_autoSwitcher.addOption(TwoPieceNoBalance, TwoPieceNoBalance);
@@ -174,7 +174,7 @@ public class RobotContainer {
             m_drivetrainSubsystem,
             () -> modifyAxis(m_driverController.getLeftX() * 1.2) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
             () -> modifyAxis(-m_driverController.getLeftY() * 1.2) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> modifyAxis(-m_driverController.getRightX()/1.4) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
+            () -> modifyAxis(-m_driverController.getRightX()/1.3) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
             () -> m_armSubsystem.getYPosition(),
             ()-> actuatorSubsystem.get_position_degrees()
     ));
@@ -377,11 +377,11 @@ public class RobotContainer {
       case TwoPieceTop:
         return AutonSequences.getTwoPieceTopCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case OnePlusHalf:
-        return AutonSequences.getTwoPieceAndBalanceBottomCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
+        return AutonSequences.getBottomOneAndHalfPieceBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case OneAndNothing:
         return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case BalanceMobilityBonus:
-        return AutonSequences.getOnePieceBalanceMobilityBonus(m_drivetrainSubsystem, m_armSubsystem, m_claw);
+        return AutonSequences.getOnePieceBalanceMobilityBonus(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case PhyscoBehavior:
           return AutonSequences.getTwoPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case TwoPieceNoBalance:

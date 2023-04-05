@@ -1,0 +1,151 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 1.8771995738435923,
+        "y": 0.5007840501792108
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.8771995738435914,
+        "y": 0.5007840501792108
+      },
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "Score Cone High Backwards"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "after",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 3.1659820559224454,
+        "y": 0.7
+      },
+      "prevControl": {
+        "x": 2.0646084397114346,
+        "y": 0.7
+      },
+      "nextControl": {
+        "x": 4.2673556721334585,
+        "y": 0.7
+      },
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "Arm Zero Command"
+        ],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.7845420847091695,
+        "y": 0.7
+      },
+      "prevControl": {
+        "x": 3.995349712535441,
+        "y": 0.7
+      },
+      "nextControl": {
+        "x": 6.076056017091352,
+        "y": 0.7
+      },
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 7.035065837433935,
+        "y": 0.9283189399712141
+      },
+      "prevControl": {
+        "x": 6.27840351493746,
+        "y": 0.9704030047895893
+      },
+      "nextControl": {
+        "x": 6.27840351493746,
+        "y": 0.9704030047895893
+      },
+      "holonomicAngle": 0,
+      "isReversal": true,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.857397706497391,
+        "y": 2.1322990615614
+      },
+      "prevControl": {
+        "x": 6.556640476451856,
+        "y": 2.15296922737207
+      },
+      "nextControl": null,
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "Balance Command"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "after",
+        "waitTime": 0
+      }
+    }
+  ],
+  "markers": [
+    {
+      "position": 2.432244318181818,
+      "names": [
+        "Intake Front",
+        "Rollers Run"
+      ]
+    },
+    {
+      "position": 3.434375,
+      "names": [
+        "Intake Zero",
+        "Zero Rollers"
+      ]
+    },
+    {
+      "position": 0.34076704545454545,
+      "names": [
+        "Arm Zero Command"
+      ]
+    }
+  ]
+}

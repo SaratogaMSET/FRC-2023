@@ -171,6 +171,12 @@
         "Down Intake",
         "Running Rollers"
       ]
+    },
+    {
+      "position": 2.7562500000000014,
+      "names": [
+        "Arm is Neutral"
+      ]
     }
   ]
 }

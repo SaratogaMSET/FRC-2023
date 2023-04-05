@@ -73,15 +73,15 @@ public class MoveWithClosest90 extends CommandBase {
         // double iLerp = (armY - minArmHeight) /(minArmHeight - maxArmHeight);
         // double divider  = Math.max(0.0, Math.min(1.0, iLerp)) * 2.5;
 
-        if(armY > 0.3){      
+        if(armY > Constants.ArmNodeDictionary.ready_midcube_score_y){      
             if(armHeight.getAsDouble() > minArmValue) {//start slow                 Constants.ArmNodeDictionary.ready_midcube_score_y){
-                double iLerp = (armY - minArmValue) / (minArmValue - maxArmValue); //inverse linear interpolation to get from 0 to 1 between min and max arm heights
-                double speedMultiplier = 1 + Math.max(0.0, Math.min(1.0, iLerp)) * (1.5); //clamp it actually between 0 to 1 in case oops! incident
+                // double iLerp = (armY - minArmValue) / (minArmValue - maxArmValue); //inverse linear interpolation to get from 0 to 1 between min and max arm heights
+                // double speedMultiplier = 1 + Math.max(0.0, Math.min(1.0, iLerp)) * (1.5); //clamp it actually between 0 to 1 in case oops! incident
                 drivetrain.drive(
                         // ChassisSpeeds.fromFieldRelativeSpeeds(
                         new ChassisSpeeds(
-                        resultX/speedMultiplier,
-                        resultY/speedMultiplier,
+                        resultX/2.5,
+                        resultY/2.5,
                         pidValue)
                         // m_drivetrainSubsystem.getRotation2d()
                         // )

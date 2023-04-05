@@ -285,13 +285,17 @@ public class AutonSequences {
         );
       }
 
-      public static Command getOnePieceBalanceMobilityBonus(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ClawSubsystem m_claw){
+      public static Command getOnePieceBalanceMobilityBonus(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers,ClawSubsystem m_claw){
 
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
           Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, m_claw, 1)),
           // Map.entry("Arm Low Score Backwards", ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 1)),
           Map.entry("Arm Zero Command", new ArmZeroAutoCommand(m_armSubsystem)), 
+          Map.entry("Intake Front", new ManualSetAngle(actuatorSubsystem, 95)),
+          Map.entry("Run Rollers", new ManualRunIntakeCommand(rollers, 0.7)),
+          Map.entry("Zero Intake", new ManualSetAngle(actuatorSubsystem, 10)),
+          Map.entry("Zero Rollers", new ManualRunIntakeCommand(rollers, 0)),
           // Map.entry("Arm Extend Low", ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 0)),
           Map.entry("Balance Command", new TunableBalanceCommand(m_drivetrainSubsystem))
           // Map.entry("Arm Neutral Command", new ArmZeroCommand(m_armSubsystem))
@@ -310,13 +314,49 @@ public class AutonSequences {
           true,
           m_drivetrainSubsystem);
 
-        List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Middle Path Builder", new PathConstraints(1, 1));
+        List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Middle Path Builder", new PathConstraints(1.25, 1.25));
         Command build = swerveAutoBuilder.fullAuto(trajectory);
         // ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds((6 * 0.1524)/1.5, 0, 0, m_drivetrainSubsystem.getRotation2d());
         return build.andThen(new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.45, 0, 0).withTimeout(1)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
 
       }
     
+      public static Command getBottomOneAndHalfPieceBalance(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers, ClawSubsystem m_claw){
+
+        final HashMap<String, Command> eventMap = new HashMap<>(
+          Map.ofEntries(
+          Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, m_claw, 1)),
+          // Map.entry("Arm Low Score Backwards", ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 1)),
+          Map.entry("Arm Zero Command", new ArmZeroCommand(m_armSubsystem)), 
+          Map.entry("Intake Front", new ManualSetAngle(actuatorSubsystem, 95)),
+          Map.entry("Rollers Run", new ManualRunIntakeCommand(rollers, 0.7)),
+          Map.entry("Intake Zero", new ManualSetAngle(actuatorSubsystem, 10)),
+          Map.entry("Zero Rollers", new ManualRunIntakeCommand(rollers, 0)),
+          // Map.entry("Arm Extend Low", ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 0)),
+          Map.entry("Balance Command", new TunableBalanceCommand(m_drivetrainSubsystem))
+          // Map.entry("Arm Neutral Command", new ArmZeroCommand(m_armSubsystem))
+          )
+          );
+        
+        // 1.0676
+        BetterSwerveAutoBuilder swerveAutoBuilder = new BetterSwerveAutoBuilder(
+          m_drivetrainSubsystem::getPose, 
+          m_drivetrainSubsystem::resetOdometry, 
+          new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
+          new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
+          new PIDConstants(Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory),
+          m_drivetrainSubsystem::drive, 
+          eventMap, 
+          true,
+          m_drivetrainSubsystem);
+
+        List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Bottom Balance Pickup", new PathConstraints(2, 1), new PathConstraints(3, 3));
+        Command build = swerveAutoBuilder.fullAuto(trajectory);
+        // ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds((6 * 0.1524)/1.5, 0, 0, m_drivetrainSubsystem.getRotation2d());
+        return build.andThen(new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.45, 0, 0).withTimeout(1)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
+
+      }
+
       public static SequentialCommandGroup getOnePieceCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ClawSubsystem m_claw){
         PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("One Piece", 4, 1);
         PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
@@ -380,7 +420,7 @@ public class AutonSequences {
           Map.ofEntries(
           Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, m_claw, 1)),
           Map.entry("Arm Neutral", new ArmZeroCommand(m_armSubsystem)),
-          Map.entry("Intake Front", new ManualSetAngle(actuator, 97.5)),
+          Map.entry("Intake Front", new ManualSetAngle(actuator, 95)),
           Map.entry("Run Rollers", new ManualRunIntakeCommand(rollers, 0.7)),
           Map.entry("Zero Intake", new ManualSetAngle(actuator, 10)),
           Map.entry("Zero Roller Speed", new ManualRunIntakeCommand(rollers, 0.0)),
@@ -388,7 +428,7 @@ public class AutonSequences {
           // Map.entry("Arm Neutral Command", new ArmZeroCommand(m_armSubsystem)),
           // Map.entry("Low Score Backwards", ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 1)),
           Map.entry("Arm Zero", new ArmZeroCommand(m_armSubsystem)),
-          Map.entry("Front Intake", new ManualSetAngle(actuator, 97.5)),
+          Map.entry("Front Intake", new ManualSetAngle(actuator, 95)),
           Map.entry("Rollers Run", new ManualRunIntakeCommand(rollers, 0.7)),
           Map.entry("Roll Intake Up", new ManualSetAngle(actuator, 10)),
           Map.entry("Extake Cube", new ManualRunIntakeCommand(rollers, -1))
@@ -422,6 +462,7 @@ public class AutonSequences {
           Map.entry("Zero Intake", new ManualSetAngleDriver(actuator, 10)),
           Map.entry("Zero Roller Speed", new ManualRunIntakeCommand(rollers, 0.0)),
           Map.entry("Score Low", new ManualRunIntakeCommand(rollers, -0.7)),
+          Map.entry("Arm is Neutral", new ArmZeroCommand(m_armSubsystem)),
           Map.entry("Down Intake", new ManualSetAngleDriver(actuator, 95)),
           Map.entry("Running Rollers", new ManualRunIntakeCommand(rollers, 0.7)),
           Map.entry("Intake Up", new ManualSetAngleDriver(actuator, 10)),

@@ -26,15 +26,15 @@
     },
     {
       "anchorPoint": {
-        "x": 6.9,
+        "x": 7.25,
         "y": 2.78
       },
       "prevControl": {
-        "x": 6.276915150278663,
+        "x": 6.626915150278663,
         "y": 2.78
       },
       "nextControl": {
-        "x": 6.276915150278663,
+        "x": 6.626915150278663,
         "y": 2.78
       },
       "holonomicAngle": 0,
@@ -82,6 +82,20 @@
       "position": 0.07784090909090909,
       "names": [
         "Arm Zero Command"
+      ]
+    },
+    {
+      "position": 0.7839488636363634,
+      "names": [
+        "Intake Front",
+        "Run Rollers"
+      ]
+    },
+    {
+      "position": 1.1885653409090893,
+      "names": [
+        "Zero Intake",
+        "Zero Rollers"
       ]
     }
   ]
