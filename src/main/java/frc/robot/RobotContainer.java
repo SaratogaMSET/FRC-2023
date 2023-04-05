@@ -42,7 +42,6 @@ import frc.robot.commands.Drivetrain.MoveWithClosest90;
 import frc.robot.commands.Drivetrain.TunableBalanceCommand;
 import frc.robot.commands.Drivetrain.ZeroGyroCommand;
 import frc.robot.commands.GroundIntakeCommands.ActuatorDefaultCommand;
-import frc.robot.commands.GroundIntakeCommands.HoldCubeInCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngleDriver;
@@ -238,7 +237,6 @@ public class RobotContainer {
     )));
 
     // m_gunner1.button(1).whileTrue(m_ledSubsystem.indicateActiveSide());
-    m_gunner1.button(3).toggleOnTrue(new ConditionalCommand(m_ledSubsystem.indicateConeCommand(), m_ledSubsystem.indicateCubeCommand(), () -> m_gunner1.button(3).getAsBoolean()));
     m_gunner1.button(3).toggleOnTrue(new ConditionalCommand(new IndicateConeCommand(m_ledSubsystem), new IndicateCubeCommand(m_ledSubsystem), () -> m_gunner1.button(3).getAsBoolean()));
     // m_gunner1.button(3).toggleOnFalse(m_ledSubsystem.indicateConeCommand());
     
