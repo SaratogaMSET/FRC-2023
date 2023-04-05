@@ -262,14 +262,14 @@ public class AutonSequences {
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           new SequentialCommandGroup(
-            ArmSequences.scoreConeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 1),
-            new WaitCommand(0.65),
+            ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, m_claw, 1),
+            // new WaitCommand(0.65),
             // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
             // new RunCommand(()->m_claw.openIntake(), m_claw).withTimeout(0.5)
-            new ManualOpenIntake(m_claw),
+            // new ManualOpenIntake(m_claw),
             // new InstantCommand(()->SmartDashboard.putBoolean("Claw Opened", false)),
             new ParallelCommandGroup(
-            new ArmZeroAutoCommand(m_armSubsystem),
+            new ArmZeroCommand(m_armSubsystem),
             swerveTrajectoryFollower
             ),
             // ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 1),
@@ -392,11 +392,9 @@ public class AutonSequences {
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           new SequentialCommandGroup(
-            ArmSequences.scoreConeHighNoRetractHighTolerance(m_armSubsystem, m_claw, 1),
-            new WaitCommand(0.65),
+            ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, m_claw, 1),
             // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
             // new RunCommand(()->m_claw.openIntake(), m_claw).withTimeout(0.5)
-            new ManualOpenIntake(m_claw),
             // new InstantCommand(()->SmartDashboard.putBoolean("Claw Opened", false)),
             new ParallelCommandGroup(
             new ArmZeroAutoCommand(m_armSubsystem),
