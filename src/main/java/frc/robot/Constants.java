@@ -321,7 +321,7 @@ public final class Constants {
         public static final double currentLimit = 52; 
         public static final double voltageLimit = 0.2;
         public static final double intakeContinousCurrentLimit = 5;
-        public static final double intakePeakCurrentLimit = 15;
+        public static final double intakePeakCurrentLimit = 20;
     }
 
     public static Mode getMode() {
