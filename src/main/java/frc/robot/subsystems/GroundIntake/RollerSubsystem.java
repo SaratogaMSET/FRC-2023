@@ -20,7 +20,7 @@ public class RollerSubsystem extends SubsystemBase {
             0.1);
     public RollerSubsystem(){
         Intake.setNeutralMode(NeutralMode.Brake);
-        Intake.configNeutralDeadband(0.01);
+        Intake.configNeutralDeadband(0.00);
         Intake.configSupplyCurrentLimit(IntakeLimit);
     }
     public void set_intake(double speed){
@@ -29,6 +29,9 @@ public class RollerSubsystem extends SubsystemBase {
 
     public boolean objectInRoller(){
         return gate.get();  
+    }
+    public double getSpeed(){
+        return Intake.get();
     }
 
     @Override

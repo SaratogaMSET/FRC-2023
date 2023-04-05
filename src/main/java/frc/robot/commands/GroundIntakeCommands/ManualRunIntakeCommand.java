@@ -23,12 +23,15 @@ public class ManualRunIntakeCommand extends CommandBase {
     @Override
     public void execute(){
         roller.set_intake(speed);
+        if(roller.objectInRoller() && speed > 0 && !useIRGate){
+            roller.set_intake(0.03);
+        }
     }
 
     @Override
     public void end(boolean interrupted){
         if(roller.objectInRoller()){
-            roller.set_intake(0.02);
+            roller.set_intake(0.03);
         }
         else{
             roller.set_intake(0);
@@ -41,6 +44,9 @@ public class ManualRunIntakeCommand extends CommandBase {
             if(useIRGate){
             return roller.objectInRoller();
             }
+        }
+        if(roller.getSpeed()  == 0.03){
+            return true;
         }
         return false;
     }

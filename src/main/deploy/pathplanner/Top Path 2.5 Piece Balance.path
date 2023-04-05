@@ -58,12 +58,12 @@
         "y": 4.149560658496317
       },
       "prevControl": {
-        "x": 4.490369147404961,
-        "y": 5.296736534445291
+        "x": 4.33192832575637,
+        "y": 5.211286806754405
       },
       "nextControl": {
-        "x": 4.490369147404961,
-        "y": 5.296736534445291
+        "x": 4.33192832575637,
+        "y": 5.211286806754405
       },
       "holonomicAngle": 180.0,
       "isReversal": true,
@@ -81,19 +81,19 @@
     },
     {
       "anchorPoint": {
-        "x": 7.389825295275592,
-        "y": 3.105139453334462
+        "x": 7.378610381337994,
+        "y": 3.1356006197181885
       },
       "prevControl": {
-        "x": 4.50672175302684,
-        "y": 5.498998550080433
+        "x": 5.577396037825267,
+        "y": 4.802904896122887
       },
       "nextControl": {
-        "x": 4.50672175302684,
-        "y": 5.498998550080433
+        "x": 9.179824724850722,
+        "y": 1.4682963433134901
       },
-      "holonomicAngle": 0,
-      "isReversal": true,
+      "holonomicAngle": -40.511082903745375,
+      "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
@@ -106,72 +106,91 @@
     },
     {
       "anchorPoint": {
-        "x": 2.213413784466458,
-        "y": 4.8829924170265
+        "x": 5.997450891441332,
+        "y": 2.7115199993111854
       },
       "prevControl": {
-        "x": 6.519541943597777,
-        "y": 4.378845064981797
+        "x": 6.7865512054359,
+        "y": 2.7115199993111854
       },
-      "nextControl": null,
-      "holonomicAngle": 167.31143107205787,
+      "nextControl": {
+        "x": 5.208350577446764,
+        "y": 2.7115199993111854
+      },
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "Cube Extake"
+          "Balance"
         ],
         "executionBehavior": "sequential",
-        "waitBehavior": "deadline",
-        "waitTime": 0.75
+        "waitBehavior": "after",
+        "waitTime": 0.0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 5.021162000304227,
+        "y": 2.71
+      },
+      "prevControl": {
+        "x": 4.628368579253325,
+        "y": 2.71
+      },
+      "nextControl": null,
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
       }
     }
   ],
+  "maxVelocity": 2.75,
+  "maxAcceleration": 5.0,
+  "isReversed": null,
   "markers": [
     {
-      "position": 0.52,
+      "position": 0.06,
+      "names": [
+        "Arm Zero Command"
+      ]
+    },
+    {
+      "position": 0.6303977272727271,
       "names": [
         "Intake Front",
         "Run Rollers"
       ]
     },
     {
-      "position": 0.62,
+      "position": 1.2210227272727268,
       "names": [
-        "Run Rollers"
-      ]
-    },
-    {
-      "position": 1.27,
-      "names": [
+        "Zero Intake",
         "Zero Roller Speed"
       ]
     },
     {
-      "position": 1.37,
-      "names": [
-        "Zero Intake"
-      ]
-    },
-    {
-      "position": 2.85909090909091,
+      "position": 2.8078125,
       "names": [
         "Front Intake",
         "Rollers Run"
       ]
     },
     {
-      "position": 3.0855113636363622,
+      "position": 3.5066761363636334,
       "names": [
-        "Roll Intake Up"
-      ]
-    },
-    {
-      "position": 0.16,
-      "names": [
-        "Arm Neutral"
+        "Intake Up",
+        "Zero Rollers",
+        "Arm Zero"
       ]
     }
   ]

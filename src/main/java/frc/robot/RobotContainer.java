@@ -31,6 +31,8 @@ import frc.robot.commands.Arm.ArmZeroCommand;
 import frc.robot.commands.Arm.ArmZeroStickyCommand;
 import frc.robot.commands.Auton.AutoRunCommand;
 import frc.robot.commands.Auton.AutonSequences;
+import frc.robot.commands.CANdle.IndicateConeCommand;
+import frc.robot.commands.CANdle.IndicateCubeCommand;
 import frc.robot.commands.CANdle.StrobeCommand;
 import frc.robot.commands.Claw.BackUpIntakeCommand;
 import frc.robot.commands.Claw.ManualCloseIntake;
@@ -40,6 +42,7 @@ import frc.robot.commands.Drivetrain.MoveWithClosest90;
 import frc.robot.commands.Drivetrain.TunableBalanceCommand;
 import frc.robot.commands.Drivetrain.ZeroGyroCommand;
 import frc.robot.commands.GroundIntakeCommands.ActuatorDefaultCommand;
+import frc.robot.commands.GroundIntakeCommands.HoldCubeInCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngleDriver;
@@ -73,6 +76,8 @@ public class RobotContainer {
   public static final String ThreePiece = "Three Piece Test Path Barrier Side";
   public static final String BalanceMobilityBonus = "Middle Balance + Mobilty Bonus + Pickup";
   public static final String BalanceMobilityBonusNoPickup = "Middle Balance + Mobility NO PICKUP";
+  public static final String TwoAndAHalfBalanceBarrier = "Barrier Side 2 Piece + Pickup";
+  public static final String BottomTwoPiece = "Bump Side Two Piece";
 
   public final SendableChooser<Boolean> autoCloseChooser = new SendableChooser<Boolean>();
   public static final Boolean disableAutoClose = false;
@@ -138,7 +143,9 @@ public class RobotContainer {
     m_autoSwitcher.addOption(BalanceMobilityBonusNoPickup, BalanceMobilityBonusNoPickup);
     m_autoSwitcher.addOption(PhyscoBehavior, PhyscoBehavior);
     m_autoSwitcher.addOption(TwoPieceNoBalance, TwoPieceNoBalance);
-    m_autoSwitcher.addOption(ThreePiece, ThreePiece);
+    // m_autoSwitcher.addOption(TwoAndAHalfBalanceBarrier,TwoAndAHalfBalanceBarrier);
+    m_autoSwitcher.addOption(BottomTwoPiece, BottomTwoPiece);
+    // m_autoSwitcher.addOption(ThreePiece, ThreePiece);
     
     
     autoCloseChooser.setDefaultOption("DISABLE the Auto Close", disableAutoClose);
@@ -232,6 +239,7 @@ public class RobotContainer {
 
     // m_gunner1.button(1).whileTrue(m_ledSubsystem.indicateActiveSide());
     m_gunner1.button(3).toggleOnTrue(new ConditionalCommand(m_ledSubsystem.indicateConeCommand(), m_ledSubsystem.indicateCubeCommand(), () -> m_gunner1.button(3).getAsBoolean()));
+    m_gunner1.button(3).toggleOnTrue(new ConditionalCommand(new IndicateConeCommand(m_ledSubsystem), new IndicateCubeCommand(m_ledSubsystem), () -> m_gunner1.button(3).getAsBoolean()));
     // m_gunner1.button(3).toggleOnFalse(m_ledSubsystem.indicateConeCommand());
     
     m_driverController.a().toggleOnTrue(new MoveWithClosest90(
@@ -290,11 +298,11 @@ public class RobotContainer {
 
 
     m_gunner1.button(1).whileTrue(
-      new ParallelCommandGroup(new ManualSetAngleDriver(actuatorSubsystem, 95), new ManualRunIntakeCommand(rollers, 0.7))) //.until( ()-> (m_claw.isGamepieceInRange() && m_claw.getGamePieceType() != null))))
+      new ParallelCommandGroup(new ManualSetAngleDriver(actuatorSubsystem, 95), new ManualRunIntakeCommand(rollers, 1))) //.until( ()-> (m_claw.isGamepieceInRange() && m_claw.getGamePieceType() != null))))
       .onFalse(new ParallelCommandGroup(new ManualSetAngleDriver(actuatorSubsystem, 10), new ManualRunIntakeCommand(rollers, 0.0)));
 
       m_gunner1.button(2).whileTrue(
-        new ManualRunIntakeCommand(rollers, -0.5)) //)
+        new ManualRunIntakeCommand(rollers, -0.375)) //)
         .onFalse(new ManualRunIntakeCommand(rollers, 0.0));
 
       m_gunner1.button(12).whileTrue(
@@ -392,6 +400,10 @@ public class RobotContainer {
         return AutonSequences.getTwoPieceNoBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers ,m_claw);
       case ThreePiece:
         return AutonSequences.getThreePieceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
+      case TwoAndAHalfBalanceBarrier:
+        return AutonSequences.getTwoAndAHalfPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
+      case BottomTwoPiece:
+        return AutonSequences.getBottomTwoPiece(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       default:
         return AutonSequences.getOnePieceCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
     }

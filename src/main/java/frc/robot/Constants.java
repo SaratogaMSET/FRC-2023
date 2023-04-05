@@ -214,7 +214,8 @@ public final class Constants {
         public static double balanceKA = 0.4;
 
         public static int allowedMaxAcceleration = 5/2;
-
+        public static double balanceXVelocity = (6 * 0.1524)/1.45;
+        public static double balanceTimeout = 1;
         // public static class ScoringTag{
 
         //         private int tagNum;
@@ -321,7 +322,7 @@ public final class Constants {
         public static final double currentLimit = 52; 
         public static final double voltageLimit = 0.2;
         public static final double intakeContinousCurrentLimit = 5;
-        public static final double intakePeakCurrentLimit = 20;
+        public static final double intakePeakCurrentLimit = 10;
     }
 
     public static Mode getMode() {

@@ -33,14 +33,8 @@ public class StrobeCommand extends CommandBase {
     @Override
     public void execute(){
 
-        // if (m_led)
         if (m_claw.hasAcquiredGamePiece()){
             candle.strobe();
-            // try {
-            //     wait(2000);
-            // } catch (Exception e) {
-            //     // TODO Auto-generated catch block
-            //     e.printStackTrace();
         }
         else {
             m_claw.setFlash(false);

@@ -117,17 +117,21 @@ public class CANdleSubsystem extends SubsystemBase {
         });
     }
 
+    public void indicateCone(){  
+        CANdleSubsystem.color = CANdleSubsystem.yellow;
+        LEDSegment.BackRightStrip.setFlowAnimation(yellow, 0.5);
+        LEDSegment.BackLeftStrip.setFlowAnimation(yellow, 0.5);
+        LEDSegment.FrontLeftStrip.setColor(yellow);
+        LEDSegment.FrontRightStrip.setColor(yellow);
+    }
+    public void indicateCube(){  
+        CANdleSubsystem.color = CANdleSubsystem.purple;
+        LEDSegment.BackRightStrip.setFlowAnimation(purple, 0.5);
+        LEDSegment.BackLeftStrip.setFlowAnimation(purple, 0.5);
+        LEDSegment.FrontLeftStrip.setColor(purple);
+        LEDSegment.FrontRightStrip.setColor(purple);
+    }
     public void strobe(){
-
-        // if (RobotContainer.m_claw.getFlash() == false){
-        //     LEDSegment.BackRightStrip.clearAnimation();
-        //     LEDSegment.BackLeftStrip.clearAnimation();
-        //     idle();
-        //     return;
-        // }
-
-        // SmartDashboard.putBoolean("flash", flash);
-
         Color newColor = new Color(CANdleSubsystem.color);    
 
         LEDSegment.BackRightStrip.setFlowAnimation(green, 0.5);
@@ -224,7 +228,7 @@ public class CANdleSubsystem extends SubsystemBase {
     }
     public Command buildSideStripCommand(Runnable runnable) {
         // if(runnable == null) return run(CANdleSubsystem::runDefaultSideAnimation);
-        return startEnd(runnable, CANdleSubsystem::runDefaultSideAnimation);
+        return startEnd(runnable, CANdleSubsystem::idle);
         // return run(runnable).finallyDo((interrupted) -> {
         //     runDefaultSideAnimation();
         // });
@@ -242,7 +246,7 @@ public class CANdleSubsystem extends SubsystemBase {
     //     runDefaultTopAnimation();
     // }s
 
-    public void idle(){
+    public static void idle(){
 
         // LEDSegment.BackLeftStrip.fullClear();
         // LEDSegment.BackRightStrip.fullClear();

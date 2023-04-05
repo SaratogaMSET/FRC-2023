@@ -91,7 +91,7 @@ public class ClawSubsystem extends SubsystemBase{
         return false; 
     }
     public boolean getConeTolerance(){
-       return encoder.getPosition() >= ClawConstants.CONE_MEDIUM_BOUND - 1;
+       return encoder.getPosition() >= ClawConstants.CONE_MEDIUM_BOUND - 4;
     }
     public boolean getCubeTolerance(){
         return encoder.getPosition() >= ClawConstants.CUBE_MEDIUM_BOUND - 1;
@@ -128,8 +128,7 @@ public class ClawSubsystem extends SubsystemBase{
             hasZeroedEncoder = true; // NEW
             resetEncoder();
         }
-        else{ 
-            //closeVelocity = -0.6;
+        else{   
 
             //NEW:
            
@@ -138,7 +137,7 @@ public class ClawSubsystem extends SubsystemBase{
                 closeVelocity = -0.25;
             }
             else{
-                closeVelocity = -0.5;
+                closeVelocity = -0.76;
             }
             //end new code
         }
