@@ -71,7 +71,8 @@ public class RobotContainer {
   public static final String PhyscoBehavior = "Two Piece + Balance Barrier Side";
   public static final String TwoPieceNoBalance = "Two Piece No Balance Barrier Side";
   public static final String ThreePiece = "Three Piece Test Path Barrier Side";
-  public static final String BalanceMobilityBonus = "Middle Balance + Mobilty Bonus";
+  public static final String BalanceMobilityBonus = "Middle Balance + Mobilty Bonus + Pickup";
+  public static final String BalanceMobilityBonusNoPickup = "Middle Balance + Mobility NO PICKUP";
 
   public final SendableChooser<Boolean> autoCloseChooser = new SendableChooser<Boolean>();
   public static final Boolean disableAutoClose = false;
@@ -134,6 +135,7 @@ public class RobotContainer {
     m_autoSwitcher.addOption(OneAndBalanceBottom, OneAndBalanceBottom);
     m_autoSwitcher.addOption(OnePlusHalf, OnePlusHalf);
     m_autoSwitcher.addOption(BalanceMobilityBonus, BalanceMobilityBonus);
+    m_autoSwitcher.addOption(BalanceMobilityBonusNoPickup, BalanceMobilityBonusNoPickup);
     m_autoSwitcher.addOption(PhyscoBehavior, PhyscoBehavior);
     m_autoSwitcher.addOption(TwoPieceNoBalance, TwoPieceNoBalance);
     m_autoSwitcher.addOption(ThreePiece, ThreePiece);
@@ -380,6 +382,8 @@ public class RobotContainer {
         return AutonSequences.getBottomOneAndHalfPieceBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case OneAndNothing:
         return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, m_claw);
+      case BalanceMobilityBonusNoPickup:
+        return AutonSequences.getOnePieceBalanceMobilityBonusNoPickup(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case BalanceMobilityBonus:
         return AutonSequences.getOnePieceBalanceMobilityBonus(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case PhyscoBehavior:

@@ -1,0 +1,85 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 1.9179071240086925,
+        "y": 2.78
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.5260738709635486,
+        "y": 2.78
+      },
+      "holonomicAngle": 0.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "Score Cone High Backwards"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "after",
+        "waitTime": 0.0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.4,
+        "y": 2.78
+      },
+      "prevControl": {
+        "x": 5.776915150278663,
+        "y": 2.78
+      },
+      "nextControl": {
+        "x": 5.776915150278663,
+        "y": 2.78
+      },
+      "holonomicAngle": 0,
+      "isReversal": true,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 5.032208675528462,
+        "y": 2.78
+      },
+      "prevControl": {
+        "x": 5.358156191241983,
+        "y": 2.78
+      },
+      "nextControl": null,
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "Balance Command"
+        ],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "markers": [
+    {
+      "position": 0.08,
+      "names": [
+        "Arm Zero Command"
+      ]
+    }
+  ]
+}
