@@ -21,6 +21,9 @@ public class ManualRunIntakeCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted){
+        if(roller.objectInRoller()){
+            roller.set_intake(0.02);
+        }
         roller.set_intake(0);
     }
 
