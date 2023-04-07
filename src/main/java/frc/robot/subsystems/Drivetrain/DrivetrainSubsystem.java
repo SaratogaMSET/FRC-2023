@@ -316,17 +316,17 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         Logger.getInstance().recordOutput("CurrentSwerveModuleStates", getModuleStates());
 
-        for(int i = 0; i < 4; i++){
-            mSwerveMods[i].updateInputs(moduleInputs[i]);
-            SmartDashboard.putNumber(i + "cancoder", mSwerveMods[i].getCanCoder().getDegrees());
-            SmartDashboard.putNumber(i + "Motor Output Percent", mSwerveMods[i].getOutputPercent());
-            SmartDashboard.putNumber(i + "Motor Output Voltage", mSwerveMods[i].getOutputVoltage());
-            SmartDashboard.putNumber(i + "Velocity", mSwerveMods[i].getVelocity());
-            SmartDashboard.putNumber(i + "RPM" , mSwerveMods[i].getRPM());
-            Logger.getInstance().recordOutput(i + "Motor Output Percent", mSwerveMods[i].getOutputPercent());
-            Logger.getInstance().recordOutput(i + "Motor Output Voltage", mSwerveMods[i].getOutputVoltage());
+        // for(int i = 0; i < 4; i++){
+        //     // mSwerveMods[i].updateInputs(moduleInputs[i]);
+        //     // SmartDashboard.putNumber(i + "cancoder", mSwerveMods[i].getCanCoder().getDegrees());
+        //     // SmartDashboard.putNumber(i + "Motor Output Percent", mSwerveMods[i].getOutputPercent());
+        //     // SmartDashboard.putNumber(i + "Motor Output Voltage", mSwerveMods[i].getOutputVoltage());
+        //     // SmartDashboard.putNumber(i + "Velocity", mSwerveMods[i].getVelocity());
+        //     // SmartDashboard.putNumber(i + "RPM" , mSwerveMods[i].getRPM());
+        //     // Logger.getInstance().recordOutput(i + "Motor Output Percent", mSwerveMods[i].getOutputPercent());
+        //     // Logger.getInstance().recordOutput(i + "Motor Output Voltage", mSwerveMods[i].getOutputVoltage());
 
-        }
+        // }
         //Logger.getInstance().recordOutput("Before Correction", Constants.Drivetrain.m_kinematics.toSwerveModuleStates(m_chassisSpeeds));
         //ChassisSpeeds speeds = driftCorrection(m_chassisSpeeds);
         //Logger.getInstance().recordOutput("After Correction", Drivetrain.m_kinematics.toSwerveModuleStates(speeds));
@@ -369,7 +369,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         odomFiltered.update(getRotation2d(), getModulePositions());
         double[] pos = new double[]{odomFiltered.getEstimatedPosition().getX(), odomFiltered.getEstimatedPosition().getY(), odomFiltered.getEstimatedPosition().getRotation().getDegrees()};
-        SmartDashboard.putNumberArray("Odom", pos);
+        // SmartDashboard.putNumberArray("Odom", pos);
         lastPose = odomFiltered.getEstimatedPosition();
         Pose2d pose = getVisionPose2d();
         if (pose != null && DriverStation.isTeleop()){
@@ -379,8 +379,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         //swerveOdometry.update(getRotation2d(), getModulePositions());  
         Logger.getInstance().recordOutput("UKF Odometry", odomFiltered.getEstimatedPosition());
-        var asdf = odomFiltered.getEstimatedPosition();
-        SmartDashboard.putNumberArray("UKF Coords", new double[]{asdf.getX(), asdf.getY(), asdf.getRotation().getRadians()});
+        // var asdf = odomFiltered.getEstimatedPosition();
+        // SmartDashboard.putNumberArray("UKF Coords", new double[]{asdf.getX(), asdf.getY(), asdf.getRotation().getRadians()});
         //lastRotation = new Rotation2d(-gyroInputs.yawPositionRad);
         // m_field.setRobotPose(odomFiltered.getEstimatedPosition());
         //if (pose != null) visionPoseEstimates.setRobotPose(pose);

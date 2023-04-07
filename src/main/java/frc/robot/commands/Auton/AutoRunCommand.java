@@ -27,6 +27,18 @@ public class AutoRunCommand extends CommandBase {
         addRequirements(drivetrainSubsystem);
     }
 
+    public AutoRunCommand(DrivetrainSubsystem drivetrainSubsystem, ChassisSpeeds chassisSpeeds) {
+        this.m_drivetrainSubsystem = drivetrainSubsystem;
+        this.m_velocityX = chassisSpeeds.vxMetersPerSecond;
+        this.m_velocityY = chassisSpeeds.vyMetersPerSecond;
+        this.m_DeltaTheta = chassisSpeeds.omegaRadiansPerSecond;
+        
+
+        pid = new PIDController(0.0,0.0,0.0); //0.1
+        //+0.02
+        addRequirements(drivetrainSubsystem);
+    }
+
     @Override
     public void initialize() {
         this.m_initialAngle = m_drivetrainSubsystem.getNavHeading();
@@ -38,8 +50,8 @@ public class AutoRunCommand extends CommandBase {
         double diff = currentAngle-m_initialAngle;
         pidValue = pid.calculate(diff, 0) * 50;
 
-        SmartDashboard.putNumber("PID Value", pidValue);
-        SmartDashboard.putNumber("Diff", diff * 180/3.1415);
+        // SmartDashboard.putNumber("PID Value", pidValue);
+        // SmartDashboard.putNumber("Diff", diff * 180/3.1415);
         if(m_DeltaTheta == 0)
             m_drivetrainSubsystem.drive(new ChassisSpeeds(m_velocityX, m_velocityY, pidValue));
         else

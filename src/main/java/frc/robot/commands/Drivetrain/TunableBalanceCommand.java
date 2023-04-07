@@ -89,7 +89,10 @@ public class TunableBalanceCommand extends CommandBase {
     
     errorDT = (error - prevError)/0.02;
     error = Constants.Drivetrain.balanceGoalDegrees - currentAngle;
-    drivePower = (Math.min(p * error + d * errorDT , 1) + ff);
+
+
+    // TODO: WAS ORIGINALLY    +(Math.min(....))
+    drivePower = -(Math.min(p * error + d * errorDT , 1) + ff);
 
     //Robot might need an extra push when going up backwards
     if (drivePower < 0) {

@@ -214,8 +214,8 @@ public final class Constants {
         public static double balanceKA = 0.4;
 
         public static int allowedMaxAcceleration = 5/2;
-        public static double balanceXVelocity = (6 * 0.1524)/1.45;
-        public static double balanceTimeout = 1;
+        public static double balanceXVelocity = 0; //(6 * 0.1524)/1.45
+        public static double balanceTimeout = 0; //1
         // public static class ScoringTag{
 
         //         private int tagNum;
@@ -430,10 +430,10 @@ public final class Constants {
       public final class ArmNodeDictionary{
         public double[] ready_highcone_score = new double[]{1.38 + 0.05, 1.18};
         public static final double ready_highcone_score_x = 1.38;
-        public static final double ready_highcone_score_y = 1.18;
+        public static final double ready_highcone_score_y = 1.18 + .0254;
 
         public double[] ready_midcone_score = new double[]{0.97, 0.65};
-        public static final double ready_midcone_score_x = 0.96 +.1525-0.08 - 0.0254;
+        public static final double ready_midcone_score_x = 0.96 +.1525-0.08 - (2* 0.0254);
         public static final double ready_midcone_score_y = 0.66 +.1525 + (2 * 0.0254);
 
         public double[] ready_highcube_score = new double[]{1.38, 0.96};

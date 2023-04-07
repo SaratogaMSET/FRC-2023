@@ -93,7 +93,7 @@ public class ActuatorSubsystem extends SubsystemBase {
         else{
             Actuator.setVoltage(((k_PAuton * error)* power));
         }
-        SmartDashboard.putNumber("Intake Error",  (k_P * error * power));
+        // SmartDashboard.putNumber("Intake Error",  (k_P * error * power));
 } 
 
     // public void set_angle(double angle, double powerPercent, double velocityError){
@@ -152,9 +152,9 @@ public class ActuatorSubsystem extends SubsystemBase {
     }
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Ground Intake Encoder",Encoder.getAbsolutePosition());
-        SmartDashboard.putNumber("Ground Intake Angle", get_position_degrees());
-        SmartDashboard.putNumber("Actuator Voltage", Actuator.getMotorOutputVoltage());
+        // SmartDashboard.putNumber("Ground Intake Encoder",Encoder.getAbsolutePosition());
+        // SmartDashboard.putNumber("Ground Intake Angle", get_position_degrees());
+        // SmartDashboard.putNumber("Actuator Voltage", Actuator.getMotorOutputVoltage());
         // SmartDashboard.putNumber("Gravity", k_G * Math.sin(get_position() - Math.toRadians(25)));
         // SmartDashboard.putNumberArray("Intake Coors", get_xy());
         

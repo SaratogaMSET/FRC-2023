@@ -67,8 +67,8 @@ public class DefaultDriveCommand extends CommandBase {
                 m_drivetrainSubsystem.drive(
                         // ChassisSpeeds.fromFieldRelativeSpeeds(
                         new ChassisSpeeds(
-                        resultX/2.5,
-                        resultY/2.5,
+                        resultX/2.75,
+                        resultY/2.75,
                         m_rotationSupplier.getAsDouble()/1.4 * multiplier)
                         // m_drivetrainSubsystem.getRotation2d()
                         // )
@@ -78,8 +78,8 @@ public class DefaultDriveCommand extends CommandBase {
             m_drivetrainSubsystem.drive(
                 // ChassisSpeeds.fromFieldRelativeSpeeds(
                 new ChassisSpeeds(
-                resultX/1.5,
-                resultY/1.5,
+                resultX/2,
+                resultY/2,
                 m_rotationSupplier.getAsDouble()/1.5 * multiplier)
                 // m_drivetrainSubsystem.getRotation2d()
                 // )

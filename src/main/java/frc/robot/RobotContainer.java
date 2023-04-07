@@ -147,8 +147,8 @@ public class RobotContainer {
     // m_autoSwitcher.addOption(ThreePiece, ThreePiece);
     
     
-    autoCloseChooser.setDefaultOption("DISABLE the Auto Close", disableAutoClose);
-    autoCloseChooser.addOption("ENABLE Auto Close", enableAutoClose);
+    autoCloseChooser.setDefaultOption("ENABLE the Auto Close", enableAutoClose);
+    autoCloseChooser.addOption("DISABLE Auto Close", disableAutoClose);
 
     // m_field = new Field2d();
     SmartDashboard.putData(m_autoSwitcher);
@@ -180,8 +180,8 @@ public class RobotContainer {
     
     m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
             m_drivetrainSubsystem,
-            () -> modifyAxis(m_driverController.getLeftX() * 1.2) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> modifyAxis(-m_driverController.getLeftY() * 1.2) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(m_driverController.getLeftX() * 1.3) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND, //1.2 or 2
+            () -> modifyAxis(-m_driverController.getLeftY() * 1.3) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND, //1.2 or 2
             () -> modifyAxis(-m_driverController.getRightX()/1.3) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
             () -> m_armSubsystem.getYPosition(),
             ()-> actuatorSubsystem.get_position_degrees()
@@ -189,9 +189,7 @@ public class RobotContainer {
 
     m_armSubsystem.setDefaultCommand(
       new ArmVoltageCommand(
-        m_armSubsystem,
-        () -> m_gunner1.getY(), 
-        () -> m_gunner1.getX()
+        m_armSubsystem
       ));
 
     m_claw.setDefaultCommand(new BackUpIntakeCommand(
@@ -201,8 +199,7 @@ public class RobotContainer {
 
       m_ledSubsystem.setDefaultCommand(
         new StrobeCommand(m_ledSubsystem, m_claw));
-    // m_driverController.rightTrigger().whileTrue(new ManualCloseIntake(m_claw));
-    // m_driverController.leftTrigger().whileTrue(new RunCommand(() -> m_claw.openClaw(), m_claw));
+    
     
     m_gunner1.button(6).whileTrue(new ManualCloseIntake(m_claw));
     m_gunner1.button(4).whileTrue(new RunCommand(() -> m_claw.openClaw(), m_claw));
@@ -242,13 +239,16 @@ public class RobotContainer {
     
     m_driverController.a().toggleOnTrue(new MoveWithClosest90(
       m_drivetrainSubsystem, 
-      () -> modifyAxis(m_driverController.getLeftX()* 1.2) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-      () -> modifyAxis(-m_driverController.getLeftY()*1.2) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+      () -> modifyAxis(m_driverController.getLeftX()* 1.3) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+      () -> modifyAxis(-m_driverController.getLeftY()*1.3) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
       () -> m_armSubsystem.getYPosition(),
       () -> actuatorSubsystem.get_position_degrees()
     ));
+
     m_driverController.leftTrigger().onTrue(
-      (new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.9, 0, 0).withTimeout(1)));
+    new BalanceCommand(m_drivetrainSubsystem));
+      
+    m_driverController.rightTrigger().onTrue(new TunableBalanceCommand(m_drivetrainSubsystem));
      m_driverController.rightBumper().onTrue(//new ConditionalCommand(
       ArmSequences.ready(m_armSubsystem, 1) //,
       // new ArmZeroAutoCommand(m_armSubsystem), 
@@ -403,7 +403,7 @@ public class RobotContainer {
       case BottomTwoPiece:
         return AutonSequences.getBottomTwoPiece(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       default:
-        return AutonSequences.getOnePieceCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
+        return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, m_claw);
     }
   }
 

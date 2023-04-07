@@ -137,8 +137,8 @@ public class ArmSubsystem extends SubsystemBase {
             System.out.println("Feedback Exceeds Distal");
         }
 
-        SmartDashboard.putNumber("PID V Prox", voltageProximal);
-        SmartDashboard.putNumber("PID V Dist", voltageDistal);
+        // SmartDashboard.putNumber("PID V Prox", voltageProximal);
+        // SmartDashboard.putNumber("PID V Dist", voltageDistal);
 
         voltageMotors(voltageProximal, voltageDistal);
     }

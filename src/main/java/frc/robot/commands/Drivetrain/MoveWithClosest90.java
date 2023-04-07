@@ -51,7 +51,7 @@ public class MoveWithClosest90 extends CommandBase {
     public void execute(){
         lastRot = drivetrain.getRotation2d().getDegrees();
         axis = ( (int) lastRot) / 90 -1;
-        SmartDashboard.putNumber("Axis error", lastRot - axis * 90 );
+        // SmartDashboard.putNumber("Axis error", lastRot - axis * 90 );
         if(lastRot - axis * 90 > 45) axis++ ;
         desiredAngle = axis * 90;
 

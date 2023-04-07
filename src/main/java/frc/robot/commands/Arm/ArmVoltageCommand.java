@@ -7,14 +7,8 @@ import frc.robot.subsystems.Arm.ArmSubsystem;
 
 public class ArmVoltageCommand extends CommandBase{
     private final ArmSubsystem armSubsystem;
-    private double pMotorVoltage;
-    private double dMotorVoltage;
-    private DoubleSupplier pMotorVoltageSupplier;
-    private DoubleSupplier dMotorVoltageSupplier;
-    public ArmVoltageCommand(ArmSubsystem armSubsystem, DoubleSupplier pMotorVoltageSupplier, DoubleSupplier dMotorVoltageSupplier){
+    public ArmVoltageCommand(ArmSubsystem armSubsystem){
         this.armSubsystem = armSubsystem;
-        this.pMotorVoltageSupplier = pMotorVoltageSupplier;
-        this.dMotorVoltageSupplier = dMotorVoltageSupplier;
         addRequirements(armSubsystem);
     }   
 
