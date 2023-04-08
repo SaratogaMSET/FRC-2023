@@ -41,6 +41,10 @@ public class ArmInterface {
     double distal_kVG = 0.66;
 
     public ArmInterface(){
+        Proximal_Left.configNeutralDeadband(0.03);
+        Proximal_Right.configNeutralDeadband(0.03);
+        Distal_Left.configNeutralDeadband(0.02);
+        Distal_Right.configNeutralDeadband(0.02);
         boolean coasted = false;
         if(coasted){
             Proximal_Left.setNeutralMode(NeutralMode.Coast);

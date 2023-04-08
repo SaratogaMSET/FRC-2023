@@ -74,7 +74,7 @@ public class BalanceCommand extends CommandBase {
         driveYaw));
     // Debugging Print Statments
     SmartDashboard.putNumber("Current Angle: ", currentAngle);
-    SmartDashboard.putNumber("Error " ,error);
+    SmartDashboard.putNumber("Error ", error);
     SmartDashboard.putNumber("Drive Power: " , drivePower);
     prevError = error;
   }

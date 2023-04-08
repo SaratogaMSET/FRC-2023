@@ -32,6 +32,7 @@ import frc.robot.commands.Claw.ManualOpenIntake;
 import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.FastBalanceCommand;
 import frc.robot.commands.Drivetrain.TunableBalanceCommand;
+import frc.robot.commands.Drivetrain.ZeroGyroCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngleDriver;
@@ -165,7 +166,7 @@ public class AutonSequences {
               // new ArmZeroCommand(m_armSubsystem),
               new SequentialCommandGroup(
                 new TunableBalanceCommand(m_drivetrainSubsystem),
-                new AutoRunCommand(m_drivetrainSubsystem, Drivetrain.balanceXVelocity, 0, 0).withTimeout(Drivetrain.balanceTimeout), //TODO: tune 
+                new AutoRunCommand(m_drivetrainSubsystem, ChassisSpeeds.fromFieldRelativeSpeeds(0, (Drivetrain.balanceXVelocity), 0, m_drivetrainSubsystem.getRotation2d())).withTimeout(Drivetrain.balanceTimeout), //TODO: tune 
                 new InstantCommand(()-> m_drivetrainSubsystem.setX())
               )
               )
@@ -279,7 +280,7 @@ public class AutonSequences {
             new ArmZeroCommand(m_armSubsystem),
             new SequentialCommandGroup(
               new BalanceCommand(m_drivetrainSubsystem),
-              new AutoRunCommand(m_drivetrainSubsystem, -((Drivetrain.balanceXVelocity)), 0, 0).withTimeout(Drivetrain.balanceTimeout), //TODO: tune 
+              new AutoRunCommand(m_drivetrainSubsystem, ChassisSpeeds.fromFieldRelativeSpeeds(0, -((Drivetrain.balanceXVelocity)), 0, m_drivetrainSubsystem.getRotation2d())).withTimeout(Drivetrain.balanceTimeout), //TODO: tune 
               new InstantCommand(()-> m_drivetrainSubsystem.setX())
             )
             )
@@ -299,7 +300,7 @@ public class AutonSequences {
           Map.entry("Zero Intake", new ManualSetAngle(actuatorSubsystem, 10)),
           Map.entry("Zero Rollers", new ManualRunIntakeCommand(rollers, 0)),
           // Map.entry("Arm Extend Low", ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 0)),
-          Map.entry("Balance Command", new TunableBalanceCommand(m_drivetrainSubsystem))
+          Map.entry("Balance Command", new FastBalanceCommand(m_drivetrainSubsystem))
           // Map.entry("Arm Neutral Command", new ArmZeroCommand(m_armSubsystem))
           )
           );
@@ -319,7 +320,7 @@ public class AutonSequences {
         List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Middle Path Builder", new PathConstraints(1.25, 1.25));
         Command build = swerveAutoBuilder.fullAuto(trajectory);
         // ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds((6 * 0.1524)/1.5, 0, 0, m_drivetrainSubsystem.getRotation2d());
-        return build.andThen(new AutoRunCommand(m_drivetrainSubsystem, Drivetrain.balanceXVelocity, 0, 0).withTimeout(Drivetrain.balanceTimeout)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
+        return build.andThen(new AutoRunCommand(m_drivetrainSubsystem, ChassisSpeeds.fromFieldRelativeSpeeds(0, ((Drivetrain.balanceXVelocity +0.25)), 0, m_drivetrainSubsystem.getRotation2d())).withTimeout(Drivetrain.balanceTimeout + 0.15)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
 
       }
 
@@ -355,7 +356,7 @@ public class AutonSequences {
         List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Middle Path Builder No Pickup", new PathConstraints(1.25, 1.25));
         Command build = swerveAutoBuilder.fullAuto(trajectory);
         // ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds((6 * 0.1524)/1.5, 0, 0, m_drivetrainSubsystem.getRotation2d());
-        return build.andThen(new AutoRunCommand(m_drivetrainSubsystem, Drivetrain.balanceXVelocity, 0, 0).withTimeout(Drivetrain.balanceTimeout)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
+        return (build).andThen(new AutoRunCommand(m_drivetrainSubsystem, ChassisSpeeds.fromFieldRelativeSpeeds(0, ((Drivetrain.balanceXVelocity)), 0, m_drivetrainSubsystem.getRotation2d())).withTimeout(Drivetrain.balanceTimeout)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
 
       }
     
@@ -390,8 +391,7 @@ public class AutonSequences {
 
         List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Bottom Balance Pickup", new PathConstraints(2, 1), new PathConstraints(3, 3));
         Command build = swerveAutoBuilder.fullAuto(trajectory);
-        // ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds((6 * 0.1524)/1.5, 0, 0, m_drivetrainSubsystem.getRotation2d());
-        return build.andThen(new AutoRunCommand(m_drivetrainSubsystem, Drivetrain.balanceXVelocity, 0, 0).withTimeout(Drivetrain.balanceTimeout)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
+        return build.andThen(new AutoRunCommand(m_drivetrainSubsystem, ChassisSpeeds.fromFieldRelativeSpeeds(0, ((Drivetrain.balanceXVelocity)), 0, m_drivetrainSubsystem.getRotation2d())).withTimeout(Drivetrain.balanceTimeout)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
 
       }
 
@@ -592,7 +592,7 @@ public class AutonSequences {
 
         List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Top Path", new PathConstraints(4, 3), new PathConstraints(2, 1.5), new PathConstraints(2.5, 3));
         Command build = swerveAutoBuilder.fullAuto(trajectory);
-        return build.andThen(new AutoRunCommand(m_drivetrainSubsystem, Drivetrain.balanceXVelocity, 0, 0).withTimeout(Drivetrain.balanceTimeout)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
+        return build.andThen(new AutoRunCommand(m_drivetrainSubsystem, ChassisSpeeds.fromFieldRelativeSpeeds(0, -((Drivetrain.balanceXVelocity)), 0, m_drivetrainSubsystem.getRotation2d())).withTimeout(Drivetrain.balanceTimeout)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
       }
 
       public static Command getTwoAndAHalfPieceBalanceAutoBuilder(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuator, RollerSubsystem rollers, ClawSubsystem m_claw){

@@ -92,7 +92,7 @@ public class TunableBalanceCommand extends CommandBase {
 
 
     // TODO: WAS ORIGINALLY    +(Math.min(....))
-    drivePower = -(Math.min(p * error + d * errorDT , 1) + ff);
+    drivePower = (Math.min(p * error + d * errorDT , 1) + ff);
 
     //Robot might need an extra push when going up backwards
     if (drivePower < 0) {

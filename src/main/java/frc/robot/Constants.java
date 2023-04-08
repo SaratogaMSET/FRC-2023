@@ -214,8 +214,8 @@ public final class Constants {
         public static double balanceKA = 0.4;
 
         public static int allowedMaxAcceleration = 5/2;
-        public static double balanceXVelocity = 0; //(6 * 0.1524)/1.45
-        public static double balanceTimeout = 0; //1
+        public static double balanceXVelocity = (6 * 0.1524)/1.45; //(6 * 0.1524)/1.45
+        public static double balanceTimeout = 1; //1
         // public static class ScoringTag{
 
         //         private int tagNum;

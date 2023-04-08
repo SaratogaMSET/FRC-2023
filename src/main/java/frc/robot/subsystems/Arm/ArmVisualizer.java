@@ -46,7 +46,7 @@ public class ArmVisualizer {
             new MechanismLigament2d(
                 "Elbow",
                 0.3683, //config.elbow().length()
-                90,
+                -90,
                 4,
                 colorOverride != null ? colorOverride : new Color8Bit(Color.kBlue)));
   }

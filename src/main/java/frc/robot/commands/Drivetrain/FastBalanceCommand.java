@@ -59,7 +59,7 @@ public class FastBalanceCommand extends CommandBase {
 
 
     // TODO: WAS ORIGINALLY    +(Math.min(....))
-    drivePower = -(Math.min(Constants.Drivetrain.balanceKP * error + Constants.Drivetrain.balanceKD * errorDT , 1) + ff);
+    drivePower = (Math.min(Constants.Drivetrain.balanceKP * error + Constants.Drivetrain.balanceKD * errorDT , 1) + ff);
 
     //Robot might need an extra push when going up backwards
     if (drivePower < 0) {

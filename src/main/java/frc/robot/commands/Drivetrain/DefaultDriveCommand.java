@@ -15,6 +15,7 @@ public class DefaultDriveCommand extends CommandBase {
     private final DoubleSupplier m_translationXSupplier;
     private final DoubleSupplier m_translationYSupplier;
     private final DoubleSupplier m_rotationSupplier;
+    private final DoubleSupplier gunnerSupplier;
     private final DoubleSupplier armHeight;
     private final DoubleSupplier actuatorHeight;
     private double m_translationXTrapezoidal = 0;
@@ -26,12 +27,14 @@ public class DefaultDriveCommand extends CommandBase {
                                DoubleSupplier translationXSupplier,
                                DoubleSupplier translationYSupplier,
                                DoubleSupplier rotationSupplier,
+                               DoubleSupplier gunnerSupplier,
                                DoubleSupplier armHeight,
                                DoubleSupplier actuatorHeight) {
         this.m_drivetrainSubsystem = drivetrainSubsystem;
         this.m_translationXSupplier = translationXSupplier;
         this.m_translationYSupplier = translationYSupplier;
         this.m_rotationSupplier = rotationSupplier;
+        this.gunnerSupplier = gunnerSupplier;
         this.armHeight = armHeight;
         this.actuatorHeight = actuatorHeight;
 
@@ -59,6 +62,7 @@ public class DefaultDriveCommand extends CommandBase {
         SmartDashboard.putNumber("m_rotationSupplier", m_rotationSupplier.getAsDouble());
         SmartDashboard.putNumber("Magnitude", magnitude);
         double armY = armHeight.getAsDouble();
+        if(Math.abs(gunnerSupplier.getAsDouble()) < 2){
          if(armY > 0.35 ){
 
             //if(armHeight.getAsDouble() > minArmValue) {//start slow                 Constants.ArmNodeDictionary.ready_midcube_score_y){
@@ -67,8 +71,8 @@ public class DefaultDriveCommand extends CommandBase {
                 m_drivetrainSubsystem.drive(
                         // ChassisSpeeds.fromFieldRelativeSpeeds(
                         new ChassisSpeeds(
-                        resultX/2.75,
-                        resultY/2.75,
+                        resultX/2.25,
+                        resultY/2.25,
                         m_rotationSupplier.getAsDouble()/1.4 * multiplier)
                         // m_drivetrainSubsystem.getRotation2d()
                         // )
@@ -95,6 +99,57 @@ public class DefaultDriveCommand extends CommandBase {
                         // m_drivetrainSubsystem.getRotation2d()
                         // )
                 );
+            }
+        }
+            else{
+                if(armY > 0.35 ){
+
+                    //if(armHeight.getAsDouble() > minArmValue) {//start slow                 Constants.ArmNodeDictionary.ready_midcube_score_y){
+                        // double iLerp = (armY - minArmValue) / (minArmValue - maxArmValue); //inverse linear interpolation to get from 0 to 1 between min and max arm heights
+                        // double speedMultiplier = 1 + Math.max(0.0, Math.min(1.0, iLerp)) * (1.5); //clamp it actually between 0 to 1 in case oops! incident
+                        if(Math.abs(ArmNodeDictionary.ready_double_substation_y - armY) < 0.03 )
+                            m_drivetrainSubsystem.drive(
+                                    // ChassisSpeeds.fromFieldRelativeSpeeds(
+                                    new ChassisSpeeds(
+                                    resultX/2.25,
+                                    Math.copySign(0.5, gunnerSupplier.getAsDouble()),
+                                    m_rotationSupplier.getAsDouble()/1.4 * multiplier)
+                                    // m_drivetrainSubsystem.getRotation2d()
+                                    // )
+                        );
+                        else{
+                            m_drivetrainSubsystem.drive(
+                                    // ChassisSpeeds.fromFieldRelativeSpeeds(
+                                    new ChassisSpeeds(
+                                    resultX/2.25,
+                                    Math.copySign(0.35, gunnerSupplier.getAsDouble()),
+                                    m_rotationSupplier.getAsDouble()/1.4 * multiplier)
+                        );
+                        }
+
+                 }
+                else if(actuatorHeight.getAsDouble() > 50){
+                    m_drivetrainSubsystem.drive(
+                        // ChassisSpeeds.fromFieldRelativeSpeeds(
+                        new ChassisSpeeds(
+                        resultX/2,
+                        Math.copySign(0.35, gunnerSupplier.getAsDouble()),
+                        m_rotationSupplier.getAsDouble()/1.5 * multiplier)
+                        // m_drivetrainSubsystem.getRotation2d()
+                        // )
+                    );
+                        }
+                    else{
+                        m_drivetrainSubsystem.drive(
+                                // ChassisSpeeds.fromFieldRelativeSpeeds(
+                                new ChassisSpeeds(
+                                resultX,
+                                Math.copySign(0.35, gunnerSupplier.getAsDouble()),
+                                m_rotationSupplier.getAsDouble()/1.5 * multiplier)
+                                // m_drivetrainSubsystem.getRotation2d()
+                                // )
+                        );
+                    }
             }
         }
     @Override
