@@ -71,7 +71,7 @@ public class RobotContainer {
   // public String m_autoSelected;  
   public static final String OneAndNothing = "One Score and NOTHING ELSE";
   public static final String PhyscoBehavior = "Two Piece + Balance Barrier Side";
-  public static final String TwoPieceNoBalance = "Two Piece No Balance Barrier Side";
+  public static final String TwoPieceNoBalance = "2 Piece No Balance Barrier Side";
   public static final String ThreePiece = "Three Piece Test Path Barrier Side";
   public static final String BalanceMobilityBonus = "Middle Balance + Mobilty Bonus + Pickup";
   public static final String BalanceMobilityBonusNoPickup = "Middle Balance + Mobility NO PICKUP";

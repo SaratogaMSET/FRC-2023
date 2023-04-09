@@ -1,5 +1,6 @@
 package frc.robot.commands.Drivetrain;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -20,6 +21,10 @@ public class DefaultDriveCommand extends CommandBase {
     private final DoubleSupplier actuatorHeight;
     private double m_translationXTrapezoidal = 0;
     private double m_translationYTrapezoidal = 0;
+    double desiredAngle;
+    int axis = 0;
+    double lastRot;
+    private PIDController controller = new PIDController(4, 0,0);
     double minArmValue = 0.3; 
     double maxArmValue = 1.18; 
 
@@ -41,6 +46,13 @@ public class DefaultDriveCommand extends CommandBase {
         addRequirements(drivetrainSubsystem);
     }
 
+    @Override
+    public void initialize(){
+        controller.enableContinuousInput(-180, 180);
+        axis = (int) m_drivetrainSubsystem.getRotation2d().getDegrees() / 90;
+        if(m_drivetrainSubsystem.getRotation2d().getDegrees() - axis * 90 > 45) axis++ ;
+        desiredAngle = axis * 90;
+    }
     @Override
     public void execute() {
 
@@ -64,16 +76,19 @@ public class DefaultDriveCommand extends CommandBase {
         double armY = armHeight.getAsDouble();
         if(Math.abs(gunnerSupplier.getAsDouble()) < 2){
          if(armY > 0.35 ){
+            lastRot = m_drivetrainSubsystem.getRotation2d().getDegrees();
+            axis = ( (int) lastRot) / 90 -1;
+            if(lastRot - axis * 90 > 45) axis++ ;
+            desiredAngle = axis * 90;
+            double pidValue = controller.calculate(lastRot, desiredAngle) * Math.PI/180;
 
-            //if(armHeight.getAsDouble() > minArmValue) {//start slow                 Constants.ArmNodeDictionary.ready_midcube_score_y){
-                // double iLerp = (armY - minArmValue) / (minArmValue - maxArmValue); //inverse linear interpolation to get from 0 to 1 between min and max arm heights
-                // double speedMultiplier = 1 + Math.max(0.0, Math.min(1.0, iLerp)) * (1.5); //clamp it actually between 0 to 1 in case oops! incident
-                m_drivetrainSubsystem.drive(
+            m_drivetrainSubsystem.drive(
                         // ChassisSpeeds.fromFieldRelativeSpeeds(
-                        new ChassisSpeeds(
-                        resultX/2.25,
-                        resultY/2.25,
-                        m_rotationSupplier.getAsDouble()/1.4 * multiplier)
+                new ChassisSpeeds(
+                resultX/2.25,
+                resultY/2.25,
+                pidValue
+                )
                         // m_drivetrainSubsystem.getRotation2d()
                         // )
                 );
@@ -103,17 +118,18 @@ public class DefaultDriveCommand extends CommandBase {
         }
             else{
                 if(armY > 0.35 ){
-
-                    //if(armHeight.getAsDouble() > minArmValue) {//start slow                 Constants.ArmNodeDictionary.ready_midcube_score_y){
-                        // double iLerp = (armY - minArmValue) / (minArmValue - maxArmValue); //inverse linear interpolation to get from 0 to 1 between min and max arm heights
-                        // double speedMultiplier = 1 + Math.max(0.0, Math.min(1.0, iLerp)) * (1.5); //clamp it actually between 0 to 1 in case oops! incident
+                    lastRot = m_drivetrainSubsystem.getRotation2d().getDegrees();
+                    axis = ( (int) lastRot) / 90 -1;
+                    if(lastRot - axis * 90 > 45) axis++ ;
+                    desiredAngle = axis * 90;
+                    double pidValue = controller.calculate(lastRot, desiredAngle) * Math.PI/180;
                         if(Math.abs(ArmNodeDictionary.ready_double_substation_y - armY) < 0.03 )
                             m_drivetrainSubsystem.drive(
                                     // ChassisSpeeds.fromFieldRelativeSpeeds(
                                     new ChassisSpeeds(
                                     resultX/2.25,
                                     Math.copySign(0.5, gunnerSupplier.getAsDouble()),
-                                    m_rotationSupplier.getAsDouble()/1.4 * multiplier)
+                                    pidValue)
                                     // m_drivetrainSubsystem.getRotation2d()
                                     // )
                         );
@@ -123,7 +139,7 @@ public class DefaultDriveCommand extends CommandBase {
                                     new ChassisSpeeds(
                                     resultX/2.25,
                                     Math.copySign(0.35, gunnerSupplier.getAsDouble()),
-                                    m_rotationSupplier.getAsDouble()/1.4 * multiplier)
+                                    pidValue)
                         );
                         }
 

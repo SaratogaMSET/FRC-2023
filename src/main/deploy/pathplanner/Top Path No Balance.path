@@ -81,49 +81,21 @@
     },
     {
       "anchorPoint": {
-        "x": 6.2930409593458085,
-        "y": 4.1341358602856095
+        "x": 5.889734675302685,
+        "y": 4.554780545324979
       },
       "prevControl": {
-        "x": 6.288890174377664,
-        "y": 4.1341358602856095
+        "x": 5.88558389033454,
+        "y": 4.554780545324979
       },
-      "nextControl": {
-        "x": 6.297191744313953,
-        "y": 4.1341358602856095
-      },
-      "holonomicAngle": -45.0,
+      "nextControl": null,
+      "holonomicAngle": 180.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [],
-        "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 7.307250435681428,
-        "y": 3.0915702699460956
-      },
-      "prevControl": {
-        "x": 7.3232656419738,
-        "y": 3.0836763655636545
-      },
-      "nextControl": null,
-      "holonomicAngle": -45.0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": false,
-      "stopEvent": {
-        "names": [
-          "Intake Up",
-          "Stop Rollers"
-        ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -163,13 +135,6 @@
       "position": 1.37,
       "names": [
         "Zero Intake"
-      ]
-    },
-    {
-      "position": 3.3214488636363644,
-      "names": [
-        "Down Intake",
-        "Running Rollers"
       ]
     },
     {

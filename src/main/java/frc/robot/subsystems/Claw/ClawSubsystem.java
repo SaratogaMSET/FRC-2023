@@ -10,17 +10,21 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.hal.simulation.EncoderDataJNI;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.event.NetworkBooleanEvent;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClawConstants;
 
 public class ClawSubsystem extends SubsystemBase{
-        
+
+    /*  private NetworkTable table = new NetworkTable(NetworkTable.getInstance(), "/Claw") ;
+     * 
+    */
+
     private double[] proximityBuffer = new double[3];
     private int bufferIndex = 0;
     private double cubeBlueTheshold = 0.22;
