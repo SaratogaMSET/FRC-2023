@@ -25,10 +25,10 @@ public class ArmZeroStickyCommand extends CommandBase{
         // }
         prox_err = armSubsystem.armInterface.getPositionProximal() - Math.PI/2;
         dist_err = armSubsystem.armInterface.getPositionDistal() + Math.PI/2;
-        if(Math.abs(prox_err) < tolerance && Math.abs(dist_err) < tolerance){
+        if(Math.abs(prox_err) < tolerance && Math.abs(dist_err) < 0.05){
             armSubsystem.voltageMotors(0, 0);
         }
-        if(position[1] < minY){
+        else if(position[1] < minY){
             double[] armAngles = armSubsystem.inverseKinematics(position[0], minY + 0.2);
             armSubsystem.PIDtoAngles(armAngles[0], armAngles[1]);
         }else{

@@ -46,7 +46,7 @@ private final PPHolonomicDriveController holonomicDriveController = new PPHolono
     this.drive = drive;
     this.poseSupplier = poseSupplier;
     addRequirements(drive);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    thetaController.enableContinuousInput(-Math.PI/2, 3* Math.PI/2); // before: (-Math.PI, Math.PI), after: (0, Math,PI)
     xController.setTolerance(0.1);
     yController.setTolerance(0.1);
     thetaController.setTolerance(0.2);
@@ -64,7 +64,7 @@ private final PPHolonomicDriveController holonomicDriveController = new PPHolono
 
     // try {
         trajectory = PathPlanner.generatePath(
-            new PathConstraints(2, 1.5), 
+            new PathConstraints(2.5, 4), 
             new PathPoint(new Translation2d(currentPose.getX(), currentPose.getY()), currentPose.getRotation(), currentPose.getRotation()), // position, heading(direction of travel), holonomic rotation
             new PathPoint(new Translation2d(targetPose.getX(), targetPose.getY()), Rotation2d.fromDegrees(180), targetPose.getRotation()
             )

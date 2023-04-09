@@ -83,11 +83,11 @@ public class ArmSubsystem extends SubsystemBase {
 
         SimpleMatrix error = target.minus(state);
 
-        double proxKp = 10.2;
-        double distKp = 9.5; //9.5
+        double proxKp = 10.2; //10.2
+        double distKp = 9.2; //9.5
 
-        double proxKd = 0.042; //0.02 0.035
-        double distKd = 0.02;
+        double proxKd = 0.042; //0.035
+        double distKd = 0.02; 
 
         double proxKf = 0.80;
         double distKf = 1.30;

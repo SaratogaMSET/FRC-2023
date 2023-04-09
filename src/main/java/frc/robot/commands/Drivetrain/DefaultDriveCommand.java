@@ -24,7 +24,7 @@ public class DefaultDriveCommand extends CommandBase {
     double desiredAngle;
     int axis = 0;
     double lastRot;
-    private PIDController controller = new PIDController(4, 0,0);
+    private PIDController controller = new PIDController(3.5, 0,0);
     double minArmValue = 0.3; 
     double maxArmValue = 1.18; 
 
@@ -48,14 +48,14 @@ public class DefaultDriveCommand extends CommandBase {
 
     @Override
     public void initialize(){
-        controller.enableContinuousInput(-180, 180);
-        axis = (int) m_drivetrainSubsystem.getRotation2d().getDegrees() / 90;
-        if(m_drivetrainSubsystem.getRotation2d().getDegrees() - axis * 90 > 45) axis++ ;
-        desiredAngle = axis * 90;
+        controller.enableContinuousInput(90, 270); //90, 360
+        axis = (int) m_drivetrainSubsystem.getRotation2d().getDegrees() / 180;
+        if(m_drivetrainSubsystem.getRotation2d().getDegrees() - axis * 180 > 90) axis++ ;
+        desiredAngle = (axis * 180.0) -90;
     }
     @Override
     public void execute() {
-
+        SmartDashboard.putNumber("desiredAngle", desiredAngle);
         m_translationXTrapezoidal = (m_translationXSupplier.getAsDouble()-m_translationXTrapezoidal)/6 + m_translationXTrapezoidal;
         m_translationYTrapezoidal = (m_translationYSupplier.getAsDouble()-m_translationYTrapezoidal)/6 + m_translationYTrapezoidal;
 
@@ -76,10 +76,10 @@ public class DefaultDriveCommand extends CommandBase {
         double armY = armHeight.getAsDouble();
         if(Math.abs(gunnerSupplier.getAsDouble()) < 2){
          if(armY > 0.35 ){
-            lastRot = m_drivetrainSubsystem.getRotation2d().getDegrees();
-            axis = ( (int) lastRot) / 90 -1;
-            if(lastRot - axis * 90 > 45) axis++ ;
-            desiredAngle = axis * 90;
+            lastRot = m_drivetrainSubsystem.getRotation2d().getDegrees(); //getPose().getRotation().getDegrees()
+            axis = ( (int) lastRot) / 180 -1;
+            if(lastRot - axis * 180 > 90) axis++ ;
+            desiredAngle = (axis * 180.0) -90;
             double pidValue = controller.calculate(lastRot, desiredAngle) * Math.PI/180;
 
             m_drivetrainSubsystem.drive(
@@ -118,10 +118,10 @@ public class DefaultDriveCommand extends CommandBase {
         }
             else{
                 if(armY > 0.35 ){
-                    lastRot = m_drivetrainSubsystem.getRotation2d().getDegrees();
-                    axis = ( (int) lastRot) / 90 -1;
-                    if(lastRot - axis * 90 > 45) axis++ ;
-                    desiredAngle = axis * 90;
+                    lastRot =  m_drivetrainSubsystem.getRotation2d().getDegrees();
+                    axis = ( (int) lastRot) / 180 -1;
+                    if(lastRot - axis * 180 > 90) axis++ ;
+                    desiredAngle =(axis * 180.0) -90;
                     double pidValue = controller.calculate(lastRot, desiredAngle) * Math.PI/180;
                         if(Math.abs(ArmNodeDictionary.ready_double_substation_y - armY) < 0.03 )
                             m_drivetrainSubsystem.drive(

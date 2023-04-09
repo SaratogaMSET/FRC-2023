@@ -430,7 +430,7 @@ public final class Constants {
       public final class ArmNodeDictionary{
         public double[] ready_highcone_score = new double[]{1.38 + 0.05, 1.18};
         public static final double ready_highcone_score_x = 1.38;
-        public static final double ready_highcone_score_y = 1.18 + 0.0127;
+        public static final double ready_highcone_score_y = 1.14; // before: 1.18, little after:1.13
 
         public double[] ready_midcone_score = new double[]{0.97, 0.65};
         public static final double ready_midcone_score_x = 0.96 +.1525-0.08 - (2* 0.0254);

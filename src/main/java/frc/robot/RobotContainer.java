@@ -235,6 +235,7 @@ public class RobotContainer {
             ()-> actuatorSubsystem.get_position_degrees()     
     )));
 
+    m_driverController.rightTrigger().onTrue(new AlignCommand(m_drivetrainSubsystem));
     // m_gunner1.button(1).whileTrue(m_ledSubsystem.indicateActiveSide());
     m_gunner1.button(3).toggleOnTrue(new ConditionalCommand(new IndicateConeCommand(m_ledSubsystem), new IndicateCubeCommand(m_ledSubsystem), () -> m_gunner1.button(3).getAsBoolean()));
     // m_gunner1.button(3).toggleOnFalse(m_ledSubsystem.indicateConeCommand());
@@ -268,7 +269,7 @@ public class RobotContainer {
        );//);
     m_driverController.leftBumper().onTrue(
     new ParallelCommandGroup(
-      new ArmZeroStickyCommand(m_armSubsystem),
+      new ArmZeroCommand(m_armSubsystem),
       new SequentialCommandGroup(
         // new WaitCommand(0.3),
         new ParallelCommandGroup(
@@ -283,20 +284,21 @@ public class RobotContainer {
     m_gunner1.button(5).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 1)); //TODO: make 0 when collision detection working
     m_gunner1.button(5).and(m_gunner1.button(1)).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 1));
 
-    m_gunner1.button(7).onTrue(ArmSequences.scoreConeHighNoRetract(m_armSubsystem, m_claw, 1)); // TODO: make 0 when collision detection working
+    m_gunner1.button(7).onTrue(ArmSequences.armDunk(m_armSubsystem, 1)); // TODO: make 0 when collision detection working
     m_gunner1.button(7).and(m_gunner1.button(1)).onTrue(ArmSequences.scoreConeHighNoRetract(m_armSubsystem, m_claw, 1)); 
 
     m_gunner1.button(8).onTrue(ArmSequences.scoreCubeHighNoRetract(m_armSubsystem,m_claw, 1)); // TODO: make 0 when collision detection working
     m_gunner1.button(8).and(m_gunner1.button(1)).onTrue(ArmSequences.scoreCubeHighNoRetract(m_armSubsystem, m_claw, 1));  
     
 
-    m_gunner1.button(9).onTrue(ArmSequences.scoreConeMidNoRetract(m_armSubsystem, m_claw, 1)); // TODO: make 0 when collision detection working
+    m_gunner1.button(9).onTrue(ArmSequences.armDunkMiddle(m_armSubsystem, 1)); // TODO: make 0 when collision detection working
     m_gunner1.button(9).and(m_gunner1.button(1)).onTrue(ArmSequences.scoreConeMidNoRetract(m_armSubsystem, m_claw, 1));
     m_gunner1.button(10).onTrue(ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 1));// TODO: make 0 when collision detection working
     m_gunner1.button(10).and(m_gunner1.button(1)).onTrue(ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 1));
 
     m_gunner1.button(11).onTrue(ArmSequences.groundIntakeCone(m_armSubsystem, m_claw,  1)); // TODO: make 0 when collision detection working
-    m_gunner1.button(11).and(m_gunner1.button(1)).onTrue(ArmSequences.groundIntakeCone(m_armSubsystem, m_claw, 1));
+    m_gunner1.button(11).and(m_gunner1.button(1)).onTrue((ArmSequences.groundIntakeCone(m_armSubsystem, m_claw,  1)));
+
 
 
     m_gunner1.button(1).whileTrue(
