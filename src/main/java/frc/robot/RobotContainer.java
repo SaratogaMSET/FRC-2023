@@ -38,6 +38,8 @@ import frc.robot.commands.Claw.BackUpIntakeCommand;
 import frc.robot.commands.Claw.ManualCloseIntake;
 import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.DefaultDriveCommand;
+import frc.robot.commands.Drivetrain.DriveToPose;
+import frc.robot.commands.Drivetrain.DriveToPoseTrajectory;
 import frc.robot.commands.Drivetrain.MoveWithClosest90;
 import frc.robot.commands.Drivetrain.TunableBalanceCommand;
 import frc.robot.commands.Drivetrain.ZeroGyroCommand;
@@ -182,7 +184,7 @@ public class RobotContainer {
             m_drivetrainSubsystem,
             () -> modifyAxis(m_driverController.getLeftX() * 1.3) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND, //1.2 or 2
             () -> modifyAxis(-m_driverController.getLeftY() * 1.3) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND, //1.2 or 2
-            () -> modifyAxis(-m_driverController.getRightX()/1.3) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
+            () -> modifyAxis(-m_driverController.getRightX()/1.1) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
             () -> -modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
             () -> m_armSubsystem.getYPosition(),
             () -> actuatorSubsystem.get_position_degrees()
@@ -207,22 +209,9 @@ public class RobotContainer {
     
     m_driverController.x().onTrue(new InstantCommand(()->m_drivetrainSubsystem.setX(), m_drivetrainSubsystem));
 
-    // m_driverController.y().onTrue(new SequentialCommandGroup(
-    //   new TurnTo90(m_drivetrainSubsystem),
-    //   new WaitCommand(1),
-    //   new AlignToCone(m_drivetrainSubsystem, m_visionSubsystem)
-    // ));
     m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
     actuatorSubsystem.setDefaultCommand(new ActuatorDefaultCommand(actuatorSubsystem));
-    
-
-    // m_driverController.x().toggleOnTrue(
-    //   new DefaultDriveCommand(
-    //         m_drivetrainSubsystem,
-    //         () -> modifyAxis(m_driverController.getLeftX()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-    //         () -> modifyAxis(-m_driverController.getLeftY()/1.5) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-    //         () -> modifyAxis(-m_driverController.getRightX()/1.5) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND     
-    // ));
+  
     
     m_driverController.b().onTrue(new SequentialCommandGroup(
       new DefaultDriveCommand(
@@ -235,10 +224,9 @@ public class RobotContainer {
             ()-> actuatorSubsystem.get_position_degrees()     
     )));
 
-    m_driverController.rightTrigger().onTrue(new AlignCommand(m_drivetrainSubsystem));
-    // m_gunner1.button(1).whileTrue(m_ledSubsystem.indicateActiveSide());
+    // m_driverController.rightTrigger().onTrue(new AlignCommand(m_drivetrainSubsystem));
+
     m_gunner1.button(3).toggleOnTrue(new ConditionalCommand(new IndicateConeCommand(m_ledSubsystem), new IndicateCubeCommand(m_ledSubsystem), () -> m_gunner1.button(3).getAsBoolean()));
-    // m_gunner1.button(3).toggleOnFalse(m_ledSubsystem.indicateConeCommand());
     
     m_driverController.a().toggleOnTrue(new MoveWithClosest90(
       m_drivetrainSubsystem, 
@@ -253,20 +241,15 @@ public class RobotContainer {
       new AutoRunCommand(m_drivetrainSubsystem, ChassisSpeeds.fromFieldRelativeSpeeds(0, -((Drivetrain.balanceXVelocity)), 0, m_drivetrainSubsystem.getRotation2d())).withTimeout(Drivetrain.balanceTimeout)
     ));
       
-    m_driverController.rightTrigger().onTrue(new TunableBalanceCommand(m_drivetrainSubsystem));
-     m_driverController.rightBumper().onTrue(//new ConditionalCommand(
-      ArmSequences.ready(m_armSubsystem, 1) //,
-      // new ArmZeroAutoCommand(m_armSubsystem), 
-      // () -> m_driverController.rightBumper().getAsBoolean()
-      ); //);
-    // m_driverController.rightBumper().toggleOnFalse(new ArmZeroCommand(m_armSubsystem));
+    m_driverController.rightTrigger().onTrue(new AlignCommand(m_drivetrainSubsystem, m_claw));
+    
+     m_driverController.rightBumper().onTrue(
+      ArmSequences.ready(m_armSubsystem, 1) 
+      );
 
     m_driverController.rightBumper().and(m_gunner1.button(1)).onTrue(
-      // new ConditionalCommand(
-       ArmSequences.ready(m_armSubsystem, 1)//,
-      //  new ArmZeroAutoCommand(m_armSubsystem), 
-      //  () -> m_driverController.rightBumper().getAsBoolean()
-       );//);
+       ArmSequences.ready(m_armSubsystem, 1)
+       );
     m_driverController.leftBumper().onTrue(
     new ParallelCommandGroup(
       new ArmZeroCommand(m_armSubsystem),
@@ -280,7 +263,6 @@ public class RobotContainer {
     )
     );
 
-    // m_gunner1.button(3).onTrue(new ToggleArmSide(m_armSubsystem));
     m_gunner1.button(5).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 1)); //TODO: make 0 when collision detection working
     m_gunner1.button(5).and(m_gunner1.button(1)).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 1));
 
@@ -313,10 +295,6 @@ public class RobotContainer {
       m_gunner1.button(12).whileTrue(
         new ManualRunIntakeCommand(rollers, 0.25, false)
       );
-    // m_gunner1.button(12).whileTrue(ArmSequences.groundIntakeTest(m_armSubsystem, m_claw, actuatorSubsystem, rollers, 0))
-    // .onFalse(new ManualRunIntakeCommand(rollers,0)); 
-    // m_gunner1.button(12).and(m_gunner1.button(1)).whileTrue(ArmSequences.groundIntakeTest(m_armSubsystem, m_claw, actuatorSubsystem, rollers, 1))
-    // .onFalse(new ManualRunIntakeCommand(rollers,0));
   }
 
   private static double deadband(double value, double deadband) {
@@ -389,8 +367,6 @@ public class RobotContainer {
         return AutonSequences.getOnePieceAndBalanceBringArmBackCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case OneAndBalanceBottom:
         return AutonSequences.getOnePieceAndBalanceBottomCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
-      // case TwoPieceTop:
-      //   return AutonSequences.getTwoPieceTopCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case OnePlusHalf:
         return AutonSequences.getBottomOneAndHalfPieceBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case OneAndNothing:

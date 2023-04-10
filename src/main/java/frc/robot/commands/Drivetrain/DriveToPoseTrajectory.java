@@ -1,4 +1,3 @@
-
 package frc.robot.commands.Drivetrain;
 
 import java.util.function.Supplier;
@@ -15,11 +14,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 // import org.littletonrobotics.frc2023.util.LoggedTunableNumber;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
-
+  
 public class DriveToPoseTrajectory extends CommandBase {
   private final DrivetrainSubsystem drive;
   private final Supplier<Pose2d> poseSupplier;
@@ -32,11 +32,14 @@ public class DriveToPoseTrajectory extends CommandBase {
   PIDController yController = new PIDController(Constants.Drivetrain.kPYAlign, Constants.Drivetrain.kIYController, 0);//FIXME
   PIDController thetaController = new PIDController(
         Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
-private final PPHolonomicDriveController holonomicDriveController = new PPHolonomicDriveController(xController, yController, thetaController);
+
+  private final PPHolonomicDriveController holonomicDriveController = new PPHolonomicDriveController(xController, yController, thetaController);
 
   private double driveErrorAbs;
   private double thetaErrorAbs;
 
+  Pose2d currentPose; 
+  Pose2d targetPose;
 
   public DriveToPoseTrajectory(DrivetrainSubsystem drive, Pose2d pose) {
     this(drive, () -> pose);
@@ -55,8 +58,8 @@ private final PPHolonomicDriveController holonomicDriveController = new PPHolono
   @Override
   public void initialize() {
     // Reset all controllers
-    var currentPose = drive.getPose();
-    var targetPose = poseSupplier.get();
+    currentPose = drive.getPose();
+    targetPose = poseSupplier.get();
 
     xController.reset();
     yController.reset();
@@ -82,11 +85,19 @@ private final PPHolonomicDriveController holonomicDriveController = new PPHolono
   public void execute() {
     // Pose2d currentPose = drive.getPose();
     // Pose2d targetPose = poseSupplier.get();
+    SmartDashboard.putNumberArray("Target Coords", new double[]{targetPose.getX(), targetPose.getY()});
     running = true;
 
     // try{
-      PathPlannerState state = (PathPlannerState) trajectory.sample(timer.get());
-      drive.drive(holonomicDriveController.calculate(drive.getPose(), state));
+    PathPlannerState state = (PathPlannerState) trajectory.sample(timer.get());
+
+    SmartDashboard.putNumberArray("chassisspeeds", 
+      new double[]{
+        holonomicDriveController.calculate(drive.getPose(), state).vxMetersPerSecond, 
+        holonomicDriveController.calculate(drive.getPose(), state).vyMetersPerSecond
+      });
+
+    drive.drive(holonomicDriveController.calculate(drive.getPose(), state));
      
     // }
     // catch(Exception e){
@@ -120,7 +131,8 @@ private final PPHolonomicDriveController holonomicDriveController = new PPHolono
 
   @Override
   public boolean isFinished() {
-    return /*trajectory == null  || */ timer.hasElapsed(trajectory.getTotalTimeSeconds()) && running/*|| atGoal()*/;
+    return atGoal();
+    //return /*trajectory == null  || */ timer.hasElapsed(trajectory.getTotalTimeSeconds()) && running/*|| atGoal()*/;
   }
   /** Checks if the robot is stopped at the final pose. */
   public boolean atGoal() {

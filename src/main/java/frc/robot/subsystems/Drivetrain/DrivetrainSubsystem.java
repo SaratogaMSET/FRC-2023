@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.swerve.BetterSwerveModuleState;
 import frc.lib.swerve.SwerveDriveKinematics2;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.subsystems.SwerveModule;
@@ -76,32 +77,30 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public DrivetrainSubsystem() {  
         m_navx.zeroYaw();
         //zeroGyroscope();  
-        resetModulesToAbsolute();     
-        try{
-            visionData = RobotContainer.m_visionSubsystem.getTable();
-        }
-        catch(Exception e){
-            visionData = NetworkTableInstance.getDefault().getTable("limelight");
-            e.printStackTrace();
-        }
+        resetModulesToAbsolute();    
+        visionData = NetworkTableInstance.getDefault().getTable("limelight-three");
 
-        stateSTD.set(0, 0, 0.01); stateSTD.set(1, 0, 0.01); stateSTD.set(2, 0, 0.01); //Tune Values
-        visDataSTD.set(0, 0, 0.99); visDataSTD.set(1, 0, 0.99); visDataSTD.set(2, 0, 0.99);
 
-        this.odomFiltered = new SwerveDrivePoseEstimator(Constants.Drivetrain.m_kinematics2, getRotation2d(), getModulePositions(), new Pose2d()); //, stateSTD, visDataSTD);
+        stateSTD.set(0, 0, 0.50); stateSTD.set(1, 0, 0.01); stateSTD.set(2, 0, 0.01); //Tune Values
+        visDataSTD.set(0, 0, 0.50); visDataSTD.set(1, 0, 0.99); visDataSTD.set(2, 0, 0.99);
+
+        this.odomFiltered = new SwerveDrivePoseEstimator(Constants.Drivetrain.m_kinematics2, getRotation2d(), getModulePositions(), new Pose2d(), stateSTD, visDataSTD);
         //swerveOdometry = new SwerveDriveOdometry(Constants.Drivetrain.m_kinematics, getRotation2d(), getModulePositions());   
     }
 
-   
     public Pose2d getVisionPose2d(){
+        try{
+        visionData = RobotContainer.m_visionSubsystem.getTable();
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
         double[] arr = visionData.getEntry("botpose").getDoubleArray(new double[8]);
         
         if (visionData.getEntry("tv").getDouble(0) == 0) return null;
         else return new Pose2d(new Translation2d(arr[0] + (8.24), arr[1] + 4.065), Rotation2d.fromDegrees(arr[5]));
     }
 
-
-      
     public PathPlannerTrajectory generateTrajectory(Pose2d targetPose){
         Pose2d currentPose = odomFiltered.getEstimatedPosition();  
 
@@ -379,12 +378,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         //swerveOdometry.update(getRotation2d(), getModulePositions());  
         Logger.getInstance().recordOutput("UKF Odometry", odomFiltered.getEstimatedPosition());
-        // var asdf = odomFiltered.getEstimatedPosition();
-        // SmartDashboard.putNumberArray("UKF Coords", new double[]{asdf.getX(), asdf.getY(), asdf.getRotation().getRadians()});
+        var asdf = odomFiltered.getEstimatedPosition();
+        SmartDashboard.putNumberArray("UKF Coords", new double[]{asdf.getX(), asdf.getY(), asdf.getRotation().getRadians()});
         //lastRotation = new Rotation2d(-gyroInputs.yawPositionRad);
-        // m_field.setRobotPose(odomFiltered.getEstimatedPosition());
+        m_field.setRobotPose(odomFiltered.getEstimatedPosition());
         //if (pose != null) visionPoseEstimates.setRobotPose(pose);
-        // SmartDashboard.putData("Field", m_field);
+        SmartDashboard.putData("Field", m_field);
         // SmartDashboard.putNumber("Nav Heading", getNavHeading());
         //SmartDashboard.putData("visionEstimate", visionPoseEstimates);
         

@@ -15,6 +15,8 @@ import frc.lib.swerve.SwerveDriveKinematics2;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -378,6 +380,43 @@ public final class Constants {
         public static final double Y_OFFSET_BLUE = -0.5588; // meters
         public static final double ALIGNMENT_ALLOWED_TOLERANCE_TRANSLATIONAL = 0.1; // meters
         public static final double ALIGNMENT_ALLOWED_TOLERANCE_ROTATIONAL = 0.122; // radians
+        public static ArrayList<Pose2d> BlueConeScoringPositions = new ArrayList<Pose2d>(
+                List.of(
+                        new Pose2d(new Translation2d(1.83, 0.502), new Rotation2d(0)),
+                        new Pose2d(new Translation2d(1.83, 1.6292), new Rotation2d(0)),
+                        new Pose2d(new Translation2d(1.83, 2.1906), new Rotation2d(0)), 
+                        new Pose2d(new Translation2d(1.83, 3.3134), new Rotation2d(0)),
+                        new Pose2d(new Translation2d(1.83, 3.8748), new Rotation2d(0)),
+                        new Pose2d(new Translation2d(1.83, 4.9626), new Rotation2d(0))
+                )
+        );
+
+        public static ArrayList<Pose2d> BlueCubeScoringPositions = new ArrayList<Pose2d>(
+                List.of(
+                        new Pose2d(new Translation2d(1.83, 1.0678), new Rotation2d(0)),
+                        new Pose2d(new Translation2d(1.83, 2.752), new Rotation2d(0)),
+                        new Pose2d(new Translation2d(1.83, 4.4362), new Rotation2d(0))
+                )
+        );
+        public static ArrayList<Pose2d> RedConeScoringPositions = new ArrayList<Pose2d>(
+                List.of(
+                        /* just flip x values 16.4846 - 1.83*/ 
+                        new Pose2d(new Translation2d(14.6546, 0.502), new Rotation2d(Math.PI)),
+                        new Pose2d(new Translation2d(14.6546, 1.6292), new Rotation2d(Math.PI)),
+                        new Pose2d(new Translation2d(14.6546, 2.1906), new Rotation2d(Math.PI)), 
+                        new Pose2d(new Translation2d(14.6546, 3.3134), new Rotation2d(Math.PI)),
+                        new Pose2d(new Translation2d(14.6546, 3.8748), new Rotation2d(Math.PI)),
+                        new Pose2d(new Translation2d(14.6546, 4.9626), new Rotation2d(Math.PI))
+                )
+        );
+
+        public static ArrayList<Pose2d> RedCubeScoringPositions = new ArrayList<Pose2d>(
+                List.of(
+                        new Pose2d(new Translation2d(14.6546, 1.0678), new Rotation2d(Math.PI)),
+                        new Pose2d(new Translation2d(14.6546, 2.752), new Rotation2d(Math.PI)),
+                        new Pose2d(new Translation2d(14.6546, 4.4362), new Rotation2d(Math.PI))
+                )
+        );
     }
 
     public final class ArmParameters{

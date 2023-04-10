@@ -9,6 +9,19 @@ import frc.robot.controls.ArmInterface;
 
 public class ArmSubsystem extends SubsystemBase {
     int side = 0;
+    double proxKp = 10.2; //10.2
+    double distKp = 9.2; //9.5
+
+    double proxKd = 0.042; //0.035
+    double distKd = 0.02; 
+
+    double proxKf = 0.80;
+    double distKf = 1.30;
+    double armTolerance = 0.03;
+
+    double maxVoltPerVelocity = 2.5000254;
+    double max_voltage = 6.5;
+    
     public ArmInterface armInterface = new ArmInterface();
     public ArmVisualizer armVisualizer = new ArmVisualizer("/Arm", null);
     public ArmSubsystem() {
@@ -82,19 +95,6 @@ public class ArmSubsystem extends SubsystemBase {
         SimpleMatrix state = armInterface.state();
 
         SimpleMatrix error = target.minus(state);
-
-        double proxKp = 10.2; //10.2
-        double distKp = 9.2; //9.5
-
-        double proxKd = 0.042; //0.035
-        double distKd = 0.02; 
-
-        double proxKf = 0.80;
-        double distKf = 1.30;
-        double armTolerance = 0.03;
-
-        double maxVoltPerVelocity = 2.5000254;
-        double max_voltage = 6.5;
 
         double voltageProximal = error.get(0) * proxKp + error.get(2) * proxKd;
         double voltageDistal = error.get(1) * distKp + error.get(3) * distKd;
