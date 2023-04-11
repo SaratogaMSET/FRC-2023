@@ -61,15 +61,15 @@ public class CANdleSubsystem extends SubsystemBase {
         candle3.configAllSettings(candleConfiguration, 400);
         candle4.configAllSettings(candleConfiguration, 400);
 
-        candle1.setControlFramePeriod(CANdleControlFrame.CANdle_Control_2_ModulatedVBatOut, 300);
-        candle2.setControlFramePeriod(CANdleControlFrame.CANdle_Control_2_ModulatedVBatOut, 300);
-        candle3.setControlFramePeriod(CANdleControlFrame.CANdle_Control_2_ModulatedVBatOut, 300);
-        candle4.setControlFramePeriod(CANdleControlFrame.CANdle_Control_2_ModulatedVBatOut, 300);
+        // candle1.setControlFramePeriod(CANdleControlFrame.CANdle_Control_2_ModulatedVBatOut, 300);
+        // candle2.setControlFramePeriod(CANdleControlFrame.CANdle_Control_2_ModulatedVBatOut, 300);
+        // candle3.setControlFramePeriod(CANdleControlFrame.CANdle_Control_2_ModulatedVBatOut, 300);
+        // candle4.setControlFramePeriod(CANdleControlFrame.CANdle_Control_2_ModulatedVBatOut, 300);
 
-        candle1.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 30000);
-        candle2.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 30000);
-        candle3.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 30000);
-        candle4.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 30000);
+        // candle1.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 30000);
+        // candle2.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 30000);
+        // candle3.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 30000);
+        // candle4.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 30000);
     }
 
     // public boolean getFlash(){
@@ -78,7 +78,33 @@ public class CANdleSubsystem extends SubsystemBase {
     // public void setFlash(boolean x){
     //     flash = x;
     // }
+   public void mapClawPosition(int index){
+        LEDSegment.FrontLeftStrip.fullClear();
+        LEDSegment.FrontRightStrip.fullClear();
+        LEDSegment.BackLeftStrip.fullClear();
+        LEDSegment.BackRightStrip.fullClear();
+        //Indices 8-37
+        if(index > 8 && index < 8 + (37-8)/2){
+            Color lerped = lerpColor(red, yellow, (index-8)/(15.0));
 
+            LEDSegment.FrontLeftStrip.setColor(lerped, index, 3);
+            LEDSegment.FrontRightStrip.setColor(lerped, index, 3);
+        }else if(index > 8 + 15 && index < 8 + (37-8)/2 + 15){
+            Color lerped = lerpColor(yellow, green, (index-8-15)/(15.0));
+
+            LEDSegment.FrontLeftStrip.setColor(lerped, index, 3);
+            LEDSegment.FrontRightStrip.setColor(lerped, index, 3);
+        }
+        // LEDSegment.FrontLeftStrip.setColor(yellow, index);
+        // // LEDSegment.BackRightStrip.setColor(yellow, index);
+        // // LEDSegment.FrontRightStrip.setColor(yellow, index);
+        // LEDSegment.FrontRightStrip.setColor(yellow, index);
+   }
+    public Color lerpColor(Color colorOne, Color colorTwo, double zerotoone){
+        return new Color((int)(colorOne.red+zerotoone*(colorTwo.red-colorOne.red)),
+                        (int)(colorOne.green+zerotoone*(colorTwo.green-colorOne.green)),
+                        (int)(colorOne.blue+zerotoone*(colorTwo.blue-colorOne.blue)));
+    }
     public void setColor(Color color){
         LEDSegment.FrontLeftStrip.setColor(color);
         LEDSegment.BackRightStrip.setColor(color);
@@ -132,8 +158,12 @@ public class CANdleSubsystem extends SubsystemBase {
         LEDSegment.FrontRightStrip.setColor(purple);
     }
     public void strobe(){
+        // LEDSegment.FrontLeftStrip.fullClear();
+        // LEDSegment.FrontRightStrip.fullClear();
+        // LEDSegment.BackLeftStrip.fullClear();
+        // LEDSegment.BackRightStrip.fullClear();
         Color newColor = new Color(CANdleSubsystem.color);    
-
+        
         LEDSegment.BackRightStrip.setFlowAnimation(green, 0.5);
         LEDSegment.BackLeftStrip.setFlowAnimation(green, 0.5);
         LEDSegment.FrontLeftStrip.setColor(green);
@@ -307,6 +337,16 @@ public class CANdleSubsystem extends SubsystemBase {
         public void setColor(Color color) {
             clearAnimation();
             candle.setLEDs(color.red, color.green, color.blue, 0, startIndex, segmentSize);
+        }
+
+        public void setColor(Color color, int index){
+            clearAnimation();
+            candle.setLEDs(color.red, color.green, color.blue, 0, index, 1);
+        }
+
+        public void setColor(Color color, int index, int count){
+            clearAnimation();
+            candle.setLEDs(color.red, color.green, color.blue, 0, index, count);
         }
 
         private void setAnimation(Animation animation) {
