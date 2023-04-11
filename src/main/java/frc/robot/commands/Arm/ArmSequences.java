@@ -8,10 +8,12 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmNodeDictionary;
+import frc.robot.commands.Claw.ManualOpenIntake;
 import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
+import frc.robot.subsystems.Claw.ClawSubsystem.GamePiece;
 import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
 import frc.robot.subsystems.GroundIntake.RollerSubsystem;
 
@@ -185,10 +187,9 @@ public class ArmSequences{
             score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_midcone_score_x, Constants.ArmNodeDictionary.ready_midcone_score_y, true);
         }else{
             ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
-            score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_midcone_score_x, Constants.ArmNodeDictionary.ready_midcone_score_y , true);
+            score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_midcone_score_x, Constants.ArmNodeDictionary.ready_midcone_score_y, true);
         }
-        ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
-        ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
+        // ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
         // return ready.andThen(score).andThen(openIntake).andThen(zero);
         return ready.andThen(score);
     }
@@ -210,49 +211,62 @@ public class ArmSequences{
         // return ready.andThen(score).andThen(openIntake).andThen(zero);
         
     }
-    public static SequentialCommandGroup armDunkMiddle(ArmSubsystem armSubsystem, int side){
-        ArmPositionCommand ready;
-        ArmPositionCommand score;
-        ArmPositionCommand dunk;
-        ArmPositionCommand reset; 
-
-        if(side > 0) {
-            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.1);
-            score = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.ready_midcone_score_x -0.03), Constants.ArmNodeDictionary.ready_midcone_score_y, 0.1, false);
-            dunk = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.ready_midcone_score_x-0.1), Constants.ArmNodeDictionary.ready_midcone_score_y -0.5, 0.3, false);
-            reset = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_midcone_score_y -0.5, 0.15);
-        } else {
-            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.1);
-            score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_midcone_score_x -0.03, Constants.ArmNodeDictionary.ready_midcone_score_y, 0.1, false);
-            dunk = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_midcone_score_x-0.1, Constants.ArmNodeDictionary.ready_midcone_score_y - 0.5, 0.3, false);
-            reset = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y + 0.25, 0.15);
-        }  
-        
-        
-        return ready.andThen(score).andThen(dunk).andThen(reset).andThen(new ArmZeroCommand(armSubsystem));
-    }
-
-    public static SequentialCommandGroup armDunk(ArmSubsystem armSubsystem, int side){
-        ArmPositionCommand ready;
-        ArmPositionCommand score;
+    public static Command armDunkMiddle(ArmSubsystem armSubsystem, ClawSubsystem clawSubsystem, int side){
+        // ArmPositionCommand ready;
+        // ArmPositionCommand score;
         ArmPositionCommand dunk;
         ArmPositionCommand reset; 
         if(side > 0) {
-            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
-            score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, 0.3, false);
-            dunk = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y-0.75, 0.4, false);
-            reset = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y + 0.25, 0.15);
+            // ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
+            // score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, 0.3, false);
+            dunk = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.ready_midcone_score_x), Constants.ArmNodeDictionary.ready_midcone_score_y-0.2, 0.1, true);
+            reset = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_midcone_score_y + 0.25, 0.15, true);
         } else {
-            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
-            score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, 0.3, false);
-            dunk = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcone_score_x-0.1, Constants.ArmNodeDictionary.ready_highcone_score_y-0.5, 0.3, false);
-            reset = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y + 0.25, 0.15);
+            // ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
+            // score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, 0.3, false);
+            dunk = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_midcone_score_x, Constants.ArmNodeDictionary.ready_midcone_score_y-0.2, 0.1, true);
+            reset = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y + 0.25, 0.15, true);
         }  
         
-        
-        return ready.andThen(score).andThen(dunk).andThen(reset).andThen(new ArmZeroCommand(armSubsystem));
+        // RunCommand openIntake = new RunCommand(()-> clawSubsystem.openClaw());
+        return (dunk); //.andThen(reset).alongWith(new WaitCommand(0.3).andThen(openIntake)); //.andThen(new ArmZeroCommand(armSubsystem));
 
     }
+
+    public static Command armDunk(ArmSubsystem armSubsystem, ClawSubsystem clawSubsystem,int side){
+        // ArmPositionCommand ready;
+        // ArmPositionCommand score;
+        ArmPositionCommand dunk;
+        ArmPositionCommand reset; 
+        if(side > 0) {
+            // ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
+            // score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, 0.3, false);
+            dunk = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.ready_highcone_score_x +0.05), Constants.ArmNodeDictionary.ready_highcone_score_y-0.2, 0.1, true);
+            reset = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y + 0.25, 0.15, true);
+        } else {
+            // ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
+            // score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, 0.3, false);
+            dunk = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcone_score_x + 0.05, Constants.ArmNodeDictionary.ready_highcone_score_y-0.2, 0.1, true);
+            reset = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y + 0.25, 0.15, true);
+        }  
+        
+        // RunCommand openIntake = new RunCommand(()-> clawSubsystem.openClaw());
+        return (dunk); //.andThen(reset).alongWith(new WaitCommand(0.3).andThen(openIntake)); //.andThen(new ArmZeroCommand(armSubsystem));
+
+    }
+
+    public static Command scoreHighCommandGroup(ArmSubsystem armSubsystem, ClawSubsystem clawSubsystem, int side){
+        if(clawSubsystem.getGamePieceType() == GamePiece.Cube){
+            return scoreCubeHighNoRetract(armSubsystem, clawSubsystem, side);
+        }
+        else if(clawSubsystem.getGamePieceType() == GamePiece.Cone) {
+            return scoreConeHighNoRetract(armSubsystem, clawSubsystem, side);
+        }
+        else{
+            return ready(armSubsystem, side);
+        }
+    }
+
     public static SequentialCommandGroup scoreConeHighNoRetract(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem ,int side){
         ArmPositionCommand ready;
         ArmPositionCommand score;
@@ -264,7 +278,7 @@ public class ArmSequences{
             score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, true);
         }
         // ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
-        ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
+        // ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
 
         // return ready.andThen(score).andThen(openIntake);
         return ready.andThen(score);
