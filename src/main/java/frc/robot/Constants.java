@@ -136,7 +136,7 @@ public final class Constants {
             public static final int driveMotorID = 34;
             public static final int angleMotorID = 35;
             public static final int canCoderID = 45;
-            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(34.45 + 180 - 118.14));
+            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(95.712));
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -146,7 +146,7 @@ public final class Constants {
             public static final int driveMotorID = 36;
             public static final int angleMotorID = 37;
             public static final int canCoderID = 47;
-            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(357.19 - 1.24 + 180 - 437.91 + 180));
+            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(-82.177));
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -156,7 +156,7 @@ public final class Constants {
             public static final int driveMotorID = 32;
             public static final int angleMotorID = 33;
             public static final int canCoderID = 43;
-            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(312.45-3.16 + 1.853 - 97.403));
+            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(-146.43));
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -166,7 +166,7 @@ public final class Constants {
             public static final int driveMotorID = 30;
             public static final int angleMotorID = 31;
             public static final int canCoderID = 41;
-            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(349.54 + 2.54 - 22.918 + 180 - 8));
+            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(322.91 - 180));
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -301,7 +301,7 @@ public final class Constants {
         public static final int INTAKE_MOTOR = 20;
         public static final double TARGET_VELOCITY = 1; //0.875 
         public static final double CUBE_MEDIUM_BOUND = (35); //52 * 0.6 
-        public static final double CONE_MEDIUM_BOUND = 56.83;
+        public static final double CONE_MEDIUM_BOUND = 60.83; //56.83
 }
 
     public final class GroundIntake{
@@ -468,11 +468,11 @@ public final class Constants {
       }
       public final class ArmNodeDictionary{
         public double[] ready_highcone_score = new double[]{1.38 + 0.05, 1.18};
-        public static final double ready_highcone_score_x = 1.38;
-        public static final double ready_highcone_score_y = 1.14; // before: 1.18, little after:1.13
+        public static final double ready_highcone_score_x = 1.38 + 0.02;
+        public static final double ready_highcone_score_y = 1.14; 
 
-        public double[] ready_midcone_score = new double[]{0.97, 0.65};
-        public static final double ready_midcone_score_x = 0.96 +.1525-0.08 - (2* 0.0254);
+        // public static double[] ready_midcone_score = new double[]{0.97, 0.65};
+        public static final double ready_midcone_score_x = 0.96 +.1525-0.08 - (3* 0.0254);
         public static final double ready_midcone_score_y = 0.66 +.1525 + (2 * 0.0254);
 
         public double[] ready_highcube_score = new double[]{1.38, 0.96};
