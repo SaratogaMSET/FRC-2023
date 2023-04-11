@@ -37,7 +37,7 @@ public class ClawSubsystem extends SubsystemBase{
     private boolean hasZeroedEncoder = false;
     double minVelocity = 0.1;
     double maxVelocity = 0.85;
-    double curve = 0.45;
+    double curve = 0.45; //0.45
 
     /* TODO make state enums */
     private boolean acquired = false;
@@ -117,7 +117,7 @@ public class ClawSubsystem extends SubsystemBase{
     }
 
     public boolean isGamepieceInRange() {
-        return getProximityValue() > 65;
+        return getProximityValue() > 90; //65
     }
 
     private void resetEncoder() {
@@ -153,7 +153,7 @@ public class ClawSubsystem extends SubsystemBase{
 
     public void autoCloseClaw() {
         if(isGamepieceInRange()) {
-            if (isClawFullyOpen() || startedAutoClose) {
+            // if (isClawFullyOpen() || startedAutoClose) {
                 // Either the claw is fully open or we had previously started auto close.
                 startedAutoClose = true;
                 double encoderPosition = encoder.getPosition();
@@ -188,7 +188,7 @@ public class ClawSubsystem extends SubsystemBase{
                     motor.set(0.0);
                 }
             }
-        }
+        // }
     }
 
     public void manualCloseClaw() {
@@ -227,7 +227,8 @@ public class ClawSubsystem extends SubsystemBase{
     public void updateClawTelemetry() {
         SmartDashboard.putNumber("ClawPos", encoder.getPosition());
         // SmartDashboard.putBoolean("Limit Switch", getHallEffect());
-        SmartDashboard.putBoolean("Is Object in Range", isGamepieceInRange());
+        // SmartDashboard.putBoolean("Is Object in Range", isGamepieceInRange());
+        SmartDashboard.putNumber("Proximity Value", getProximityValue());
         // SmartDashboard.putBoolean("Detecting", objectInRange());
         // SmartDashboard.putNumber("Red value", colorSensor.getRed());
         // SmartDashboard.putNumber("Green value", colorSensor.getGreen());
