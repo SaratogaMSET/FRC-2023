@@ -164,7 +164,7 @@ public class VisionSubsystem extends SubsystemBase {
         // SmartDashboard.putNumber("LL to Mid (Vertical)",getLimelightTy(1));
         // SmartDashboard.putNumber("LL to High (Vertical)",getLimelightTy(2));
         // SmartDashboard.putNumber("LL to AprilTag",Math.hypot(getCamTranOld()[0], getCamTranOld()[2]));
-        NetworkTableInstance.getDefault().flush();
+        // NetworkTableInstance.getDefault().flush();
         //meters to inches: 1m = 39.3701 in
         // SmartDashboard.putNumber("LL to Mid (Horizontal, Inches)",39.3701*(getLimelightTx(1)));
         // SmartDashboard.putNumber("LL to High (Horizontal, Inches)", 39.3701*(getLimelightTx(2)));

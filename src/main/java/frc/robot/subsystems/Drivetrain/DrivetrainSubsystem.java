@@ -81,8 +81,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         visionData = NetworkTableInstance.getDefault().getTable("limelight-three");
 
 
-        stateSTD.set(0, 0, 0.50); stateSTD.set(1, 0, 0.01); stateSTD.set(2, 0, 0.01); //Tune Values
-        visDataSTD.set(0, 0, 0.50); visDataSTD.set(1, 0, 0.99); visDataSTD.set(2, 0, 0.99);
+        stateSTD.set(0, 0, 0.20); stateSTD.set(1, 0, 0.2); stateSTD.set(2, 0, 0.2); //Tune Values
+        visDataSTD.set(0, 0, 0.80); visDataSTD.set(1, 0, 0.8); visDataSTD.set(2, 0, 0.8);
 
         this.odomFiltered = new SwerveDrivePoseEstimator(Constants.Drivetrain.m_kinematics2, getRotation2d(), getModulePositions(), new Pose2d(), stateSTD, visDataSTD);
         //swerveOdometry = new SwerveDriveOdometry(Constants.Drivetrain.m_kinematics, getRotation2d(), getModulePositions());   
@@ -101,48 +101,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         else return new Pose2d(new Translation2d(arr[0] + (8.24), arr[1] + 4.065), Rotation2d.fromDegrees(arr[5]));
     }
 
-    public PathPlannerTrajectory generateTrajectory(Pose2d targetPose){
-        Pose2d currentPose = odomFiltered.getEstimatedPosition();  
-
-        Translation2d currentPosition = 
-            new Translation2d(currentPose.getX(), currentPose.getY());
-        Translation2d desiredPosition = 
-            new Translation2d(targetPose.getX(), targetPose.getY());
-        Rotation2d driveAngle = desiredPosition.minus(currentPosition).getAngle();
-
-        PathPlannerTrajectory trajectory = PathPlanner.generatePath(
-            new PathConstraints(1, 1),
-            List.of(
-                new PathPoint(currentPosition, driveAngle, this.getRotation2d()), // drive angle doesn't matter i think?
-                new PathPoint(desiredPosition, driveAngle, targetPose.getRotation()) // in radians
-            ));
-        return trajectory;
-    }
-
-    public PPSwerveControllerCommandA driveToPose(){
-        /* TODO Implement hashers */
-        PathPlannerTrajectory trajectory = generateTrajectory(new Pose2d(new Translation2d(1, 1), new Rotation2d()));
-
-        PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
-        PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);//FIXME
-        PIDController thetaController = new PIDController(
-              Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
-        
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);
-        xController.reset();
-        yController.reset();
-        thetaController.reset();
-        
-        return new PPSwerveControllerCommandA(
-            trajectory, 
-            this::getPose, 
-            xController, 
-            yController, 
-            thetaController, 
-            this::drive, 
-            false, 
-            this);
-    }
+    
     
     public Rotation2d getRotation2d() {
         // if(gyroInputs.connected){
@@ -156,7 +115,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
         double angle = m_navx.getYaw() + 180 - offset;
         angle = angle + 90 + 360;
         angle = angle % 360;
-        SmartDashboard.putNumber("navX Offset", offset);
         return Math.toRadians(angle);
       }
 
@@ -331,9 +289,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         //Logger.getInstance().recordOutput("After Correction", Drivetrain.m_kinematics.toSwerveModuleStates(speeds));
 
         previousDesiredState = currentDesiredState;
-        //currentDesiredState = Constants.Drivetrain.m_kinematics.toSwerveModuleStates(speeds);
         currentDesiredState = Constants.Drivetrain.m_kinematics2.toSwerveModuleStates(m_chassisSpeeds);
-        // ChassisSpeeds currentSpeeds = Constants.Drivetrain.m_kinematics.toChassisSpeeds(previousDesiredState);
         SwerveDriveKinematics2.desaturateWheelSpeeds(currentDesiredState, Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND);
 
         if(previousDesiredState[0] == null || previousDesiredState[1] == null || previousDesiredState[2] == null || previousDesiredState[3] == null){
@@ -366,8 +322,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
         //Logger.getInstance().recordOutput("Gyro Rotation2d", new Pose2d(new Translation2d(0,0),m_navx.getRotation2d()));
         //Logger.getInstance().recordOutput("Gyro Yaw", m_navx.getYaw());
 
+        // odomFiltered.update(getRotation2d(), new Rotation2d(m_navx.getPitch()), new Rotation2d(m_navx.getRoll()), getModulePositions());
         odomFiltered.update(getRotation2d(), getModulePositions());
-        double[] pos = new double[]{odomFiltered.getEstimatedPosition().getX(), odomFiltered.getEstimatedPosition().getY(), odomFiltered.getEstimatedPosition().getRotation().getDegrees()};
+
+        // double[] pos = new double[]{odomFiltered.getEstimatedPosition().getX(), odomFiltered.getEstimatedPosition().getY(), odomFiltered.getEstimatedPosition().getRotation().getDegrees()};
         // SmartDashboard.putNumberArray("Odom", pos);
         lastPose = odomFiltered.getEstimatedPosition();
         Pose2d pose = getVisionPose2d();
@@ -378,12 +336,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         //swerveOdometry.update(getRotation2d(), getModulePositions());  
         Logger.getInstance().recordOutput("UKF Odometry", odomFiltered.getEstimatedPosition());
-        var asdf = odomFiltered.getEstimatedPosition();
-        SmartDashboard.putNumberArray("UKF Coords", new double[]{asdf.getX(), asdf.getY(), asdf.getRotation().getRadians()});
+        // var asdf = odomFiltered.getEstimatedPosition();
+        // SmartDashboard.putNumberArray("UKF Coords", new double[]{asdf.getX(), asdf.getY(), asdf.getRotation().getRadians()});
         //lastRotation = new Rotation2d(-gyroInputs.yawPositionRad);
         m_field.setRobotPose(odomFiltered.getEstimatedPosition());
         //if (pose != null) visionPoseEstimates.setRobotPose(pose);
-        SmartDashboard.putData("Field", m_field);
+        // SmartDashboard.putData("Field", m_field);
         // SmartDashboard.putNumber("Nav Heading", getNavHeading());
         //SmartDashboard.putData("visionEstimate", visionPoseEstimates);
         

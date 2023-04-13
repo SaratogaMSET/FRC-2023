@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.Claw;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorSensorV3;
 import com.revrobotics.RelativeEncoder;
@@ -39,6 +41,7 @@ public class ClawSubsystem extends SubsystemBase{
     double maxVelocity = 0.85;
     double curve = 0.45; //0.45
 
+
     /* TODO make state enums */
     private boolean acquired = false;
     private boolean flash = false;
@@ -52,7 +55,14 @@ public class ClawSubsystem extends SubsystemBase{
 
     public ClawSubsystem() {
         motor.setIdleMode(IdleMode.kBrake);
-        colorSensor = new ColorSensorV3(Port.kOnboard);
+        colorSensor = new ColorSensorV3(Port.kOnboard); //kmxp
+        /*
+            Test was done without the eboard cover on
+         * kOnboard: Cube in the center : 63 +-3
+         *          : Cube High touching the color sensor: 125 +- 3 
+         * kMxp: Cube in the center : 60 - 68
+         *          : Cube High touching the color sensor: 122 +- 3 
+         */
         motor.setSmartCurrentLimit(30);
     }
 
@@ -125,7 +135,7 @@ public class ClawSubsystem extends SubsystemBase{
     }  
 
     public void openClaw() {
-        updateClawTelemetry();
+        // updateClawTelemetry();
         double openVelocity = 0.0;
         if(isClawFullyOpen()) {
             openVelocity = 0.0; 
@@ -229,7 +239,7 @@ public class ClawSubsystem extends SubsystemBase{
         // SmartDashboard.putBoolean("Limit Switch", getHallEffect());
         // SmartDashboard.putBoolean("Is Object in Range", isGamepieceInRange());
         SmartDashboard.putNumber("Proximity Value", getProximityValue());
-        // SmartDashboard.putBoolean("Detecting", objectInRange());
+        SmartDashboard.putBoolean("Detecting", isGamepieceInRange());
         // SmartDashboard.putNumber("Red value", colorSensor.getRed());
         // SmartDashboard.putNumber("Green value", colorSensor.getGreen());
         // SmartDashboard.putNumber("Blue value", colorSensor.getBlue());
@@ -244,8 +254,8 @@ public class ClawSubsystem extends SubsystemBase{
     public void periodic() {
         // This method will be called once per scheduler run
         updateClawTelemetry();
+        Logger.getInstance().recordOutput("Proximity Value", getProximityValue());
         // if (Timer.getFPGATimestamp() - time > 2) flash = false;
-        // SmartDashboard.putNumber("TIME IS DOOOMED", time);
     }
 
     @Override

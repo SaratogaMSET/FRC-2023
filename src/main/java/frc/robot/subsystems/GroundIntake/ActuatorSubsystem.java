@@ -131,7 +131,7 @@ public class ActuatorSubsystem extends SubsystemBase {
         else{
             
             double outputVoltage = (k_P * error + k_I * integralError + k_D * velocityError- gravity) * power;
-            SmartDashboard.putNumber("More Pain", outputVoltage );
+            // SmartDashboard.putNumber("More Pain", outputVoltage );
             double yikes = Math.max(0.5, Math.min(4, outputVoltage));
             Actuator.setVoltage(yikes);
         }
