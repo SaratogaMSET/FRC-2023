@@ -317,7 +317,7 @@ public class AutonSequences {
           true,
           m_drivetrainSubsystem);
 
-        List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Middle Path Builder", new PathConstraints(1.25, 1.25));
+        List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Middle Path Builder", new PathConstraints(2, 4));
         Command build = swerveAutoBuilder.fullAuto(trajectory);
         // ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds((6 * 0.1524)/1.5, 0, 0, m_drivetrainSubsystem.getRotation2d());
         return build.andThen(new AutoRunCommand(m_drivetrainSubsystem, ChassisSpeeds.fromFieldRelativeSpeeds(0, ((Drivetrain.balanceXVelocity +0.25)), 0, m_drivetrainSubsystem.getRotation2d())).withTimeout(Drivetrain.balanceTimeout + 0.15)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));

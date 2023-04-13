@@ -47,6 +47,9 @@ public class MoveWithClosest90 extends CommandBase {
     }
     @Override
     public void initialize(){
+        m_translationXTrapezoidal = 0;
+        m_translationYTrapezoidal = 0;
+        m_drivetrainSubsystem.drive(new ChassisSpeeds(0.0,0.0,0.0));
         controller.enableContinuousInput(-180, 180);
         axis = (int) m_drivetrainSubsystem.getRotation2d().getDegrees() / 90;
         if(m_drivetrainSubsystem.getRotation2d().getDegrees() - axis * 90 > 45) axis++ ;

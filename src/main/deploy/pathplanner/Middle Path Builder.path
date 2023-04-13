@@ -51,15 +51,18 @@
     },
     {
       "anchorPoint": {
-        "x": 5.032208675528462,
-        "y": 2.78
+        "x": 5.853492198303842,
+        "y": 2.808125105833545
       },
       "prevControl": {
-        "x": 5.358156191241983,
-        "y": 2.78
+        "x": 6.179439714017363,
+        "y": 2.808125105833545
       },
-      "nextControl": null,
-      "holonomicAngle": 0,
+      "nextControl": {
+        "x": 5.527544682590321,
+        "y": 2.808125105833545
+      },
+      "holonomicAngle": 180.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -72,20 +75,44 @@
         "waitBehavior": "none",
         "waitTime": 0
       }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.9546787687325375,
+        "y": 2.8119523114046223
+      },
+      "prevControl": {
+        "x": 4.778408195189539,
+        "y": 2.8119523114046223
+      },
+      "nextControl": null,
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "Balance Command"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "after",
+        "waitTime": 0
+      }
     }
   ],
-  "maxVelocity": 1.0,
-  "maxAcceleration": 1.0,
+  "maxVelocity": 1.25,
+  "maxAcceleration": 4.0,
   "isReversed": null,
   "markers": [
     {
-      "position": 0.07784090909090909,
+      "position": 0.08,
       "names": [
         "Arm Zero Command"
       ]
     },
     {
-      "position": 0.7839488636363634,
+      "position": 0.78,
       "names": [
         "Intake Front",
         "Run Rollers"

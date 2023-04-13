@@ -49,6 +49,9 @@ public class DefaultDriveCommand extends CommandBase {
 
     @Override
     public void initialize(){
+        m_translationXTrapezoidal = 0;
+        m_translationYTrapezoidal = 0;
+        m_drivetrainSubsystem.drive(new ChassisSpeeds(0.0,0.0,0.0));
         controller.enableContinuousInput(90, 270); //90, 360
         axis = (int) m_drivetrainSubsystem.getRotation2d().getDegrees() / 180;
         if(m_drivetrainSubsystem.getRotation2d().getDegrees() - axis * 180 > 90) axis++ ;
@@ -56,6 +59,7 @@ public class DefaultDriveCommand extends CommandBase {
     }
     @Override
     public void execute() {
+        double rotation = m_rotationSupplier.getAsDouble()/1.5;
         SmartDashboard.putNumber("desiredAngle", desiredAngle);
         m_translationXTrapezoidal = (m_translationXSupplier.getAsDouble()-m_translationXTrapezoidal)/6 + m_translationXTrapezoidal;
         m_translationYTrapezoidal = (m_translationYSupplier.getAsDouble()-m_translationYTrapezoidal)/6 + m_translationYTrapezoidal;
@@ -67,18 +71,13 @@ public class DefaultDriveCommand extends CommandBase {
 
         double multiplier = Math.pow(Math.abs(m_rotationSupplier.getAsDouble()/7), 0.8);
 
-        double resultX = Math.cos(roboAngle) * magnitude;
-        double resultY = Math.sin(roboAngle) * magnitude;
-        
-        
-        SmartDashboard.putNumber("m_translationXSupplier", m_translationXTrapezoidal);
-        SmartDashboard.putNumber("m_translationYSupplier", m_translationYTrapezoidal);
-        SmartDashboard.putNumber("m_rotationSupplier", m_rotationSupplier.getAsDouble());
-        SmartDashboard.putNumber("Magnitude", magnitude);
-        double armY = armHeight.getAsDouble();
+        // double scaler = 1/(1- translationalScaler) * ( rotation* multiplier);
 
-        double scaler = 1/(1- translationalScaler) * ( m_rotationSupplier.getAsDouble()/1.5 * multiplier);
-        SmartDashboard.putNumber("Scaler", scaler);
+        double resultX = Math.cos(roboAngle) * magnitude;  //* scaler;
+        double resultY = Math.sin(roboAngle) * magnitude; //* scaler;
+        
+        double armY = armHeight.getAsDouble();
+    
 
         if(Math.abs(gunnerSupplier.getAsDouble()) < 2){
          if(armY > 0.35){
@@ -93,7 +92,7 @@ public class DefaultDriveCommand extends CommandBase {
                 new ChassisSpeeds(
                 resultX/2.25,
                 resultY/2.25,
-                pidValue
+                pidValue + rotation
                 )
                         // m_drivetrainSubsystem.getRotation2d()
                         // )
@@ -106,7 +105,7 @@ public class DefaultDriveCommand extends CommandBase {
                 new ChassisSpeeds(
                 resultX/2,
                 resultY/2,
-                m_rotationSupplier.getAsDouble()/1.5 * multiplier)
+                rotation * multiplier)
                 // m_drivetrainSubsystem.getRotation2d()
                 // )
             );
@@ -117,7 +116,7 @@ public class DefaultDriveCommand extends CommandBase {
                         new ChassisSpeeds(
                         resultX,
                         resultY,
-                        m_rotationSupplier.getAsDouble()/1.5 * multiplier)
+                        rotation * multiplier)
                         // m_drivetrainSubsystem.getRotation2d()
                         // )
                 );
@@ -136,7 +135,7 @@ public class DefaultDriveCommand extends CommandBase {
                                     new ChassisSpeeds(
                                     resultX/2.25,
                                     Math.copySign(0.5, gunnerSupplier.getAsDouble()),
-                                    pidValue)
+                                    pidValue + rotation)
                                     // m_drivetrainSubsystem.getRotation2d()
                                     // )
                         );
@@ -146,7 +145,7 @@ public class DefaultDriveCommand extends CommandBase {
                                     new ChassisSpeeds(
                                     resultX/2.25,
                                     Math.copySign(0.35, gunnerSupplier.getAsDouble()),
-                                    pidValue)
+                                    pidValue + rotation)
                         );
                         }
 
@@ -157,7 +156,7 @@ public class DefaultDriveCommand extends CommandBase {
                         new ChassisSpeeds(
                         resultX/2,
                         Math.copySign(0.35, gunnerSupplier.getAsDouble()),
-                        m_rotationSupplier.getAsDouble()/1.5 * multiplier)
+                        rotation * multiplier)
                         // m_drivetrainSubsystem.getRotation2d()
                         // )
                     );
@@ -168,7 +167,7 @@ public class DefaultDriveCommand extends CommandBase {
                                 new ChassisSpeeds(
                                 resultX,
                                 Math.copySign(0.35, gunnerSupplier.getAsDouble()),
-                                m_rotationSupplier.getAsDouble()/1.5 * multiplier)
+                                rotation * multiplier)
                                 // m_drivetrainSubsystem.getRotation2d()
                                 // )
                         );
