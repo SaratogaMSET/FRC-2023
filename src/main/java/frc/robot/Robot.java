@@ -13,6 +13,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -52,7 +53,7 @@ public class Robot extends LoggedRobot {
       case REAL:
         Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
         Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-        new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+        // new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
         break;
 
       case SIM:
@@ -71,6 +72,7 @@ public class Robot extends LoggedRobot {
     ctreConfigs = new CTREConfigs();
     m_robotContainer = new RobotContainer();
     m_robotContainer.m_claw.setBrakeMode();
+    // LiveWindow.enableAllTelemetry();
   }
 
   /**
@@ -119,6 +121,8 @@ public class Robot extends LoggedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
+    CommandScheduler.getInstance().cancelAll();
+    CommandScheduler.getInstance().close();
     m_robotContainer.m_claw.setCoastMode();
   }
 

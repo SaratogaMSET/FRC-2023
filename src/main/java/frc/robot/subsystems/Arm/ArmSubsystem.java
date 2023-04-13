@@ -5,11 +5,12 @@ import org.ejml.simple.SimpleMatrix;
 //import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ArmNodeDictionary;
 import frc.robot.controls.ArmInterface;
 
 public class ArmSubsystem extends SubsystemBase {
     int side = 0;
-    double proxKp = 10.2; //10.2
+    double proxKp = 9.75; //10.2
     double distKp = 9.2; //9.5
 
     double proxKd = 0.042; //0.035
@@ -149,6 +150,7 @@ public class ArmSubsystem extends SubsystemBase {
         // SmartDashboard.putNumber("Side", side);
         armVisualizer.update(armInterface.getPositionProximal(), armInterface.getPositionDistal());
         // armVisualizer.logRectangles("Arm Bounds", armInterface.Bounds, new Color8Bit(Color.kGreen));
+        //SmartDashboard.putBoolean("Arm Dunk Height thing", Math.abs(getYPosition() - (ArmNodeDictionary.ready_highcone_score_y-0.2)) < 0.1);
     }
 
 @Override
