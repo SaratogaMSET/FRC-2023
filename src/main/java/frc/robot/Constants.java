@@ -312,7 +312,7 @@ public final class Constants {
 
         public static final int IR_GATE = 1;
         
-        public static final double encoder_offset = 223.506;
+        public static final double encoder_offset = 166.03; //223.506
 
         public static final double x_offset = 0.26;
         public static final double y_offset = 0.4;
@@ -516,5 +516,7 @@ public final class Constants {
         public static final double ready_double_substation_y = 1.08 -0.1524 - 0.0254 -0.0254 - 0.04;
         // public double[] pickup_double_substation = new double[]{0.62, 0.90};
       }
+
+      
 }
 
