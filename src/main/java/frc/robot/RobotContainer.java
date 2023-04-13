@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -47,7 +48,7 @@ import frc.robot.commands.GroundIntakeCommands.ActuatorDefaultCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngleDriver;
-import frc.robot.commands.Vision.AlignCommand;
+
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
@@ -210,6 +211,8 @@ public class RobotContainer {
     m_driverController.x().onTrue(new InstantCommand(()->m_drivetrainSubsystem.setX(), m_drivetrainSubsystem));
 
     m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
+    m_driverController.leftTrigger().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
+    
     actuatorSubsystem.setDefaultCommand(new ActuatorDefaultCommand(actuatorSubsystem));
   
     
@@ -226,11 +229,7 @@ public class RobotContainer {
 
     // m_driverController.rightTrigger().onTrue(new AlignCommand(m_drivetrainSubsystem));
 
-    m_gunner1.button(3).onTrue(
-      (new ManualSetAngleDriver(actuatorSubsystem, 105))) //.until( ()-> (m_claw.isGamepieceInRange() && m_claw.getGamePieceType() != null))))
-    .onFalse(
-      (new ArmZeroCommand(m_armSubsystem)).andThen(new ParallelCommandGroup(new ManualSetAngleDriver(actuatorSubsystem, 10), new ManualRunIntakeCommand(rollers, 0.0))));
-    
+   
     m_driverController.a().toggleOnTrue(new MoveWithClosest90(
       m_drivetrainSubsystem, 
       () -> modifyAxis(m_driverController.getLeftX()* 1.3) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
@@ -240,12 +239,13 @@ public class RobotContainer {
       () -> -modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND
     ));
 
-    m_driverController.leftTrigger().onTrue(
-    new BalanceCommand(m_drivetrainSubsystem).andThen(
-      new AutoRunCommand(m_drivetrainSubsystem, ChassisSpeeds.fromFieldRelativeSpeeds(0, -((Drivetrain.balanceXVelocity)), 0, m_drivetrainSubsystem.getRotation2d())).withTimeout(Drivetrain.balanceTimeout)
-    ));
+    // m_driverController.leftTrigger().onTrue(
+    // // new BalanceCommand(m_drivetrainSubsystem).andThen(
+    //   new AutoRunCommand(m_drivetrainSubsystem, ChassisSpeeds.fromFieldRelativeSpeeds(0, ((Drivetrain.balanceXVelocity)), 0, m_drivetrainSubsystem.getRotation2d())).withTimeout(Drivetrain.balanceTimeout)
+    // // )
+    // );
       
-    m_driverController.rightTrigger().onTrue(new AlignCommand(m_drivetrainSubsystem, m_claw));
+    // m_driverController.rightTrigger().onTrue(new AlignCommand(m_drivetrainSubsystem, m_claw));
     // m_driverController.rightTrigger().onTrue(new AutoRunCommand(m_drivetrainSubsystem, new ChassisSpeeds(1,0,0)).withTimeout(1));
     
      m_driverController.rightBumper().onTrue(
@@ -268,6 +268,8 @@ public class RobotContainer {
       )
     )
     );
+
+    m_gunner1.button(3).onTrue(ArmSequences.score(m_armSubsystem, 1));
 
     m_gunner1.button(5).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 1)); //TODO: make 0 when collision detection working
     m_gunner1.button(5).and(m_gunner1.button(1)).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 1));
