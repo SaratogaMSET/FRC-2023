@@ -29,8 +29,9 @@ public class ManualSetAngleDriver extends CommandBase {
 
     @Override
     public void initialize(){
-        errorSum =0;
+        errorSum = 0;
         errorDT = 0;
+        error =0;
     }
     @Override
     public void execute(){

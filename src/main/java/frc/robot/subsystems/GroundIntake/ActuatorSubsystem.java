@@ -152,7 +152,7 @@ public class ActuatorSubsystem extends SubsystemBase {
     }
     @Override
     public void periodic() {
-        // SmartDashboard.putNumber("Ground Intake Encoder",Encoder.getAbsolutePosition());
+        SmartDashboard.putNumber("Ground Intake Angle", get_position_degrees());
         // SmartDashboard.putNumber("Ground Intake Angle", get_position_degrees());
         // SmartDashboard.putNumber("Actuator Voltage", Actuator.getMotorOutputVoltage());
         // SmartDashboard.putNumber("Gravity", k_G * Math.sin(get_position() - Math.toRadians(25)));

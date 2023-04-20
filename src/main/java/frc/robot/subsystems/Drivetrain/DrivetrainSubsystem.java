@@ -18,6 +18,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -260,6 +261,19 @@ public class DrivetrainSubsystem extends SubsystemBase {
             mod.resetToAbsolute();
         }
     }
+
+    public Twist2d getFieldVelocity(){
+        ChassisSpeeds chassisSpeeds = Drivetrain.m_kinematics2.toChassisSpeeds(getModuleStates());
+        Translation2d linearFieldVelocity =
+            new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond)
+                .rotateBy(getRotation2d());
+        
+        return new Twist2d(
+                linearFieldVelocity.getX(),
+                linearFieldVelocity.getY(),
+                chassisSpeeds.omegaRadiansPerSecond);
+    }
+    
 
     public ChassisSpeeds limitVelocity(ChassisSpeeds chassisSpeeds){
         speeds.vxMetersPerSecond = Math.max(-Drivetrain.allowedMaxAcceleration, Math.min(Drivetrain.allowedMaxAcceleration, chassisSpeeds.vxMetersPerSecond));
