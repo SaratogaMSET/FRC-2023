@@ -303,7 +303,7 @@ public class RobotContainer {
         (new ArmZeroCommand(m_armSubsystem)).andThen(new ParallelCommandGroup(new ManualSetAngleDriver(actuatorSubsystem, 10), new ManualRunIntakeCommand(rollers, 0.0))));
 
       m_gunner1.button(2).whileTrue(
-        new ManualRunIntakeCommand(rollers, -0.375)) //)
+        new ManualRunIntakeCommand(rollers, -0.25)) // -0.375
         .onFalse(new ManualRunIntakeCommand(rollers, 0.0));
 
       m_gunner1.button(12).whileTrue(
