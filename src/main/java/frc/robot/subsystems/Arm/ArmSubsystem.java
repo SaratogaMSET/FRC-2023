@@ -13,8 +13,13 @@ public class ArmSubsystem extends SubsystemBase {
     double proxKp = 9.75; //10.2
     double distKp = 9.2; //9.5
 
+
     double proxKd = 0.042; //0.035
     double distKd = 0.02; 
+
+    // double proxKpMiddle = 9.5; //10.2
+    double distKpMiddle = 9.0;
+    double distKdMiddle = 0.065; 
 
     double proxKf = 0.80;
     double distKf = 1.30;
@@ -91,6 +96,59 @@ public class ArmSubsystem extends SubsystemBase {
 
     //     voltageMotors(voltageProximal, voltageDistal);
     // }
+    public void PIDtoAnglesMiddle(double target_proximal, double target_distal){
+        SimpleMatrix target = new SimpleMatrix(new double[][]{{target_proximal}, {target_distal}, {0}, {0}});
+        SimpleMatrix state = armInterface.state();
+
+        SimpleMatrix error = target.minus(state);
+
+        double voltageProximal = error.get(0) * proxKp + error.get(2) * proxKd;
+        double voltageDistal = error.get(1) * distKpMiddle + error.get(3) * distKdMiddle;
+
+        if(Math.abs(voltageProximal) > Math.abs(maxVoltPerVelocity * state.get(2))){
+            if(voltageProximal * state.get(2) < 0){
+                //If Opp Direction
+                voltageProximal = Math.signum(voltageProximal) * proxKf;
+            }
+            voltageProximal = Math.signum(error.get(0)) * (Math.abs(maxVoltPerVelocity * state.get(2)) + proxKf);
+        }
+        if(Math.abs(voltageDistal) > Math.abs(maxVoltPerVelocity * state.get(3))){
+            if(voltageDistal * state.get(2) < 0){
+                //If Opp Direction
+                voltageDistal = Math.signum(voltageDistal) * distKf;
+            }
+            voltageDistal = Math.signum(error.get(1)) * (Math.abs(maxVoltPerVelocity * state.get(3)) + distKf);
+        }
+
+        // if(Math.abs(voltageProximal) < proxKf){
+        //     voltageProximal = Math.signum(error.get(0)) * proxKf;
+        // }
+        // if(Math.abs(voltageDistal) < distKf){
+        //     voltageDistal = Math.signum(error.get(1)) * distKf;
+        // }
+
+        if(Math.abs(error.get(0)) < armTolerance){
+            voltageProximal = proxKp * error.get(0);
+        }
+        if(Math.abs(error.get(1)) < armTolerance){
+            voltageDistal = distKp * error.get(1);
+        }
+
+        if(Math.abs(voltageProximal) > max_voltage){
+            voltageProximal = Math.signum(voltageProximal) * max_voltage;
+            System.out.println("Feedback Exceeds Proximal");
+        }
+        if(Math.abs(voltageDistal) > max_voltage){
+            voltageDistal = Math.signum(voltageDistal) * max_voltage;
+            System.out.println("Feedback Exceeds Distal");
+        }
+
+        // SmartDashboard.putNumber("PID V Prox", voltageProximal);
+        // SmartDashboard.putNumber("PID V Dist", voltageDistal);
+
+        voltageMotors(voltageProximal, voltageDistal);
+    }
+
     public void PIDtoAngles(double target_proximal, double target_distal){
         SimpleMatrix target = new SimpleMatrix(new double[][]{{target_proximal}, {target_distal}, {0}, {0}});
         SimpleMatrix state = armInterface.state();

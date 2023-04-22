@@ -216,7 +216,7 @@ public class RobotContainer {
     actuatorSubsystem.setDefaultCommand(new ActuatorDefaultCommand(actuatorSubsystem));
   
     
-    m_driverController.b().onTrue(new SequentialCommandGroup(
+    m_driverController.b().toggleOnTrue(new SequentialCommandGroup(
       new DefaultDriveCommand(
             m_drivetrainSubsystem,
             () -> modifyAxis(m_driverController.getLeftX()/2.25) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,

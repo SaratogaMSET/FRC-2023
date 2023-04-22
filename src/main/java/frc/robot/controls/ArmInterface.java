@@ -222,7 +222,6 @@ public class ArmInterface {
     public double getVelocityDistal(){
         return (getMotorEncoderVDistalLeft() + getMotorEncoderVDistalRight())/2;
     }
-
     public SimpleMatrix state(){
         return new SimpleMatrix(new double[][]{{getPositionProximal()}, {getPositionDistal()}, {getVelocityProximal()}, {getVelocityDistal()}});
     }
