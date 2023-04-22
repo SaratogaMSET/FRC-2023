@@ -32,7 +32,7 @@ public class ClawSubsystem extends SubsystemBase{
     private double cubeBlueTheshold = 0.22;
     private Color currentColor;
     public boolean startedAutoClose = false;
-    public ColorSensorV3 colorSensor;
+    // public ColorSensorV3 colorSensor;
     public CANSparkMax motor = new CANSparkMax(ClawConstants.INTAKE_MOTOR, MotorType.kBrushless);
     public RelativeEncoder encoder = motor.getEncoder();
     String print = "Claw/"; 
@@ -55,7 +55,7 @@ public class ClawSubsystem extends SubsystemBase{
 
     public ClawSubsystem() {
         motor.setIdleMode(IdleMode.kBrake);
-        colorSensor = new ColorSensorV3(Port.kOnboard); //kmxp
+        // colorSensor = new ColorSensorV3(Port.kOnboard); //kmxp
         /*
             Test was done without the eboard cover on
          * kOnboard: Cube in the center : 63 +-3
@@ -91,19 +91,19 @@ public class ClawSubsystem extends SubsystemBase{
     }
 
 
-    public boolean hasAcquiredGamePiece(){
-        if(isGamepieceInRange() &&
-            getGamePieceType() == GamePiece.Cone &&
-            getConeTolerance()) return true;
+    // public boolean hasAcquiredGamePiece(){
+    //     if(isGamepieceInRange() &&
+    //         getGamePieceType() == GamePiece.Cone &&
+    //         getConeTolerance()) return true;
 
-        else if(isGamepieceInRange() &&
-            getGamePieceType() == GamePiece.Cube &&
-            getCubeTolerance()){
+    //     else if(isGamepieceInRange() &&
+    //         getGamePieceType() == GamePiece.Cube &&
+    //         getCubeTolerance()){
     
-            return true;
-        }
-        return false; 
-    }
+    //         return true;
+    //     }
+    //     return false; 
+    // }
     public boolean getConeTolerance(){
        return encoder.getPosition() >= ClawConstants.CONE_MEDIUM_BOUND - 4;
     }
@@ -115,20 +115,20 @@ public class ClawSubsystem extends SubsystemBase{
         startedAutoClose = false;
     }
 
-    private double getProximityValue() {
-        proximityBuffer[bufferIndex] = colorSensor.getProximity();
-        bufferIndex++;
-        bufferIndex = bufferIndex % proximityBuffer.length;
+    // private double getProximityValue() {
+    //     proximityBuffer[bufferIndex] = colorSensor.getProximity();
+    //     bufferIndex++;
+    //     bufferIndex = bufferIndex % proximityBuffer.length;
 
-        double sum = 0;
-        for (double x : proximityBuffer)
-            sum += x;
-        return sum / proximityBuffer.length;
-    }
+    //     double sum = 0;
+    //     for (double x : proximityBuffer)
+    //         sum += x;
+    //     return sum / proximityBuffer.length;
+    // }
 
-    public boolean isGamepieceInRange() {
-        return getProximityValue() > 90; //65
-    }
+    // public boolean isGamepieceInRange() {
+    //     return getProximityValue() > 90; //65
+    // }
 
     private void resetEncoder() {
         encoder.setPosition(0);
@@ -161,45 +161,45 @@ public class ClawSubsystem extends SubsystemBase{
     }
 
 
-    public void autoCloseClaw() {
-        if(isGamepieceInRange()) {
-            // if (isClawFullyOpen() || startedAutoClose) {
-                // Either the claw is fully open or we had previously started auto close.
-                startedAutoClose = true;
-                double encoderPosition = encoder.getPosition();
-                if (getGamePieceType() == GamePiece.Cube) {
-                    if(encoderPosition >= ClawConstants.CUBE_MEDIUM_BOUND - 1) {
-                        motor.set(0.0);
-                        acquired = true;
-                        flash = true;
-                        // time = Timer.getFPGATimestamp();
-                    } else {
-                        double encoderPositionRatio = (0.0-encoder.getPosition()) / (0.0-ClawConstants.CONE_MEDIUM_BOUND);
-                        encoderPositionRatio = 1 - Math.max(0.0, Math.min(encoderPositionRatio, 1.0));
-                        encoderPositionRatio = Math.pow(encoderPositionRatio, curve);
-                        encoderPositionRatio = Math.max(minVelocity, Math.min(encoderPositionRatio, maxVelocity));
-                        motor.set(encoderPositionRatio);
-                    }
+    // public void autoCloseClaw() {
+    //     if(isGamepieceInRange()) {
+    //         // if (isClawFullyOpen() || startedAutoClose) {
+    //             // Either the claw is fully open or we had previously started auto close.
+    //             startedAutoClose = true;
+    //             double encoderPosition = encoder.getPosition();
+    //             if (getGamePieceType() == GamePiece.Cube) {
+    //                 if(encoderPosition >= ClawConstants.CUBE_MEDIUM_BOUND - 1) {
+    //                     motor.set(0.0);
+    //                     acquired = true;
+    //                     flash = true;
+    //                     // time = Timer.getFPGATimestamp();
+    //                 } else {
+    //                     double encoderPositionRatio = (0.0-encoder.getPosition()) / (0.0-ClawConstants.CONE_MEDIUM_BOUND);
+    //                     encoderPositionRatio = 1 - Math.max(0.0, Math.min(encoderPositionRatio, 1.0));
+    //                     encoderPositionRatio = Math.pow(encoderPositionRatio, curve);
+    //                     encoderPositionRatio = Math.max(minVelocity, Math.min(encoderPositionRatio, maxVelocity));
+    //                     motor.set(encoderPositionRatio);
+    //                 }
                 
-                } else if (getGamePieceType() == GamePiece.Cone) {
-                    if (encoderPosition >= ClawConstants.CONE_MEDIUM_BOUND - 1) {
-                        motor.set(0.0);
-                        acquired = true;
-                        flash = true;
-                        // time = Timer.getFPGATimestamp();
-                    } else {
-                        double encoderPositionRatio = (0.0-encoder.getPosition()) / (0.0-ClawConstants.CONE_MEDIUM_BOUND);
-                        encoderPositionRatio = 1 - Math.max(0.0, Math.min(encoderPositionRatio, 1.0));
-                        encoderPositionRatio = Math.pow(encoderPositionRatio, curve);
-                        encoderPositionRatio = Math.max(minVelocity, Math.min(encoderPositionRatio, maxVelocity));
-                        motor.set(encoderPositionRatio);
-                    }
-                } else {
-                    motor.set(0.0);
-                }
-            }
-        // }
-    }
+    //             } else if (getGamePieceType() == GamePiece.Cone) {
+    //                 if (encoderPosition >= ClawConstants.CONE_MEDIUM_BOUND - 1) {
+    //                     motor.set(0.0);
+    //                     acquired = true;
+    //                     flash = true;
+    //                     // time = Timer.getFPGATimestamp();
+    //                 } else {
+    //                     double encoderPositionRatio = (0.0-encoder.getPosition()) / (0.0-ClawConstants.CONE_MEDIUM_BOUND);
+    //                     encoderPositionRatio = 1 - Math.max(0.0, Math.min(encoderPositionRatio, 1.0));
+    //                     encoderPositionRatio = Math.pow(encoderPositionRatio, curve);
+    //                     encoderPositionRatio = Math.max(minVelocity, Math.min(encoderPositionRatio, maxVelocity));
+    //                     motor.set(encoderPositionRatio);
+    //                 }
+    //             } else {
+    //                 motor.set(0.0);
+    //             }
+    //         }
+    //     // }
+    // }
 
     public void manualCloseClaw() {
         if (isClawFullyClosed()) {
@@ -214,17 +214,17 @@ public class ClawSubsystem extends SubsystemBase{
     }
 
     public GamePiece getGamePieceType() {
-        currentColor = colorSensor.getColor();
-        if (currentColor == null) {
+        // currentColor = colorSensor.getColor();
+        // if (currentColor == null) {
             return GamePiece.None;
         }
 
-        double magnitude = currentColor.blue + currentColor.red + currentColor.green;
-        if (currentColor.blue / magnitude > cubeBlueTheshold)
-            return GamePiece.Cube;
-        else
-            return GamePiece.Cone;
-    }
+    //     double magnitude = currentColor.blue + currentColor.red + currentColor.green;
+    //     if (currentColor.blue / magnitude > cubeBlueTheshold)
+    //         return GamePiece.Cube;
+    //     else
+    //         return GamePiece.Cone;
+    // }
 
     private boolean isClawFullyClosed() {
         return motor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).isPressed();
@@ -238,8 +238,8 @@ public class ClawSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("ClawPos", encoder.getPosition());
         // SmartDashboard.putBoolean("Limit Switch", getHallEffect());
         // SmartDashboard.putBoolean("Is Object in Range", isGamepieceInRange());
-        SmartDashboard.putNumber("Proximity Value", getProximityValue());
-        SmartDashboard.putBoolean("Detecting", isGamepieceInRange());
+        // SmartDashboard.putNumber("Proximity Value", getProximityValue());
+        // SmartDashboard.putBoolean("Detecting", isGamepieceInRange());
         // SmartDashboard.putNumber("Red value", colorSensor.getRed());
         // SmartDashboard.putNumber("Green value", colorSensor.getGreen());
         // SmartDashboard.putNumber("Blue value", colorSensor.getBlue());
@@ -252,9 +252,10 @@ public class ClawSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("Opening Claw", motor.get());
         // This method will be called once per scheduler run
         updateClawTelemetry();
-        Logger.getInstance().recordOutput("Proximity Value", getProximityValue());
+        // Logger.getInstance().recordOutput("Proximity Value", getProximityValue());
         // if (Timer.getFPGATimestamp() - time > 2) flash = false;
     }
 

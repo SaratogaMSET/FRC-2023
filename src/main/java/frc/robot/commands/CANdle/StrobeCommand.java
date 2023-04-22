@@ -32,21 +32,22 @@ public class StrobeCommand extends CommandBase {
 
     @Override
     public void execute(){
-        if(!m_claw.hasAcquiredGamePiece()){
-            double index = (70 - m_claw.encoder.getPosition())/(2);
+        // if(!m_claw.hasAcquiredGamePiece()){
+        //     double index = (70 - m_claw.encoder.getPosition())/(2);
 
-            if(index > 35) index = 35;
-            if(index < 9) index = 9;
+        //     if(index > 35) index = 35;
+        //     if(index < 9) index = 9;
 
-            candle.mapClawPosition((int) index);
-        }
-        else if (m_claw.hasAcquiredGamePiece()){
-            candle.strobe();
-        }
-        else {
-            m_claw.setFlash(false);
-            candle.idle();
-        }
+        //     candle.mapClawPosition((int) index);
+        // }
+        // else if (m_claw.hasAcquiredGamePiece()){
+        //     candle.strobe();
+        // }
+        // else {
+        //     m_claw.setFlash(false);
+        //     candle.idle();
+        // }
+        candle.idle();
     }
 
     @Override

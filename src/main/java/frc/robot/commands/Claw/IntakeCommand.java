@@ -53,14 +53,16 @@ public class IntakeCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(!isAuton.getAsBoolean()){
-      if(m_intake.isGamepieceInRange()){
-        m_intake.autoCloseClaw();
-      }
-    }
-    else{
-      m_intake.setIdle();
-    }
+    // if(!isAuton.getAsBoolean()){
+    //   if(m_intake.isGamepieceInRange()){
+    //     m_intake.autoCloseClaw();
+    //   }
+    // }
+    // else{
+    //   m_intake.setIdle();
+    // }
+
+    m_intake.setIdle();
   }
 
   // Called once the command ends or is interrupted.

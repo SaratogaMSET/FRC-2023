@@ -109,8 +109,8 @@ public class ArmSequences{
             ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y);
             score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_midcube_score_x, Constants.ArmNodeDictionary.ready_midcube_score_y, true);
         }
-        ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
-        RunCommand openIntake = new RunCommand(()-> m_clawSubsystem.openClaw());
+        // ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
+        // RunCommand openIntake = new RunCommand(()-> m_clawSubsystem.openClaw());
         // return ready.andThen(score).andThen(openIntake).andThen(zero);
         return ready.andThen(score);
     }
@@ -348,7 +348,7 @@ public class ArmSequences{
         }
         // ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
         ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
-
+        
         // return ready.andThen(score).andThen(openIntake);
         return ready.andThen(score).andThen(new WaitCommand(0.15)).andThen(openIntake); //0.25
     }
@@ -401,25 +401,25 @@ public class ArmSequences{
         return ready.andThen(intake);
     }
 
-    public static Command groundIntakeTest(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem, ActuatorSubsystem actuator, RollerSubsystem rollers,int side) {
-        ArmPositionCommand ready;
-        ArmPositionCommand intake;
-        if(side > 0){
-            intake = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.pick_up_ground_intake_x, Constants.ArmNodeDictionary.pick_up_ground_intake_y, true);
+    // public static Command groundIntakeTest(ArmSubsystem armSubsystem, ClawSubsystem m_clawSubsystem, ActuatorSubsystem actuator, RollerSubsystem rollers,int side) {
+    //     ArmPositionCommand ready;
+    //     ArmPositionCommand intake;
+    //     if(side > 0){
+    //         intake = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.pick_up_ground_intake_x, Constants.ArmNodeDictionary.pick_up_ground_intake_y, true);
             
-        }else{
-            ArmPositionCommand intakeReady = new ArmPositionCommand(armSubsystem, ArmNodeDictionary.pick_up_ready_position_x, ArmNodeDictionary.pick_up_ready_position_y, 0.05);
-            intake = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.pick_up_ground_intake_x, Constants.ArmNodeDictionary.pick_up_ground_intake_y, true);
-            ManualSetAngle dropIntake = new ManualSetAngle(actuator, 95);
+    //     }else{
+    //         ArmPositionCommand intakeReady = new ArmPositionCommand(armSubsystem, ArmNodeDictionary.pick_up_ready_position_x, ArmNodeDictionary.pick_up_ready_position_y, 0.05);
+    //         intake = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.pick_up_ground_intake_x, Constants.ArmNodeDictionary.pick_up_ground_intake_y, true);
+    //         ManualSetAngle dropIntake = new ManualSetAngle(actuator, 95);
             
-            ManualRunIntakeCommand runRollers = new ManualRunIntakeCommand(rollers, 0.5 );
+    //         ManualRunIntakeCommand runRollers = new ManualRunIntakeCommand(rollers, 0.5 );
 
-            // return (dropIntake.alongWith(runRollers).alongWith(new SequentialCommandGroup(intakeReady, intake))).until(()-> (m_clawSubsystem.isGamepieceInRange() && m_clawSubsystem.getGamePieceType() != null));
-            return new SequentialCommandGroup(intakeReady, intake).until(()-> (m_clawSubsystem.isGamepieceInRange() && m_clawSubsystem.getGamePieceType() != null));
-        }
+    //         // return (dropIntake.alongWith(runRollers).alongWith(new SequentialCommandGroup(intakeReady, intake))).until(()-> (m_clawSubsystem.isGamepieceInRange() && m_clawSubsystem.getGamePieceType() != null));
+    //         return new SequentialCommandGroup(intakeReady, intake).until(()-> (m_clawSubsystem.isGamepieceInRange() && m_clawSubsystem.getGamePieceType() != null));
+    //     }
         // return ready.andThen(intake).andThen(closeIntake).andThen(zero);
-        return intake;
-    }
+    //     return intake;
+    // }
 
     public static Command ZeroArm(ArmSubsystem armSubsystem){
         ArmPositionCommand intakeReady = new ArmPositionCommand(armSubsystem, ArmNodeDictionary.pick_up_ready_position_x, ArmNodeDictionary.pick_up_ready_position_y + 0.15, 0.1);

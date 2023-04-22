@@ -56,15 +56,18 @@ public class BackUpIntakeCommand extends CommandBase {
   @Override
   public void execute() {
     if(!isAuton.getAsBoolean()){
-        if(m_intake.isGamepieceInRange()){
-            if(enableAutoClose.getAsBoolean()){
-                m_intake.autoCloseClaw();
-        }
-    }
-    else{
       m_intake.setIdle();
     }
-  }
+  //       if(m_intake.isGamepieceInRange()){
+  //           if(enableAutoClose.getAsBoolean()){
+  //               m_intake.autoCloseClaw();
+  //       }
+  //   }
+    else{
+      // m_intake.setIdle();
+    }
+  // }
+    // m_intake.setIdle();
   }
 
   // Called once the command ends or is interrupted.
