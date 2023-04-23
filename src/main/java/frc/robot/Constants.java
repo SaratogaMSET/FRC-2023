@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.opencv.core.Point;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -417,6 +419,46 @@ public final class Constants {
                         new Pose2d(new Translation2d(14.6546, 4.4362), new Rotation2d(Math.PI))
                 )
         );
+
+        public static class Field {
+                public static final float FIELD_WIDTH = 16.54175f;
+                public static final float FIELD_HEIGHT = 8.0137f;
+                public static final int NUM_TAGS = 8;
+                public static final Point[] TAGS = {
+                        new Point(Tags.ID_1.x, Tags.ID_1.y),
+                        new Point(Tags.ID_2.x, Tags.ID_2.y),
+                        new Point(Tags.ID_3.x, Tags.ID_3.y),
+                        new Point(Tags.ID_4.x, Tags.ID_4.y),
+                        new Point(Tags.ID_5.x, Tags.ID_5.y),
+                        new Point(Tags.ID_6.x, Tags.ID_6.y),
+                        new Point(Tags.ID_7.x, Tags.ID_7.y),
+                        new Point(Tags.ID_8.x, Tags.ID_8.y)
+                };
+            }
+    
+            public static enum Tags {
+                ID_1(15.513558f, 1.071626f, 0.462788f),
+                ID_2(15.513558f, 2.748026f, 0.462788f),
+                ID_3(15.513558f, 4.424426f, 0.462788f),
+                ID_4(16.178784f, 6.749796f, 0.695452f),
+                ID_5(0.36195f, 6.749796f, 0.695452f),
+                ID_6(1.02743f, 4.424426f, 0.462788f),
+                ID_7(1.02743f, 2.748026f, 0.462788f),
+                ID_8(1.02743f, 1.071626f, 0.462788f);
+    
+                public final float x;
+                public final float y;
+                public final float z;
+    
+                Tags(float x, float y, float z) {
+                    this.x = x;
+                    this.y = y;
+                    this.z = z;
+                }
+            }
+    public static class FilterConstants {
+            public static final int NUM_PARTICLES = 1;
+    }
     }
 
     public final class ArmParameters{
