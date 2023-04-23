@@ -229,14 +229,14 @@ public class PoseEstimator {
     }
 
     public void start() {
-        System.out.println("Starting FishServer.");
-        new Thread("FishServer") {
+        System.out.println("Starting pose estimator.");
+        new Thread("Pose Estimator") {
             public void run() {
                 while (true) {
                     poseEstimatorPeriodic();
                 }
             }
         }.start();
-        System.out.println("FishServer started.");
+        System.out.println("Pose estimator started.");
     }
 }

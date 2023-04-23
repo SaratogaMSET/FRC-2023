@@ -1,15 +1,8 @@
 package frc.robot.subsystems.Drivetrain;
 
-import java.util.List;
-
 import org.littletonrobotics.junction.Logger;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint;
-import com.pathplanner.lib.commands.PPSwerveControllerCommandA;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -32,14 +25,12 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.swerve.BetterSwerveModuleState;
 import frc.lib.swerve.SwerveDriveKinematics2;
 import frc.robot.Constants;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.Drivetrain;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.SwerveModule;
 
 public class DrivetrainSubsystem extends SubsystemBase {
@@ -48,7 +39,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     public final AHRS m_navx = new AHRS(SPI.Port.kMXP, (byte) 200);
     public double offset = 0;
-    private Rotation2d lastRotation = new Rotation2d();
     private final PIDController driftCorrectionPID = new PIDController(0.1, 0.00, 0.000);
     public ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);    
     //private SwerveDriveOdometry swerveOdometry;
@@ -61,7 +51,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private SwerveDrivePoseEstimator odomFiltered;
     private final Matrix<N3, N1> stateSTD = new Matrix<>(Nat.N3(), Nat.N1());
     private final Matrix<N3, N1> visDataSTD = new Matrix<>(Nat.N3(), Nat.N1());
-
 
     private final SwerveModuleIOInputsAutoLogged[] moduleInputs = new SwerveModuleIOInputsAutoLogged[] {new SwerveModuleIOInputsAutoLogged(), new SwerveModuleIOInputsAutoLogged(), new SwerveModuleIOInputsAutoLogged(), new SwerveModuleIOInputsAutoLogged()};
     double pXY = 0;
@@ -160,7 +149,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     public Pose2d getPose() {
         return odomFiltered.getEstimatedPosition();
-        //return swerveOdometry.getPoseMeters();
     }
 
     public void resetOdometry(Pose2d pose) {

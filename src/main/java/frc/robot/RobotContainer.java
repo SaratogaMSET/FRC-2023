@@ -6,8 +6,8 @@ package frc.robot;
 
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -15,10 +15,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -27,28 +25,18 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.commands.Arm.ArmSequences;
 import frc.robot.commands.Arm.ArmVoltageCommand;
-import frc.robot.commands.Arm.ArmZeroAutoCommand;
 import frc.robot.commands.Arm.ArmZeroCommand;
-import frc.robot.commands.Arm.ArmZeroStickyCommand;
-import frc.robot.commands.Auton.AutoRunCommand;
 import frc.robot.commands.Auton.AutonSequences;
-import frc.robot.commands.CANdle.IndicateConeCommand;
-import frc.robot.commands.CANdle.IndicateCubeCommand;
 import frc.robot.commands.CANdle.StrobeCommand;
 import frc.robot.commands.Claw.BackUpIntakeCommand;
 import frc.robot.commands.Claw.ManualCloseIntake;
-import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.DefaultDriveCommand;
-import frc.robot.commands.Drivetrain.DriveToPose;
-import frc.robot.commands.Drivetrain.DriveToPoseTrajectory;
 import frc.robot.commands.Drivetrain.MoveWithClosest90;
-import frc.robot.commands.Drivetrain.TunableBalanceCommand;
 import frc.robot.commands.Drivetrain.ZeroGyroCommand;
 import frc.robot.commands.GroundIntakeCommands.ActuatorDefaultCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngleDriver;
-
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
@@ -56,6 +44,7 @@ import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
 import frc.robot.subsystems.GroundIntake.RollerSubsystem;
 import frc.robot.subsystems.Vision.VisionSubsystem;
+import frc.robot.util.server.PoseEstimator;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -84,7 +73,6 @@ public class RobotContainer {
   public final SendableChooser<Boolean> autoCloseChooser = new SendableChooser<Boolean>();
   public static final Boolean disableAutoClose = false;
   public static final Boolean enableAutoClose = true;
-
   
   public final ClawSubsystem m_claw = new ClawSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
@@ -93,12 +81,19 @@ public class RobotContainer {
   private final CANdleSubsystem m_ledSubsystem = new CANdleSubsystem();
   private final ActuatorSubsystem actuatorSubsystem = new ActuatorSubsystem();
   private final RollerSubsystem rollers = new RollerSubsystem();
-  // private final ClawSubsystem m_clawSubsystem = new ClawSubsystem(new ClawIOSparkMax());
+  private final PoseEstimator m_localizer = new PoseEstimator(
+    m_visionSubsystem, 
+    m_drivetrainSubsystem, 
+    Constants.Drivetrain.m_kinematics1, 
+    new Rotation2d(), 
+    new Pose2d()
+  );
+
+  private Pose2d m_filteredPose = new Pose2d();
   
   public static final double pi = Math.PI;
   public final static CommandXboxController m_driverController = new CommandXboxController(0);
   private final CommandJoystick m_gunner1 = new CommandJoystick(1);
-  private final CommandJoystick m_gunner2 = new CommandJoystick(2);
 
   public static final double MAX_VELOCITY_METERS_PER_SECOND = (6380.0 / 60.0 *
           SdsModuleConfigurations.MK4_L2.getDriveReduction() *
@@ -159,14 +154,9 @@ public class RobotContainer {
     
     
     configureButtonBindings();
-      
-  }
-
-       
-
-    // Configure the button bindings
     
-  
+    m_localizer.start();
+  }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -341,23 +331,6 @@ public class RobotContainer {
 
     return value;
   }
-  /** 
-   * @param value the joystick input
-   * @param exponent the exponent number to use
-   * @param activeLinearDeadband when to activate linear scaling instead of exponential scaling
-   * **/
-  private static double modifyAxis(double value, double exponent, double activeLinearDeadband) {
-		// Deadband
-
-		value = MathUtil.applyDeadband(value, 0.05);
-
-    if(Math.abs(value) < activeLinearDeadband)
-		  value = Math.copySign(Math.pow(value, exponent), value);
-    else if(value > activeLinearDeadband){
-      value = Math.copySign(value * value, value);
-    }
-		return value;
-	}
 
   public void updateRobotState(){
     // RobotState.armSide = m_armSubsystem.getSide();
@@ -365,6 +338,7 @@ public class RobotContainer {
     // SmartDashboard.putNumber("armside", RobotState.armSide);
     // SmartDashboard.putNumber("prox of the yimity", sensor.getProximity());
     // SmartDashboard.putBoolean("hall effect", HallEffect.get());
+    m_filteredPose = m_localizer.getPose();
   }
 
   /**
@@ -404,4 +378,10 @@ public class RobotContainer {
     }
   }
 
+  /**
+   * @return the REAL pose of the robot
+   */
+  public Pose2d getREALPose() {
+    return m_filteredPose;
   }
+}
