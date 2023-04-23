@@ -1,16 +1,10 @@
 package frc.robot.subsystems.CANdle;
 
-import java.util.function.BooleanSupplier;
-
-import javax.swing.text.Segment;
-
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.CANdleConfiguration;
-import com.ctre.phoenix.led.CANdleControlFrame;
-import com.ctre.phoenix.led.CANdleStatusFrame;
 import com.ctre.phoenix.led.ColorFlowAnimation;
 import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 import com.ctre.phoenix.led.LarsonAnimation;
@@ -19,11 +13,9 @@ import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.SingleFadeAnimation;
 import com.ctre.phoenix.led.StrobeAnimation;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.MathUtils;
-import frc.robot.RobotContainer;
 
 public class CANdleSubsystem extends SubsystemBase {
     private static final CANdle candle1 = new CANdle(59, "649-Hammerhead-CANivore"); //Front Left

@@ -77,9 +77,8 @@ application {
 
 jar {
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-    manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest('testclient.App')
     manifest {
-        attributes 'Main-Class': 'testclient.App'
+        attributes 'Main-Class': 'mcljava.App'
     }
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
