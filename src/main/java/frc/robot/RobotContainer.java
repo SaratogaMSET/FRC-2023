@@ -44,6 +44,7 @@ import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
 import frc.robot.subsystems.GroundIntake.RollerSubsystem;
 import frc.robot.subsystems.Vision.VisionSubsystem;
+import frc.robot.util.SmoothingFilter;
 import frc.robot.util.server.PoseEstimator;
 
 /**
@@ -88,6 +89,7 @@ public class RobotContainer {
     new Rotation2d(), 
     new Pose2d()
   );
+  private final SmoothingFilter smoother = new SmoothingFilter();
 
   private Pose2d m_filteredPose = new Pose2d();
   
@@ -338,7 +340,7 @@ public class RobotContainer {
     // SmartDashboard.putNumber("armside", RobotState.armSide);
     // SmartDashboard.putNumber("prox of the yimity", sensor.getProximity());
     // SmartDashboard.putBoolean("hall effect", HallEffect.get());
-    m_filteredPose = m_localizer.getPose();
+    m_filteredPose = smoother.filter(m_localizer.getPose());
   }
 
   /**

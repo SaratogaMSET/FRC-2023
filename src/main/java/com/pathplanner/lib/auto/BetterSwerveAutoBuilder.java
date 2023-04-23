@@ -1,7 +1,10 @@
 package com.pathplanner.lib.auto;
 
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.pathplanner.lib.commands.PPSwerveControllerCommandA;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -11,9 +14,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class BetterSwerveAutoBuilder extends BaseAutoBuilder {
   private final SwerveDriveKinematics kinematics;
