@@ -48,7 +48,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     private NetworkTable visionData;
 
-    private SwerveDrivePoseEstimator odomFiltered;
     private final Matrix<N3, N1> stateSTD = new Matrix<>(Nat.N3(), Nat.N1());
     private final Matrix<N3, N1> visDataSTD = new Matrix<>(Nat.N3(), Nat.N1());
 
