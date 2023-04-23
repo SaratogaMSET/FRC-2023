@@ -9,6 +9,9 @@ public class MathUtils {
         return Math.max(minValue, Math.min(value, maxValue));
     }
 
+    public static double clamp(double value, double minValue, double maxValue) {
+        return ensureRange(value, minValue, maxValue);
+    }
 
     /**
      * @param value
