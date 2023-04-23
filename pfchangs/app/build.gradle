@@ -59,6 +59,7 @@ dependencies {
     implementation "edu.wpi.first.hal:hal-java:2023.4.3"
     implementation "edu.wpi.first.hal:hal-jni:2023.4.3"
     implementation "edu.wpi.first.hal:hal-jni:2023.4.3:${wpi.platforms.desktop}"
+    implementation "/pfchangs/build/libs/app.jar"
 
     nativeDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.desktop)
     nativeDebug wpi.java.vendor.jniDebug(wpi.platforms.desktop)

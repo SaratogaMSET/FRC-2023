@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.util.MathUtils;
 import frc.robot.Constants;
 import frc.robot.commands.Drivetrain.DriveToPose;
-import frc.robot.commands.Drivetrain.DriveToPoseTrajectory;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem.GamePiece;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;

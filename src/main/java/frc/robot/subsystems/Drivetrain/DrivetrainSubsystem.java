@@ -56,7 +56,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     double pXY = 0;
     double desiredHeading;
     Pose2d lastPose;
-
+    SwerveDrivePoseEstimator odomFiltered = new SwerveDrivePoseEstimator(Constants.Drivetrain.m_kinematics2, getRotation2d(), getModulePositions(), lastPose);
     public SwerveModule[] mSwerveMods = new SwerveModule[] {
         new SwerveModule(0, Constants.Drivetrain.Mod0.constants),
         new SwerveModule(1, Constants.Drivetrain.Mod1.constants),
@@ -72,10 +72,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
 
         stateSTD.set(0, 0, 0.20); stateSTD.set(1, 0, 0.2); stateSTD.set(2, 0, 0.2); //Tune Values
-        visDataSTD.set(0, 0, 0.80); visDataSTD.set(1, 0, 0.8); visDataSTD.set(2, 0, 0.8);
-
-        this.odomFiltered = new SwerveDrivePoseEstimator(Constants.Drivetrain.m_kinematics2, getRotation2d(), getModulePositions(), new Pose2d(), stateSTD, visDataSTD);
-        //swerveOdometry = new SwerveDriveOdometry(Constants.Drivetrain.m_kinematics, getRotation2d(), getModulePositions());   
+        visDataSTD.set(0, 0, 0.80); visDataSTD.set(1, 0, 0.8); visDataSTD.set(2, 0, 0.8);   
     }
 
     public Pose2d getVisionPose2d(){
@@ -119,7 +116,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
         // chassisSpeeds.vyMetersPerSecond += IpD * omega * (Math.sin(theta)*Math.cos(deltaTheta) + Math.cos(theta)*Math.sin(deltaTheta));
         
         // chassisSpeeds = driftCorrection(chassisSpeeds);
-        m_chassisSpeeds = chassisSpeeds;
+        Pose2d velocity = new Pose2d(chassisSpeeds.vxMetersPerSecond * Constants.loopPeriodSecs,
+            chassisSpeeds.vyMetersPerSecond * Constants.loopPeriodSecs,
+            Rotation2d.fromRadians(chassisSpeeds.omegaRadiansPerSecond * Constants.loopPeriodSecs));
+        Twist2d twist_vel = new Pose2d().log(velocity);
+        m_chassisSpeeds = new ChassisSpeeds(twist_vel.dx / Constants.loopPeriodSecs, 
+        twist_vel.dy / Constants.loopPeriodSecs, 
+        twist_vel.dtheta / Constants.loopPeriodSecs);
       }    
 
       public ChassisSpeeds driftCorrection(ChassisSpeeds speeds){
@@ -232,14 +235,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
       
     }
 
-    public static double apply(double xCoordinate) {
-        if (DriverStation.getAlliance() == Alliance.Red) {
-          return Units.inchesToMeters(651.25) - xCoordinate;
-        } else {
-          return xCoordinate;
-        }
-      }
-
     public Rotation2d getYaw() {
         return (Constants.Drivetrain.invertGyro) ? Rotation2d.fromDegrees(360 - m_navx.getYaw()) : Rotation2d.fromDegrees(m_navx.getYaw());
     }
@@ -262,14 +257,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
                 chassisSpeeds.omegaRadiansPerSecond);
     }
     
-
-    public ChassisSpeeds limitVelocity(ChassisSpeeds chassisSpeeds){
-        speeds.vxMetersPerSecond = Math.max(-Drivetrain.allowedMaxAcceleration, Math.min(Drivetrain.allowedMaxAcceleration, chassisSpeeds.vxMetersPerSecond));
-        speeds.vyMetersPerSecond = Math.max(-Drivetrain.allowedMaxAcceleration, Math.min(Drivetrain.allowedMaxAcceleration, chassisSpeeds.vyMetersPerSecond));
-        speeds.omegaRadiansPerSecond = Math.max(-Drivetrain.allowedMaxAcceleration, Math.min(Drivetrain.allowedMaxAcceleration, chassisSpeeds.omegaRadiansPerSecond));
-        return speeds;
-    }
-
     @Override
     public void periodic(){
 
@@ -293,7 +280,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         previousDesiredState = currentDesiredState;
         currentDesiredState = Constants.Drivetrain.m_kinematics2.toSwerveModuleStates(m_chassisSpeeds);
         SwerveDriveKinematics2.desaturateWheelSpeeds(currentDesiredState, Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND);
-
+        
         if(previousDesiredState[0] == null || previousDesiredState[1] == null || previousDesiredState[2] == null || previousDesiredState[3] == null){
             previousDesiredState = currentDesiredState;
         }
@@ -341,7 +328,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
         // var asdf = odomFiltered.getEstimatedPosition();
         // SmartDashboard.putNumberArray("UKF Coords", new double[]{asdf.getX(), asdf.getY(), asdf.getRotation().getRadians()});
         //lastRotation = new Rotation2d(-gyroInputs.yawPositionRad);
-        m_field.setRobotPose(odomFiltered.getEstimatedPosition());
         //if (pose != null) visionPoseEstimates.setRobotPose(pose);
         // SmartDashboard.putData("Field", m_field);
         // SmartDashboard.putNumber("Nav Heading", getNavHeading());

@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -78,20 +80,21 @@ public class RobotContainer {
   public final ClawSubsystem m_claw = new ClawSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   public final static VisionSubsystem m_visionSubsystem = new VisionSubsystem();
-  public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();  
+  
   private final CANdleSubsystem m_ledSubsystem = new CANdleSubsystem();
   private final ActuatorSubsystem actuatorSubsystem = new ActuatorSubsystem();
   private final RollerSubsystem rollers = new RollerSubsystem();
-  private final PoseEstimator m_localizer = new PoseEstimator(
+  public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();  
+  public static final PoseEstimator m_localizer = new PoseEstimator(
     m_visionSubsystem, 
     m_drivetrainSubsystem, 
-    Constants.Drivetrain.m_kinematics1, 
+    Constants.Drivetrain.m_kinematics2, 
     new Rotation2d(), 
     new Pose2d()
   );
   private final SmoothingFilter smoother = new SmoothingFilter();
 
-  private Pose2d m_filteredPose = new Pose2d();
+  public Pose2d m_filteredPose = new Pose2d();
   
   public static final double pi = Math.PI;
   public final static CommandXboxController m_driverController = new CommandXboxController(0);
@@ -341,6 +344,7 @@ public class RobotContainer {
     // SmartDashboard.putNumber("prox of the yimity", sensor.getProximity());
     // SmartDashboard.putBoolean("hall effect", HallEffect.get());
     m_filteredPose = smoother.filter(m_localizer.getPose());
+    Logger.getInstance().recordOutput("MCL", m_filteredPose);
   }
 
   /**

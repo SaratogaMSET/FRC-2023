@@ -40,8 +40,6 @@ public class BalanceCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() { 
-    // Uncomment the line below this to simulate the gyroscope axis with a controller joystick
-      // Double currentAngle = -1 * Robot.controller.getRawAxis(Constants.LEFT_VERTICAL_JOYSTICK_AXIS) * 45;
 
     driveRoll = new Rotation2d(m_DriveSubsystem.m_navx.getRoll());  
     drivePitch = new Rotation2d(m_DriveSubsystem.m_navx.getPitch());
@@ -57,7 +55,7 @@ public class BalanceCommand extends CommandBase {
     errorDT = (error - prevError)/0.02;
     error = Constants.Drivetrain.balanceGoalDegrees - currentAngle;
     
-    // TODO: WAS ORIGINALLY    - (Math.min(....))
+
     drivePower = (Math.min(Constants.Drivetrain.balanceKP * error + Constants.Drivetrain.balanceKD * errorDT , 1) + ff);
 
     //Robot might need an extra push when going up backwards
@@ -72,10 +70,7 @@ public class BalanceCommand extends CommandBase {
       m_DriveSubsystem.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
         new ChassisSpeeds(0, drivePower, 0),
         driveYaw));
-    // Debugging Print Statments
-    SmartDashboard.putNumber("Current Angle: ", currentAngle);
-    SmartDashboard.putNumber("Error ", error);
-    SmartDashboard.putNumber("Drive Power: " , drivePower);
+
     prevError = error;
   }
 
