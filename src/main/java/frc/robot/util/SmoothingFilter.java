@@ -9,7 +9,7 @@ public class SmoothingFilter {
     private final double FREQUENCY = 20.0; // how often the thing's updated I think??
     private boolean ready = false;
     private double timerInterval = 1000.0 / FREQUENCY;
-    private double latency = 15.0;
+    private double latency = 25.0;
     private double strength = 3.0;
     private double multiplier = 1.0;
     private double smoothingOffsetX = 0.0;
