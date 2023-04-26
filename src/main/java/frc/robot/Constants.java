@@ -213,7 +213,7 @@ public final class Constants {
 
         public static double balanceKS = 0.5;
 
-        public static double balanceKV = 0.5;
+        public static double balanceKV = 0.35; //0.5
 
         public static double balanceKA = 0.4;
 

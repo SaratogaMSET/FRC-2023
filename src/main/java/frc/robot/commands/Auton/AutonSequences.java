@@ -3,6 +3,7 @@ package frc.robot.commands.Auton;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -41,6 +42,7 @@ import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
 import frc.robot.subsystems.GroundIntake.RollerSubsystem;
+import frc.robot.util.server.PoseEstimator;
 
 public class AutonSequences {
 
@@ -324,7 +326,7 @@ public class AutonSequences {
 
       }
 
-      public static Command getOnePieceBalanceMobilityBonusNoPickup(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers,ClawSubsystem m_claw){
+      public static Command getOnePieceBalanceMobilityBonusNoPickup(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers,ClawSubsystem m_claw, PoseEstimator localizer){
 
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
@@ -343,7 +345,7 @@ public class AutonSequences {
         
         // 1.0676
         BetterSwerveAutoBuilder swerveAutoBuilder = new BetterSwerveAutoBuilder(
-          m_drivetrainSubsystem::getPose, 
+          localizer::getPose, 
           m_drivetrainSubsystem::resetOdometry, 
           new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
           new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
@@ -432,7 +434,7 @@ public class AutonSequences {
 
       }
 
-      public static SequentialCommandGroup getOnePieceCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ClawSubsystem m_claw){
+      public static SequentialCommandGroup getOnePieceCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ClawSubsystem m_claw, PoseEstimator pose){
         PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("One Piece", 4, 1);
         PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
     
@@ -449,7 +451,7 @@ public class AutonSequences {
     
         PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
           trajectory1, 
-          m_drivetrainSubsystem::getPose,
+          pose::getPose,
           Constants.Drivetrain.m_kinematics2,
           xController,
           yController,

@@ -8,6 +8,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -103,7 +104,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
         angle = angle % 360;
         return Math.toRadians(angle);
       }
-
       public void drive(ChassisSpeeds chassisSpeeds) {
         // double IpX = Units.inchesToMeters(2);
         // double IpY = Units.inchesToMeters(-5.4);
@@ -115,13 +115,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
         // chassisSpeeds.vyMetersPerSecond += IpD * omega * (Math.sin(theta)*Math.cos(deltaTheta) + Math.cos(theta)*Math.sin(deltaTheta));
         
         // chassisSpeeds = driftCorrection(chassisSpeeds);
-        Pose2d velocity = new Pose2d(chassisSpeeds.vxMetersPerSecond * Constants.loopPeriodSecs,
-            chassisSpeeds.vyMetersPerSecond * Constants.loopPeriodSecs,
-            Rotation2d.fromRadians(chassisSpeeds.omegaRadiansPerSecond * Constants.loopPeriodSecs));
-        Twist2d twist_vel = new Pose2d().log(velocity);
-        m_chassisSpeeds = new ChassisSpeeds(twist_vel.dx / Constants.loopPeriodSecs, 
-        twist_vel.dy / Constants.loopPeriodSecs, 
-        twist_vel.dtheta / Constants.loopPeriodSecs);
+
+        // Pose2d velocity = new Pose2d(chassisSpeeds.vxMetersPerSecond * Constants.loopPeriodSecs,
+        //     chassisSpeeds.vyMetersPerSecond * Constants.loopPeriodSecs,
+        //     Rotation2d.fromRadians(chassisSpeeds.omegaRadiansPerSecond * Constants.loopPeriodSecs));
+        // Twist2d twist_vel = new Pose2d().log(velocity);
+        // m_chassisSpeeds = new ChassisSpeeds(twist_vel.dx / Constants.loopPeriodSecs, 
+        // twist_vel.dy / Constants.loopPeriodSecs, 
+        // twist_vel.dtheta / Constants.loopPeriodSecs);
+
+        m_chassisSpeeds = chassisSpeeds;
       }    
 
       public ChassisSpeeds driftCorrection(ChassisSpeeds speeds){
@@ -305,7 +308,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         // //     SmartDashboard.putNumber("Desired Module "+ i + " Velocity", currentDesiredState[i].speedMetersPerSecond);     
         // }
         
-
+        Logger.getInstance().recordOutput("DesiredSwerveModuleStates", currentDesiredState);
         setModuleStates(currentDesiredState);
         //Logger.getInstance().recordOutput("Gyro Rotation2d", new Pose2d(new Translation2d(0,0),m_navx.getRotation2d()));
         //Logger.getInstance().recordOutput("Gyro Yaw", m_navx.getYaw());

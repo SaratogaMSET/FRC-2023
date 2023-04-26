@@ -356,7 +356,7 @@ public class RobotContainer {
     String selected = m_autoSwitcher.getSelected();
     switch(selected){
       case OnePiece:
-        return AutonSequences.getOnePieceCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
+        return AutonSequences.getOnePieceCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw, m_localizer);
       case OneAndBalance:
         return AutonSequences.getOnePieceAndBalanceBringArmBackCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case OneAndBalanceBottom:
@@ -366,7 +366,7 @@ public class RobotContainer {
       case OneAndNothing:
         return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case BalanceMobilityBonusNoPickup:
-        return AutonSequences.getOnePieceBalanceMobilityBonusNoPickup(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
+        return AutonSequences.getOnePieceBalanceMobilityBonusNoPickup(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw, m_localizer);
       case BalanceMobilityBonus:
         return AutonSequences.getOnePieceBalanceMobilityBonus(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case PhyscoBehavior:
