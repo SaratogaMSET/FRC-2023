@@ -39,6 +39,7 @@ import frc.robot.commands.GroundIntakeCommands.ActuatorDefaultCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngleDriver;
+import frc.robot.subsystems.PoseSmoothingFilter;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
@@ -46,7 +47,6 @@ import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
 import frc.robot.subsystems.GroundIntake.RollerSubsystem;
 import frc.robot.subsystems.Vision.VisionSubsystem;
-import frc.robot.util.SmoothingFilter;
 import frc.robot.util.server.PoseEstimator;
 
 /**
@@ -85,14 +85,13 @@ public class RobotContainer {
   private final ActuatorSubsystem actuatorSubsystem = new ActuatorSubsystem();
   private final RollerSubsystem rollers = new RollerSubsystem();
   public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();  
-  public static final PoseEstimator m_localizer = new PoseEstimator(
+  private final PoseSmoothingFilter m_localizer = new PoseSmoothingFilter(new PoseEstimator(
     m_visionSubsystem, 
     m_drivetrainSubsystem, 
     Constants.Drivetrain.m_kinematics2, 
     new Rotation2d(), 
     new Pose2d()
-  );
-  private final SmoothingFilter smoother = new SmoothingFilter();
+  ));
 
   public Pose2d m_filteredPose = new Pose2d();
   
@@ -159,8 +158,6 @@ public class RobotContainer {
     
     
     configureButtonBindings();
-    
-    m_localizer.start();
   }
 
   /**
@@ -343,7 +340,6 @@ public class RobotContainer {
     // SmartDashboard.putNumber("armside", RobotState.armSide);
     // SmartDashboard.putNumber("prox of the yimity", sensor.getProximity());
     // SmartDashboard.putBoolean("hall effect", HallEffect.get());
-    m_filteredPose = smoother.filter(m_localizer.getPose());
     Logger.getInstance().recordOutput("MCL", m_filteredPose);
   }
 
@@ -356,7 +352,7 @@ public class RobotContainer {
     String selected = m_autoSwitcher.getSelected();
     switch(selected){
       case OnePiece:
-        return AutonSequences.getOnePieceCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw, this::getREALPose);
+        return AutonSequences.getOnePieceCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw, m_localizer::getPose);
       case OneAndBalance:
         return AutonSequences.getOnePieceAndBalanceBringArmBackCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case OneAndBalanceBottom:
@@ -366,7 +362,7 @@ public class RobotContainer {
       case OneAndNothing:
         return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case BalanceMobilityBonusNoPickup:
-        return AutonSequences.getOnePieceBalanceMobilityBonusNoPickup(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw, this::getREALPose);
+        return AutonSequences.getOnePieceBalanceMobilityBonusNoPickup(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw, m_localizer::getPose);
       case BalanceMobilityBonus:
         return AutonSequences.getOnePieceBalanceMobilityBonus(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case PhyscoBehavior:
@@ -382,12 +378,5 @@ public class RobotContainer {
       default:
         return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, m_claw);
     }
-  }
-
-  /**
-   * @return the REAL pose of the robot
-   */
-  public Pose2d getREALPose() {
-    return m_filteredPose;
   }
 }

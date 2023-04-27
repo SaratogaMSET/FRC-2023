@@ -1,23 +1,41 @@
-package frc.robot.util;
+package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.MathUtils;
+import frc.robot.util.server.PoseEstimator;
 
-public class SmoothingFilter {
+public class PoseSmoothingFilter extends SubsystemBase {
+    private final PoseEstimator localizer;
     private final double THRESHOLD = 0.9;
     private final double FREQUENCY = 20.0; // how often the thing's updated I think??
     private boolean ready = false;
     private double timerInterval = 1000.0 / FREQUENCY;
     private double latency = 25.0;
-    private double strength = 3.0;
+    private double strength = 5.0;
     private double multiplier = 1.0;
     private double smoothingOffsetX = 0.0;
     private double smoothingOffsetY = 1.0;
     private double weight;
     private Pose2d position;
 
-    public Pose2d filter(Pose2d calcTarget) {
+    public PoseSmoothingFilter(PoseEstimator localizer) {
+        this.localizer = localizer;
+        this.localizer.start();
+    }
+
+    public Pose2d getPose() {
+        return position;
+    }
+
+    public void reset(Pose2d pose, Rotation2d gyroAngle) {
+        ready = false;
+        localizer.reset(pose, gyroAngle);
+    }
+
+    private Pose2d filter(Pose2d calcTarget) {
         if (!ready) {
             position = calcTarget;
             setWeight(latency);
@@ -52,5 +70,14 @@ public class SmoothingFilter {
         double stepCount = latency / timerInterval;
         double target = 1 - THRESHOLD;
         weight = 1.0 - (1.0 / Math.pow(1.0 / target, 1.0 / stepCount));
+    }
+
+    @Override
+    public void periodic() {
+        filter(localizer.getPose());
+
+        SmartDashboard.putNumberArray("Smooth localizer pose", new double[]{
+            position.getX(), position.getY(), position.getRotation().getRadians()
+        });
     }
 }
