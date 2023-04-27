@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -79,5 +81,6 @@ public class PoseSmoothingFilter extends SubsystemBase {
         SmartDashboard.putNumberArray("Smooth localizer pose", new double[]{
             position.getX(), position.getY(), position.getRotation().getRadians()
         });
+        Logger.getInstance().recordOutput("Smooth MCL", position);
     }
 }

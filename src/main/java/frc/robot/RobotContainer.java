@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -92,8 +90,6 @@ public class RobotContainer {
     new Rotation2d(), 
     new Pose2d()
   ));
-
-  public Pose2d m_filteredPose = new Pose2d();
   
   public static final double pi = Math.PI;
   public final static CommandXboxController m_driverController = new CommandXboxController(0);
@@ -340,7 +336,6 @@ public class RobotContainer {
     // SmartDashboard.putNumber("armside", RobotState.armSide);
     // SmartDashboard.putNumber("prox of the yimity", sensor.getProximity());
     // SmartDashboard.putBoolean("hall effect", HallEffect.get());
-    Logger.getInstance().recordOutput("MCL", m_filteredPose);
   }
 
   /**
