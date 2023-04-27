@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
@@ -33,7 +32,6 @@ import frc.robot.commands.Claw.ManualOpenIntake;
 import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.FastBalanceCommand;
 import frc.robot.commands.Drivetrain.TunableBalanceCommand;
-import frc.robot.commands.Drivetrain.ZeroGyroCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngleDriver;
@@ -361,6 +359,42 @@ public class AutonSequences {
         return (build).andThen(new AutoRunCommand(m_drivetrainSubsystem, ChassisSpeeds.fromFieldRelativeSpeeds(0, ((Drivetrain.balanceXVelocity)), 0, m_drivetrainSubsystem.getRotation2d())).withTimeout(Drivetrain.balanceTimeout)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
 
       }
+
+      public static Command getOnePieceBalanceMobilityBonusNoPickup(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers,ClawSubsystem m_claw, Supplier<Pose2d> localizer){
+
+        final HashMap<String, Command> eventMap = new HashMap<>(
+          Map.ofEntries(
+          Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, m_claw, 1)),
+          // Map.entry("Arm Low Score Backwards", ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 1)),
+          Map.entry("Arm Zero Command", new ArmZeroAutoCommand(m_armSubsystem)), 
+          Map.entry("Intake Front", new ManualSetAngle(actuatorSubsystem, 95)),
+          Map.entry("Run Rollers", new ManualRunIntakeCommand(rollers, 0.7)),
+          Map.entry("Zero Intake", new ManualSetAngle(actuatorSubsystem, 10)),
+          Map.entry("Zero Rollers", new ManualRunIntakeCommand(rollers, 0)),
+          // Map.entry("Arm Extend Low", ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 0)),
+          Map.entry("Balance Command", new TunableBalanceCommand(m_drivetrainSubsystem))
+          // Map.entry("Arm Neutral Command", new ArmZeroCommand(m_armSubsystem))
+          )
+          );
+        
+        // 1.0676
+        BetterSwerveAutoBuilder swerveAutoBuilder = new BetterSwerveAutoBuilder(
+          localizer::get, 
+          m_drivetrainSubsystem::resetOdometry, 
+          new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
+          new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
+          new PIDConstants(Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory),
+          m_drivetrainSubsystem::drive, 
+          eventMap, 
+          true,
+          m_drivetrainSubsystem);
+
+        List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Middle Path Builder No Pickup", new PathConstraints(1.25, 1.25));
+        Command build = swerveAutoBuilder.fullAuto(trajectory);
+        // ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds((6 * 0.1524)/1.5, 0, 0, m_drivetrainSubsystem.getRotation2d());
+        return (build).andThen(new AutoRunCommand(m_drivetrainSubsystem, ChassisSpeeds.fromFieldRelativeSpeeds(0, ((Drivetrain.balanceXVelocity)), 0, m_drivetrainSubsystem.getRotation2d())).withTimeout(Drivetrain.balanceTimeout)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
+
+      }
     
       public static Command getBottomOneAndHalfPieceBalance(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers, ClawSubsystem m_claw){
 
@@ -452,6 +486,62 @@ public class AutonSequences {
         PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
           trajectory1, 
           pose::getPose,
+          Constants.Drivetrain.m_kinematics2,
+          xController,
+          yController,
+          thetaController,
+          m_drivetrainSubsystem::drive,
+          true,
+          m_drivetrainSubsystem
+        );
+        
+    
+        return new SequentialCommandGroup(
+          new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
+          new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
+          new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
+          // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
+          // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
+          new SequentialCommandGroup(
+            ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, m_claw, 1),
+            // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
+            // new RunCommand(()->m_claw.openIntake(), m_claw).withTimeout(0.5)
+            // new InstantCommand(()->SmartDashboard.putBoolean("Claw Opened", false)),
+            new ParallelCommandGroup(
+            new ArmZeroAutoCommand(m_armSubsystem),
+            swerveTrajectoryFollower
+        )
+            // ArmSequences.lowScoreNoRetract(m_armSubsystem, m_claw, 0),
+            // new ParallelCommandGroup(
+            // new ArmZeroCommand(m_armSubsystem),
+            // new SequentialCommandGroup(
+            //   new BalanceCommand(m_drivetrainSubsystem),
+            //   new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.5, 0, 0).withTimeout(1.1),
+            //   new InstantCommand(()-> m_drivetrainSubsystem.setX())
+            // )
+            // )
+          )
+        );
+      }
+
+      public static SequentialCommandGroup getOnePieceCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ClawSubsystem m_claw, Supplier<Pose2d> pose){
+        PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("One Piece", 4, 1);
+        PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
+    
+    
+        PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
+        PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);//FIXME
+        PIDController thetaController = new PIDController(
+              Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
+        
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        xController.reset();
+        yController.reset();
+        thetaController.reset();
+    
+        PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
+          trajectory1, 
+          pose::get,
           Constants.Drivetrain.m_kinematics2,
           xController,
           yController,
