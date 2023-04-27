@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.MathUtils;
 import frc.robot.util.server.PoseEstimator;
 
+// TODO this can probably `extends` PoseEstimator rather than encapsulating?
 public class PoseSmoothingFilter extends SubsystemBase {
     private final PoseEstimator localizer;
     private final double THRESHOLD = 0.9;
