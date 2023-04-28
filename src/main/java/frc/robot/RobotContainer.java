@@ -26,6 +26,7 @@ import frc.robot.Constants.Drivetrain;
 import frc.robot.commands.Arm.ArmSequences;
 import frc.robot.commands.Arm.ArmVoltageCommand;
 import frc.robot.commands.Arm.ArmZeroCommand;
+import frc.robot.commands.Arm.ArmZeroStickyCommand;
 import frc.robot.commands.Auton.AutonSequences;
 import frc.robot.commands.CANdle.StrobeCommand;
 import frc.robot.commands.Claw.BackUpIntakeCommand;
@@ -246,7 +247,7 @@ public class RobotContainer {
     
     m_driverController.leftBumper().onTrue(
     new ParallelCommandGroup(
-      new ArmZeroCommand(m_armSubsystem),
+      new ArmZeroStickyCommand(m_armSubsystem),
       new SequentialCommandGroup(
         // new WaitCommand(0.3),
         new ParallelCommandGroup(
