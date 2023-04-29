@@ -60,6 +60,8 @@ public final class Constants {
         public static final boolean driveMotorInvert = chosenModule.driveMotorInvert;
         public static final double driveGearRatio = chosenModule.driveGearRatio;
         public static final double angleGearRatio = chosenModule.angleGearRatio;
+
+    
         /**
          * The left-to-right distance between the drivetrain wheels
          *
@@ -98,6 +100,10 @@ public final class Constants {
         public static final double MAX_VELOCITY_METERS_PER_SECOND = (6380.0 / 60.0 *
                 SdsModuleConfigurations.MK4_L2.getDriveReduction() *
                 SdsModuleConfigurations.MK4_L2.getWheelDiameter() * Math.PI);
+
+        public static final double speedLimit = MAX_VELOCITY_METERS_PER_SECOND; // Base Meters Per Second Speed
+        public static final double slowSpeedLimit = 3.36; // Slow Meters Per Second Speed
+        public static final double slowestSpeedLimit = 2.444; // slowest Meters Per Second Speed
 
         public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
                 Math.hypot(Drivetrain.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, Drivetrain.DRIVETRAIN_WHEELBASE_METERS / 2.0);

@@ -172,9 +172,9 @@ public class RobotContainer {
     
     m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
             m_drivetrainSubsystem,
-            () -> modifyAxis(m_driverController.getLeftX() * 1.35) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND, //1.2 or 2
-            () -> modifyAxis(-m_driverController.getLeftY() * 1.35) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND, //1.2 or 2
-            () -> modifyAxis(-m_driverController.getRightX()/1.1) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
+            () -> modifyAxis(m_driverController.getLeftX()), //1.2 or 2
+            () -> modifyAxis(-m_driverController.getLeftY()), //1.2 or 2
+            () -> modifyAxis(-m_driverController.getRightX()),
             () -> -modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
             () -> m_armSubsystem.getYPosition(),
             () -> actuatorSubsystem.get_position_degrees()
@@ -208,10 +208,10 @@ public class RobotContainer {
     m_driverController.b().toggleOnTrue(new SequentialCommandGroup(
       new DefaultDriveCommand(
             m_drivetrainSubsystem,
-            () -> modifyAxis(m_driverController.getLeftX()/2.25) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> modifyAxis(-m_driverController.getLeftY()/2.25) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> modifyAxis(-m_driverController.getRightX()/2.25) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
-            () -> modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(m_driverController.getLeftX()/2.25),
+            () -> modifyAxis(-m_driverController.getLeftY()/2.25) ,
+            () -> modifyAxis(-m_driverController.getRightX()/2.25),
+            () -> modifyAxis(m_gunner1.getX(), 0.1),
             ()-> m_armSubsystem.getYPosition(),
             ()-> actuatorSubsystem.get_position_degrees()     
     )));
@@ -219,14 +219,14 @@ public class RobotContainer {
     // m_driverController.rightTrigger().onTrue(new AlignCommand(m_drivetrainSubsystem));
 
    
-    m_driverController.a().toggleOnTrue(new MoveWithClosest90(
-      m_drivetrainSubsystem, 
-      () -> modifyAxis(m_driverController.getLeftX()* 1.35) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-      () -> modifyAxis(-m_driverController.getLeftY()*1.35) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-      () -> m_armSubsystem.getYPosition(),
-      () -> actuatorSubsystem.get_position_degrees(),
-      () -> -modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND
-    ));
+    // m_driverController.a().toggleOnTrue(new MoveWithClosest90(
+    //   m_drivetrainSubsystem, 
+    //   () -> modifyAxis(m_driverController.getLeftX()* 1.35) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+    //   () -> modifyAxis(-m_driverController.getLeftY()*1.35) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+    //   () -> m_armSubsystem.getYPosition(),
+    //   () -> actuatorSubsystem.get_position_degrees(),
+    //   () -> -modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND
+    // ));
 
     // m_driverController.leftTrigger().onTrue(
     // // new BalanceCommand(m_drivetrainSubsystem).andThen(
@@ -284,7 +284,7 @@ public class RobotContainer {
     ()-> -modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND));
     // m_gunner1.button(11).and(m_gunner1.button(1)).onTrue((ArmSequences.groundIntakeCone(m_armSubsystem, m_claw,  1)));
 
-
+    
 
     m_gunner1.button(1).whileTrue(
       new ParallelCommandGroup(new ManualSetAngleDriver(actuatorSubsystem, 95), new ManualRunIntakeCommand(rollers, 1))) //.until( ()-> (m_claw.isGamepieceInRange() && m_claw.getGamePieceType() != null))))
@@ -358,13 +358,13 @@ public class RobotContainer {
       case OneAndNothing:
         return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, m_claw);
       case BalanceMobilityBonusNoPickup:
-        return AutonSequences.getOnePieceBalanceMobilityBonusNoPickup(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw, m_localizer::getPose);
+        return AutonSequences.getOnePieceBalanceMobilityBonusNoPickup(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw, m_localizer);
       case BalanceMobilityBonus:
         return AutonSequences.getOnePieceBalanceMobilityBonus(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case PhyscoBehavior:
           return AutonSequences.getTwoPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case TwoPieceNoBalance:
-        return AutonSequences.getTwoPieceNoBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers ,m_claw);
+        return AutonSequences.getTwoPieceNoBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers ,m_claw, m_localizer);
       case ThreePiece:
         return AutonSequences.getThreePieceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case TwoAndAHalfBalanceBarrier:

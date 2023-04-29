@@ -124,7 +124,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
             Pose2d velocity = new Pose2d(chassisSpeeds.vxMetersPerSecond * Constants.loopPeriodSecs,
                 chassisSpeeds.vyMetersPerSecond * Constants.loopPeriodSecs,
                 Rotation2d.fromRadians(chassisSpeeds.omegaRadiansPerSecond * Constants.loopPeriodSecs));
-            Twist2d twist_vel = new Pose2d().log(velocity);
+            Twist2d twist_vel = getPose().log(velocity);
             m_chassisSpeeds = new ChassisSpeeds(twist_vel.dx / Constants.loopPeriodSecs, 
             twist_vel.dy / Constants.loopPeriodSecs, 
             twist_vel.dtheta / Constants.loopPeriodSecs);
