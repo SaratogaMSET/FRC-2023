@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.math.GeomUtil;
 import frc.lib.swerve.BetterSwerveModuleState;
 import frc.lib.swerve.SwerveDriveKinematics2;
 import frc.robot.Constants;
@@ -124,7 +125,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
             Pose2d velocity = new Pose2d(chassisSpeeds.vxMetersPerSecond * Constants.loopPeriodSecs,
                 chassisSpeeds.vyMetersPerSecond * Constants.loopPeriodSecs,
                 Rotation2d.fromRadians(chassisSpeeds.omegaRadiansPerSecond * Constants.loopPeriodSecs));
-            Twist2d twist_vel = getPose().log(velocity);
+            Twist2d twist_vel = GeomUtil.log(velocity);
             m_chassisSpeeds = new ChassisSpeeds(twist_vel.dx / Constants.loopPeriodSecs, 
             twist_vel.dy / Constants.loopPeriodSecs, 
             twist_vel.dtheta / Constants.loopPeriodSecs);
