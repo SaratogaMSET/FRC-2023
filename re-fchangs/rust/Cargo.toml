@@ -6,11 +6,14 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+criterion = "0.4.0"
+lazy_static = "1.4.0"
 num = "0.4.0"
 rand = { version = "0.8.5", features = [
     "default",
     "packed_simd",
     "simd_support",
+    "small_rng",
 ] }
 rand_distr = "0.4.3"
 serde = { version = "1.0.159", features = [
@@ -20,3 +23,7 @@ serde = { version = "1.0.159", features = [
     "serde_derive",
 ] }
 serde_json = "1.0.95"
+
+[[bench]]
+name = "mcl_benchmark"
+harness = false

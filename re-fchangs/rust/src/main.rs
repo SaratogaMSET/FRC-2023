@@ -6,16 +6,7 @@ use std::{
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-use crate::amcl::Amcl;
-
-mod amcl;
-mod constants;
-mod math_util;
-mod particle;
-mod point3;
-mod robot_data;
-mod tag;
-mod tag_distance;
+use rust::amcl::Amcl;
 
 #[derive(Serialize, Deserialize)]
 struct EstimateData {
@@ -80,7 +71,7 @@ fn main() {
             );
         }
 
-        amcl.compute_weighted_average();
+        amcl.compute_weighted_average(); // potential FIXME: we might want to get rid of this line
         let out_data = EstimateData {
             id: odom_id,
             x: amcl.get_weighted_average().x(),
