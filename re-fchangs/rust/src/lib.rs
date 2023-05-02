@@ -1,5 +1,3 @@
-#![feature(lazy_cell)]
-
 pub mod amcl;
 pub mod constants;
 pub mod math_util;
