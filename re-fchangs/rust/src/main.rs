@@ -74,9 +74,9 @@ fn main() {
         amcl.compute_weighted_average(); // potential FIXME: we might want to get rid of this line
         let out_data = EstimateData {
             id: odom_id,
-            x: amcl.get_weighted_average().x(),
-            y: amcl.get_weighted_average().y(),
-            w: amcl.get_weighted_average().w(),
+            x: *amcl.get_weighted_average().x(),
+            y: *amcl.get_weighted_average().y(),
+            w: *amcl.get_weighted_average().w(),
         };
         let json_out = json!(out_data);
 
