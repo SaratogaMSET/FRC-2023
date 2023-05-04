@@ -91,37 +91,37 @@ impl Amcl {
     }
 
     pub fn update_odometry(&mut self, x: f64, y: f64, w: f64) {
-        self.motion_delta.0 = x;
-        self.motion_delta.1 = y;
-        self.motion_delta.2 = w;
+        *self.motion_delta.x() = x;
+        *self.motion_delta.y() = y;
+        *self.motion_delta.z() = w;
         self.update_motion();
     }
 
     fn update_motion(&mut self) {
-        let dx = self.motion_delta.x();
-        let dy = self.motion_delta.y();
-        let dw = self.motion_delta.z();
+        let dx = *self.motion_delta.x();
+        let dy = *self.motion_delta.y();
+        let dw = *self.motion_delta.z();
 
-        for mut p in &mut self.particles {
-            p.0 += dx + normal_distribution(0.0, self.motion_gauss_x);
-            p.1 += dy + normal_distribution(0.0, self.motion_gauss_y);
-            p.2 += dw + normal_distribution(0.0, self.motion_gauss_w);
+        for p in &mut self.particles {
+            *p.x() += dx + normal_distribution(0.0, self.motion_gauss_x);
+            *p.y() += dy + normal_distribution(0.0, self.motion_gauss_y);
+            *p.w() += dw + normal_distribution(0.0, self.motion_gauss_w);
 
-            p.2 %= 2.0 * PI;
-            if p.2 < 0.0 {
-                p.2 += 2.0 * PI;
+            *p.w() %= 2.0 * PI;
+            if *p.w() < 0.0 {
+                *p.w() += 2.0 * PI;
             }
 
-            if p.0 > FIELD_WIDTH - FIELD_WIDTH_OFFSET {
-                p.0 = FIELD_WIDTH - FIELD_WIDTH_OFFSET;
-            } else if p.0 < -FIELD_WIDTH_OFFSET {
-                p.0 = -FIELD_WIDTH_OFFSET;
+            if *p.x() > FIELD_WIDTH - FIELD_WIDTH_OFFSET {
+                *p.x() = FIELD_WIDTH - FIELD_WIDTH_OFFSET;
+            } else if *p.x() < -FIELD_WIDTH_OFFSET {
+                *p.x() = -FIELD_WIDTH_OFFSET;
             }
 
-            if p.1 > FIELD_HEIGHT - FIELD_HEIGHT_OFFSET {
-                p.1 = FIELD_HEIGHT - FIELD_HEIGHT_OFFSET;
-            } else if p.1 < -FIELD_HEIGHT_OFFSET {
-                p.1 = -FIELD_HEIGHT_OFFSET;
+            if *p.y() > FIELD_HEIGHT - FIELD_HEIGHT_OFFSET {
+                *p.y() = FIELD_HEIGHT - FIELD_HEIGHT_OFFSET;
+            } else if *p.y() < -FIELD_HEIGHT_OFFSET {
+                *p.y() = -FIELD_HEIGHT_OFFSET;
             }
         }
     }
@@ -150,12 +150,12 @@ impl Amcl {
 
             if num_points > 0 {
                 for d in &mut self.distances.values_mut() {
-                    let tag_dist: f64 = d.distance()
+                    let tag_dist: f64 = *d.distance()
                         + normal_distribution(
                             0.0,
                             f64::hypot(self.vision_gauss_x, self.vision_gauss_y),
                         );
-                    let particle_distance: f64 = f64::hypot(p.x() - d.x(), p.y() - d.y());
+                    let particle_distance: f64 = f64::hypot(*p.x() - *d.x(), *p.y() - *d.y());
                     let distance_diff: f64 = f64::abs(particle_distance - tag_dist);
                     prob *= gaussian(
                         0.0,
@@ -164,27 +164,27 @@ impl Amcl {
                     );
                 }
 
-                p.3 = prob;
+                *p.weight() = prob;
 
                 if self.use_heading && id > 1 {
                     let cmps_prob = Self::heading_err::<true, true>(
-                        p.w(),
+                        *p.w(),
                         (campose[2] + TAG_ARRAY[id as usize - 1_usize].z()).to_radians()
                             % (2.0 * PI)
                             + normal_distribution(0.0, self.vision_gauss_w),
                         self.vision_gauss_w,
                     );
 
-                    p.3 *= cmps_prob;
+                    *p.weight() *= cmps_prob;
                 }
 
-                sum_weight += p.weight();
+                sum_weight += *p.weight();
             }
         }
 
         for p in &mut self.particles {
-            w_avg += p.weight() / NUM_PARTICES as f64;
-            p.3 /= sum_weight;
+            w_avg += *p.weight() / NUM_PARTICES as f64;
+            *p.weight() /= sum_weight;
         }
 
         self.mcl_wslow += self.mcl_aslow * (w_avg - self.mcl_wslow);
@@ -198,7 +198,7 @@ impl Amcl {
         let reset_prob: f64 = f64::clamp(1.0 - (self.mcl_wfast - self.mcl_wslow), 0.0, 1.0);
         let r = uniform_random_distribution(0.0, 1.0 / NUM_PARTICES as f64);
         let mut new_particles: Vec<Particle> = Vec::new();
-        let mut c = self.particles.first().unwrap().weight();
+        let mut c = *self.particles.first_mut().unwrap().weight();
         let mut id = 0;
         self.best_estimate = *self.particles.first().unwrap();
 
@@ -220,10 +220,10 @@ impl Amcl {
                 let u = r + (j as f64 / NUM_PARTICES as f64);
                 while u > c {
                     id += 1;
-                    c += self.particles.get(id).unwrap().weight();
+                    c += *self.particles.get_mut(id).unwrap().weight();
                 }
 
-                if self.particles.get(id).unwrap().weight() > self.best_estimate.weight() {
+                if self.particles.get_mut(id).unwrap().weight() > self.best_estimate.weight() {
                     self.best_estimate = *self.particles.get(id).unwrap();
                 }
 
@@ -242,7 +242,7 @@ impl Amcl {
         self.best_estimate = *self.particles.first().unwrap();
 
         for i in 0..NUM_PARTICES {
-            if self.particles.get(i).unwrap().weight() > self.best_estimate.weight() {
+            if self.particles.get_mut(i).unwrap().weight() > self.best_estimate.weight() {
                 self.best_estimate = *self.particles.get(i).unwrap();
             }
         }
@@ -255,14 +255,14 @@ impl Amcl {
 
         let (mut mean_x, mut mean_y, mut mean_w) = (0.0, 0.0, 0.0);
         for p in &mut self.particles {
-            mean_x += p.x();
-            mean_y += p.y();
-            mean_w += p.w();
+            mean_x += *p.x();
+            mean_y += *p.y();
+            mean_w += *p.w();
         }
 
-        self.mean_estimate.0 = mean_x / NUM_PARTICES as f64;
-        self.mean_estimate.1 = mean_y / NUM_PARTICES as f64;
-        self.mean_estimate.2 = mean_w / NUM_PARTICES as f64;
+        *self.mean_estimate.x() = mean_x / NUM_PARTICES as f64;
+        *self.mean_estimate.y() = mean_y / NUM_PARTICES as f64;
+        *self.mean_estimate.w() = mean_w / NUM_PARTICES as f64;
 
         self.mean_estimate
     }
@@ -270,9 +270,9 @@ impl Amcl {
     pub fn compute_weighted_average(&mut self) -> Particle {
         let (mut mean_x, mut mean_y, mut mean_w) = (0.0, 0.0, 0.0);
         for p in &mut self.particles {
-            mean_x += p.x() * p.weight();
-            mean_y += p.y() * p.weight();
-            mean_w += p.w() * p.weight();
+            mean_x += *p.x() * *p.weight();
+            mean_y += *p.y() * *p.weight();
+            mean_w += *p.w() * *p.weight();
         }
 
         self.weighted_average = Particle(mean_x, mean_y, mean_w, 0.0);
