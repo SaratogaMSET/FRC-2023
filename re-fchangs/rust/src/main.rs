@@ -78,7 +78,9 @@ fn main() {
                 // potential FIXME: we might want to get rid of the following line since
                 // it could mess with the filter's calculated positional estimates by using
                 // particles whose weights are not reflective of their actual probability
-                // of correctness in weighted average computation.
+                // of correctness in weighted average computation, since after resampling
+                // all particle weights are reset, meaning the weighted average might not
+                // be correct.
                 amcl.compute_weighted_average();
                 let out_data = EstimateData {
                     id: odom_id,
