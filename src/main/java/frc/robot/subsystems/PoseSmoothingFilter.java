@@ -12,7 +12,7 @@ import frc.robot.util.server.PoseEstimator;
 public class PoseSmoothingFilter extends SubsystemBase {
     private final PoseEstimator localizer;
     private final double THRESHOLD = 0.9;
-    private final double FREQUENCY = 20.0; // how often the thing's updated I think??
+    private final double FREQUENCY = 50.0; // how often the thing's updated I think??
     private boolean ready = false;
     private double timerInterval = 1000.0 / FREQUENCY;
     private double latency = 25.0;
