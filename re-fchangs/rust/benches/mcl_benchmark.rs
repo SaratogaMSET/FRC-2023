@@ -40,5 +40,10 @@ fn mcl_bench_average(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, mcl_bench_odom, mcl_bench_resample, mcl_bench_average);
+criterion_group!(
+    benches,
+    mcl_bench_odom,
+    mcl_bench_resample,
+    mcl_bench_average
+);
 criterion_main!(benches);
