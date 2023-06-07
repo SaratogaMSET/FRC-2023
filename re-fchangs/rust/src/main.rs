@@ -102,6 +102,8 @@ fn main() {
         let mut line = String::new();
         reader.read_line(&mut line).unwrap();
         let json_in: Value = serde_json::from_str(line.trim()).unwrap();
-        MEASUREMENT_QUEUE.force_push(json_in);
+        if MEASUREMENT_QUEUE.force_push(json_in).is_some() {
+            eprintln!("Queue full; measurement dropped!");
+        }
     }
 }
