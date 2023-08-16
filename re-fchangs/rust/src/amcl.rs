@@ -223,10 +223,11 @@ impl Amcl {
                 // `u` increases with each iteration of the outer loop, ensuring that different particles get selected
                 // with each outer loop iteration. (i.e., if `u` stayed the same, the same particle would put us over
                 // the top every iteration, despite there probably being more particles that we haven't looked at yet.)
-                // this is how we make sure the higher-weighted particles are selected for the next generation.
+                // this is how we make sure the higher-weighted particles are selected for the next generation: higher-weighted
+                // particles have a greater chance of putting `c` over the top.
                 // of course, there is a chance that a high-weight particle puts us just under the threshold, then a
-                // lower-weight particle is the one that puts us over the top. there's not much anyone can do in that case.
-                // finding a better resampling algorithm is left as an exercise to the reader.
+                // lower-weight particle is the one that puts us over the top. we assume the chance of that happening is low
+                // enough for us to ignore.
                 let u = r + (j as f64 / NUM_PARTICES as f64);
                 while u > c {
                     id += 1;
