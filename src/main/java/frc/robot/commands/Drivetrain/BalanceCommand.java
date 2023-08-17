@@ -56,7 +56,9 @@ public class BalanceCommand extends CommandBase {
     error = Constants.Drivetrain.balanceGoalDegrees - currentAngle;
     
 
-    drivePower = (Math.min(Constants.Drivetrain.balanceKP * error + Constants.Drivetrain.balanceKD * errorDT , 1) + ff);
+    drivePower = (Math.min(Constants.Drivetrain.balanceKP * error + Constants.Drivetrain.balanceKD * errorDT , 1) 
+                  // + ff
+    );
 
     //Robot might need an extra push when going up backwards
     if (drivePower < 0) {
