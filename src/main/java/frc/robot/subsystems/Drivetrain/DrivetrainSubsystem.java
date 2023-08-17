@@ -110,8 +110,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         return Math.toRadians(angle);
       }
       public void drive(ChassisSpeeds chassisSpeeds) {
-        // double IpX = Units.inchesToMeters(2);
-        // double IpY = Units.inchesToMeters(-5.4);
+        // double IpX = Units.inchesToMeters(-2); //TODO: Replace with constant
+        // double IpY = Units.inchesToMeters(-5.4); //TODO: Replace with constant
         // double IpD = Math.hypot(IpY, IpX);
         // double theta = Math.atan2(IpY, IpX);
         // double omega = chassisSpeeds.omegaRadiansPerSecond;

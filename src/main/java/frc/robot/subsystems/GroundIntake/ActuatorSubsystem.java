@@ -66,7 +66,7 @@ public class ActuatorSubsystem extends SubsystemBase {
         return Actuator.getMotorOutputVoltage();
     }
 
-    /** 0 is considered to be at the top
+    /** 0 is considered to be the ground intake at vertical
      * @param desired angle in degrees CW +
      */
     public void set_angle(double angle, double powerPercent){

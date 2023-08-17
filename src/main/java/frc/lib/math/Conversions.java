@@ -2,6 +2,7 @@ package frc.lib.math;
 
 public class Conversions {
 
+    private Conversions(){}
     /**
      * @param positionCounts CANCoder Position Counts
      * @param gearRatio Gear Ratio between CANCoder and Mechanism

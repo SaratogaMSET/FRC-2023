@@ -179,7 +179,6 @@ public class RobotContainer {
             () -> m_armSubsystem.getYPosition(),
             () -> actuatorSubsystem.get_position_degrees()
     ));
-
     m_armSubsystem.setDefaultCommand(
       new ArmVoltageCommand(
         m_armSubsystem

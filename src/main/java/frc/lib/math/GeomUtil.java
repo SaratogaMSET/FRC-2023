@@ -19,6 +19,9 @@ import edu.wpi.first.math.geometry.Twist2d;
 
 /** Geometry utilities for working with translations, rotations, transforms, and poses. */
 public class GeomUtil {
+
+  private GeomUtil(){}
+  
   private final static double kEps = 1E-9;
   /**
    * Creates a pure translating transform
