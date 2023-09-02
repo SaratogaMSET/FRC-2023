@@ -35,7 +35,6 @@ import frc.robot.commands.Drivetrain.TunableBalanceCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngleDriver;
-import frc.robot.subsystems.PoseSmoothingFilter;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
@@ -325,7 +324,7 @@ public class AutonSequences {
 
       }
 
-      public static Command getOnePieceBalanceMobilityBonusNoPickup(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers,ClawSubsystem m_claw, PoseSmoothingFilter localizer){
+      public static Command getOnePieceBalanceMobilityBonusNoPickup(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers,ClawSubsystem m_claw){
         BetterSwerveAutoBuilder swerveAutoBuilder;
 
         final HashMap<String, Command> eventMap = new HashMap<>(
@@ -342,10 +341,10 @@ public class AutonSequences {
           // Map.entry("Arm Neutral Command", new ArmZeroCommand(m_armSubsystem))
           )
           );
-        if(localizer != null){
+        // if(localizer != null){
         // 1.0676
         swerveAutoBuilder = new BetterSwerveAutoBuilder(
-          localizer::getPose, 
+          m_drivetrainSubsystem::getPose, 
           m_drivetrainSubsystem::resetOdometry, 
           new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
           new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
@@ -354,8 +353,8 @@ public class AutonSequences {
           eventMap, 
           true,
           m_drivetrainSubsystem);
-        }
-        else{
+        // }
+        // else{
           swerveAutoBuilder = new BetterSwerveAutoBuilder(
           m_drivetrainSubsystem::getPose, 
           m_drivetrainSubsystem::resetOdometry, 
@@ -366,13 +365,13 @@ public class AutonSequences {
           eventMap, 
           true,
           m_drivetrainSubsystem);
-        }
+        
         List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Middle Path Builder No Pickup", new PathConstraints(1.25, 1.25));
         Command build = swerveAutoBuilder.fullAuto(trajectory);
         // ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds((6 * 0.1524)/1.5, 0, 0, m_drivetrainSubsystem.getRotation2d());
         return (build).andThen(new AutoRunCommand(m_drivetrainSubsystem, ChassisSpeeds.fromFieldRelativeSpeeds(0, ((Drivetrain.balanceXVelocity)), 0, m_drivetrainSubsystem.getRotation2d())).withTimeout(Drivetrain.balanceTimeout)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
-
-      }
+        }
+      
     
       public static Command getBottomOneAndHalfPieceBalance(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers, ClawSubsystem m_claw){
 
@@ -446,7 +445,7 @@ public class AutonSequences {
 
       }
 
-      public static SequentialCommandGroup getOnePieceCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ClawSubsystem m_claw, PoseEstimator pose){
+      public static SequentialCommandGroup getOnePieceCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ClawSubsystem m_claw){
         PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("One Piece", 4, 1);
         PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
     
@@ -595,7 +594,7 @@ public class AutonSequences {
         return build; //.andThen(new BalanceCommand(m_drivetrainSubsystem)); //.andThen(new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.5, 0, 0).withTimeout(0.35));
       }
 
-      public static Command getTwoPieceNoBalance(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuator, RollerSubsystem rollers, ClawSubsystem m_claw, PoseSmoothingFilter localizer){
+      public static Command getTwoPieceNoBalance(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuator, RollerSubsystem rollers, ClawSubsystem m_claw){
         BetterSwerveAutoBuilder swerveAutoBuilder;
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
@@ -615,20 +614,20 @@ public class AutonSequences {
        );
         
         // 1.0676
-        if(localizer != null){
-          // 1.0676
-          swerveAutoBuilder = new BetterSwerveAutoBuilder(
-            localizer::getPose, 
-            m_drivetrainSubsystem::resetOdometry, 
-            new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
-            new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
-            new PIDConstants(Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory),
-            m_drivetrainSubsystem::drive, 
-            eventMap, 
-            true,
-            m_drivetrainSubsystem);
-          }
-          else{
+        // if(localizer != null){
+        //   // 1.0676
+        //   swerveAutoBuilder = new BetterSwerveAutoBuilder(
+        //     localizer::getPose, 
+        //     m_drivetrainSubsystem::resetOdometry, 
+        //     new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
+        //     new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
+        //     new PIDConstants(Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory),
+        //     m_drivetrainSubsystem::drive, 
+        //     eventMap, 
+        //     true,
+        //     m_drivetrainSubsystem);
+        //   }
+          // else{
             swerveAutoBuilder = new BetterSwerveAutoBuilder(
             m_drivetrainSubsystem::getPose, 
             m_drivetrainSubsystem::resetOdometry, 
@@ -639,7 +638,7 @@ public class AutonSequences {
             eventMap, 
             true,
             m_drivetrainSubsystem);
-          }
+          // }
 
         List <PathPlannerTrajectory> trajectory = PathPlanner.loadPathGroup("Top Path No Balance", new PathConstraints(4, 3), new PathConstraints(2, 1.5), new PathConstraints(2, 3));
         Command build = swerveAutoBuilder.fullAuto(trajectory);
