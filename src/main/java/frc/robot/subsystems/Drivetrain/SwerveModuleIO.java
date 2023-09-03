@@ -3,6 +3,7 @@ package frc.robot.subsystems.Drivetrain;
 import org.littletonrobotics.junction.AutoLog;
 import frc.lib.swerve.BetterSwerveModuleState;
 
+/** Not used to sim software yet**/
 public interface SwerveModuleIO {
     @AutoLog
     class SwerveModuleIOInputs {

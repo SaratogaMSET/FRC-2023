@@ -7,9 +7,11 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.lib.swerve.BetterSwerveModuleState;
 import frc.robot.Constants;
 
-
+/**Not used to sim software **/
 public class SwerveModuleIOSim implements SwerveModuleIO {
-    private final FlywheelSim driveSim = new FlywheelSim(DCMotor.getFalcon500(1), Constants.Drivetrain.chosenModule.driveGearRatio, 0.025);
+    //Flywheels are the best way for us to sim the swerve drivetrain modules
+    //Think of each way the wheel is moving (rotating can be seen as a flywheel in the xy plane, spinning the wheel is the xz plane)
+    private final FlywheelSim driveSim = new FlywheelSim(DCMotor.getFalcon500(1), Constants.Drivetrain.chosenModule.driveGearRatio, 0.025); 
     private final FlywheelSim steerSim = new FlywheelSim(DCMotor.getFalcon500(1), Constants.Drivetrain.chosenModule.angleGearRatio, 0.004096955);
     private final PIDController drivePID = new PIDController(10, 0, 0);
     private final PIDController steerPosPID = new PIDController(15, 0, 0);

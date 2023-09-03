@@ -5,7 +5,9 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import frc.robot.Constants;
 
-/** IO implementation for Pigeon2 */
+/** IO implementation for NAVX */
+@Deprecated
+/** We are still getting used to our sim software**/
 public class GyroIONavx implements GyroIO {
   private final AHRS gyro;
   private double prevYawPosition;

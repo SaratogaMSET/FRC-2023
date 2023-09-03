@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Drivetrain;
 
+@Deprecated
+/** Still getting used to our sim software**/
 public class GyroIOSim implements GyroIO{
 
     @Override

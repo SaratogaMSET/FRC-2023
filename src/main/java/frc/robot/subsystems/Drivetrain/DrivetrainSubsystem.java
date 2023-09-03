@@ -43,17 +43,20 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private SwerveModuleState[] currentDesiredStateTele = new SwerveModuleState[4];
     private SwerveModuleState[] previousDesiredStateTele = new SwerveModuleState[4];
     
-    public final AHRS m_navx = new AHRS(SPI.Port.kMXP, (byte) 200);
-    public double offset = 0;
-    private final PIDController driftCorrectionPID = new PIDController(0.1, 0.00, 0.000);
+    public final AHRS m_navx = new AHRS(SPI.Port.kMXP, (byte) 200); //this is our gyro that we use
+    public double offset = 0; //offset that we add to every time we rezero the gyro
+    private final PIDController driftCorrectionPID = new PIDController(0.1, 0.00, 0.000); //a pid controller to fight drift
+
+    //the speeds that we use to convert to individual swerve module states
     public ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);    
-    //private SwerveDriveOdometry swerveOdometry;
     public ChassisSpeeds previouChassisSpeeds = new ChassisSpeeds(0.0,0.0,0.0);
     ChassisSpeeds speeds = new ChassisSpeeds(0.0,0.0,0.0);
-    private Field2d m_field = new Field2d();
 
     private NetworkTable visionData;
 
+    /*How much do we "trust" our drivetrain measurements and how much do we "trust" our vision estimates. 
+     * A higher value means we trust it more.
+     * */
     private final Matrix<N3, N1> stateSTD = new Matrix<>(Nat.N3(), Nat.N1());
     private final Matrix<N3, N1> visDataSTD = new Matrix<>(Nat.N3(), Nat.N1());
 
@@ -61,6 +64,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     double pXY = 0;
     double desiredHeading;
     Pose2d lastPose;
+    //Normal motor encoder data for odometry combined with vision estimates
     SwerveDrivePoseEstimator odomFiltered = new SwerveDrivePoseEstimator(Constants.Drivetrain.m_kinematics2, getRotation2d(), getModulePositions(), lastPose);
     public SwerveModule[] mSwerveMods = new SwerveModule[] {
         new SwerveModule(0, Constants.Drivetrain.Mod0.constants),
@@ -94,7 +98,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     
-    
+    /**simple conversion from what the navx angle is to a rotation 2d
+     * Note that navx considers clockwise to be positive, while our coordinate system is clockwise is negative
+     */
     public Rotation2d getRotation2d() {
         // if(gyroInputs.connected){
             return Rotation2d.fromDegrees(-Math.toDegrees(getNavHeading()));
@@ -103,12 +109,24 @@ public class DrivetrainSubsystem extends SubsystemBase {
         //     return Rotation2d.fromRadians(m_chassisSpeeds.omegaRadiansPerSecond * 0.02 + lastRotation.getRadians());
         // }
     }
+    //Get the reading of the navx in radians
     public double getNavHeading(){
         double angle = m_navx.getYaw() + 180 - offset;
         angle = angle + 90 + 360;
         angle = angle % 360;
         return Math.toRadians(angle);
       }
+
+
+      /**Use this to command chassis speeds, which will be converted
+       * Note: In teleop we use a Pose2d.log(), which will allow us to generate a curve that the robot will follow
+       * instead of the direct chassis speeds. We do this to counteract the robot skewing in the direction of rotation
+       * while moving and rotating at the same time.
+       * 
+       * 2nd order kinematics also does this, but this is only viable for auton as it makes assumptions (wont get into the math here)
+       * that make it unviable for teleop
+       * @param chassisSpeeds the desired ChassisSpeeds
+       */
       public void drive(ChassisSpeeds chassisSpeeds) {
         // double IpX = Units.inchesToMeters(-2); //TODO: Replace with constant
         // double IpY = Units.inchesToMeters(-5.4); //TODO: Replace with constant
@@ -146,6 +164,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
         return speeds;
         }
 
+    /**We use 2nd order kinematics for auton, and this is converting the desired speed of the robot to individual states 
+     * each swerve module will go to.
+     */
     public void setModuleStates(ChassisSpeeds chassisSpeeds) {
 
         BetterSwerveModuleState[] desiredStates = Constants.Drivetrain.m_kinematics2.toSwerveModuleStates(chassisSpeeds);
@@ -154,22 +175,30 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
     }    
 
+    /**To directly command the states to the modules
+     * @param desiredStates 2nd order kinematics states
+     */
     public void setModuleStates(BetterSwerveModuleState[] desiredStates) {
         for(SwerveModule mod : mSwerveMods){
             mod.setDesiredState(desiredStates[mod.moduleNumber], false);
         }
     }
 
+    /**To directly command the states to the modules
+     * @param desiredStates 1st order kinematics states
+     */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         for(SwerveModule mod : mSwerveMods){
             mod.setDesiredState(desiredStates[mod.moduleNumber], true);
         }
     }
 
+    /**Get the odom position from the field */
     public Pose2d getPose() {
         return odomFiltered.getEstimatedPosition();
     }
 
+    /** Reset the odom to a given pose, useful for when starting auton period */
     public void resetOdometry(Pose2d pose) {
         odomFiltered.resetPosition(getRotation2d(), getModulePositions(), pose);
         //swerveOdometry.resetPosition(getRotation2d(), getModulePositions(), pose);
@@ -183,6 +212,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
             new BetterSwerveModuleState(0.1, Rotation2d.fromDegrees(45), 0),
         });
     }
+    
     public SwerveModuleState[] getModuleStates(){
         SwerveModuleState[] states = new SwerveModuleState[4];
         switch(Constants.currentMode){
@@ -261,6 +291,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
     }
 
+    /** Instead of getting a robot relative velocity, we want to get a field velocity: useful for auto scoring in the future */
     public Twist2d getFieldVelocity(){
         ChassisSpeeds chassisSpeeds = Drivetrain.m_kinematics2.toChassisSpeeds(getModuleStates());
         Translation2d linearFieldVelocity =
@@ -289,7 +320,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
         //     // Logger.getInstance().recordOutput(i + "Motor Output Voltage", mSwerveMods[i].getOutputVoltage());
 
         // }
-        
+
+        //We only want to use 2nd order kinematics during auton, otherwise we trace the arc that the robot wants to go
+        //based on the desired chassis speeds and 1st order kinematics and command that instead to the modules
+        //See drive() method in this class 
+
         if(DriverStation.isAutonomous()){
             previousDesiredState = currentDesiredState;
             currentDesiredState = Constants.Drivetrain.m_kinematics2.toSwerveModuleStates(m_chassisSpeeds);
@@ -311,6 +346,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
                 currentDesiredState[2].angle = previousDesiredState[2].angle;
                 currentDesiredState[3].angle = previousDesiredState[3].angle;
             }
+
+            //useful debugging
 
             // for(int i = 0; i < 4; i++){
             //     SmartDashboard.putNumber("Mod " + i + " Cancoder", mSwerveMods[i].getCanCoder().getDegrees());
@@ -362,6 +399,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         // double[] pos = new double[]{odomFiltered.getEstimatedPosition().getX(), odomFiltered.getEstimatedPosition().getY(), odomFiltered.getEstimatedPosition().getRotation().getDegrees()};
         // SmartDashboard.putNumberArray("Odom", pos);
+
+        //we dont want to ruin our estimator by feeding in a null value
         lastPose = odomFiltered.getEstimatedPosition();
         Pose2d pose = getVisionPose2d();
         if (pose != null && DriverStation.isTeleop()){

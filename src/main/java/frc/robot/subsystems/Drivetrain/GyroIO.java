@@ -3,6 +3,7 @@ package frc.robot.subsystems.Drivetrain;
 import org.littletonrobotics.junction.AutoLog;
 
 /** Add your docs here. */
+@Deprecated
 public interface GyroIO {
   
   @AutoLog
