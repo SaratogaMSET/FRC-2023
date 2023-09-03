@@ -20,16 +20,7 @@ public class VisionSubsystem extends SubsystemBase {
     private double a;  // x val 
     private double b;  // y val
 
-    private double[] distances = new double[]{
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1
-    };
+    private double[] distances = new double[]{ -1,-1,-1,-1,-1,-1,-1,-1};
 
     public VisionSubsystem() {}
 
