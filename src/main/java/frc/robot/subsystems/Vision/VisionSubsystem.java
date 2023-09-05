@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Vision;
 
+import java.util.Arrays;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -39,7 +41,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     /* This is mostly for tuning the accuracy of the pipeline, the robot doesn't really use theses values well  */ 
     private double[] getDistances() {
-        Arrays.fill(distances, -1)
+        Arrays.fill(distances, -1);
 
         for (var r : getLatestResults().targetingResults.targets_Fiducials) {
             var tmp = r.getRobotPose_TargetSpace();
