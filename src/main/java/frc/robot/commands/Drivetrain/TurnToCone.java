@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.Vision.VisionSubsystem;
 
+@Deprecated
 public class TurnToCone extends CommandBase{
 
     private final DrivetrainSubsystem m_drivetrain; 
@@ -34,7 +35,8 @@ public class TurnToCone extends CommandBase{
     public void execute(){
 
         // pidValue = controller.calculate(m_visionSubsystem.getOffsetTo2DOFBase()[2], 0); //-> to radians
-        pidValue = controller.calculate(Math.toRadians(m_visionSubsystem.getOffsetTo2DOFBase()[2]), 0); //-> to radians
+        //pidValue = controller.calculate(Math.toRadians(m_visionSubsystem.getOffsetTo2DOFBase()[2]), 0); //-> to radians
+        pidValue = 0;
 
         int limit = 2;
         if (pidValue > limit) {

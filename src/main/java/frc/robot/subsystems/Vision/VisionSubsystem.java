@@ -101,9 +101,6 @@ public class VisionSubsystem extends SubsystemBase {
         return (int) getTable().getEntry("tid").getInteger(-1);
     }
 
-    /* Retroreflective(NOT USEFUL). See limelight documentation for details*/
-    
-
     public double getTX(){
         return getTable().getEntry("tx").getDouble(0.0);
     }
@@ -112,61 +109,13 @@ public class VisionSubsystem extends SubsystemBase {
         return getTable().getEntry("ty").getDouble(0.0);
     }
 
-    // Explanation is in the limelight case study docs. (pretty much making triangles and solving them)
-    private double getDistanceFromRetro(){
-        double camHeight, camAngle;
-        if (getPipeline() > 0){
-            if (getTable().equals(ll3)){
-                camHeight = VisionConstants.H1_LL3;
-                camAngle = VisionConstants.A1_LL3;
-            } else {
-                camHeight = VisionConstants.H1_LL2;
-                camAngle = VisionConstants.A1_LL2; 
-            }
-            if (getTY() < -3){
-                return (Constants.VisionConstants.H2b - camHeight) / Math.tan(Math.toRadians(camAngle + getTY()));
-            } 
-            return (Constants.VisionConstants.H2a - camHeight) / Math.tan(Math.toRadians(camAngle + getTY()));
-        } else {
-            return 0.0;
-        }
-    }
-
-    /* Robot pose from retroreflctive vision targets(think target_pose in robot_space) */ 
-    public double[] getOffsetTo2DOFBase(){       
-
-        d1 = getDistanceFromRetro();
-        tx = getTX();
-        
-        a = Math.sin(Math.toRadians(tx)) * d1;  // x val 
-        b = Math.cos(Math.toRadians(tx)) * d1;  // y val
-
-        if (getTable().equals(ll3)){
-
-            double angle = Math.atan((a - Constants.VisionConstants.C2_LL3) / (b + Constants.VisionConstants.C1_LL3));
-
-            double[] x = {a - Constants.VisionConstants.C2_LL3, b + Constants.VisionConstants.C1_LL3, Math.toDegrees(angle)};
-            return x;
-        } else {
-
-            double angle = Math.atan((a - Constants.VisionConstants.C2_LL3) / (b + Constants.VisionConstants.C1_LL3));
-            
-            // negative x -> arm is to the right. idk why man 
-            double[] x = {a - Constants.VisionConstants.C2_LL2, b + Constants.VisionConstants.C1_LL2, Math.toDegrees(angle)};
-            return x; 
-        }
-    }
-
-    /**
+   /**
      * *
      * @param pipelineNum the pipeline number to switch to. We might need one for the high tape, one for the mid tape and one for apriltag.
      */
     public void setPipeline(int pipelineNum){
         getTable().getEntry("pipeline").setNumber(pipelineNum);
     }
-    
-    /* End Retroreflective */
-
 /* START OF ATREY'S APRILTAG CODE; USING OLD FUNCTIONS; RETURNS TX, TY, CAMERA-RELATIVE ANGLE TO APRILTAG */
 
     /* campose but using network tables */
