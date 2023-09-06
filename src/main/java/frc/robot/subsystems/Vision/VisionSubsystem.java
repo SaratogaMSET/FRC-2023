@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Vision;
 
+import java.util.Arrays;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -11,8 +13,11 @@ import frc.robot.subsystems.Vision.LimelightHelpers.LimelightResults;
 import frc.robot.util.wrappers.VisionMeasurement;
 
 public class VisionSubsystem extends SubsystemBase {
+
     private NetworkTable ll2 = NetworkTableInstance.getDefault().getTable("limelight-two");
     private NetworkTable ll3 = NetworkTableInstance.getDefault().getTable("limelight-three");
+
+    private double[] distances = new double[]{-1,-1,-1,-1,-1,-1,-1,-1};
 
     private double d1;
     private double tx;
@@ -20,19 +25,11 @@ public class VisionSubsystem extends SubsystemBase {
     private double a;  // x val 
     private double b;  // y val
 
-    private double[] distances = new double[]{
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1
-    };
 
     public VisionSubsystem() {}
 
+
+    /* gets the robot pose relative to the apriltag target. Read docs */ 
     private Pose2d getCamPose2d() {
         double id = getTagID();
         for (var v : getLatestResults().targetingResults.targets_Fiducials) {
@@ -42,17 +39,9 @@ public class VisionSubsystem extends SubsystemBase {
         return new Pose2d();
     }
 
+    /* This is mostly for tuning the accuracy of the pipeline, the robot doesn't really use theses values well  */ 
     private double[] getDistances() {
-        distances = new double[]{
-            -1,
-            -1,
-            -1,
-            -1,
-            -1,
-            -1,
-            -1,
-            -1
-        };
+        Arrays.fill(distances, -1);
 
         for (var r : getLatestResults().targetingResults.targets_Fiducials) {
             var tmp = r.getRobotPose_TargetSpace();
@@ -62,6 +51,7 @@ public class VisionSubsystem extends SubsystemBase {
         return distances;
     }
 
+    /* Limelight helper implementation for deprecated mcl */ 
     public VisionMeasurement getLatestMeasurement() {
         LimelightResults results = getLatestResults();
         return new VisionMeasurement(
@@ -76,6 +66,7 @@ public class VisionSubsystem extends SubsystemBase {
         );
     }
 
+    // LL2 does not support the LimelightResults Helper functions. 
     public LimelightResults getLatestResults() {
         return LimelightHelpers.getLatestResults("limelight-three");
     }
@@ -110,7 +101,8 @@ public class VisionSubsystem extends SubsystemBase {
         return (int) getTable().getEntry("tid").getInteger(-1);
     }
 
-    /* Retroreflective(NOT USEFUL) */
+    /* Retroreflective(NOT USEFUL). See limelight documentation for details*/
+    
 
     public double getTX(){
         return getTable().getEntry("tx").getDouble(0.0);
@@ -120,6 +112,7 @@ public class VisionSubsystem extends SubsystemBase {
         return getTable().getEntry("ty").getDouble(0.0);
     }
 
+    // Explanation is in the limelight case study docs. (pretty much making triangles and solving them)
     private double getDistanceFromRetro(){
         double camHeight, camAngle;
         if (getPipeline() > 0){
@@ -133,35 +126,33 @@ public class VisionSubsystem extends SubsystemBase {
             if (getTY() < -3){
                 return (Constants.VisionConstants.H2b - camHeight) / Math.tan(Math.toRadians(camAngle + getTY()));
             } 
-            //SmartDashboard.putNumber("gET ME OUT", ((Constants.VisionConstants.H2a - camHeight) / Math.tan(Math.toRadians(camAngle + getTY()))));
             return (Constants.VisionConstants.H2a - camHeight) / Math.tan(Math.toRadians(camAngle + getTY()));
         } else {
             return 0.0;
         }
     }
 
+    /* Robot pose from retroreflctive vision targets(think target_pose in robot_space) */ 
     public double[] getOffsetTo2DOFBase(){       
 
-        if (getTable().equals(ll3)){
-            d1 = getDistanceFromRetro();
-            tx = getTX();
+        d1 = getDistanceFromRetro();
+        tx = getTX();
+        
+        a = Math.sin(Math.toRadians(tx)) * d1;  // x val 
+        b = Math.cos(Math.toRadians(tx)) * d1;  // y val
 
-            a = Math.sin(Math.toRadians(tx)) * d1;  // x val 
-            b = Math.cos(Math.toRadians(tx)) * d1;  // y val
+        if (getTable().equals(ll3)){
 
             double angle = Math.atan((a - Constants.VisionConstants.C2_LL3) / (b + Constants.VisionConstants.C1_LL3));
-        double[] x = {a - Constants.VisionConstants.C2_LL3, b + Constants.VisionConstants.C1_LL3, Math.toDegrees(angle)};
+
+            double[] x = {a - Constants.VisionConstants.C2_LL3, b + Constants.VisionConstants.C1_LL3, Math.toDegrees(angle)};
             return x;
         } else {
-            d1 = getDistanceFromRetro();
-            tx = getTX();
-            a = Math.sin(Math.toRadians(tx)) * d1;  // x val 
-            b = Math.cos(Math.toRadians(tx)) * d1;  // y val
 
             double angle = Math.atan((a - Constants.VisionConstants.C2_LL3) / (b + Constants.VisionConstants.C1_LL3));
             
             // negative x -> arm is to the right. idk why man 
-        double[] x = {a - Constants.VisionConstants.C2_LL2, b + Constants.VisionConstants.C1_LL2, Math.toDegrees(angle)};
+            double[] x = {a - Constants.VisionConstants.C2_LL2, b + Constants.VisionConstants.C1_LL2, Math.toDegrees(angle)};
             return x; 
         }
     }
@@ -173,10 +164,12 @@ public class VisionSubsystem extends SubsystemBase {
     public void setPipeline(int pipelineNum){
         getTable().getEntry("pipeline").setNumber(pipelineNum);
     }
+    
     /* End Retroreflective */
 
 /* START OF ATREY'S APRILTAG CODE; USING OLD FUNCTIONS; RETURNS TX, TY, CAMERA-RELATIVE ANGLE TO APRILTAG */
 
+    /* campose but using network tables */
     private double[] getCamTranOld() {
         return getTable().getEntry("botpose_targetspace").getDoubleArray(new double[6]);
     }
