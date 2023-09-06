@@ -15,6 +15,8 @@ public class ActuatorSubsystem extends SubsystemBase {
     WPI_TalonFX Actuator = new WPI_TalonFX(Constants.GroundIntake.actuator_ID, "649-Hammerhead-CANivore");
 
     CANCoder Encoder = new CANCoder(Constants.GroundIntake.encoder_ID,  "649-Hammerhead-CANivore");
+    //TODO: Make these constants not completely bogus
+    //They were here because the intake was added under a time constraint, they are not "valid" control theory wise
     double previousError = 0;
     public double k_GAuton = 0.0648; //0.0648
     public double k_G = 0.0648;
@@ -25,8 +27,11 @@ public class ActuatorSubsystem extends SubsystemBase {
     double k_PUp = 0.6; //0.7
     double errorDT;
     double prevError;
+
+    //Ki is almost always not a good idea on a frc robot
     PIDController controller = new PIDController(k_P,0,k_D);
     
+    //How we current limit the motor actuating the ground intake 
     SupplyCurrentLimitConfiguration ActuatorLimit = new SupplyCurrentLimitConfiguration(
             true, 
             Constants.Drivetrain.driveContinuousCurrentLimit, 
@@ -38,11 +43,10 @@ public class ActuatorSubsystem extends SubsystemBase {
         Actuator.configNeutralDeadband(0.0);
     }
    
+
+    //Very defined range of motion 
     public double get_position(){
         double raw_radians =  Math.toRadians(Encoder.getAbsolutePosition() - Constants.GroundIntake.encoder_offset);
-        //while(raw_radians > Math.PI) raw_radians -= 2 * Math.PI;
-        //while(raw_radians < -Math.PI) raw_radians += 2 * Math.PI;
-        // raw_radians = (18.0/60.0) * (16.0/40.0) * (8.0/34.0) * raw_radians;
         return raw_radians;
     }
     public double get_position_degrees(){
@@ -55,12 +59,17 @@ public class ActuatorSubsystem extends SubsystemBase {
     public double getCurrent(){
         return Actuator.getStatorCurrent();
     }
-    double[] get_xy(){
-        return new double[]{
-            Constants.GroundIntake.x_offset + Math.sin(get_position()) * Constants.GroundIntake.length,
-            Constants.GroundIntake.y_offset + Math.cos(get_position()) * Constants.GroundIntake.length
-        };
-    }
+
+    // /**
+    //  * Does not do anything useful for right now
+    //  * 
+    //  */
+    // double[] get_xy(){
+    //     return new double[]{
+    //         Constants.GroundIntake.x_offset + Math.sin(get_position()) * Constants.GroundIntake.length,
+    //         Constants.GroundIntake.y_offset + Math.cos(get_position()) * Constants.GroundIntake.length
+    //     };
+    // }
 
     public double getVoltage(){
         return Actuator.getMotorOutputVoltage();
@@ -124,8 +133,10 @@ public class ActuatorSubsystem extends SubsystemBase {
             
             double outputVoltage = (k_P * error + k_I * integralError + k_D * velocityError- gravity) * power;
             // SmartDashboard.putNumber("More Pain", outputVoltage );
-            double yikes = Math.max(0.5, Math.min(4, outputVoltage));
-            Actuator.setVoltage(yikes);
+
+            //we slam the ground intake down if we dont limit the voltage of the motor
+            double calc = Math.max(0.5, Math.min(4, outputVoltage));
+            Actuator.setVoltage(calc);
         }
     } 
 
@@ -134,12 +145,20 @@ public class ActuatorSubsystem extends SubsystemBase {
     //     Actuator.setVoltage(voltage);
     // }
 
-    public boolean detect_collision(double[] ee_cartesian, double radius){
-        double distance = Math.hypot(ee_cartesian[0] - get_xy()[0], ee_cartesian[1] - get_xy()[1]);
+    /**
+     * Does not do anything useful for right now
+     */
+    // public boolean detect_collision(double[] ee_cartesian, double radius){
+    //     // double distance = Math.hypot(ee_cartesian[0] - get_xy()[0], ee_cartesian[1] - get_xy()[1]);
 
-        return Math.abs(distance) < radius;
-    }
-    public void tuneGravityCompensation(){
+    //     return Math.abs(distance) < radius;
+    // }
+
+    /** Keeps the ground intake up.
+     * This should be done in a command that is almost always running, like a default command,
+     * so that the ground intake does not start to droop on its own.
+     */
+    public void gravityCompensation(){
         Actuator.set(-k_G * Math.sin(get_position() - Math.toRadians(25)));
     }
     @Override

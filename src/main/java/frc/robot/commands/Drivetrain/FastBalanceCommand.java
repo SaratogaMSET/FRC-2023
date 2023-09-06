@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 
+/** The only reason this exists is because it has a higher limit than BalanceCommand,
+ * it is just easier to search for in AutonSequences.java
+ */
 public class FastBalanceCommand extends CommandBase {
 
   private DrivetrainSubsystem m_DriveSubsystem;
@@ -48,9 +51,10 @@ public class FastBalanceCommand extends CommandBase {
     driveYaw = m_DriveSubsystem.getRotation2d();
     LinearFilter xAccelFilter = LinearFilter.movingAverage(5);
     currAcc = m_DriveSubsystem.m_navx.getWorldLinearAccelX();
+
     currAcc = xAccelFilter.calculate(currAcc);
     currAcc = 180 * Math.asin(currAcc/9.81)/Math.PI;
-    ff = Constants.Drivetrain.balanceKS * currAngle + Constants.Drivetrain.balanceKV*currentAngularVelocity + Constants.Drivetrain.balanceKA * currAcc;
+    // ff = Constants.Drivetrain.balanceKS * currAngle + Constants.Drivetrain.balanceKV*currentAngularVelocity + Constants.Drivetrain.balanceKA * currAcc;
 
     this.currentAngle = driveRoll.getRadians() * driveYaw.getSin() - drivePitch.getRadians() * driveYaw.getCos();
     
@@ -59,7 +63,9 @@ public class FastBalanceCommand extends CommandBase {
 
 
     // TODO: WAS ORIGINALLY    +(Math.min(....))
-    drivePower = (Math.min(Constants.Drivetrain.balanceKP * error + Constants.Drivetrain.balanceKD * errorDT , 1) + ff);
+    drivePower = (Math.min(Constants.Drivetrain.balanceKP * error + Constants.Drivetrain.balanceKD * errorDT , 1)
+    //  + ff
+     );
 
     //Robot might need an extra push when going up backwards
     if (drivePower < 0) {

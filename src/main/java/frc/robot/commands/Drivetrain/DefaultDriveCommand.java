@@ -13,6 +13,7 @@ import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
+/**For controlling the drivetrain using joysticks */
 public class DefaultDriveCommand extends CommandBase {
     private final DrivetrainSubsystem m_drivetrainSubsystem;
 
@@ -44,6 +45,18 @@ public class DefaultDriveCommand extends CommandBase {
     double minArmValue = 0.3; 
     double maxArmValue = 1.18; 
 
+    /**
+     * 
+     * @param drivetrainSubsystem DrivetrainSubsystem
+     * @param translationXSupplier controller.getLeftX()
+     * @param translationYSupplier controller.getLeftY()
+     * @param rotationSupplier controller.getRightX()
+     * @param gunnerSupplier This is the override we do when the arm is up. It is a flat speed
+     * override that we do when aligning to score
+     * @param armHeight Used for dynamically controlling the speed of the drivetrain and determining
+     * if gunner overriding is valid
+     * @param actuatorHeight How far down ActuatorSubstem is. Also used for controlling speed.
+     */
     public DefaultDriveCommand(DrivetrainSubsystem drivetrainSubsystem,
                                DoubleSupplier translationXSupplier,
                                DoubleSupplier translationYSupplier,
