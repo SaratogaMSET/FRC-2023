@@ -6,8 +6,8 @@ package frc.robot;
 
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -15,8 +15,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -25,19 +27,27 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.commands.Arm.ArmSequences;
 import frc.robot.commands.Arm.ArmVoltageCommand;
+import frc.robot.commands.Arm.ArmZeroAutoCommand;
 import frc.robot.commands.Arm.ArmZeroCommand;
 import frc.robot.commands.Arm.ArmZeroStickyCommand;
+import frc.robot.commands.Auton.AutoRunCommand;
 import frc.robot.commands.Auton.AutonSequences;
+import frc.robot.commands.CANdle.IndicateConeCommand;
+import frc.robot.commands.CANdle.IndicateCubeCommand;
 import frc.robot.commands.CANdle.StrobeCommand;
 import frc.robot.commands.Claw.BackUpIntakeCommand;
 import frc.robot.commands.Claw.ManualCloseIntake;
+import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.DefaultDriveCommand;
+import frc.robot.commands.Drivetrain.DriveToPose;
 import frc.robot.commands.Drivetrain.MoveWithClosest90;
+import frc.robot.commands.Drivetrain.TunableBalanceCommand;
 import frc.robot.commands.Drivetrain.ZeroGyroCommand;
 import frc.robot.commands.GroundIntakeCommands.ActuatorDefaultCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngleDriver;
+
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
@@ -45,7 +55,6 @@ import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
 import frc.robot.subsystems.GroundIntake.RollerSubsystem;
 import frc.robot.subsystems.Vision.VisionSubsystem;
-import frc.robot.util.server.PoseEstimator;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -74,26 +83,21 @@ public class RobotContainer {
   public final SendableChooser<Boolean> autoCloseChooser = new SendableChooser<Boolean>();
   public static final Boolean disableAutoClose = false;
   public static final Boolean enableAutoClose = true;
+
   
   public final ClawSubsystem m_claw = new ClawSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   public final static VisionSubsystem m_visionSubsystem = new VisionSubsystem();
-  
+  public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();  
   private final CANdleSubsystem m_ledSubsystem = new CANdleSubsystem();
   private final ActuatorSubsystem actuatorSubsystem = new ActuatorSubsystem();
   private final RollerSubsystem rollers = new RollerSubsystem();
-  public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();  
-  // private final PoseSmoothingFilter m_localizer = new PoseSmoothingFilter(new PoseEstimator(
-  //   m_visionSubsystem, 
-  //   m_drivetrainSubsystem, 
-  //   Constants.Drivetrain.m_kinematics2, 
-  //   new Rotation2d(), 
-  //   new Pose2d()
-  // ));
+  // private final ClawSubsystem m_clawSubsystem = new ClawSubsystem(new ClawIOSparkMax());
   
   public static final double pi = Math.PI;
   public final static CommandXboxController m_driverController = new CommandXboxController(0);
   private final CommandJoystick m_gunner1 = new CommandJoystick(1);
+  private final CommandJoystick m_gunner2 = new CommandJoystick(2);
 
   public static final double MAX_VELOCITY_METERS_PER_SECOND = (6380.0 / 60.0 *
           SdsModuleConfigurations.MK4_L2.getDriveReduction() *
@@ -154,7 +158,14 @@ public class RobotContainer {
     
     
     configureButtonBindings();
+      
   }
+
+       
+
+    // Configure the button bindings
+    
+  
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -171,13 +182,14 @@ public class RobotContainer {
     
     m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
             m_drivetrainSubsystem,
-            () -> modifyAxis(m_driverController.getLeftX()), //1.2 or 2
-            () -> modifyAxis(-m_driverController.getLeftY()), //1.2 or 2
-            () -> modifyAxis(-m_driverController.getRightX()),
+            () -> modifyAxis(m_driverController.getLeftX() * 1.35) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND, //1.2 or 2
+            () -> modifyAxis(-m_driverController.getLeftY() * 1.35) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND, //1.2 or 2
+            () -> modifyAxis(-m_driverController.getRightX()/1.1) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
             () -> -modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
             () -> m_armSubsystem.getYPosition(),
             () -> actuatorSubsystem.get_position_degrees()
     ));
+
     m_armSubsystem.setDefaultCommand(
       new ArmVoltageCommand(
         m_armSubsystem
@@ -206,10 +218,10 @@ public class RobotContainer {
     m_driverController.b().toggleOnTrue(new SequentialCommandGroup(
       new DefaultDriveCommand(
             m_drivetrainSubsystem,
-            () -> modifyAxis(m_driverController.getLeftX()/2.25),
-            () -> modifyAxis(-m_driverController.getLeftY()/2.25) ,
-            () -> modifyAxis(-m_driverController.getRightX()/2.25),
-            () -> modifyAxis(m_gunner1.getX(), 0.1),
+            () -> modifyAxis(m_driverController.getLeftX()/2.25) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(-m_driverController.getLeftY()/2.25) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> modifyAxis(-m_driverController.getRightX()/2.25) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
+            () -> modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
             ()-> m_armSubsystem.getYPosition(),
             ()-> actuatorSubsystem.get_position_degrees()     
     )));
@@ -217,14 +229,14 @@ public class RobotContainer {
     // m_driverController.rightTrigger().onTrue(new AlignCommand(m_drivetrainSubsystem));
 
    
-    // m_driverController.a().toggleOnTrue(new MoveWithClosest90(
-    //   m_drivetrainSubsystem, 
-    //   () -> modifyAxis(m_driverController.getLeftX()* 1.35) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-    //   () -> modifyAxis(-m_driverController.getLeftY()*1.35) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-    //   () -> m_armSubsystem.getYPosition(),
-    //   () -> actuatorSubsystem.get_position_degrees(),
-    //   () -> -modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND
-    // ));
+    m_driverController.a().toggleOnTrue(new MoveWithClosest90(
+      m_drivetrainSubsystem, 
+      () -> modifyAxis(m_driverController.getLeftX()* 1.35) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+      () -> modifyAxis(-m_driverController.getLeftY()*1.35) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+      () -> m_armSubsystem.getYPosition(),
+      () -> actuatorSubsystem.get_position_degrees(),
+      () -> -modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND
+    ));
 
     // m_driverController.leftTrigger().onTrue(
     // // new BalanceCommand(m_drivetrainSubsystem).andThen(
@@ -245,7 +257,7 @@ public class RobotContainer {
     
     m_driverController.leftBumper().onTrue(
     new ParallelCommandGroup(
-      new ArmZeroStickyCommand(m_armSubsystem),
+      new ArmZeroCommand(m_armSubsystem),
       new SequentialCommandGroup(
         // new WaitCommand(0.3),
         new ParallelCommandGroup(
@@ -282,7 +294,7 @@ public class RobotContainer {
     ()-> -modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND));
     // m_gunner1.button(11).and(m_gunner1.button(1)).onTrue((ArmSequences.groundIntakeCone(m_armSubsystem, m_claw,  1)));
 
-    
+
 
     m_gunner1.button(1).whileTrue(
       new ParallelCommandGroup(new ManualSetAngleDriver(actuatorSubsystem, 95), new ManualRunIntakeCommand(rollers, 1))) //.until( ()-> (m_claw.isGamepieceInRange() && m_claw.getGamePieceType() != null))))
@@ -290,7 +302,7 @@ public class RobotContainer {
         (new ArmZeroCommand(m_armSubsystem)).andThen(new ParallelCommandGroup(new ManualSetAngleDriver(actuatorSubsystem, 10), new ManualRunIntakeCommand(rollers, 0.0))));
 
       m_gunner1.button(2).whileTrue(
-        new ManualRunIntakeCommand(rollers, -0.25).alongWith(new ManualSetAngleDriver(actuatorSubsystem, 25))) // -0.375
+        new ManualRunIntakeCommand(rollers, -0.25)) // -0.375
         .onFalse(new ManualRunIntakeCommand(rollers, 0.0));
 
       m_gunner1.button(12).whileTrue(
@@ -328,6 +340,23 @@ public class RobotContainer {
 
     return value;
   }
+  /** 
+   * @param value the joystick input
+   * @param exponent the exponent number to use
+   * @param activeLinearDeadband when to activate linear scaling instead of exponential scaling
+   * **/
+  private static double modifyAxis(double value, double exponent, double activeLinearDeadband) {
+		// Deadband
+
+		value = MathUtil.applyDeadband(value, 0.05);
+
+    if(Math.abs(value) < activeLinearDeadband)
+		  value = Math.copySign(Math.pow(value, exponent), value);
+    else if(value > activeLinearDeadband){
+      value = Math.copySign(value * value, value);
+    }
+		return value;
+	}
 
   public void updateRobotState(){
     // RobotState.armSide = m_armSubsystem.getSide();
@@ -373,4 +402,5 @@ public class RobotContainer {
         return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, m_claw);
     }
   }
-}
+
+  }
