@@ -7,14 +7,15 @@ package frc.robot.commands.Claw;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Claw.ClawSubsystem;
-import frc.robot.subsystems.Claw.ClawSubsystem;
 
-/** An example command that uses an example subsystem. */
+/**
+ * Manual open intake command
+ */
 public class ManualOpenIntake extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final ClawSubsystem m_intake;
   /**
-   * Creates a new ExampleCommand.
+   * Creates a new ManualOpenIntake.
    *
    * @param subsystem The subsystem used by this command.
    */
@@ -44,7 +45,7 @@ public class ManualOpenIntake extends CommandBase {
 
   // Returns true when the command should end.
   @Override
-  public boolean isFinished() {
+  public boolean isFinished() { // Finish when claw is fully open
     if(m_intake.isClawFullyOpen()) 
       return true;
 
