@@ -9,16 +9,17 @@ import java.util.function.BooleanSupplier;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Claw.ClawSubsystem;
-import frc.robot.subsystems.Claw.ClawSubsystem;
 
-/** An example command that uses an example subsystem. */
+/**
+ * Default intake command
+ */
 public class BackUpIntakeCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final ClawSubsystem m_intake;
   private BooleanSupplier isAuton;
   private BooleanSupplier enableAutoClose;
   /**
-   * Creates a new ExampleCommand.
+   * Creates a new BackUpIntakeCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
@@ -55,10 +56,10 @@ public class BackUpIntakeCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(!isAuton.getAsBoolean()){
+    if(!isAuton.getAsBoolean()){  // If not in autonomous mode, set intake to idle mode
       m_intake.setIdle();
     }
-        if(m_intake.isGamepieceInRange()){
+        if(m_intake.isGamepieceInRange()){  // Run auto close if enabled and game piece detected
             if(enableAutoClose.getAsBoolean()){
                 m_intake.autoCloseClaw();
         }
