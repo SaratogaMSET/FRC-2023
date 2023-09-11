@@ -14,6 +14,8 @@ import frc.robot.util.wrappers.VisionMeasurement;
 
 public class VisionSubsystem extends SubsystemBase {
 
+    /* Network tables is the method of communication between camera data  and us programmers. It's kinda like a dictionary
+    */
     private NetworkTable ll2 = NetworkTableInstance.getDefault().getTable("limelight-two");
     private NetworkTable ll3 = NetworkTableInstance.getDefault().getTable("limelight-three");
 
@@ -29,7 +31,10 @@ public class VisionSubsystem extends SubsystemBase {
     public VisionSubsystem() {}
 
 
-    /* gets the robot pose relative to the apriltag target. Read docs */ 
+    /* gets the robot pose relative to the apriltag target. 
+    Read docs: https://docs.limelightvision.io/en/latest/networktables_api.html
+    Scroll to "Apriltags and 3D Data"
+    */ 
     private Pose2d getCamPose2d() {
         double id = getTagID();
         for (var v : getLatestResults().targetingResults.targets_Fiducials) {
@@ -39,7 +44,8 @@ public class VisionSubsystem extends SubsystemBase {
         return new Pose2d();
     }
 
-    /* This is mostly for tuning the accuracy of the pipeline, the robot doesn't really use theses values well  */ 
+    /* This is mostly for tuning the accuracy of the pipeline, the robot doesn't really use theses values well. Reports the 
+    of the camera in meters from each apriltag based on id(array index 0 is apriltag 1) */ 
     private double[] getDistances() {
         Arrays.fill(distances, -1);
 
@@ -51,7 +57,7 @@ public class VisionSubsystem extends SubsystemBase {
         return distances;
     }
 
-    /* Limelight helper implementation for deprecated mcl */ 
+    /* Limelight helper implementation for server communication with deprecated mcl*/ 
     public VisionMeasurement getLatestMeasurement() {
         LimelightResults results = getLatestResults();
         return new VisionMeasurement(
@@ -71,6 +77,8 @@ public class VisionSubsystem extends SubsystemBase {
         return LimelightHelpers.getLatestResults("limelight-three");
     }
 
+    // Rather than trying to fuse data together from cameras, we just decided to pick based on which camera has data
+    // (Monkey solution) If both see data, ll3 is given priority. 
     public NetworkTable getTable(){
         if (ll3.getEntry("tv").getInteger(0) == 1){
             SmartDashboard.putNumber("check", 1);
@@ -87,6 +95,8 @@ public class VisionSubsystem extends SubsystemBase {
             return false;
         }
     }
+
+    /* Network Table Communications: https://docs.limelightvision.io/en/latest/networktables_api.html  */
   
     public long getPipeline(){
         return getTable().getEntry("getpipe").getInteger(0);
@@ -116,13 +126,17 @@ public class VisionSubsystem extends SubsystemBase {
     public void setPipeline(int pipelineNum){
         getTable().getEntry("pipeline").setNumber(pipelineNum);
     }
-/* START OF ATREY'S APRILTAG CODE; USING OLD FUNCTIONS; RETURNS TX, TY, CAMERA-RELATIVE ANGLE TO APRILTAG */
+
+    /* START OF ATREY'S APRILTAG CODE; USING OLD FUNCTIONS; RETURNS TX, TY, CAMERA-RELATIVE ANGLE TO APRILTAG */
 
     /* campose but using network tables */
     private double[] getCamTranOld() {
         return getTable().getEntry("botpose_targetspace").getDoubleArray(new double[6]);
     }
 
+    /* These return the distances from the center of the camera of the cone node positions in terms of tx and ty(like standard limelight degrees)
+     * (I THINK. One of the seniors last year was cooking something). 
+     */
     public double getLimelightTx(int topOrMid){
         double apriltagDistance = Math.hypot(getCamTranOld()[0], getCamTranOld()[2]);
 
