@@ -35,7 +35,7 @@ import frc.robot.commands.Auton.AutonSequences;
 import frc.robot.commands.CANdle.IndicateConeCommand;
 import frc.robot.commands.CANdle.IndicateCubeCommand;
 import frc.robot.commands.CANdle.StrobeCommand;
-import frc.robot.commands.Claw.BackUpIntakeCommand;
+import frc.robot.commands.Claw.DefaultIntakeCommand;
 import frc.robot.commands.Claw.ManualCloseIntake;
 import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.DefaultDriveCommand;
@@ -195,7 +195,7 @@ public class RobotContainer {
         m_armSubsystem
       ));
 
-    m_claw.setDefaultCommand(new BackUpIntakeCommand(
+    m_claw.setDefaultCommand(new DefaultIntakeCommand(
       m_claw, 
       () -> DriverStation.isAutonomous(),
       () -> autoCloseChooser.getSelected()));

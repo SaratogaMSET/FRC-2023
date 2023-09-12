@@ -34,7 +34,7 @@ public class ManualCloseIntake extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.manualCloseClaw();
+    m_intake.manualCloseClaw(); // call the manual close claw function around every 20ms while command is still being scheduled
   }
 
   // Called once the command ends or is interrupted.

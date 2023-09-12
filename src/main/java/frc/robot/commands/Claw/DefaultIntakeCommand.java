@@ -13,24 +13,24 @@ import frc.robot.subsystems.Claw.ClawSubsystem;
 /**
  * Default intake command
  */
-public class BackUpIntakeCommand extends CommandBase {
+public class DefaultIntakeCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final ClawSubsystem m_intake;
   private BooleanSupplier isAuton;
   private BooleanSupplier enableAutoClose;
   /**
-   * Creates a new BackUpIntakeCommand.
+   * Creates a new DefaultIntakeCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public BackUpIntakeCommand(ClawSubsystem subsystem) {
+  public DefaultIntakeCommand(ClawSubsystem subsystem) {
     m_intake = subsystem;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
   
-  public BackUpIntakeCommand(ClawSubsystem subsystem, BooleanSupplier isAuto, BooleanSupplier enableAutoClose){
+  public DefaultIntakeCommand(ClawSubsystem subsystem, BooleanSupplier isAuto, BooleanSupplier enableAutoClose){
     m_intake = subsystem;
     isAuton = isAuto;
     this.enableAutoClose = enableAutoClose;
@@ -39,19 +39,7 @@ public class BackUpIntakeCommand extends CommandBase {
   }
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    // switch(direction){
-    //   case OPEN:
-    //     m_intake.openIntake();
-    //     break;
-    //   case CLOSE:
-    //     m_intake.closeIntake();
-    //     break;
-    //   case IDLE:
-    //     m_intake.setIdle();
-    //     break;
-    // }
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -59,7 +47,7 @@ public class BackUpIntakeCommand extends CommandBase {
     if(!isAuton.getAsBoolean()){  // If not in autonomous mode, set intake to idle mode
       m_intake.setIdle();
     }
-        if(m_intake.isGamepieceInRange()){  // Run auto close if enabled and game piece detected
+        if(m_intake.isGamepieceInRange()){  // Run auto close if it is enabled and game piece is in range
             if(enableAutoClose.getAsBoolean()){
                 m_intake.autoCloseClaw();
         }
