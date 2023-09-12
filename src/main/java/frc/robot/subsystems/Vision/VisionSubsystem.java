@@ -134,62 +134,21 @@ public class VisionSubsystem extends SubsystemBase {
         return getTable().getEntry("botpose_targetspace").getDoubleArray(new double[6]);
     }
 
-    /* These return the distances from the center of the camera of the cone node positions in terms of tx and ty(like standard limelight degrees)
-     * (I THINK. One of the seniors last year was cooking something). 
-     */
-    public double getLimelightTx(int topOrMid){
-        double apriltagDistance = Math.hypot(getCamTranOld()[0], getCamTranOld()[2]);
-
-        if(topOrMid==1){
-            return apriltagDistance+Constants.Vision.apriltagToMidHorizontal;
-        }
-        else if(topOrMid==2){
-            return apriltagDistance+Constants.Vision.apriltagToHighHorizontal;
-        }
-        else{
-            return -1;
-        }
-    }
-
-    public double getLimelightTy(int topOrMid){
-        if(topOrMid==1){
-            return 0.6477;
-        }
-        else if(topOrMid==2){
-            return 0.9652;
-        }
-        else{
-            return -1;
-        }
-    }
-
     @Override
     public void periodic() {
 
         // Logger.getInstance().recordOutput("Smart Targeting X", 100*Math.hypot(getCamTranOld()[0], getCamTranOld()[2])); //get X stuff for verification
         // SmartDashboard.putNumberArray("Botpose 2d", getLatestResults().targetingResults.botpose);
         // SmartDashboard.putNumberArray("Distances", getDistances());
-        // SmartDashboard.putNumberArray("Pose to target(arm base)", getOffsetTo2DOFBase()); //Ignore if not on retroreflective pipeline. 
-        // SmartDashboard.putNumber("distance to retro", getDistanceFromRetro());
-
 
         // SmartDashboard.putNumber("Raw Angle", getLatestResults().targetingResults.getBotPose2d().getRotation().getDegrees());
 
-
-        // SmartDashboard.putNumber("LL to Mid (Horizontal)",getLimelightTx(1));
-        // SmartDashboard.putNumber("LL to High (Horizontal)", getLimelightTx(2));
-        // SmartDashboard.putNumber("LL to Mid (Vertical)",getLimelightTy(1));
-        // SmartDashboard.putNumber("LL to High (Vertical)",getLimelightTy(2));
         // SmartDashboard.putNumber("LL to AprilTag",Math.hypot(getCamTranOld()[0], getCamTranOld()[2]));
         NetworkTableInstance.getDefault().flush();
         //meters to inches: 1m = 39.3701 in
-        // SmartDashboard.putNumber("LL to Mid (Horizontal, Inches)",39.3701*(getLimelightTx(1)));
-        // SmartDashboard.putNumber("LL to High (Horizontal, Inches)", 39.3701*(getLimelightTx(2)));
-        // SmartDashboard.putNumber("LL to Mid (Vertical, Inches)",39.3701*(getLimelightTy(1)));
-        // SmartDashboard.putNumber("LL to High (Vertical, Inches)",39.3701*(getLimelightTy(2)));
+
         // SmartDashboard.putNumber("LL to AprilTag (Inches)",39.3701*(Math.hypot(getCamTranOld()[0], getCamTranOld()[2])));
         // SmartDashboard.putNumber("getTX", getTX());
-        // NetworkTableInstance.getDefault().flush();
     }
 
     @Override

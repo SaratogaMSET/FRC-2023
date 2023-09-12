@@ -362,25 +362,9 @@ public final class Constants {
     }
 
     public static class Vision {
-        public static final int LED = 3;
-        public static final double H1 = 5; // distance between limelight and ground (height of limelight mount)
-        public static final double H2 = 107; // height of target
-        public static final double A1 = 35; // angle from horizontal axis
-        public static final double AREA_VISIBLE = 1; //if area is large enough to be visible (ta)
         
-        public static class Distance {
-            public static final int STATE1 = 110; 
-            public static final int STATE2 = 150;
-            public static final int STATE3 = 190;
-            public static final int STATE4 = 270;
-        }
-
-        public static final double apriltagToMidHorizontal = 0.219837;
-        public static final double apriltagToHighHorizontal = apriltagToMidHorizontal*3;
-        public static final double apriltagtoMidVertical = 0.15875;
-        public static final double apriltagtoHighVertical = 0.73025;
-
         // TODO replace with actual values
+
         // Where 0 starts from the corresponding alliance color's right side
         public static final Pose2d INITIAL_TARGET_POSE = new Pose2d(new Translation2d(2.04245, 0.59764), new Rotation2d(-2.96931));
         public static final double Y_OFFSET = 0.5588; // meters

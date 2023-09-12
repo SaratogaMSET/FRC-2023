@@ -31,6 +31,7 @@ public class DriveToPose extends CommandBase {
   private final ProfiledPIDController driveController =
       new ProfiledPIDController(
           3, 0.0, 0.0, new TrapezoidProfile.Constraints(4.0, 2.0), Constants.loopPeriodSecs);
+    // theta means angle btw
   private final ProfiledPIDController thetaController =
       new ProfiledPIDController(
           2.5, 0.0, 0.0, new TrapezoidProfile.Constraints(4.0, 1.75), Constants.loopPeriodSecs);
@@ -93,6 +94,7 @@ public class DriveToPose extends CommandBase {
     this.drivetrainSubsystem = drive;
     this.poseSupplier = poseSupplier;
     addRequirements(drive);
+    // basically finds the allows the pid to not spin like 350 degrees to get to a point when it could just spin 10. 
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
@@ -121,7 +123,7 @@ public class DriveToPose extends CommandBase {
   public void execute() {
     running = true;
 
-    // Update from tunable numbers
+    // Update from tunable numbers. Basically u can change pid values from the dashboard! A thing for convenience. 
     // if (driveKp.hasChanged(hashCode())
     //     || driveKd.hasChanged(hashCode())
     //     || thetaKp.hasChanged(hashCode())
@@ -143,20 +145,24 @@ public class DriveToPose extends CommandBase {
     var targetPose = poseSupplier.get();
 
     // Calculate drive speed
+    // Magnitude of distance between pose and target(hypotenuse)
     double currentDistance =
-        currentPose.getTranslation().getDistance(poseSupplier.get().getTranslation());
+        currentPose.getTranslation().getDistance(targetPose.getTranslation()); 
+
     double ffScaler =
         MathUtil.clamp(
             (currentDistance - ffMinRadius) / (ffMaxRadius - ffMinRadius),
             0.0,
             1.0);
+
     driveErrorAbs = currentDistance;
     driveController.reset(
         lastSetpointTranslation.getDistance(targetPose.getTranslation()),
         driveController.getSetpoint().velocity);
+    
     double driveVelocityScalar =
         driveController.getSetpoint().velocity * ffScaler
-            + driveController.calculate(driveErrorAbs, 0.0);
+            + driveController.calculate(driveErrorAbs, 0.0); // P control "drives error to zero"
     if (driveController.atGoal()) driveVelocityScalar = 0.0;
     lastSetpointTranslation =
         new Pose2d(
@@ -171,8 +177,10 @@ public class DriveToPose extends CommandBase {
         thetaController.getSetpoint().velocity * ffScaler
             + thetaController.calculate(
                 currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+
     thetaErrorAbs =
         Math.abs(currentPose.getRotation().minus(targetPose.getRotation()).getRadians());
+
     if (thetaController.atGoal()) thetaVelocity = 0.0;
 
     // Command speeds
