@@ -64,24 +64,27 @@ public class ClawSubsystem extends SubsystemBase {
         motor.setSmartCurrentLimit(30); // Set motor current limit to prevent motor damage
     }
 
-    /* true = we got a game piece. False = we don't */
+    /**
+     * Check if game piece has been acquired
+     * @return value of acquired boolean: false is not acquired, and true is.
+     */
     public boolean isGamepieceAcquired() {
         return acquired;
     }
 
     /**
-     * Get time (not actually used)
-     * 
-     * @return time
+     * Get time
+     * @return time in ms
+     * @deprecated
      */
     public double getTime() {
         return time;
     }
 
     /**
-     * check whether LED is set to flash
+     * Check whether LED is set to flash
      * 
-     * @return state of flash
+     * @return true if flash desired, false if not
      */
     public boolean getFlash() {
         return flash;
@@ -111,19 +114,19 @@ public class ClawSubsystem extends SubsystemBase {
     }
 
     /**
-     * Check game piece acquisition
+     * Check if game piece is within proximity sensor threshold and encoder threshold
      * 
-     * @return true if game piece has been required, false if not
+     * @return true if game piece has been acquired, false if not
      */
     public boolean hasAcquiredGamePiece() {
         if (isGamepieceInRange() &&
                 getGamePieceType() == GamePiece.Cone && // If color sensor detects a cone and encoder measurement is within cone encoder bound, cone has been acquired
-                getConeTolerance())
+                closedToConeTolerance())
             return true;
 
         else if (isGamepieceInRange() &&
                 getGamePieceType() == GamePiece.Cube && // If color sensor detects a cube and encoder measurement is within cube encoder bound, cube has been acquired
-                getCubeTolerance()) {
+                closedToCubeTolerance()) {
 
             return true;
         }
@@ -133,18 +136,18 @@ public class ClawSubsystem extends SubsystemBase {
     /**
      * Check if claw has closed enough to have acquired a cone
      * 
-     * @return true if claw is closed past cone encoder tolerance
+     * @return true if claw is closed past cone encoder tolerance, false if not
      */
-    public boolean getConeTolerance() {
+    public boolean closedToConeTolerance() {
         return encoder.getPosition() >= ClawConstants.CONE_MEDIUM_BOUND - 4;  // If within 4 rotations of cone encoder tolerance - cone collapses a lot
     }
 
     /**
      * Check if claw has closed enough to have acquired a cube
      * 
-     * @return true if claw is closed past cube encoder tolerance
+     * @return true if claw is closed past cube encoder tolerance, false if not
      */
-    public boolean getCubeTolerance() {
+    public boolean closedToCubeTolerance() {
         return encoder.getPosition() >= ClawConstants.CUBE_MEDIUM_BOUND - 1;    // If within 1 rotation of cube encoder tolerance
     }
 
@@ -157,7 +160,7 @@ public class ClawSubsystem extends SubsystemBase {
     }
 
     /**
-     * Get value of proximity sensor and update proximity buffer
+     * Get value of proximity sensor in native units and update proximity buffer. 
      * Average proximity buffer values to cancel out white noise/momentary changes
      * 
      * @return averaged proximity buffer value
@@ -174,11 +177,11 @@ public class ClawSubsystem extends SubsystemBase {
     }
 
     /**
-     * Check if game piece is within distance to tip of fully closed claw
+     * Check if game piece is within distance to tip of fully closed claw -- 90 native units of the proximity sensor, which is a tested value (sensor values decrease as object is futher away)
      * @return true if object is within range
      */
     public boolean isGamepieceInRange() {
-        return getProximityValue() > 90;    // Check if game piece is within 90 native units of the proximity sensor, which is a tested value (sensor values decrease as object is futher away)
+        return getProximityValue() > 90;
     }
 
     /**
