@@ -47,11 +47,11 @@ public class BalanceCommand extends CommandBase {
     drivePitch = new Rotation2d(m_DriveSubsystem.m_navx.getPitch());
     driveYaw = m_DriveSubsystem.getRotation2d();
 
-    // LinearFilter xAccelFilter = LinearFilter.movingAverage(5);
-    // currAcc = m_DriveSubsystem.m_navx.getWorldLinearAccelX();
-    // currAcc = xAccelFilter.calculate(currAcc);
-    // currAcc = 180 * Math.asin(currAcc/9.81)/Math.PI;
-    // ff = Constants.Drivetrain.balanceKS * currAngle + Constants.Drivetrain.balanceKV*currentAngularVelocity + Constants.Drivetrain.balanceKA * currAcc;
+    LinearFilter xAccelFilter = LinearFilter.movingAverage(5);
+    currAcc = m_DriveSubsystem.m_navx.getWorldLinearAccelX();
+    currAcc = xAccelFilter.calculate(currAcc);
+    currAcc = 180 * Math.asin(currAcc/9.81)/Math.PI;
+    ff = Constants.Drivetrain.balanceKS * currAngle + Constants.Drivetrain.balanceKV*currentAngularVelocity + Constants.Drivetrain.balanceKA * currAcc;
 
     this.currentAngle = driveRoll.getRadians() * driveYaw.getSin() - drivePitch.getRadians() * driveYaw.getCos();
     
@@ -60,7 +60,7 @@ public class BalanceCommand extends CommandBase {
     
 
     drivePower = (Math.min(Constants.Drivetrain.balanceKP * error + Constants.Drivetrain.balanceKD * errorDT , 1) 
-                  // + ff
+                  + ff
     );
 
     //Robot might need an extra push when going up backwards

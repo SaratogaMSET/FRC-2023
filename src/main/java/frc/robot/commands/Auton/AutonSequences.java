@@ -18,10 +18,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.lib.auton.ChoreoSwerveControllerCommand;
+import frc.lib.auton.ChoreoTrajectory;
+import frc.lib.auton.TrajectoryManager;
 import frc.robot.Constants;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.commands.Arm.ArmSequences;
@@ -837,5 +841,35 @@ public class AutonSequences {
             // new BalanceCommand(m_drivetrainSubsystem)
           )
         );
+      }
+      public static Command ChoreoCommand(DrivetrainSubsystem m_drivetrainSubsystem){
+        TrajectoryManager.getInstance().LoadTrajectories();
+        ChoreoTrajectory traj = TrajectoryManager.getInstance().getTrajectory("TestChoreoPath.json");
+        PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
+        PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);//FIXME
+        PIDController thetaController = new PIDController(
+              Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
+
+      ChoreoSwerveControllerCommand swerveControllerCommand =
+          new ChoreoSwerveControllerCommand(
+              TrajectoryManager.getInstance().getTrajectory("TestChoreoPath.json"),
+              m_drivetrainSubsystem::getPose, // Functional interface to feed supplier
+              Drivetrain.m_kinematics1,
+              // Position controllers
+              xController,
+              yController,
+              thetaController,
+              m_drivetrainSubsystem::setModuleStates,
+              m_drivetrainSubsystem);
+
+      // Reset odometry to the starting pose of the trajectory.
+      m_drivetrainSubsystem.resetOdometry(traj.getInitialPose());
+
+      // Run path following command, then stop at the end.
+      return Commands.sequence(
+          Commands.runOnce(()->m_drivetrainSubsystem.resetOdometry(traj.getInitialPose())),
+          swerveControllerCommand,
+          Commands.runOnce(() -> m_drivetrainSubsystem.drive(new ChassisSpeeds(0, 0, 0)))
+      );
       }
 }

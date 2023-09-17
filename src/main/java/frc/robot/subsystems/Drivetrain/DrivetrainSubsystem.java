@@ -212,21 +212,24 @@ public class DrivetrainSubsystem extends SubsystemBase {
             }
             return states;
 
-            case SIM:
-                for(int i = 0; i < 4; i++){
-                    states[i] = new SwerveModuleState(moduleInputs[i].driveVelocityMetersPerSec, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
-                }
-                return states;
+            // case SIM:
+            //     for(int i = 0; i < 4; i++){
+            //         states[i] = new SwerveModuleState(moduleInputs[i].driveVelocityMetersPerSec, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
+            //     }
+            //     return states;
 
-            case REPLAY:
-                for(int i = 0; i < 4; i++){
-                    states[i] = new SwerveModuleState(moduleInputs[i].driveVelocityMetersPerSec, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
-                }
-            return states;
+            // case REPLAY:
+            //     for(int i = 0; i < 4; i++){
+            //         states[i] = new SwerveModuleState(moduleInputs[i].driveVelocityMetersPerSec, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
+            //     }
+            // return states;
 
             default:
-                for(int i = 0; i < 4; i++){
-                    states[i] = new SwerveModuleState(moduleInputs[i].driveVelocityMetersPerSec, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
+                // for(int i = 0; i < 4; i++){
+                //     states[i] = new SwerveModuleState(moduleInputs[i].driveVelocityMetersPerSec, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
+                // }
+                for(int i =0; i < 4; i++){
+                    states[i] = mSwerveMods[i].getState();
                 }
                 return states;
         }
@@ -242,22 +245,26 @@ public class DrivetrainSubsystem extends SubsystemBase {
                 }
                 return positions;
         
-            case SIM:
-                for(int i = 0; i < mSwerveMods.length; i ++){
+            // case SIM:
+            //     for(int i = 0; i < mSwerveMods.length; i ++){
 
-                    positions[i] = new SwerveModulePosition(moduleInputs[i].drivePositionMeters, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
-                }
-                return positions;
-            case REPLAY:
-                for(int i = 0; i < mSwerveMods.length; i ++){
+            //         positions[i] = new SwerveModulePosition(moduleInputs[i].drivePositionMeters, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
+            //     }
+            //     return positions;
+            // case REPLAY:
+            //     for(int i = 0; i < mSwerveMods.length; i ++){
                 
-                    positions[i] = new SwerveModulePosition(moduleInputs[i].drivePositionMeters, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
-                }
-                return positions;
+            //         positions[i] = new SwerveModulePosition(moduleInputs[i].drivePositionMeters, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
+            //     }
+            //     return positions;
             default:
-                for(int i = 0; i < mSwerveMods.length; i ++){
+                // for(int i = 0; i < mSwerveMods.length; i ++){
                 
-                    positions[i] = new SwerveModulePosition(moduleInputs[i].drivePositionMeters, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
+                //     positions[i] = new SwerveModulePosition(moduleInputs[i].drivePositionMeters, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
+                // }
+                for(int i = 0; i < mSwerveMods.length; i ++){
+                    positions[i] = mSwerveMods[i].getPosition();
+                        // positions[i] = new SwerveModulePosition(moduleInputs[i].drivePositionMeters, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
                 }
                 return positions;
         }

@@ -1,86 +1,111 @@
-package frc.robot.subsystems.Drivetrain;
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-import edu.wpi.first.math.MathUtil;
+package frc.robot.subsystems.Swerve;
+
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import frc.lib.swerve.BetterSwerveModuleState;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.lib.util.SwerveModuleConstants;
 import frc.robot.Constants;
 
-/**Not used to sim software **/
+/** Add your docs here. */
 public class SwerveModuleIOSim implements SwerveModuleIO {
-    //Flywheels are the best way for us to sim the swerve drivetrain modules
-    //Think of each way the wheel is moving (rotating can be seen as a flywheel in the xy plane, spinning the wheel is the xz plane)
-    private final FlywheelSim driveSim = new FlywheelSim(DCMotor.getFalcon500(1), Constants.Drivetrain.chosenModule.driveGearRatio, 0.025); 
-    private final FlywheelSim steerSim = new FlywheelSim(DCMotor.getFalcon500(1), Constants.Drivetrain.chosenModule.angleGearRatio, 0.004096955);
-    private final PIDController drivePID = new PIDController(10, 0, 0);
-    private final PIDController steerPosPID = new PIDController(15, 0, 0);
+  // Physics sims arent in use right now, but could add them in later
+  FlywheelSim drivePhysicsSim = new FlywheelSim(DCMotor.getFalcon500(1), 6.75 / 1, 0.025);
+  SingleJointedArmSim steerPhysicsSim =
+      new SingleJointedArmSim(
+          DCMotor.getFalcon500(1),
+          150 / 7,
+          0.004,
+          Units.inchesToMeters(1.5),
+          0.0,
+          2 * Math.PI,
+          false);
 
-    private double steerAbsolutePositionRad = Math.random() * 2.0 * Math.PI;
-    private double steerRelativePositionRad = steerAbsolutePositionRad;
-    private double driveAppliedVolts = 0.0;
-    private double steerAppliedVolts = 0.0;
+  PIDController driveController = new PIDController(Constants.Swerve.simDriveKP, 0, 0);
+  SimpleMotorFeedforward driveFeedforward =
+      new SimpleMotorFeedforward(
+          Constants.Swerve.simDriveKS, Constants.Swerve.simDriveKV, Constants.Swerve.simDriveKA);
 
-    public void updateInputs(SwerveModuleIOInputs inputs) {
-        driveSim.update(0.02);
-        steerSim.update(0.02);
+  PIDController steerController =
+      new PIDController(Constants.Swerve.simAngleKP, 0, Constants.Swerve.simAngleKD);
 
-        double angleDiffRad =
-                steerSim.getAngularVelocityRadPerSec() * 0.02;
-        steerRelativePositionRad += angleDiffRad;
-        steerAbsolutePositionRad += angleDiffRad;
-        while (steerAbsolutePositionRad < 0) {
-            steerAbsolutePositionRad += 2.0 * Math.PI;
-        }
-        while (steerAbsolutePositionRad > 2.0 * Math.PI) {
-            steerAbsolutePositionRad -= 2.0 * Math.PI;
-        }
+  double velocitySetpoint = 0.0;
+  double drivePosition = 0.0;
+  double driveVolts = 0.0;
+  double steerSetpoint = 0.0;
+  double steerVolts = 0.0;
 
-        inputs.driveVelocityMetersPerSec = driveSim.getAngularVelocityRadPerSec() * Math.PI * Constants.Drivetrain.chosenModule.wheelDiameter / Constants.Drivetrain.chosenModule.driveGearRatio;
-        inputs.drivePositionMeters = inputs.drivePositionMeters
-                + (inputs.driveVelocityMetersPerSec * 0.02);
-        inputs.driveAppliedVolts = driveAppliedVolts;
-        inputs.driveCurrentAmps = Math.abs(driveSim.getCurrentDrawAmps());
-        inputs.driveTempCelcius = 0;
+  int moduleNumber = -1;
 
-        inputs.steerAbsolutePositionRad = steerAbsolutePositionRad;
-        inputs.steerAbsoluteVelocityRadPerSec = steerSim.getAngularVelocityRadPerSec();
-        inputs.steerPositionRad = steerRelativePositionRad;
-        inputs.steerVelocityRadPerSec = steerSim.getAngularVelocityRadPerSec();
-        inputs.steerAppliedVolts = steerAppliedVolts;
-        inputs.steerCurrentAmps = Math.abs(steerSim.getCurrentDrawAmps());
-        inputs.steerTempCelcius = 0;
-    }
+  public SwerveModuleIOSim(int moduleNumber, SwerveModuleConstants moduleConstants) {
+    this.moduleNumber = moduleNumber;
+  }
 
-    @Override
-    public void setDriveVoltage(double voltage) {
-        driveAppliedVolts = MathUtil.clamp(voltage, -12.0, 12.0);
-        driveSim.setInputVoltage(driveAppliedVolts);
-    }
+  @Override
+  public void updateInputs(SwerveModuleIOInputs inputs) {
+    // Update physics "sim"
+    drivePosition += velocitySetpoint * 0.020;
+    // Update contorl loops
+    driveVolts = 0.0;
+    steerVolts = 0.0;
 
-    @Override
-    public void setSteerVoltage(double voltage) {
-        steerAppliedVolts = MathUtil.clamp(voltage, -12.0, 12.0);
-        steerSim.setInputVoltage(steerAppliedVolts);
-    }
+    // Update logs
+    inputs.moduleNumber = moduleNumber;
 
-    @Override
-    public void setDesiredState(BetterSwerveModuleState state, boolean isOpenLoop) {
-        if (isOpenLoop) {
-            double percent = state.speedMetersPerSecond / Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND;
-            driveSim.setInputVoltage(percent * 12);
-        }
-        else {
-            drivePID.setSetpoint(state.speedMetersPerSecond);
-            driveSim.setInputVoltage(drivePID.calculate(driveSim.getAngularVelocityRadPerSec() * Math.PI * Constants.Drivetrain.chosenModule.wheelDiameter / Constants.Drivetrain.chosenModule.driveGearRatio));
-        }
-        steerPosPID.setSetpoint(state.angle.getRadians());
-        steerSim.setInputVoltage(steerPosPID.calculate(steerRelativePositionRad) + (isOpenLoop ? 0 : -0.65) * state.omegaRadPerSecond);
-    }
+    inputs.drivePositionRotations = 0.0;
+    inputs.driveSpeedRPS = velocitySetpoint;
+    inputs.drivePercentOut = driveVolts / 12.0;
+    inputs.driveCurrentAmps = 0.0;
+    inputs.driveTemparature = 0.0;
 
-    @Override
-    public void stopMotors() {
-        driveSim.setInputVoltage(0);
-        steerSim.setInputVoltage(0);
-    }
+    inputs.absoluteEncoderRotations = getAbsoluteRotation().getRadians();
+
+    inputs.steerPositionRotations = steerSetpoint;
+    inputs.steerSpeedRPS = 0.0;
+    inputs.steerPercentOut = steerVolts / 12.0;
+    inputs.steerCurrentAmps = 0.0;
+    inputs.steerTemparature = 0.0;
+  }
+
+  @Override
+  public void setDesiredState(SwerveModuleState state, boolean isOpenLoop) {
+    velocitySetpoint = state.speedMetersPerSecond;
+    steerSetpoint = state.angle.getRadians();
+  }
+
+  @Override
+  public Rotation2d getAbsoluteRotation() {
+    return Rotation2d.fromRadians(steerSetpoint);
+  }
+
+  @Override
+  public void resetToAbsolute() {}
+
+  @Override
+  public SwerveModuleState getState() {
+    return new SwerveModuleState(velocitySetpoint, getAbsoluteRotation());
+  }
+
+  @Override
+  public SwerveModulePosition getPosition() {
+    return new SwerveModulePosition(drivePosition, getAbsoluteRotation());
+  }
+
+  @Override
+  public int getModuleNumber() {
+    return moduleNumber;
+  }
+
+  private double rpmToMetersPerSecond(double rpm) {
+    return rpm * (1.0 / 60.0) * 2 * Math.PI * Units.inchesToMeters(4.0);
+  }
 }

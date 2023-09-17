@@ -54,7 +54,7 @@ public class FastBalanceCommand extends CommandBase {
 
     currAcc = xAccelFilter.calculate(currAcc);
     currAcc = 180 * Math.asin(currAcc/9.81)/Math.PI;
-    // ff = Constants.Drivetrain.balanceKS * currAngle + Constants.Drivetrain.balanceKV*currentAngularVelocity + Constants.Drivetrain.balanceKA * currAcc;
+    ff = Constants.Drivetrain.balanceKS * currAngle + Constants.Drivetrain.balanceKV*currentAngularVelocity + Constants.Drivetrain.balanceKA * currAcc;
 
     this.currentAngle = driveRoll.getRadians() * driveYaw.getSin() - drivePitch.getRadians() * driveYaw.getCos();
     
@@ -64,7 +64,7 @@ public class FastBalanceCommand extends CommandBase {
 
     // TODO: WAS ORIGINALLY    +(Math.min(....))
     drivePower = (Math.min(Constants.Drivetrain.balanceKP * error + Constants.Drivetrain.balanceKD * errorDT , 1)
-    //  + ff
+     + ff
      );
 
     //Robot might need an extra push when going up backwards

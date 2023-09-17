@@ -79,6 +79,7 @@ public class RobotContainer {
   public static final String BalanceMobilityBonusNoPickup = "Middle Balance + Mobility NO PICKUP";
   public static final String TwoAndAHalfBalanceBarrier = "Barrier Side 2 Piece + Pickup";
   public static final String BottomTwoPiece = "Bump Side Two Piece";
+  public static final String ChoreoTrajectory = "Choreo Trajectory";
 
   public final SendableChooser<Boolean> autoCloseChooser = new SendableChooser<Boolean>();
   public static final Boolean disableAutoClose = false;
@@ -146,6 +147,7 @@ public class RobotContainer {
     m_autoSwitcher.addOption(TwoPieceNoBalance, TwoPieceNoBalance);
     // m_autoSwitcher.addOption(TwoAndAHalfBalanceBarrier,TwoAndAHalfBalanceBarrier);
     m_autoSwitcher.addOption(BottomTwoPiece, BottomTwoPiece);
+    m_autoSwitcher.addOption(ChoreoTrajectory, ChoreoTrajectory);
     // m_autoSwitcher.addOption(ThreePiece, ThreePiece);
     
     
@@ -398,6 +400,8 @@ public class RobotContainer {
         return AutonSequences.getTwoAndAHalfPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case BottomTwoPiece:
         return AutonSequences.getBottomTwoPiece(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
+      case ChoreoTrajectory:
+        return AutonSequences.ChoreoCommand(m_drivetrainSubsystem); 
       default:
         return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, m_claw);
     }
