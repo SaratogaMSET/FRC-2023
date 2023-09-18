@@ -18,13 +18,13 @@ public class ActuatorSubsystem extends SubsystemBase {
     //TODO: Make these constants not completely bogus
     //They were here because the intake was added under a time constraint, they are not "valid" control theory wise
     double previousError = 0;
-    public double k_GAuton = 0.0648; //0.0648
-    public double k_G = 0.0648;
-    double k_PAuton = 0.85;
-    double k_P = 0.6; //0.65
+    public double k_GAuton = 0.07; //0.0648
+    public double k_G = 0.07; //0.0648
+    double k_PAuton = 0.85; //0.85
+    double k_P = 0.6; //0.6
     double k_D = 0.000;
     double k_I = 0.000;
-    double k_PUp = 0.6; //0.7
+    double k_PUp = 0.6; //0.6
     double errorDT;
     double prevError;
 

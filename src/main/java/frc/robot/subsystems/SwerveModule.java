@@ -17,9 +17,9 @@ import frc.lib.util.CTREModuleState;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.subsystems.Drivetrain.SwerveModuleIO;
+// import frc.robot.subsystems.Drivetrain.SwerveModuleIO;
 
-public class SwerveModule implements SwerveModuleIO {
+public class SwerveModule{
     public int moduleNumber;
     private Rotation2d angleOffset;
     private Rotation2d lastAngle;

@@ -320,7 +320,7 @@ public final class Constants {
 
         public static final int IR_GATE = 1;
         
-        public static final double encoder_offset = 166.03 ; //223.506
+        public static final double encoder_offset = 34; //166.03 + 180 - 360, 50 
 
         public static final double x_offset = 0.26;
         public static final double y_offset = 0.4;
