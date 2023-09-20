@@ -93,24 +93,15 @@ public class RobotContainer {
   private final CANdleSubsystem m_ledSubsystem = new CANdleSubsystem();
   private final ActuatorSubsystem actuatorSubsystem = new ActuatorSubsystem();
   private final RollerSubsystem rollers = new RollerSubsystem();
-  // private final ClawSubsystem m_clawSubsystem = new ClawSubsystem(new ClawIOSparkMax());
-  
-  public static final double pi = Math.PI;
+
   public final static CommandXboxController m_driverController = new CommandXboxController(0);
   private final CommandJoystick m_gunner1 = new CommandJoystick(1);
-
-  public static final double MAX_VELOCITY_METERS_PER_SECOND = (6380.0 / 60.0 *
-          SdsModuleConfigurations.MK4_L2.getDriveReduction() *
-          SdsModuleConfigurations.MK4_L2.getWheelDiameter() * Math.PI);
-
-  public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
-          Math.hypot(Drivetrain.DRIVETRAIN_TRACKWIDTH_METERS / 2.0, Drivetrain.DRIVETRAIN_WHEELBASE_METERS / 2.0);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-
+    //TODO: For SIM LATER
     // switch(Constants.currentMode){
     //   case REAL:
     //   m_drivetrainSubsystem = new DrivetrainSubsystem(new GyroIONavx(), 
@@ -132,8 +123,6 @@ public class RobotContainer {
     //       new SwerveModule(3, Constants.Drivetrain.Mod3.constants));
     //   }
 
-    
-    // m_autoSwitcher.addOption(Rotate, Rotate);
     m_autoSwitcher.setDefaultOption(OneAndNothing, OneAndNothing);
     m_autoSwitcher.addOption(OnePiece, OnePiece);
     m_autoSwitcher.addOption(TwoPieceNoBalance, TwoPieceNoBalance);
@@ -164,11 +153,6 @@ public class RobotContainer {
       
   }
 
-       
-
-    // Configure the button bindings
-    
-  
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -241,15 +225,6 @@ public class RobotContainer {
       () -> -modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND
     ));
 
-    // m_driverController.leftTrigger().onTrue(
-    // // new BalanceCommand(m_drivetrainSubsystem).andThen(
-    //   new AutoRunCommand(m_drivetrainSubsystem, ChassisSpeeds.fromFieldRelativeSpeeds(0, ((Drivetrain.balanceXVelocity)), 0, m_drivetrainSubsystem.getRotation2d())).withTimeout(Drivetrain.balanceTimeout)
-    // // )
-    // );
-      
-    // m_driverController.rightTrigger().onTrue(new AlignCommand(m_drivetrainSubsystem, m_claw));
-    // m_driverController.rightTrigger().onTrue(new AutoRunCommand(m_drivetrainSubsystem, new ChassisSpeeds(1,0,0)).withTimeout(1));
-    
      m_driverController.rightBumper().onTrue(
       ArmSequences.ready(m_armSubsystem, 1) 
       );
@@ -343,31 +318,14 @@ public class RobotContainer {
 
     return value;
   }
-  /** 
-   * @param value the joystick input
-   * @param exponent the exponent number to use
-   * @param activeLinearDeadband when to activate linear scaling instead of exponential scaling
-   * **/
-  private static double modifyAxis(double value, double exponent, double activeLinearDeadband) {
-		// Deadband
 
-		value = MathUtil.applyDeadband(value, 0.05);
-
-    if(Math.abs(value) < activeLinearDeadband)
-		  value = Math.copySign(Math.pow(value, exponent), value);
-    else if(value > activeLinearDeadband){
-      value = Math.copySign(value * value, value);
-    }
-		return value;
-	}
-
-  public void updateRobotState(){
-    // RobotState.armSide = m_armSubsystem.getSide();
-    // SmartDashboard.putNumber("side of the arm variety", m_armSubsystem.getSide());
-    // SmartDashboard.putNumber("armside", RobotState.armSide);
-    // SmartDashboard.putNumber("prox of the yimity", sensor.getProximity());
-    // SmartDashboard.putBoolean("hall effect", HallEffect.get());
-  }
+  // public void updateRobotState(){
+  //   // RobotState.armSide = m_armSubsystem.getSide();
+  //   // SmartDashboard.putNumber("side of the arm variety", m_armSubsystem.getSide());
+  //   // SmartDashboard.putNumber("armside", RobotState.armSide);
+  //   // SmartDashboard.putNumber("prox of the yimity", sensor.getProximity());
+  //   // SmartDashboard.putBoolean("hall effect", HallEffect.get());
+  // }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
