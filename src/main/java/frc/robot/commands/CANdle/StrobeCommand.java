@@ -43,10 +43,6 @@ public class StrobeCommand extends CommandBase {
         else if (m_claw.hasAcquiredGamePiece()){
             candle.strobe();
         }
-        else {
-            m_claw.setFlash(false);
-            candle.idle();
-        }
         // candle.idle();
     }
 
