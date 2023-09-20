@@ -65,16 +65,16 @@ import frc.robot.subsystems.Vision.VisionSubsystem;
 public class RobotContainer {
   // public static HashMap <String, Command> eventMap = new HashMap<>();
   public final SendableChooser<String> m_autoSwitcher = new SendableChooser<String>();
-  public static final String OneAndBalance = "One And Balance Middle";
-  public static final String OneAndBalanceBottom = "One And Balance Bump Side";
-  public static final String TwoPieceTop = "Cone Preload and Cube score Barrier Side";
-  public static final String OnePiece = "One Piece + Community Bonus Anywhere but Middle";
-  public static final String OnePlusHalf = "Score, get One more and Balance Bump Side";
+  public static final String OneAndBalance = "Middle One And Balance";
+  public static final String OneAndBalanceBottom = "Bump Side One And Balance";
+  public static final String TwoPieceTop = "Barrier Side Cone Preload and Cube score";
+  public static final String OnePiece = " Anywhere but Middle: One Piece + Community Bonus";
+  public static final String OnePlusHalf = "Bump Side 1.5 + Balance ";
   // public String m_autoSelected;  
   public static final String OneAndNothing = "One Score and NOTHING ELSE";
-  public static final String PhyscoBehavior = "Two Piece + Balance Barrier Side";
-  public static final String TwoPieceNoBalance = "2 Piece No Balance Barrier Side";
-  public static final String ThreePiece = "Three Piece Test Path Barrier Side";
+  // public static final String PhyscoBehavior = "Barrier Side Two Piece + Balance ";
+  public static final String TwoPieceNoBalance = " Barrier Side 2 Piece No Balance";
+  // public static final String ThreePiece = "Three Piece Test Path Barrier Side";
   public static final String BalanceMobilityBonus = "Middle Balance + Mobilty Bonus + Pickup";
   public static final String BalanceMobilityBonusNoPickup = "Middle Balance + Mobility NO PICKUP";
   public static final String TwoAndAHalfBalanceBarrier = "Barrier Side 2 Piece + Pickup";
@@ -98,7 +98,6 @@ public class RobotContainer {
   public static final double pi = Math.PI;
   public final static CommandXboxController m_driverController = new CommandXboxController(0);
   private final CommandJoystick m_gunner1 = new CommandJoystick(1);
-  private final CommandJoystick m_gunner2 = new CommandJoystick(2);
 
   public static final double MAX_VELOCITY_METERS_PER_SECOND = (6380.0 / 60.0 *
           SdsModuleConfigurations.MK4_L2.getDriveReduction() *
@@ -136,17 +135,19 @@ public class RobotContainer {
     
     // m_autoSwitcher.addOption(Rotate, Rotate);
     m_autoSwitcher.setDefaultOption(OneAndNothing, OneAndNothing);
-    m_autoSwitcher.addOption(OneAndBalance, OneAndBalance);
     m_autoSwitcher.addOption(OnePiece, OnePiece);
-    // m_autoSwitcher.addOption(TwoPieceTop, TwoPieceTop);
+    m_autoSwitcher.addOption(TwoPieceNoBalance, TwoPieceNoBalance);
+    m_autoSwitcher.addOption(TwoAndAHalfBalanceBarrier,TwoAndAHalfBalanceBarrier);
+
+    m_autoSwitcher.addOption(OneAndBalance, OneAndBalance);
+    m_autoSwitcher.addOption(BalanceMobilityBonusNoPickup, BalanceMobilityBonusNoPickup);
+    m_autoSwitcher.addOption(BalanceMobilityBonus, BalanceMobilityBonus);
+
     m_autoSwitcher.addOption(OneAndBalanceBottom, OneAndBalanceBottom);
     m_autoSwitcher.addOption(OnePlusHalf, OnePlusHalf);
-    m_autoSwitcher.addOption(BalanceMobilityBonus, BalanceMobilityBonus);
-    m_autoSwitcher.addOption(BalanceMobilityBonusNoPickup, BalanceMobilityBonusNoPickup);
-    m_autoSwitcher.addOption(PhyscoBehavior, PhyscoBehavior);
-    m_autoSwitcher.addOption(TwoPieceNoBalance, TwoPieceNoBalance);
-    // m_autoSwitcher.addOption(TwoAndAHalfBalanceBarrier,TwoAndAHalfBalanceBarrier);
     m_autoSwitcher.addOption(BottomTwoPiece, BottomTwoPiece);
+    
+    // m_autoSwitcher.addOption(PhyscoBehavior, PhyscoBehavior);
     m_autoSwitcher.addOption(ChoreoTrajectory, ChoreoTrajectory);
     // m_autoSwitcher.addOption(ThreePiece, ThreePiece);
     
@@ -390,12 +391,12 @@ public class RobotContainer {
         return AutonSequences.getOnePieceBalanceMobilityBonusNoPickup(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case BalanceMobilityBonus:
         return AutonSequences.getOnePieceBalanceMobilityBonus(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
-      case PhyscoBehavior:
-          return AutonSequences.getTwoPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
+      // case PhyscoBehavior:
+      //     return AutonSequences.getTwoPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case TwoPieceNoBalance:
         return AutonSequences.getTwoPieceNoBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers ,m_claw);
-      case ThreePiece:
-        return AutonSequences.getThreePieceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
+      // case ThreePiece:
+      //   return AutonSequences.getThreePieceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case TwoAndAHalfBalanceBarrier:
         return AutonSequences.getTwoAndAHalfPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
       case BottomTwoPiece:
