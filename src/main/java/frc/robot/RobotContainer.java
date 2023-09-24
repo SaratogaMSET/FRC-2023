@@ -34,6 +34,7 @@ import frc.robot.commands.Auton.AutoRunCommand;
 import frc.robot.commands.Auton.AutonSequences;
 import frc.robot.commands.CANdle.IndicateConeCommand;
 import frc.robot.commands.CANdle.IndicateCubeCommand;
+import frc.robot.commands.CANdle.ManualStrobeCommand; // NEW BEVERLY
 import frc.robot.commands.CANdle.StrobeCommand;
 import frc.robot.commands.Claw.DefaultIntakeCommand;
 import frc.robot.commands.Claw.ManualCloseIntake;
@@ -84,7 +85,8 @@ public class RobotContainer {
   public final SendableChooser<Boolean> autoCloseChooser = new SendableChooser<Boolean>();
   public static final Boolean disableAutoClose = false;
   public static final Boolean enableAutoClose = true;
-
+  public static Boolean flash = false;  // NEW BEVERLY
+  public static Boolean cone = false;  // NEW BEVERLY
   
   public final ClawSubsystem m_claw = new ClawSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
@@ -95,8 +97,8 @@ public class RobotContainer {
   private final RollerSubsystem rollers = new RollerSubsystem();
 
   public final static CommandXboxController m_driverController = new CommandXboxController(0);
-  private final CommandJoystick m_gunner1 = new CommandJoystick(1);
-
+  public final static CommandJoystick m_gunner1 = new CommandJoystick(1);
+  
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -160,7 +162,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {
+  private void configureButtonBindings() {  // TODO: uncomment
     new SequentialCommandGroup( 
         new WaitCommand(1),
         new InstantCommand(() -> m_drivetrainSubsystem.drive(new ChassisSpeeds(0.0, 0.0, 0.0))),
@@ -187,12 +189,12 @@ public class RobotContainer {
       () -> DriverStation.isAutonomous(),
       () -> autoCloseChooser.getSelected()));
 
-      m_ledSubsystem.setDefaultCommand(
-        new StrobeCommand(m_ledSubsystem, m_claw));
+    m_ledSubsystem.setDefaultCommand(
+      new ManualStrobeCommand(m_ledSubsystem, m_claw)); // Change from StrobeCommand
     
     
     m_gunner1.button(6).whileTrue(new ManualCloseIntake(m_claw));
-    m_gunner1.button(4).whileTrue(new RunCommand(()-> m_claw.openClaw(), m_claw));
+    // m_gunner1.button(4).whileTrue(new RunCommand(()-> m_claw.openClaw(), m_claw)); //TODO: UNCOMMENT THIS LATER, THIS WAS JUST FOR TESTING
     
     m_driverController.x().onTrue(new InstantCommand(()->m_drivetrainSubsystem.setX(), m_drivetrainSubsystem));
 

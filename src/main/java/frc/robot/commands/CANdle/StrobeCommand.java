@@ -29,7 +29,6 @@ public class StrobeCommand extends CommandBase {
     //     addRequirements(ledSubsystem);
     // }
 
-
     @Override
     public void execute(){
         if(!m_claw.hasAcquiredGamePiece()){
@@ -41,7 +40,7 @@ public class StrobeCommand extends CommandBase {
             candle.mapClawPosition((int) index);
         }
         else if (m_claw.hasAcquiredGamePiece()){
-            candle.strobe();
+            candle.strobe(new Color(56, 209, 0));
         }
         // candle.idle();
     }

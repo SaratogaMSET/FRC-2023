@@ -7,6 +7,7 @@ import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix.led.ColorFlowAnimation;
 import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
+import edu.wpi.first.wpilibj.util.Color;    // NEW
 import com.ctre.phoenix.led.LarsonAnimation;
 import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 import com.ctre.phoenix.led.RainbowAnimation;
@@ -142,6 +143,7 @@ public class CANdleSubsystem extends SubsystemBase {
         LEDSegment.FrontLeftStrip.setColor(yellow);
         LEDSegment.FrontRightStrip.setColor(yellow);
     }
+
     public void indicateCube(){  
         CANdleSubsystem.color = CANdleSubsystem.purple;
         LEDSegment.BackRightStrip.setFlowAnimation(purple, 0.5);
@@ -149,17 +151,53 @@ public class CANdleSubsystem extends SubsystemBase {
         LEDSegment.FrontLeftStrip.setColor(purple);
         LEDSegment.FrontRightStrip.setColor(purple);
     }
-    public void strobe(){
+
+    // Following is NEW:
+    public void indicateConeBack(){  
+        CANdleSubsystem.color = CANdleSubsystem.yellow;
+        LEDSegment.BackRightStrip.setFlowAnimation(yellow, 0.5);
+        LEDSegment.BackLeftStrip.setFlowAnimation(yellow, 0.5);
+        LEDSegment.FrontLeftStrip.setColor(yellow);
+        LEDSegment.FrontRightStrip.setColor(yellow);
+    }
+
+    public void indicateCubeBack(){  
+        CANdleSubsystem.color = CANdleSubsystem.purple;
+        LEDSegment.BackRightStrip.setFlowAnimation(purple, 0.5);
+        LEDSegment.BackLeftStrip.setFlowAnimation(purple, 0.5);
+        LEDSegment.FrontLeftStrip.setColor(purple);
+        LEDSegment.FrontRightStrip.setColor(purple);
+    }
+
+    public void indicateConeFront(){  
+        CANdleSubsystem.color = CANdleSubsystem.yellow;
+        LEDSegment.FrontLeftStrip.setFlowAnimation(yellow, 0.5);
+        LEDSegment.FrontRightStrip.setFlowAnimation(yellow, 0.5);
+        LEDSegment.BackRightStrip.setColor(yellow);
+        LEDSegment.BackLeftStrip.setColor(yellow);
+    }
+
+    public void indicateCubeFront(){  
+        CANdleSubsystem.color = CANdleSubsystem.purple;
+        LEDSegment.FrontLeftStrip.setFlowAnimation(purple, 0.5);
+        LEDSegment.FrontRightStrip.setFlowAnimation(purple, 0.5);
+        LEDSegment.BackRightStrip.setColor(purple);
+        LEDSegment.BackLeftStrip.setColor(purple);
+    }
+
+    public void strobe(Color newColor){
         // LEDSegment.FrontLeftStrip.fullClear();
         // LEDSegment.FrontRightStrip.fullClear();
         // LEDSegment.BackLeftStrip.fullClear();
         // LEDSegment.BackRightStrip.fullClear();
-        Color newColor = new Color(CANdleSubsystem.color);    
+        // Color newColor = new Color(CANdleSubsystem.color);    
         
-        LEDSegment.BackRightStrip.setFlowAnimation(green, 0.5);
-        LEDSegment.BackLeftStrip.setFlowAnimation(green, 0.5);
-        LEDSegment.FrontLeftStrip.setColor(green);
-        LEDSegment.FrontRightStrip.setColor(green);
+        LEDSegment.BackRightStrip.setFlowAnimation(newColor, 0.5);  //Changed
+        LEDSegment.BackLeftStrip.setFlowAnimation(newColor, 0.5);
+        LEDSegment.FrontRightStrip.setFlowAnimation(newColor, 0.5);
+        LEDSegment.FrontLeftStrip.setFlowAnimation(newColor, 0.5);
+        // LEDSegment.FrontLeftStrip.setColor(green);
+        // LEDSegment.FrontRightStrip.setColor(green);
     }
 
     public Command strobeCommand(){
