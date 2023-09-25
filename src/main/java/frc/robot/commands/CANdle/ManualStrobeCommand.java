@@ -15,12 +15,24 @@ public class ManualStrobeCommand extends CommandBase {
     private final CANdleSubsystem candle;
     private final ClawSubsystem m_claw;
     private boolean previousGunnerValue = false;
+    private double previousTimeStarted = -1;
+    private boolean alreadyFlashed = false;
+    private boolean previousObjectDetected = false;
 
     // private final Color color;
     public ManualStrobeCommand(CANdleSubsystem ledSubsystem, ClawSubsystem claw){
         this.candle = ledSubsystem;
         this.m_claw = claw;
         addRequirements(ledSubsystem);
+    }
+
+    private void setTimerStarted(boolean objectDetected){
+        if(!previousObjectDetected && objectDetected && Timer.getFPGATimestamp() - previousTimeStarted > 2.0)
+            previousTimeStarted = Timer.getFPGATimestamp();
+    }
+
+    private boolean twoSecondsFlashed(double timeStarted){
+        return Timer.getFPGATimestamp() - timeStarted >= 2.0;
     }
 
     private void toggleGunnerButton() {
@@ -94,7 +106,8 @@ public class ManualStrobeCommand extends CommandBase {
         // }
 
         toggleGunnerButton();
-        if(m_claw.isGamepieceInRange()){
+        setTimerStarted(m_claw.isGamepieceInRange());
+        if(m_claw.isGamepieceInRange() && !twoSecondsFlashed(previousTimeStarted)){
             if(RobotContainer.cone){
                 candle.indicateConeFront();
             }
@@ -110,6 +123,9 @@ public class ManualStrobeCommand extends CommandBase {
                 candle.indicateCubeBack();
             }
         }
+        previousObjectDetected = m_claw.isGamepieceInRange();
+        //Print Statements for Debugging:
+        SmartDashboard.putNumber("Time since last flash", Timer.getFPGATimestamp() - previousTimeStarted);
     }
 
     @Override
