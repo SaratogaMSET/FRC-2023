@@ -9,6 +9,7 @@ import frc.robot.subsystems.CANdle.CANdleSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem.Color;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 
+@Deprecated
 public class StrobeCommand extends CommandBase {
     
     private final CANdleSubsystem candle;
@@ -37,10 +38,10 @@ public class StrobeCommand extends CommandBase {
             if(index > 35) index = 35;
             if(index < 9) index = 9;
 
-            candle.mapClawPosition((int) index);
+            // candle.mapClawPosition((int) index);
         }
         else if (m_claw.hasAcquiredGamePiece()){
-            candle.strobe(new Color(56, 209, 0));
+            // candle.strobe(new Color(56, 209, 0));
         }
         // candle.idle();
     }
