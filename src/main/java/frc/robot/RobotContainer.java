@@ -88,7 +88,7 @@ public class RobotContainer {
   public static Boolean flash = false;  // NEW BEVERLY
   public static Boolean cone = false;  // NEW BEVERLY
   
-  public final ClawSubsystem m_claw = new ClawSubsystem();
+  public final static ClawSubsystem m_claw = new ClawSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   public final static VisionSubsystem m_visionSubsystem = new VisionSubsystem();
   public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();  
@@ -190,7 +190,7 @@ public class RobotContainer {
       () -> autoCloseChooser.getSelected()));
 
     m_ledSubsystem.setDefaultCommand(
-      new ManualStrobeCommand(m_ledSubsystem, m_claw)); // Change from StrobeCommand
+      new ManualStrobeCommand(m_ledSubsystem)); // Change from StrobeCommand
     
     
     m_gunner1.button(6).whileTrue(new ManualCloseIntake(m_claw));
