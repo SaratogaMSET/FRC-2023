@@ -845,8 +845,8 @@ public class AutonSequences {
       public static Command ChoreoCommand(DrivetrainSubsystem m_drivetrainSubsystem){
         TrajectoryManager.getInstance().LoadTrajectories();
         ChoreoTrajectory traj = TrajectoryManager.getInstance().getTrajectory("TestChoreoPath.json");
-        PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0); //FIXME
-        PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);//FIXME
+        PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0);
+        PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);
         PIDController thetaController = new PIDController(
               Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
 
@@ -854,12 +854,10 @@ public class AutonSequences {
           new ChoreoSwerveControllerCommand(
               TrajectoryManager.getInstance().getTrajectory("TestChoreoPath.json"),
               m_drivetrainSubsystem::getPose, // Functional interface to feed supplier
-              Drivetrain.m_kinematics1,
-              // Position controllers
               xController,
               yController,
               thetaController,
-              m_drivetrainSubsystem::setModuleStates,
+              m_drivetrainSubsystem::drive,
               m_drivetrainSubsystem);
 
       // Reset odometry to the starting pose of the trajectory.
