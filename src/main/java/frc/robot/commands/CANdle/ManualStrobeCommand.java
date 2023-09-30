@@ -8,21 +8,20 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.CANdle.CANdleSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem.Color;
-import frc.robot.subsystems.Claw.ClawSubsystem;
+// import frc.robot.subsystems.Claw.ClawSubsystem;
 
 public class ManualStrobeCommand extends CommandBase {
     
     private final CANdleSubsystem candle;
-    private final ClawSubsystem m_claw;
+    // private final ClawSubsystem m_claw;
     private boolean previousGunnerValue = false;
     private double previousTimeStarted = -1;
     private boolean alreadyFlashed = false;
     private boolean previousObjectDetected = false;
 
     // private final Color color;
-    public ManualStrobeCommand(CANdleSubsystem ledSubsystem, ClawSubsystem claw){
+    public ManualStrobeCommand(CANdleSubsystem ledSubsystem){
         this.candle = ledSubsystem;
-        this.m_claw = claw;
         addRequirements(ledSubsystem);
     }
 
@@ -106,8 +105,8 @@ public class ManualStrobeCommand extends CommandBase {
         // }
 
         toggleGunnerButton();
-        setTimerStarted(m_claw.isGamepieceInRange());
-        if(m_claw.isGamepieceInRange() && !twoSecondsFlashed(previousTimeStarted)){
+        setTimerStarted(RobotContainer.m_claw.hasAcquiredGamePiece());
+        if(RobotContainer.m_claw.hasAcquiredGamePiece() && !twoSecondsFlashed(previousTimeStarted)){
             if(RobotContainer.cone){
                 candle.indicateConeFront();
             }
@@ -123,7 +122,7 @@ public class ManualStrobeCommand extends CommandBase {
                 candle.indicateCubeBack();
             }
         }
-        previousObjectDetected = m_claw.isGamepieceInRange();
+        previousObjectDetected = RobotContainer.m_claw.hasAcquiredGamePiece();
         //Print Statements for Debugging:
         SmartDashboard.putNumber("Time since last flash", Timer.getFPGATimestamp() - previousTimeStarted);
     }
