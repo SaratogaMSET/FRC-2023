@@ -32,10 +32,7 @@ import frc.robot.commands.Arm.ArmZeroCommand;
 import frc.robot.commands.Arm.ArmZeroStickyCommand;
 import frc.robot.commands.Auton.AutoRunCommand;
 import frc.robot.commands.Auton.AutonSequences;
-import frc.robot.commands.CANdle.IndicateConeCommand;
-import frc.robot.commands.CANdle.IndicateCubeCommand;
-import frc.robot.commands.CANdle.ManualStrobeCommand; // NEW BEVERLY
-import frc.robot.commands.CANdle.StrobeCommand;
+import frc.robot.commands.CANdle.ManualStrobeCommand;
 import frc.robot.commands.Claw.DefaultIntakeCommand;
 import frc.robot.commands.Claw.ManualCloseIntake;
 import frc.robot.commands.Drivetrain.BalanceCommand;
@@ -85,8 +82,7 @@ public class RobotContainer {
   public final SendableChooser<Boolean> autoCloseChooser = new SendableChooser<Boolean>();
   public static final Boolean disableAutoClose = false;
   public static final Boolean enableAutoClose = true;
-  public static Boolean flash = false;  // NEW BEVERLY
-  public static Boolean cone = false;  // NEW BEVERLY
+  public static Boolean cone = false;
   
   public final static ClawSubsystem m_claw = new ClawSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
