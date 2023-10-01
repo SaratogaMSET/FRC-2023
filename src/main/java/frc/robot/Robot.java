@@ -174,6 +174,31 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {
+    // Color green = new Color(56, 209, 0);    // NEW
+    // Color purple = new Color(184, 0, 185);    // NEW
+    // boolean testBoolean = RobotContainer.m_driverController.leftTrigger().getAsBoolean();
+    // RobotContainer.flash = testBoolean;
+    // RobotContainer.cone = RobotContainer.m_driverController.getLeftX() > 0;
+    // if(testBoolean){
+    //   if(RobotContainer.m_driverController.getLeftX() > 0){
+    //     m_candle.indicateConeFront();
+    //   }
+    //   else{
+    //     m_candle.indicateConeBack();
+    //   }
+    // }
+    //   // m_candle.strobe(green);
+    // else {
+    //   if(RobotContainer.m_driverController.getLeftX() < 0){
+    //     m_candle.indicateCubeFront();
+    //   }
+    //   else{
+    //     m_candle.indicateCubeBack();
+    //   }
+    // }
+      // m_candle.strobe(purple);
+    // if(RobotContainer.m_driverController.leftBumper().getAsBoolean())
+    //   m_candle.indicateCone();
   }
 
   /** This function is called once when the robot is first started up. */
