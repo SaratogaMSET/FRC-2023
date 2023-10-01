@@ -108,18 +108,18 @@ public class ManualStrobeCommand extends CommandBase {
         setTimerStarted(RobotContainer.m_claw.hasAcquiredGamePiece());
         if(RobotContainer.m_claw.hasAcquiredGamePiece() && !twoSecondsFlashed(previousTimeStarted)){
             if(RobotContainer.cone){
-                candle.indicateConeFront();
+                candle.indicateConeStrobe();
             }
             else{
-                candle.indicateCubeFront();
+                candle.indicateCubeStrobe();
             }
         }
         else{
             if(RobotContainer.cone){
-                candle.indicateConeBack();
+                candle.indicateConeNoStrobe();
             }
             else{
-                candle.indicateCubeBack();
+                candle.indicateCubeNoStrobe();
             }
         }
         previousObjectDetected = RobotContainer.m_claw.hasAcquiredGamePiece();

@@ -54,18 +54,18 @@ public class CANdleSubsystem extends SubsystemBase {
         LEDSegment.FrontRightStrip.setColor(yellow);
     }
 
-    public void indicateConeFront() {
+    public void indicateConeStrobe() {
         LEDSegment.FrontLeftStrip.setStrobeAnimation(yellow, 0.5);
         LEDSegment.FrontRightStrip.setStrobeAnimation(yellow, 0.5);
-        LEDSegment.BackRightStrip.setColor(yellow);
-        LEDSegment.BackLeftStrip.setColor(yellow);
+        LEDSegment.BackRightStrip.setStrobeAnimation(yellow, 0.5);
+        LEDSegment.BackLeftStrip.setStrobeAnimation(yellow, 0.5);
     }
 
-    public void indicateCubeFront() {
+    public void indicateCubeStrobe() {
         LEDSegment.FrontLeftStrip.setStrobeAnimation(purple, 0.5);
         LEDSegment.FrontRightStrip.setStrobeAnimation(purple, 0.5);
-        LEDSegment.BackRightStrip.setColor(purple);
-        LEDSegment.BackLeftStrip.setColor(purple);
+        LEDSegment.BackRightStrip.setStrobeAnimation(purple, 0.5);
+        LEDSegment.BackLeftStrip.setStrobeAnimation(purple, 0.5);
     }
 
     public void indicateCubeNoStrobe(){
