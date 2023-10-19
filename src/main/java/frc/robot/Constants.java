@@ -312,6 +312,19 @@ public final class Constants {
         public static final double CONE_MEDIUM_BOUND = 60.83; //56.83
 }
 
+public static class WheelIntakeConstants{
+        public static final int IntakeId = 21;
+        public static final double CONE_HOLD_VOLTAGE= 2; //TODO: FIX
+        public static final double CUBE_HOLD_VOLTAGE = 1; //TODO: FIX
+        public static final double CONE_STALL_CURRENT = 4; //TODO: fix
+        public static final double CUBE_STALL_CURRENT = 4; //TODO: FIX
+        public static final double stopVelocity = 0.2; //TODO: fix
+        public static final double reduction = 8;       
+        public static final double holdVolts = 1.5;
+        public static final double intakeVelocityWaitStart = 0.3;
+        public static final double intakeVelocityWaitStop = 0.6;
+      }
+
     public final class GroundIntake{
         public static final int actuator_ID = 57;
         public static final int intake_ID = 22;

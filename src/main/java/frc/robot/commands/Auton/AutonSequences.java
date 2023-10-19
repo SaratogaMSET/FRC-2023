@@ -844,7 +844,7 @@ public class AutonSequences {
       }
       public static Command ChoreoCommand(DrivetrainSubsystem m_drivetrainSubsystem){
         TrajectoryManager.getInstance().LoadTrajectories();
-        ChoreoTrajectory traj = TrajectoryManager.getInstance().getTrajectory("TestChoreoPath.json");
+        ChoreoTrajectory traj = TrajectoryManager.getInstance().getTrajectory("ChoreoTestPath.json");
         PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0);
         PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);
         PIDController thetaController = new PIDController(
@@ -852,7 +852,7 @@ public class AutonSequences {
 
       ChoreoSwerveControllerCommand swerveControllerCommand =
           new ChoreoSwerveControllerCommand(
-              TrajectoryManager.getInstance().getTrajectory("TestChoreoPath.json"),
+              TrajectoryManager.getInstance().getTrajectory("ChoreoTestPath.json"),
               m_drivetrainSubsystem::getPose, // Functional interface to feed supplier
               xController,
               yController,

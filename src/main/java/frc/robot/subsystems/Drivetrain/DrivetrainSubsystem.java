@@ -80,7 +80,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         new SwerveModule(3, Constants.Drivetrain.Mod3.constants)
     };
     
-    public DrivetrainSubsystem() {  
+    public DrivetrainSubsystem() { 
         m_navx.zeroYaw();
         //zeroGyroscope();  
         resetModulesToAbsolute();    
