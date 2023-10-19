@@ -482,14 +482,17 @@ public static class WheelIntakeConstants{
         public static final int encoder_distal_left_ID = 13;
         public static final int encoder_distal_right_ID = 10;
     
-        public static final double encoder_proximal_left_offset = 0.67;
-        public static final double encoder_proximal_right_offset = 0.227;
-        public static final double encoder_distal_left_offset = 0.513;
-        public static final double encoder_distal_right_offset = 0.75;
+        public static final double encoder_proximal_left_offset = 0.193;
+        public static final double encoder_proximal_right_offset = 0.5585;
+        public static final double encoder_distal_left_offset = 0.238;
+        public static final double encoder_distal_right_offset = 0.615;
     
         public static final double gear_reduction_proximal = (68.0 / 16) * (68.0 / 8) * (48.0 / 14);
         public static final double gear_reduction_distal = (68.0 / 16) * (68.0 / 8) * (48.0 / 16);
-    
+
+        public static final double voltage_shift_proximal = (34.0 / 10) / (48.0 / 14);
+        public static final double voltage_shift_distal = (34.0 / 10) / (48.0 / 16);
+        
         public static final double motor_encoder_ticks_per_revolution = 2048;
     
         public static final double proximal_highbound = 140 * (Math.PI / 180);

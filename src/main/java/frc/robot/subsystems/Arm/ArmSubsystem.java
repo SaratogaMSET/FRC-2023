@@ -7,19 +7,19 @@ import frc.robot.controls.ArmInterface;
 
 public class ArmSubsystem extends SubsystemBase {
     int side = 0;
-    double proxKp = 9.75; //10.2
-    double distKp = 9.2; //9.5
+    double proxKp = 9.75 * 16.6 / 13.6; //10.2
+    double distKp = 9.2 * 8.6 / 5.6; //9.5
 
 
-    double proxKd = 0.042; //0.035
-    double distKd = 0.02; 
+    double proxKd = 0.042 * 16.6 / 13.6; //0.035
+    double distKd = 0.02 * 8.6 / 5.6; 
 
     // double proxKpMiddle = 9.5; //10.2
-    double distKpMiddle = 9.0;
-    double distKdMiddle = 0.065; 
+    double distKpMiddle = 9;
+    double distKdMiddle = 0; 
 
-    double proxKf = 0.80;
-    double distKf = 1.30;
+    final double proxKf = 0.80 * 16.6 / 13.6;
+    final double distKf = 1.10 * 8.6 / 5.6;
     double armTolerance = 0.03;
 
     double maxVoltPerVelocity = 2.5000254;
@@ -202,6 +202,7 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
     public void periodic() {
         updateState();
+        armInterface.showState();
         // SmartDashboard.putNumber("Side", side);
         armVisualizer.update(armInterface.getPositionProximal(), armInterface.getPositionDistal());
         // armVisualizer.logRectangles("Arm Bounds", armInterface.Bounds, new Color8Bit(Color.kGreen));
