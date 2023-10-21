@@ -22,14 +22,14 @@ public class WheelIntake extends SubsystemBase{
         CUBE
     }
     Gamepiece currentGamepiece = Gamepiece.CONE; //TODO: SYNC WITH LEDS ON THE FULL ROBOT CUS OWEN 
-    public WPI_TalonFX intake = new WPI_TalonFX(WheelIntakeConstants.IntakeId); 
+    public WPI_TalonFX intake = new WPI_TalonFX(WheelIntakeConstants.IntakeId, "649-Hammerhead-CANivore"); 
     public double[] buffer = new double[5]; 
     private int bufferIndex = 0;
     private double intakeVolts = 12;    
     public WheelIntake(){
         //supply configurations
         // intake.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 5, 14, 0.1));
-        intake.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 15, 40, 2));
+        intake.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true,15, 40, 2));
         intake.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 10, 10,0.0));
         intake.setNeutralMode(NeutralMode.Brake);
         intake.enableVoltageCompensation(true);

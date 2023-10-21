@@ -20,7 +20,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
@@ -35,7 +34,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.math.GeomUtil;
 import frc.lib.swerve.BetterSwerveModuleState;
 import frc.lib.swerve.SwerveDriveKinematics2;
 import frc.robot.Constants;
@@ -47,9 +45,6 @@ import frc.robot.subsystems.SwerveModule;
 public class DrivetrainSubsystem extends SubsystemBase {
     private BetterSwerveModuleState[] currentDesiredState = new BetterSwerveModuleState[4];
     private BetterSwerveModuleState[] previousDesiredState = new BetterSwerveModuleState[4];
-
-    private SwerveModuleState[] currentDesiredStateTele = new SwerveModuleState[4];
-    private SwerveModuleState[] previousDesiredStateTele = new SwerveModuleState[4];
 
     public final AHRS m_navx = new AHRS(SPI.Port.kMXP, (byte) 200);
     public double offset = 0;
@@ -80,7 +75,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         new SwerveModule(3, Constants.Drivetrain.Mod3.constants)
     };
     
-    public DrivetrainSubsystem() { 
+    public DrivetrainSubsystem() {  
         m_navx.zeroYaw();
         //zeroGyroscope();  
         resetModulesToAbsolute();    
@@ -90,9 +85,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         stateSTD.set(0, 0, 0.20); stateSTD.set(1, 0, 0.2); stateSTD.set(2, 0, 0.2); //Tune Values
         visDataSTD.set(0, 0, 0.80); visDataSTD.set(1, 0, 0.8); visDataSTD.set(2, 0, 0.8);
 
-        //Normal motor encoder data for odometry combined with vision estimates
         this.odomFiltered = new SwerveDrivePoseEstimator(Constants.Drivetrain.m_kinematics2, getRotation2d(), getModulePositions(), new Pose2d(), stateSTD, visDataSTD);
-
         //swerveOdometry = new SwerveDriveOdometry(Constants.Drivetrain.m_kinematics, getRotation2d(), getModulePositions());   
     }
 
@@ -137,20 +130,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         // chassisSpeeds.vyMetersPerSecond += IpD * omega * (Math.sin(theta)*Math.cos(deltaTheta) + Math.cos(theta)*Math.sin(deltaTheta));
         
         // chassisSpeeds = driftCorrection(chassisSpeeds);
-
-        //Only want to use 2nd order in auton, so we instead use 
-        if(DriverStation.isTeleop()){
-            Pose2d velocity = new Pose2d(chassisSpeeds.vxMetersPerSecond * Constants.loopPeriodSecs,
-                chassisSpeeds.vyMetersPerSecond * Constants.loopPeriodSecs,
-                Rotation2d.fromRadians(chassisSpeeds.omegaRadiansPerSecond * Constants.loopPeriodSecs));
-            Twist2d twist_vel = GeomUtil.log(velocity);
-            m_chassisSpeeds = new ChassisSpeeds(twist_vel.dx / Constants.loopPeriodSecs, 
-            twist_vel.dy / Constants.loopPeriodSecs, 
-            twist_vel.dtheta / Constants.loopPeriodSecs);
-        }
-        else{
-            m_chassisSpeeds = chassisSpeeds;
-        }
+        m_chassisSpeeds = chassisSpeeds;
       }    
 
       public ChassisSpeeds driftCorrection(ChassisSpeeds speeds){
@@ -164,9 +144,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
         return speeds;
         }
 
-     /**We use 2nd order kinematics for auton, and this is converting the desired speed of the robot to individual states 
-     * each swerve module will go to.
-     */
     public void setModuleStates(ChassisSpeeds chassisSpeeds) {
 
         BetterSwerveModuleState[] desiredStates = Constants.Drivetrain.m_kinematics2.toSwerveModuleStates(chassisSpeeds);
@@ -174,13 +151,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
             mod.setDesiredState(desiredStates[mod.moduleNumber], false);
         }
     }    
-    
-    /**To directly command the states to the modules
-     * @param desiredStates 1st order kinematics states
-     */
-    public void setModuleStates(SwerveModuleState[] desiredStates) {
+
+    public void setModuleStates(BetterSwerveModuleState[] desiredStates) {
         for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(desiredStates[mod.moduleNumber], true);
+            mod.setDesiredState(desiredStates[mod.moduleNumber], false);
         }
     }
 
@@ -225,13 +199,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
             // return states;
 
             default:
-                // for(int i = 0; i < 4; i++){
-                //     states[i] = new SwerveModuleState(moduleInputs[i].driveVelocityMetersPerSec, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
-                // }
-                for(int i =0; i < 4; i++){
-                    states[i] = mSwerveMods[i].getState();
-                }
-                return states;
+            for(int i =0; i < 4; i++){
+                states[i] = mSwerveMods[i].getState();
+            }
+            return states;
         }
     }
 
@@ -258,15 +229,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
             //     }
             //     return positions;
             default:
-                // for(int i = 0; i < mSwerveMods.length; i ++){
-                
-                //     positions[i] = new SwerveModulePosition(moduleInputs[i].drivePositionMeters, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
-                // }
-                for(int i = 0; i < mSwerveMods.length; i ++){
-                    positions[i] = mSwerveMods[i].getPosition();
-                        // positions[i] = new SwerveModulePosition(moduleInputs[i].drivePositionMeters, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
-                }
-                return positions;
+            for(int i = 0; i < mSwerveMods.length; i ++){
+                positions[i] = mSwerveMods[i].getPosition();
+                    // positions[i] = new SwerveModulePosition(moduleInputs[i].drivePositionMeters, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
+            }
+            return positions;
         }
     }
 
@@ -307,81 +274,65 @@ public class DrivetrainSubsystem extends SubsystemBase {
                 chassisSpeeds.omegaRadiansPerSecond);
     }
     
+
+    public ChassisSpeeds limitVelocity(ChassisSpeeds chassisSpeeds){
+        speeds.vxMetersPerSecond = Math.max(-Drivetrain.allowedMaxAcceleration, Math.min(Drivetrain.allowedMaxAcceleration, chassisSpeeds.vxMetersPerSecond));
+        speeds.vyMetersPerSecond = Math.max(-Drivetrain.allowedMaxAcceleration, Math.min(Drivetrain.allowedMaxAcceleration, chassisSpeeds.vyMetersPerSecond));
+        speeds.omegaRadiansPerSecond = Math.max(-Drivetrain.allowedMaxAcceleration, Math.min(Drivetrain.allowedMaxAcceleration, chassisSpeeds.omegaRadiansPerSecond));
+        return speeds;
+    }
+
     @Override
     public void periodic(){
 
-         //We only want to use 2nd order kinematics during auton, otherwise we trace the arc that the robot wants to go
-        //based on the desired chassis speeds and 1st order kinematics and command that instead to the modules
-        //See drive() method in this class 
+        Logger.getInstance().recordOutput("CurrentSwerveModuleStates", getModuleStates());
 
-        if(DriverStation.isAutonomous()){
+        // for(int i = 0; i < 4; i++){
+        //     // mSwerveMods[i].updateInputs(moduleInputs[i]);
+        //     // SmartDashboard.putNumber(i + "cancoder", mSwerveMods[i].getCanCoder().getDegrees());
+        //     // SmartDashboard.putNumber(i + "Motor Output Percent", mSwerveMods[i].getOutputPercent());
+        //     // SmartDashboard.putNumber(i + "Motor Output Voltage", mSwerveMods[i].getOutputVoltage());
+        //     // SmartDashboard.putNumber(i + "Velocity", mSwerveMods[i].getVelocity());
+        //     // SmartDashboard.putNumber(i + "RPM" , mSwerveMods[i].getRPM());
+        //     // Logger.getInstance().recordOutput(i + "Motor Output Percent", mSwerveMods[i].getOutputPercent());
+        //     // Logger.getInstance().recordOutput(i + "Motor Output Voltage", mSwerveMods[i].getOutputVoltage());
+
+        // }
+        //Logger.getInstance().recordOutput("Before Correction", Constants.Drivetrain.m_kinematics.toSwerveModuleStates(m_chassisSpeeds));
+        //ChassisSpeeds speeds = driftCorrection(m_chassisSpeeds);
+        //Logger.getInstance().recordOutput("After Correction", Drivetrain.m_kinematics.toSwerveModuleStates(speeds));
+
+        previousDesiredState = currentDesiredState;
+        currentDesiredState = Constants.Drivetrain.m_kinematics2.toSwerveModuleStates(m_chassisSpeeds);
+        SwerveDriveKinematics2.desaturateWheelSpeeds(currentDesiredState, Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND);
+
+        if(previousDesiredState[0] == null || previousDesiredState[1] == null || previousDesiredState[2] == null || previousDesiredState[3] == null){
             previousDesiredState = currentDesiredState;
-            currentDesiredState = Constants.Drivetrain.m_kinematics2.toSwerveModuleStates(m_chassisSpeeds);
-            SwerveDriveKinematics2.desaturateWheelSpeeds(currentDesiredState, Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND);
-            
-            if(previousDesiredState[0] == null || previousDesiredState[1] == null || previousDesiredState[2] == null || previousDesiredState[3] == null){
-                previousDesiredState = currentDesiredState;
-            }
-
-            double joystickCenterState = 0;
-            boolean joystickCentered = true;
-            for(int i = 0; i < currentDesiredState.length && joystickCentered; i++){
-                if(Math.abs(currentDesiredState[i].angle.getRadians() - joystickCenterState) > 0.004) joystickCentered = false;
-            }
-            
-            if(joystickCentered){
-                currentDesiredState[0].angle = previousDesiredState[0].angle;
-                currentDesiredState[1].angle = previousDesiredState[1].angle;
-                currentDesiredState[2].angle = previousDesiredState[2].angle;
-                currentDesiredState[3].angle = previousDesiredState[3].angle;
-            }
-
-            //useful debugging
-
-            // for(int i = 0; i < 4; i++){
-            //     SmartDashboard.putNumber("Mod " + i + " Cancoder", mSwerveMods[i].getCanCoder().getDegrees());
-            // //     SmartDashboard.putNumber("Mod " + i + " Integrated", mSwerveMods[i].getPosition().angle.getDegrees());
-            // //     SmartDashboard.putNumber("Mod " + i + " Velocity", mSwerveMods[i].getState().speedMetersPerSecond);
-            // //     SmartDashboard.putNumber("Desired Module "+ i + " Angle", currentDesiredState[i].angle.getDegrees());   
-            // //     SmartDashboard.putNumber("Desired Module "+ i + " Velocity", currentDesiredState[i].speedMetersPerSecond);     
-            // }
-            
-            Logger.getInstance().recordOutput("DesiredSwerveModuleStatesAutonomous", currentDesiredState);
-            setModuleStates(currentDesiredState);
         }
-        else{
-            previousDesiredStateTele = currentDesiredStateTele;
-            currentDesiredStateTele = Constants.Drivetrain.m_kinematics1.toSwerveModuleStates(m_chassisSpeeds);
-            SwerveDriveKinematics.desaturateWheelSpeeds(currentDesiredStateTele, Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND);
-            
-            if(previousDesiredStateTele[0] == null || previousDesiredStateTele[1] == null || previousDesiredStateTele[2] == null || previousDesiredStateTele[3] == null){
-                previousDesiredStateTele = currentDesiredStateTele;
-            }
 
-            double joystickCenterState = 0;
-            boolean joystickCentered = true;
-            for(int i = 0; i < currentDesiredStateTele.length && joystickCentered; i++){
-                if(Math.abs(currentDesiredStateTele[i].angle.getRadians() - joystickCenterState) > 0.004) joystickCentered = false;
-            }
-            
-            if(joystickCentered){
-                currentDesiredStateTele[0].angle = previousDesiredStateTele[0].angle;
-                currentDesiredStateTele[1].angle = previousDesiredStateTele[1].angle;
-                currentDesiredStateTele[2].angle = previousDesiredStateTele[2].angle;
-                currentDesiredStateTele[3].angle = previousDesiredStateTele[3].angle;
-            }
-
-            // for(int i = 0; i < 4; i++){
-            //     SmartDashboard.putNumber("Mod " + i + " Cancoder", mSwerveMods[i].getCanCoder().getDegrees());
-            // //     SmartDashboard.putNumber("Mod " + i + " Integrated", mSwerveMods[i].getPosition().angle.getDegrees());
-            // //     SmartDashboard.putNumber("Mod " + i + " Velocity", mSwerveMods[i].getState().speedMetersPerSecond);
-            // //     SmartDashboard.putNumber("Desired Module "+ i + " Angle", currentDesiredState[i].angle.getDegrees());   
-            // //     SmartDashboard.putNumber("Desired Module "+ i + " Velocity", currentDesiredState[i].speedMetersPerSecond);     
-            // }
-            
-            Logger.getInstance().recordOutput("DesiredSwerveModuleStatesTele", currentDesiredStateTele);
-            setModuleStates(currentDesiredStateTele);
+        double joystickCenterState = 0;
+        boolean joystickCentered = true;
+        for(int i = 0; i < currentDesiredState.length && joystickCentered; i++){
+            if(Math.abs(currentDesiredState[i].angle.getRadians() - joystickCenterState) > 0.004) joystickCentered = false;
         }
+        
+        if(joystickCentered){
+            currentDesiredState[0].angle = previousDesiredState[0].angle;
+            currentDesiredState[1].angle = previousDesiredState[1].angle;
+            currentDesiredState[2].angle = previousDesiredState[2].angle;
+            currentDesiredState[3].angle = previousDesiredState[3].angle;
+        }
+
+        // for(int i = 0; i < 4; i++){
+        //     SmartDashboard.putNumber("Mod " + i + " Cancoder", mSwerveMods[i].getCanCoder().getDegrees());
+        // //     SmartDashboard.putNumber("Mod " + i + " Integrated", mSwerveMods[i].getPosition().angle.getDegrees());
+        // //     SmartDashboard.putNumber("Mod " + i + " Velocity", mSwerveMods[i].getState().speedMetersPerSecond);
+        // //     SmartDashboard.putNumber("Desired Module "+ i + " Angle", currentDesiredState[i].angle.getDegrees());   
+        // //     SmartDashboard.putNumber("Desired Module "+ i + " Velocity", currentDesiredState[i].speedMetersPerSecond);     
+        // }
+        
+
+        setModuleStates(currentDesiredState);
         //Logger.getInstance().recordOutput("Gyro Rotation2d", new Pose2d(new Translation2d(0,0),m_navx.getRotation2d()));
         //Logger.getInstance().recordOutput("Gyro Yaw", m_navx.getYaw());
 

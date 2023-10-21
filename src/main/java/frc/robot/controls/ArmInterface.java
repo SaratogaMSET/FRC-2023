@@ -258,6 +258,10 @@ public class ArmInterface {
             SmartDashboard.putNumber(encoder_values + "Distal Right", getEncoderDistalRight());
         }
 
+            SmartDashboard.putNumber("Arm Proximal", getPositionProximal());
+            SmartDashboard.putNumber("Arm Distal", getPositionDistal());
+            SmartDashboard.putNumber("Arm x", Arm.forwardKinematics(getPositionProximal(), getPositionDistal())[0]);
+            SmartDashboard.putNumber("Arm y", Arm.forwardKinematics(getPositionProximal(), getPositionDistal())[1]);
         // String motor_encoder_values = "Arm Motor Encoders/";
         // boolean show_motor_encoder_values = false;
         // if(show_motor_encoder_values){

@@ -33,8 +33,6 @@ import frc.robot.commands.Arm.ArmZeroStickyCommand;
 import frc.robot.commands.Auton.AutoRunCommand;
 import frc.robot.commands.Auton.AutonSequences;
 import frc.robot.commands.CANdle.ManualStrobeCommand;
-import frc.robot.commands.Claw.DefaultIntakeCommand;
-import frc.robot.commands.Claw.ManualCloseIntake;
 import frc.robot.commands.Drivetrain.BalanceCommand;
 import frc.robot.commands.Drivetrain.DefaultDriveCommand;
 import frc.robot.commands.Drivetrain.DriveToPose;
@@ -48,7 +46,6 @@ import frc.robot.commands.GroundIntakeCommands.ManualSetAngleDriver;
 import frc.robot.commands.WheelIntake.RunWheelExtakeCommand;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem;
-import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
 import frc.robot.subsystems.GroundIntake.RollerSubsystem;
@@ -72,7 +69,7 @@ public class RobotContainer {
   // public String m_autoSelected;  
   public static final String OneAndNothing = "One Score and NOTHING ELSE";
   // public static final String PhyscoBehavior = "Barrier Side Two Piece + Balance ";
-  public static final String TwoPieceNoBalance = " Barrier Side 2 Piece No Balance";
+  public static final String TwoPieceNoBalance = "Barrier Side 2 Piece No Balance";
   // public static final String ThreePiece = "Three Piece Test Path Barrier Side";
   public static final String BalanceMobilityBonus = "Middle Balance + Mobilty Bonus + Pickup";
   public static final String BalanceMobilityBonusNoPickup = "Middle Balance + Mobility NO PICKUP";
@@ -85,7 +82,6 @@ public class RobotContainer {
   public static final Boolean enableAutoClose = true;
   public static Boolean cone = false;
   
-  public final static ClawSubsystem m_claw = new ClawSubsystem();
   public final static WheelIntake intake = new WheelIntake();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   public final static VisionSubsystem m_visionSubsystem = new VisionSubsystem();
@@ -183,19 +179,14 @@ public class RobotContainer {
         m_armSubsystem
       ));
 
-    m_claw.setDefaultCommand(new DefaultIntakeCommand(
-      m_claw, 
-      () -> DriverStation.isAutonomous(),
-      () -> autoCloseChooser.getSelected()));
-
     m_ledSubsystem.setDefaultCommand(
       new ManualStrobeCommand(m_ledSubsystem)); // Change from StrobeCommand
     
     
-    // m_gunner1.button(6).whileTrue(new ManualCloseIntake(m_claw));
+    // m_gunner1.button(6).whileTrue(new ManualCloseIntake(intake));
     m_gunner1.button(6).whileTrue(intake.intakeCommand());
-    m_gunner1.button(4).whileTrue(new RunWheelExtakeCommand(intake));
-    // m_gunner1.button(4).whileTrue(new RunCommand(()-> m_claw.openClaw(), m_claw));
+    m_gunner1.button(4).whileTrue(new RunWheelExtakeCommand(intake, 0.5));
+    // m_gunner1.button(4).whileTrue(new RunCommand(()-> intake.openClaw(), intake));
     
     m_driverController.x().onTrue(new InstantCommand(()->m_drivetrainSubsystem.setX(), m_drivetrainSubsystem));
 
@@ -229,11 +220,11 @@ public class RobotContainer {
     ));
 
      m_driverController.rightBumper().onTrue(
-      ArmSequences.ready(m_armSubsystem, 1) 
+      ArmSequences.ready(m_armSubsystem, 1).alongWith(intake.intakeCommand()) 
       );
 
     m_driverController.rightBumper().and(m_gunner1.button(1)).onTrue(
-       ArmSequences.ready(m_armSubsystem, 1)
+       ArmSequences.ready(m_armSubsystem, 1).alongWith(intake.intakeCommand())
        );
     
     m_driverController.leftBumper().onTrue(
@@ -249,22 +240,22 @@ public class RobotContainer {
     )
     );
 
-    m_gunner1.button(3).onTrue(ArmSequences.score(m_armSubsystem, 1));
+    // m_gunner1.button(3).onTrue(ArmSequences.score(m_armSubsystem, 1));
 
-    m_gunner1.button(5).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 1)); //TODO: make 0 when collision detection working
-    m_gunner1.button(5).and(m_gunner1.button(1)).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 1));
+    m_gunner1.button(5).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 1).alongWith(intake.intakeCommand())); //TODO: make 0 when collision detection working
+    m_gunner1.button(5).and(m_gunner1.button(1)).onTrue(ArmSequences.readyMoreForward(m_armSubsystem, 1).alongWith(intake.intakeCommand()));
 
-    m_gunner1.button(7).onTrue(ArmSequences.scoreConeHighNoRetract(m_armSubsystem, m_claw, 1)); // TODO: make 0 when collision detection working
-    m_gunner1.button(7).and(m_gunner1.button(1)).onTrue(ArmSequences.scoreConeHighNoRetract(m_armSubsystem, m_claw, 1)); 
+    m_gunner1.button(7).onTrue(ArmSequences.scoreConeHighNoRetract(m_armSubsystem, 1)); // TODO: make 0 when collision detection working
+    m_gunner1.button(7).and(m_gunner1.button(1)).onTrue(ArmSequences.scoreConeHighNoRetract(m_armSubsystem, 1)); 
 
-    m_gunner1.button(8).onTrue(ArmSequences.armDunk(m_armSubsystem, m_claw, 1)); // TODO: make 0 when collision detection working
-    m_gunner1.button(8).and(m_gunner1.button(1)).onTrue(ArmSequences.armDunk(m_armSubsystem, m_claw, 1));  
+    m_gunner1.button(8).onTrue(ArmSequences.armDunk(m_armSubsystem, intake, 1)); // TODO: make 0 when collision detection working
+    m_gunner1.button(8).and(m_gunner1.button(1)).onTrue(ArmSequences.armDunk(m_armSubsystem, intake, 1));  
     
 
-    m_gunner1.button(9).onTrue(ArmSequences.scoreConeMidNoRetract(m_armSubsystem, m_claw, 1)); // TODO: make 0 when collision detection working
-    m_gunner1.button(9).and(m_gunner1.button(1)).onTrue(ArmSequences.scoreConeMidNoRetract(m_armSubsystem, m_claw, 1));
-    m_gunner1.button(10).onTrue(ArmSequences.armDunkMiddle(m_armSubsystem, m_claw, 1));// TODO: make 0 when collision detection working
-    m_gunner1.button(10).and(m_gunner1.button(1)).onTrue(ArmSequences.armDunkMiddle(m_armSubsystem, m_claw, 1));
+    m_gunner1.button(9).onTrue(ArmSequences.scoreConeMidNoRetract(m_armSubsystem, 1)); // TODO: make 0 when collision detection working
+    m_gunner1.button(9).and(m_gunner1.button(1)).onTrue(ArmSequences.scoreConeMidNoRetract(m_armSubsystem, 1));
+    m_gunner1.button(10).onTrue(ArmSequences.armDunkMiddle(m_armSubsystem, intake, 1));// TODO: make 0 when collision detection working
+    m_gunner1.button(10).and(m_gunner1.button(1)).onTrue(ArmSequences.armDunkMiddle(m_armSubsystem, intake, 1));
 
     // m_gunner1.button(11).toggleOnTrue(new MoveWithClosest90(
     // m_drivetrainSubsystem,
@@ -273,12 +264,12 @@ public class RobotContainer {
     // () -> m_armSubsystem.getYPosition(),
     // () -> actuatorSubsystem.get_position_degrees(),
     // ()-> -modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND));
-    // // m_gunner1.button(11).and(m_gunner1.button(1)).onTrue((ArmSequences.groundIntakeCone(m_armSubsystem, m_claw,  1)));
+    // // m_gunner1.button(11).and(m_gunner1.button(1)).onTrue((ArmSequences.groundIntakeCone(m_armSubsystem, intake,  1)));
 
 
 
     m_gunner1.button(1).whileTrue(
-      new ParallelCommandGroup(new ManualSetAngleDriver(actuatorSubsystem, 95), new ManualRunIntakeCommand(rollers, 1))) //.until( ()-> (m_claw.isGamepieceInRange() && m_claw.getGamePieceType() != null))))
+      new ParallelCommandGroup(new ManualSetAngleDriver(actuatorSubsystem, 95), new ManualRunIntakeCommand(rollers, 1))) //.until( ()-> (intake.isGamepieceInRange() && intake.getGamePieceType() != null))))
       .onFalse(
         (new ArmZeroCommand(m_armSubsystem)).andThen(new ParallelCommandGroup(new ManualSetAngleDriver(actuatorSubsystem, 10), new ManualRunIntakeCommand(rollers, 0.0))));
 
@@ -339,33 +330,33 @@ public class RobotContainer {
     String selected = m_autoSwitcher.getSelected();
     switch(selected){
       case OnePiece:
-        return AutonSequences.getOnePieceCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
+        return AutonSequences.getOnePieceCommand(m_drivetrainSubsystem, m_armSubsystem, intake);
       case OneAndBalance:
-        return AutonSequences.getOnePieceAndBalanceBringArmBackCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
+        return AutonSequences.getOnePieceAndBalanceBringArmBackCommand(m_drivetrainSubsystem, m_armSubsystem, intake);
       case OneAndBalanceBottom:
-        return AutonSequences.getOnePieceAndBalanceBottomCommand(m_drivetrainSubsystem, m_armSubsystem, m_claw);
+        return AutonSequences.getOnePieceAndBalanceBottomCommand(m_drivetrainSubsystem, m_armSubsystem, intake);
       case OnePlusHalf:
-        return AutonSequences.getBottomOneAndHalfPieceBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
+        return AutonSequences.getBottomOneAndHalfPieceBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
       case OneAndNothing:
-        return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, m_claw);
+        return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, intake);
       case BalanceMobilityBonusNoPickup:
-        return AutonSequences.getOnePieceBalanceMobilityBonusNoPickup(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
+        return AutonSequences.getOnePieceBalanceMobilityBonusNoPickup(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
       case BalanceMobilityBonus:
-        return AutonSequences.getOnePieceBalanceMobilityBonus(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
+        return AutonSequences.getOnePieceBalanceMobilityBonus(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
       // case PhyscoBehavior:
-      //     return AutonSequences.getTwoPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
+      //     return AutonSequences.getTwoPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
       case TwoPieceNoBalance:
-        return AutonSequences.getTwoPieceNoBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers ,m_claw);
+        return AutonSequences.getTwoPieceNoBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers ,intake);
       // case ThreePiece:
-      //   return AutonSequences.getThreePieceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
+      //   return AutonSequences.getThreePieceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
       case TwoAndAHalfBalanceBarrier:
-        return AutonSequences.getTwoAndAHalfPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
+        return AutonSequences.getTwoAndAHalfPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
       case BottomTwoPiece:
-        return AutonSequences.getBottomTwoPiece(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, m_claw);
+        return AutonSequences.getBottomTwoPiece(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
       // case ChoreoTrajectory:
       //   return AutonSequences.ChoreoCommand(m_drivetrainSubsystem); 
       default:
-        return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, m_claw);
+        return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, intake);
     }
   }
 

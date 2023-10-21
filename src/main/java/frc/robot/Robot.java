@@ -68,7 +68,6 @@ public class Robot extends LoggedRobot {
     Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
     ctreConfigs = new CTREConfigs();
     m_robotContainer = new RobotContainer();
-    m_robotContainer.m_claw.setBrakeMode();
     // LiveWindow.enableAllTelemetry();
   }
 
@@ -120,7 +119,6 @@ public class Robot extends LoggedRobot {
   public void disabledInit() {
     CommandScheduler.getInstance().cancelAll();
     CommandScheduler.getInstance().close();
-    m_robotContainer.m_claw.setCoastMode();
   }
 
   @Override
@@ -133,7 +131,6 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_robotContainer.m_claw.setBrakeMode();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -149,7 +146,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
-    m_robotContainer.m_claw.setBrakeMode();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove

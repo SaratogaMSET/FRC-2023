@@ -5,10 +5,10 @@ import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.WheelIntake.WheelIntake;
 
-public class RunWheelExtakeCommand extends CommandBase {
+public class SetIntakeSpeedCommand extends CommandBase {
     WheelIntake wheelIntake;
     double speed;
-    public RunWheelExtakeCommand(WheelIntake wheelIntake, double speed){
+    public SetIntakeSpeedCommand(WheelIntake wheelIntake, double speed){
         this.wheelIntake = wheelIntake;
         addRequirements(wheelIntake);
         this.speed = speed;
@@ -16,13 +16,17 @@ public class RunWheelExtakeCommand extends CommandBase {
 
     @Override
     public void initialize(){
-        wheelIntake.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true,30, 40, 2));
+        wheelIntake.set(speed);
     }
     @Override
     public void execute(){
-        wheelIntake.set(-speed);
+        wheelIntake.set(speed);
     }
 
+    @Override
+    public boolean isFinished(){
+        return true;
+    }
     @Override
     public void end(boolean interrupted){
         wheelIntake.set(0);
