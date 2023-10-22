@@ -101,8 +101,8 @@ public class ManualStrobeCommand extends CommandBase {
         // }
 
         toggleGunnerButton();
-        setTimerStarted(RobotContainer.intake.hasAcquiredGamePiece());
-        if(RobotContainer.intake.hasAcquiredGamePiece() && !twoSecondsFlashed(previousTimeStarted)){
+        setTimerStarted(RobotContainer.intake.isGamePieceAcquired());
+        if(RobotContainer.intake.isGamePieceAcquired() && !twoSecondsFlashed(previousTimeStarted)){
             if(RobotContainer.cone){
                 candle.indicateConeStrobe();
             }
@@ -118,7 +118,7 @@ public class ManualStrobeCommand extends CommandBase {
                 candle.indicateCubeNoStrobe();
             }
         }
-        previousObjectDetected = RobotContainer.intake.hasAcquiredGamePiece();
+        previousObjectDetected = RobotContainer.intake.isGamePieceAcquired();
         //Print Statements for Debugging:
         SmartDashboard.putNumber("Time since last flash", Timer.getFPGATimestamp() - previousTimeStarted);
     }

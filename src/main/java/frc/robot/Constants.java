@@ -509,7 +509,7 @@ public static class WheelIntakeConstants{
         public static final double proximal_inertia = 2*2961.95 * lbs_sqinches_to_kg_sqmeters;
         public static final double proximal_com = 22.80 * inches_to_meters;
     
-        public static final double distal_length = 33 * inches_to_meters;
+        public static final double distal_length = 32 * inches_to_meters;
         public static final double distal_mass = 2.8*2 * pounds_to_kilograms;
         public static final double distal_inertia = 2*866.840 * lbs_sqinches_to_kg_sqmeters;
         public static final double distal_com = 13.56 * inches_to_meters;
@@ -520,17 +520,17 @@ public static class WheelIntakeConstants{
         public static final double ready_highcone_score_y = 1.14; 
 
         // public static double[] ready_midcone_score = new double[]{0.97, 0.65};
-        public static final double ready_midcone_score_x = 0.96 +.1525-0.08 - (3* 0.0254);
-        public static final double ready_midcone_score_y = 0.66 +.1525 + (2 * 0.0254);
+        public static final double ready_midcone_score_x = 0.96 + 0.15 - (4 * 0.0254);
+        public static final double ready_midcone_score_y = 0.66 + 0.2;
 
-        public double[] ready_highcube_score = new double[]{1.38, 0.96};
-        public static final double ready_highcube_score_x = 1.38;
+        public double[] ready_highcube_score = new double[]{1.33, 0.96};
+        public static final double ready_highcube_score_x = 1.33;
         public static final double ready_highcube_score_y = 0.96;
         
-        public double[] ready_midcube_score = new double[]{0.97, 0.65};
+        public double[] ready_midcube_score = new double[]{0.94, 0.59};
         
-        public static final double ready_midcube_score_x = 0.97;
-        public static final double ready_midcube_score_y = 0.65;
+        public static final double ready_midcube_score_x = 0.94;
+        public static final double ready_midcube_score_y = 0.59;
 
         public final double[] ready_low_score = new double[]{0.59, 0};
         public static final double ready_low_score_x  = 0.59;

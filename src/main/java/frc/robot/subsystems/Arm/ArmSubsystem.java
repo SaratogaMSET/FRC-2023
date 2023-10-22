@@ -8,21 +8,21 @@ import frc.robot.controls.ArmInterface;
 public class ArmSubsystem extends SubsystemBase {
     int side = 0;
     double proxKp = 9.75 * 16.6 / 13.6; //10.2
-    double distKp = 9.2 * 8.6 / 5.6; //9.5
+    double distKp = 9.5 * 8.6 / 5.6; //9.5
 
 
     double proxKd = 0.042 * 16.6 / 13.6; //0.035
     double distKd = 0.02 * 8.6 / 5.6; 
 
     // double proxKpMiddle = 9.5; //10.2
-    double distKpMiddle = 9;
-    double distKdMiddle = 0; 
+    double distKpMiddle = 7;
+    double distKdMiddle = 0.2; 
 
     final double proxKf = 0.80 * 16.6 / 13.6;
-    final double distKf = 1.10 * 8.6 / 5.6;
+    final double distKf = 1.10;// * 8.6 / 5.6;
     double armTolerance = 0.03;
 
-    double maxVoltPerVelocity = 2.5000254;
+    double maxVoltPerVelocity = 2.250254;
     double max_voltage = 6.5;
     
     public ArmInterface armInterface = new ArmInterface();
@@ -125,10 +125,10 @@ public class ArmSubsystem extends SubsystemBase {
         // }
 
         if(Math.abs(error.get(0)) < armTolerance){
-            voltageProximal = proxKp * error.get(0);
+            voltageProximal = 0.8 * error.get(0) * proxKp + error.get(2) * proxKd;
         }
         if(Math.abs(error.get(1)) < armTolerance){
-            voltageDistal = distKp * error.get(1);
+            voltageDistal = 0.8 * error.get(1) * distKpMiddle + error.get(3) * distKdMiddle;
         }
 
         if(Math.abs(voltageProximal) > max_voltage){
@@ -178,10 +178,10 @@ public class ArmSubsystem extends SubsystemBase {
         // }
 
         if(Math.abs(error.get(0)) < armTolerance){
-            voltageProximal = proxKp * error.get(0);
+            voltageProximal = 0.8 * proxKp * error.get(0) + error.get(2) * proxKd;
         }
         if(Math.abs(error.get(1)) < armTolerance){
-            voltageDistal = distKp * error.get(1);
+            voltageDistal = 0.8 * distKp * error.get(1) + error.get(3) * distKd;
         }
 
         if(Math.abs(voltageProximal) > max_voltage){
