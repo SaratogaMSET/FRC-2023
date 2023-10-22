@@ -83,7 +83,7 @@ public class WheelIntake extends SubsystemBase{
             .finallyDo((interrupted) -> setVoltage(WheelIntakeConstants.holdVolts));
       }
       public boolean hasAcquiredGamePiece(){
-        return  getVelocity() <= WheelIntakeConstants.stopVelocity && (12* Math.abs(intake.get())) <= WheelIntakeConstants.holdVolts;
+        return  getVelocity() <= WheelIntakeConstants.stopVelocity && ((12* Math.abs(intake.get())) <= WheelIntakeConstants.holdVolts);
       }
       public boolean isGamePieceAcquired(){
         return intake.getMotorOutputVoltage() >= WheelIntakeConstants.holdVolts && getVelocity() <= WheelIntakeConstants.stopVelocity;
@@ -95,6 +95,7 @@ public class WheelIntake extends SubsystemBase{
         SmartDashboard.putNumber("Current Motor Output Voltage", getVoltage());
         SmartDashboard.putNumber("Buffer value", buffer());
         SmartDashboard.putNumber("Velocity", getVelocity());
+        SmartDashboard.putBoolean("Has Gamepiece been acquired", hasAcquiredGamePiece());
         // if(!isConeAcquired() && !isCubeAcquired()){
         //     intake.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(false, 5, 40, 0.1));
         // }
