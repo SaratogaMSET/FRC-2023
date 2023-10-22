@@ -76,10 +76,6 @@ public class RobotContainer {
   public static final String TwoAndAHalfBalanceBarrier = "Barrier Side 2 Piece + Pickup";
   public static final String BottomTwoPiece = "Bump Side Two Piece";
   // public static final String ChoreoTrajectory = "Choreo Trajectory";
-
-  public final SendableChooser<Boolean> autoCloseChooser = new SendableChooser<Boolean>();
-  public static final Boolean disableAutoClose = false;
-  public static final Boolean enableAutoClose = true;
   public static Boolean cone = false;
   
   public final static WheelIntake intake = new WheelIntake();
@@ -136,14 +132,10 @@ public class RobotContainer {
     // m_autoSwitcher.addOption(PhyscoBehavior, PhyscoBehavior);
     // m_autoSwitcher.addOption(ChoreoTrajectory, ChoreoTrajectory);
     // m_autoSwitcher.addOption(ThreePiece, ThreePiece);
-    
-    
-    autoCloseChooser.setDefaultOption("ENABLE the Auto Close", enableAutoClose);
-    autoCloseChooser.addOption("DISABLE Auto Close", disableAutoClose);
+  
 
     // m_field = new Field2d();
     SmartDashboard.putData(m_autoSwitcher);
-    SmartDashboard.putData(autoCloseChooser);
     
     
     configureButtonBindings();
