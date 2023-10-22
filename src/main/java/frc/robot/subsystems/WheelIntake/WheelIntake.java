@@ -51,20 +51,6 @@ public class WheelIntake extends SubsystemBase{
     public double getStatorCurrent(){
         return intake.getStatorCurrent();
     }
-    public boolean isConeAcquired(){
-        return (currentGamepiece == Gamepiece.CONE && (buffer()>= WheelIntakeConstants.CONE_STALL_CURRENT));
-    }
-    public boolean isCubeAcquired(){
-        return currentGamepiece == Gamepiece.CUBE && (buffer() >= WheelIntakeConstants.CUBE_STALL_CURRENT);
-    }
-    public void toggleCurrentGamePiece(){ //TODO: SYNC WITH LEDS ON THE REAL ROBOT
-        if(currentGamepiece == Gamepiece.CONE){
-            currentGamepiece = Gamepiece.CUBE;
-        }
-        else{
-            currentGamepiece = Gamepiece.CONE;
-        }
-    }
     public static double falconToRPM(double velocityCounts, double gearRatio) {
         double motorRPM = velocityCounts * (600.0 / 2048.0);        
         double mechRPM = motorRPM / gearRatio;
@@ -96,18 +82,18 @@ public class WheelIntake extends SubsystemBase{
                         new SuppliedWaitCommand(() -> WheelIntakeConstants.intakeVelocityWaitStop)))
             .finallyDo((interrupted) -> setVoltage(WheelIntakeConstants.holdVolts));
       }
-
+      public boolean hasAcquiredGamePiece(){
+        return  getVelocity() <= WheelIntakeConstants.stopVelocity && (12* Math.abs(intake.get())) <= WheelIntakeConstants.holdVolts;
+      }
       public boolean isGamePieceAcquired(){
         return intake.getMotorOutputVoltage() >= WheelIntakeConstants.holdVolts && getVelocity() <= WheelIntakeConstants.stopVelocity;
       }
       
     @Override
     public void periodic(){
-        SmartDashboard.putString("Object Tracking", currentGamepiece.toString());
         SmartDashboard.putNumber("Current Output Current", getStatorCurrent());
         SmartDashboard.putNumber("Current Motor Output Voltage", getVoltage());
         SmartDashboard.putNumber("Buffer value", buffer());
-        SmartDashboard.putBoolean("is cone", isConeAcquired());
         SmartDashboard.putNumber("Velocity", getVelocity());
         // if(!isConeAcquired() && !isCubeAcquired()){
         //     intake.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(false, 5, 40, 0.1));
