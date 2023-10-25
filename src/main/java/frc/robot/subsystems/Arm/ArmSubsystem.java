@@ -3,16 +3,30 @@ package frc.robot.subsystems.Arm;
 import org.ejml.simple.SimpleMatrix;
 
 //import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.controls.ArmInterface;
+
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleArrayLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 
 public class ArmSubsystem extends SubsystemBase {
     int side = 0;
     public ArmInterface armInterface = new ArmInterface();
     public ArmVisualizer armVisualizer = new ArmVisualizer("/Arm", null);
+
+    private DoubleArrayLogEntry armAngleLog;
+    private DoubleArrayLogEntry armVoltageLog;
     public ArmSubsystem() {
         armInterface.resetMotorEncoders();
+
+        DataLogManager.start();
+
+        // Set up custom log entries
+        DataLog log = DataLogManager.getLog();
+        this.armAngleLog = new DoubleArrayLogEntry(log, "/Arm/Angles");
+        this.armVoltageLog = new DoubleArrayLogEntry(log, "/Arm/Voltages");
     }
     
     public void updateState(){
@@ -147,6 +161,8 @@ public class ArmSubsystem extends SubsystemBase {
     public void periodic() {
         updateState();
         // SmartDashboard.putNumber("Side", side);
+        armAngleLog.append(new double[]{armInterface.getPositionProximal(), armInterface.getPositionDistal()});
+        armVoltageLog.append(new double[]{armInterface.getVoltageProximal(), armInterface.getVoltageDistal()});
         armVisualizer.update(armInterface.getPositionProximal(), armInterface.getPositionDistal());
         // armVisualizer.logRectangles("Arm Bounds", armInterface.Bounds, new Color8Bit(Color.kGreen));
     }

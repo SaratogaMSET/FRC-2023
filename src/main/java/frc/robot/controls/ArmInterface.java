@@ -5,6 +5,7 @@ import org.ejml.simple.SimpleMatrix;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
+import edu.wpi.first.wpilibj.RobotController;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
@@ -40,6 +41,8 @@ public class ArmInterface {
     double proximal_kVG = 1.20;
     double distal_kVG = 0.66;
 
+    double applied_volts_proximal = 0;
+    double applied_volts_distal = 0;
     public ArmInterface(){
         Proximal_Left.configNeutralDeadband(0.03);
         Proximal_Right.configNeutralDeadband(0.03);
@@ -229,6 +232,21 @@ public class ArmInterface {
     public SimpleMatrix state_nv(){
         return new SimpleMatrix(new double[][]{{getPositionProximal()}, {getPositionDistal()}, {0}, {0}});
     }
+
+    public double getVoltageProximal(){
+        if(applied_volts_proximal > 0){
+            return Math.min(RobotController.getBatteryVoltage(), applied_volts_proximal);
+        }else{
+            return -Math.min(RobotController.getBatteryVoltage(), -applied_volts_proximal);
+        }
+    }
+    public double getVoltageDistal(){
+        if(applied_volts_proximal > 0){
+            return Math.min(RobotController.getBatteryVoltage(), applied_volts_distal);
+        }else{
+            return -Math.min(RobotController.getBatteryVoltage(), -applied_volts_distal);
+        }
+    }
     public void update_state(){
         EncoderV_Proximal_Left.update(getEncoderProximalLeft());
         EncoderV_Proximal_Right.update(getEncoderProximalRight());
@@ -376,6 +394,9 @@ public class ArmInterface {
 
         }
 
+        applied_volts_proximal = controlVoltageProxima + voltage_ff_prox;
+        applied_volts_distal = controlVoltageDistal + voltage_ff_dist;
+
         Proximal_Left.setVoltage(controlVoltageProxima + voltage_ff_prox);
         Proximal_Right.setVoltage(controlVoltageProxima + voltage_ff_prox);
 
@@ -405,6 +426,9 @@ public class ArmInterface {
             voltage_ff_dist = 0;
             System.out.println("Feedforward Error Distal");
         }
+
+        applied_volts_proximal = controlVoltageProxima + voltage_ff_prox;
+        applied_volts_distal = controlVoltageDistal + voltage_ff_dist;
 
         Proximal_Left.setVoltage(controlVoltageProxima + voltage_ff_prox);
         Proximal_Right.setVoltage(controlVoltageProxima + voltage_ff_prox);
