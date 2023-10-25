@@ -177,7 +177,7 @@ public class RobotContainer {
     
     // m_gunner1.button(6).whileTrue(new ManualCloseIntake(intake));
     m_gunner1.button(6).whileTrue(intake.intakeCommand());
-    m_gunner1.button(4).whileTrue(new RunWheelExtakeCommand(intake, 0.5));
+    m_gunner1.button(4).whileTrue(new RunWheelExtakeCommand(intake, 0.25));
     // m_gunner1.button(4).whileTrue(new RunCommand(()-> intake.openClaw(), intake));
     
     m_driverController.x().onTrue(new InstantCommand(()->m_drivetrainSubsystem.setX(), m_drivetrainSubsystem));
@@ -242,9 +242,9 @@ public class RobotContainer {
 
     m_gunner1.button(8).onTrue(ArmSequences.armDunk(m_armSubsystem, intake, 1)); // TODO: make 0 when collision detection working
     m_gunner1.button(8).and(m_gunner1.button(1)).onTrue(ArmSequences.armDunk(m_armSubsystem, intake, 1));  
-    
 
-    m_gunner1.button(9).onTrue(ArmSequences.scoreConeMidNoRetract(m_armSubsystem, 1)); // TODO: make 0 when collision detection working
+    // m_gunner1.button(9).onTrue(ArmSequences.scoreConeMidNoRetract(m_armSubsystem, 1)); // TODO: make 0 when collision detection working
+    m_gunner1.button(9).onTrue(new ConditionalCommand(ArmSequences.scoreCubeMidNoRetract(m_armSubsystem, 1), ArmSequences.scoreConeMidNoRetract(m_armSubsystem, 1), ()->CANdleSubsystem.getIsCubeState())); // TODO: make 0 when collision detection working
     m_gunner1.button(9).and(m_gunner1.button(1)).onTrue(ArmSequences.scoreConeMidNoRetract(m_armSubsystem, 1));
     m_gunner1.button(10).onTrue(ArmSequences.armDunkMiddle(m_armSubsystem, intake, 1));// TODO: make 0 when collision detection working
     m_gunner1.button(10).and(m_gunner1.button(1)).onTrue(ArmSequences.armDunkMiddle(m_armSubsystem, intake, 1));

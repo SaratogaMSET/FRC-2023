@@ -20,6 +20,8 @@ public class CANdleSubsystem extends SubsystemBase {
     private static final Color yellow = new Color(242, 60, 0);
     private static final Color purple = new Color(184, 0, 185);
 
+    public static boolean isCubeState = false;
+
     public CANdleSubsystem() {
         CANdleConfiguration candleConfiguration = new CANdleConfiguration();
         candleConfiguration.statusLedOffWhenActive = true;
@@ -48,6 +50,7 @@ public class CANdleSubsystem extends SubsystemBase {
     }
 
     public void indicateConeNoStrobe() {
+        isCubeState = false;
         LEDSegment.BackRightStrip.setColor(yellow);
         LEDSegment.BackLeftStrip.setColor(yellow);
         LEDSegment.FrontLeftStrip.setColor(yellow);
@@ -55,6 +58,7 @@ public class CANdleSubsystem extends SubsystemBase {
     }
 
     public void indicateConeStrobe() {
+        isCubeState = false;
         LEDSegment.FrontLeftStrip.setStrobeAnimation(yellow, 0.5);
         LEDSegment.FrontRightStrip.setStrobeAnimation(yellow, 0.5);
         LEDSegment.BackRightStrip.setStrobeAnimation(yellow, 0.5);
@@ -62,6 +66,7 @@ public class CANdleSubsystem extends SubsystemBase {
     }
 
     public void indicateCubeStrobe() {
+        isCubeState = true;
         LEDSegment.FrontLeftStrip.setStrobeAnimation(purple, 0.5);
         LEDSegment.FrontRightStrip.setStrobeAnimation(purple, 0.5);
         LEDSegment.BackRightStrip.setStrobeAnimation(purple, 0.5);
@@ -69,12 +74,16 @@ public class CANdleSubsystem extends SubsystemBase {
     }
 
     public void indicateCubeNoStrobe(){
+        isCubeState = true;
         LEDSegment.BackRightStrip.setColor(purple);
         LEDSegment.BackLeftStrip.setColor(purple);
         LEDSegment.FrontLeftStrip.setColor(purple);
         LEDSegment.FrontRightStrip.setColor(purple);
     }
 
+    public static boolean getIsCubeState(){
+        return isCubeState;
+    }
     public static enum LEDSegment {
 
         FrontLeftStrip(8, 30, 3, candle1),
