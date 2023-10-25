@@ -323,13 +323,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
             currentDesiredState[3].angle = previousDesiredState[3].angle;
         }
 
-        // for(int i = 0; i < 4; i++){
-        //     SmartDashboard.putNumber("Mod " + i + " Cancoder", mSwerveMods[i].getCanCoder().getDegrees());
-        // //     SmartDashboard.putNumber("Mod " + i + " Integrated", mSwerveMods[i].getPosition().angle.getDegrees());
-        // //     SmartDashboard.putNumber("Mod " + i + " Velocity", mSwerveMods[i].getState().speedMetersPerSecond);
-        // //     SmartDashboard.putNumber("Desired Module "+ i + " Angle", currentDesiredState[i].angle.getDegrees());   
-        // //     SmartDashboard.putNumber("Desired Module "+ i + " Velocity", currentDesiredState[i].speedMetersPerSecond);     
-        // }
+        for(int i = 0; i < 4; i++){
+            SmartDashboard.putNumber("Mod " + i + " Cancoder", mSwerveMods[i].getAbsoluteRotation().getDegrees());
+        //     SmartDashboard.putNumber("Mod " + i + " Integrated", mSwerveMods[i].getPosition().angle.getDegrees());
+        //     SmartDashboard.putNumber("Mod " + i + " Velocity", mSwerveMods[i].getState().speedMetersPerSecond);
+        //     SmartDashboard.putNumber("Desired Module "+ i + " Angle", currentDesiredState[i].angle.getDegrees());   
+        //     SmartDashboard.putNumber("Desired Module "+ i + " Velocity", currentDesiredState[i].speedMetersPerSecond);     
+        }
         
 
         setModuleStates(currentDesiredState);
