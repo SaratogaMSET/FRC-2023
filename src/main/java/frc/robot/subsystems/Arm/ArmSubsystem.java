@@ -125,10 +125,10 @@ public class ArmSubsystem extends SubsystemBase {
         // }
 
         if(Math.abs(error.get(0)) < armTolerance){
-            voltageProximal = 0.8 * error.get(0) * proxKp + 2 * error.get(2) * proxKd;
+            voltageProximal = 0.8 * error.get(0) * proxKp + 6 * error.get(2) * proxKd;
         }
         if(Math.abs(error.get(1)) < armTolerance){
-            voltageDistal = 0.8 * error.get(1) * distKpMiddle + 2 * error.get(3) * distKdMiddle;
+            voltageDistal = 0.8 * error.get(1) * distKpMiddle + 6 * error.get(3) * distKdMiddle;
         }
 
         if(Math.abs(voltageProximal) > max_voltage){
@@ -178,10 +178,10 @@ public class ArmSubsystem extends SubsystemBase {
         // }
 
         if(Math.abs(error.get(0)) < armTolerance){
-            voltageProximal = 0.8 * proxKp * error.get(0) + 2 * error.get(2) * proxKd;
+            voltageProximal = 0.8 * proxKp * error.get(0) + 6 * error.get(2) * proxKd;
         }
         if(Math.abs(error.get(1)) < armTolerance){
-            voltageDistal = 0.8 * distKp * error.get(1) + 2 * error.get(3) * distKd;
+            voltageDistal = 0.8 * distKp * error.get(1) + 6 * error.get(3) * distKd;
         }
 
         if(Math.abs(voltageProximal) > max_voltage){

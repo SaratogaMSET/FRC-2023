@@ -140,10 +140,10 @@ public class ArmSequences{
         ArmPositionCommandMiddle score;
         if(side > 0){
             ready = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.ready_double_substation_x), Constants.ArmNodeDictionary.ready_double_substation_y + 0.25, 0.5);
-            score = new ArmPositionCommandMiddle(armSubsystem, -(Constants.ArmNodeDictionary.ready_midcone_score_x) - 0.1, Constants.ArmNodeDictionary.ready_midcone_score_y - 0.1, true);
+            score = new ArmPositionCommandMiddle(armSubsystem, -(Constants.ArmNodeDictionary.ready_midcone_score_x) - 0.15, Constants.ArmNodeDictionary.ready_midcone_score_y - 0.1, true);
         }else{
             ready = new ArmPositionCommand(armSubsystem, (Constants.ArmNodeDictionary.ready_double_substation_x), Constants.ArmNodeDictionary.ready_double_substation_y + 0.25, 0.5);
-            score = new ArmPositionCommandMiddle(armSubsystem, Constants.ArmNodeDictionary.ready_midcone_score_x - 0.1, Constants.ArmNodeDictionary.ready_midcone_score_y - 0.1, true);
+            score = new ArmPositionCommandMiddle(armSubsystem, Constants.ArmNodeDictionary.ready_midcone_score_x - 0.15, Constants.ArmNodeDictionary.ready_midcone_score_y - 0.1, true);
         }
         // ParallelRaceGroup openIntake = new RunCommand(()-> m_clawSubsystem.openClaw()).until(()-> m_clawSubsystem.isClawFullyOpen());
         // return ready.andThen(score).andThen(openIntake).andThen(zero);
