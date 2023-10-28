@@ -224,7 +224,6 @@ public class ArmSequences{
             reset = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y + 0.25, 0.05, false);
         }  
         
-        // RunCommand openIntake = new RunCommand(()-> clawSubsystem.openClaw());
         return (((dunk).andThen((reset)).andThen(new ArmZeroCommand(armSubsystem)))).raceWith(extake).andThen(new SetIntakeSpeedCommand(intake, 0.0));//.andThen(reset).alongWith(new WaitCommand(0.3).andThen(openIntake)); //.andThen(new ArmZeroCommand(armSubsystem));
 
     }
@@ -321,7 +320,31 @@ public class ArmSequences{
         ArmPositionCommand score;
         ArmPositionCommand dunk;
         ArmPositionCommand reset;
-        RunWheelExtakeCommand extake = new RunWheelExtakeCommand(intake, 0.03);
+        RunWheelExtakeCommand extake = new RunWheelExtakeCommand(intake, 0.3);
+        
+        if(side > 0) {
+            ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
+            score = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, 0.07);
+            dunk = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.ready_highcone_score_x + 0.05), Constants.ArmNodeDictionary.ready_highcone_score_y-0.2, 0.1, false);
+            reset = new ArmPositionCommand(armSubsystem, -(Constants.ArmNodeDictionary.ready_double_substation_x), Constants.ArmNodeDictionary.ready_double_substation_y + 0.25, 0.15, false);
+        } else {
+            ready = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);
+            score = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcone_score_x, Constants.ArmNodeDictionary.ready_highcone_score_y, 0.07);
+            dunk = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_highcone_score_x + 0.05, Constants.ArmNodeDictionary.ready_highcone_score_y-0.2, 0.1, false);
+            reset = new ArmPositionCommand(armSubsystem, Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y + 0.25, 0.15, false);
+        }
+        // ArmZeroCommand zero = new ArmZeroCommand(armSubsystem);
+        
+        // return ready.andThen(score).andThen(openIntake);
+        return ready.andThen(score).andThen(dunk.andThen(reset).raceWith(extake)).andThen(new SetIntakeSpeedCommand(intake, 0.0));
+    }
+
+    public static SequentialCommandGroup scoreConeHighNoRetractHighToleranceAutonMiddle(ArmSubsystem armSubsystem, WheelIntake intake, int side){
+        ArmPositionCommand ready;
+        ArmPositionCommand score;
+        ArmPositionCommand dunk;
+        ArmPositionCommand reset;
+        RunWheelExtakeCommand extake = new RunWheelExtakeCommand(intake, 0.3);
         
         if(side > 0) {
             ready = new ArmPositionCommand(armSubsystem, -Constants.ArmNodeDictionary.ready_double_substation_x, Constants.ArmNodeDictionary.ready_double_substation_y, 0.5);

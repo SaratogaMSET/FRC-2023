@@ -268,7 +268,7 @@ public class AutonSequences {
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           new SequentialCommandGroup(
-            ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, intake, 1),
+            ArmSequences.scoreConeHighNoRetractHighToleranceAutonMiddle(m_armSubsystem, intake, 1),
             // new WaitCommand(0.65),
             // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
             // new RunCommand(()->intake.openIntake(), intake).withTimeout(0.5)
@@ -295,7 +295,7 @@ public class AutonSequences {
 
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
-          Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, intake, 1)),
+          Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAutonMiddle(m_armSubsystem, intake, 1)),
           // Map.entry("Arm Low Score Backwards", ArmSequences.lowScoreNoRetract(m_armSubsystem, intake, 1)),
           Map.entry("Arm Zero Command", new ArmZeroAutoCommand(m_armSubsystem)), 
           Map.entry("Intake Front", new ManualSetAngle(actuatorSubsystem, 95)),
@@ -332,7 +332,7 @@ public class AutonSequences {
 
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
-          Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, intake, 1)),
+          Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAutonMiddle(m_armSubsystem, intake, 1)),
           // Map.entry("Arm Low Score Backwards", ArmSequences.lowScoreNoRetract(m_armSubsystem, intake, 1)),
           Map.entry("Arm Zero Command", new ArmZeroAutoCommand(m_armSubsystem)), 
           Map.entry("Intake Front", new ManualSetAngle(actuatorSubsystem, 95)),
@@ -486,7 +486,7 @@ public class AutonSequences {
             // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
             // new RunCommand(()->intake.openIntake(), intake).withTimeout(0.5)
             // new InstantCommand(()->SmartDashboard.putBoolean("Claw Opened", false)),
-            swerveTrajectoryFollower
+            swerveTrajectoryFollower.alongWith(new ArmZeroCommand(m_armSubsystem))
             // ArmSequences.lowScoreNoRetract(m_armSubsystem, intake, 0),
             // new ParallelCommandGroup(
             // new ArmZeroCommand(m_armSubsystem),
