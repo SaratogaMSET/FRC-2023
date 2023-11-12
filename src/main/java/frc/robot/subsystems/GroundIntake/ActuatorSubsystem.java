@@ -5,169 +5,69 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.GroundIntake;
+import frc.robot.Constants;
 
 public class ActuatorSubsystem extends SubsystemBase {
-    WPI_TalonFX Actuator = new WPI_TalonFX(Constants.GroundIntake.actuator_ID, "649-Hammerhead-CANivore");
+    //PID Controller Values
 
-    CANCoder Encoder = new CANCoder(Constants.GroundIntake.encoder_ID,  "649-Hammerhead-CANivore");
-    //TODO: Make these constants not completely bogus
-    //They were here because the intake was added under a time constraint, they are not valid control theory wise
-    double previousError = 0;
-    public double k_GAuton = 0.07; //0.0648
-    public double k_G = 0.07; //0.0648
-    double k_PAuton = 0.85; //0.85
-    double k_P = 0.7; //0.6
-    double k_D = 0.000;
-    double k_I = 0.000;
-    double k_PUp = 0.6; //0.6
-    double errorDT;
-    double prevError;
+    //You want this value to be just enough such that the angle is as close to the setpoint as possible but not overshooting.
+    //Increasing will increase the power/ make it overshoot more, decreasing it lowers the power.
+    double kp = 0.37;
 
-    //Ki is almost always not a good idea on a frc robot
-    PIDController controller = new PIDController(k_P,0,k_D);
-    
-    //How we current limit the motor actuating the ground intake 
+    double ki = 0; //Don't touch this.
+    double kd = 0.0; //Changing this made the ground intake oscillate too much
+    double kg = 0.025; //Changes how much power you need to overcome gravity
+    PIDController controller = new PIDController(kp, ki, kd); 
+
+    //Encoders essentially save the position of the motor, in this case saving the angle of the actuator
+    CANCoder encoder = new CANCoder(GroundIntake.encoder_ID, "649-Hammerhead-CANivore");
+    WPI_TalonFX motor = new WPI_TalonFX(GroundIntake.actuator_ID, "649-Hammerhead-CANivore");
+    //Setting current limits as a failsafe
     SupplyCurrentLimitConfiguration ActuatorLimit = new SupplyCurrentLimitConfiguration(
             true, 
             Constants.Drivetrain.driveContinuousCurrentLimit, 
             GroundIntake.currentLimit, 
             Constants.Drivetrain.drivePeakCurrentDuration);
-    public ActuatorSubsystem(){
-        Actuator.setNeutralMode(NeutralMode.Brake);
-        Actuator.configSupplyCurrentLimit(ActuatorLimit);
-        Actuator.configNeutralDeadband(0.0);
+    public ActuatorSubsystem() {
+        motor.setNeutralMode(NeutralMode.Brake);
+        motor.configSupplyCurrentLimit(ActuatorLimit);
+        motor.configNeutralDeadband(0.0);
     }
-   
-
-    //Very defined range of motion 
-    public double get_position(){
-        double raw_radians =  Math.toRadians(Encoder.getAbsolutePosition() - Constants.GroundIntake.encoder_offset);
-        return raw_radians;
+    //Encoder Offset is used to make the odometry match up with the position of the actuator in real life
+    public double getAngle() {
+        return encoder.getAbsolutePosition() - GroundIntake.encoder_offset;
     }
-    public double get_position_degrees(){
-        double raw_degrees =  (Encoder.getAbsolutePosition() - Constants.GroundIntake.encoder_offset);
-        //while(raw_radians > Math.PI) raw_radians -= 2 * Math.PI;
-        //while(raw_radians < -Math.PI) raw_radians += 2 * Math.PI;
-        // raw_degrees = (18.0/60.0) * (16.0/40.0) * (8.0/34.0) * raw_degrees;
-        return raw_degrees;
-    }
-    public double getCurrent(){
-        return Actuator.getStatorCurrent();
-    }
+    public void setAngle(double angle, double powerPercent) {
+        powerPercent = MathUtil.clamp(powerPercent, 0, 100); //clamp(value, low, high) returns low if the value is lower than low, high if the value is higher than high, else just return the value.
+        angle = MathUtil.clamp(angle, GroundIntake.highbound, GroundIntake.lowbound); //Names are a little misleading, lowbound is a large number as the angle when the actuator is close to the ground is high and vice versa.
+        double scaledAngle = angle / GroundIntake.lowbound; //Scaling the angle so it is essentially a percentage of how far the angle is from lowbound, needed for PID controller calculations.
+        controller.setSetpoint(scaledAngle); //Sets the PID Controller setpoint to the scaled angle
+        double power = (powerPercent / 100) * controller.calculate(getAngle() / GroundIntake.lowbound); //Scaling the measurement of the current angle so controller.calculate returns a value between -1 and 1.
 
-    // /**
-    //  * Does not do anything useful for right now
-    //  * 
-    //  */
-    // double[] get_xy(){
-    //     return new double[]{
-    //         Constants.GroundIntake.x_offset + Math.sin(get_position()) * Constants.GroundIntake.length,
-    //         Constants.GroundIntake.y_offset + Math.cos(get_position()) * Constants.GroundIntake.length
-    //     };
-    // }
-
-    public double getVoltage(){
-        return Actuator.getMotorOutputVoltage();
-    }
-
-    /** 0 is considered to be the ground intake at vertical
-     * @param desired angle in degrees CW +
-     */
-    public void set_angle(double angle, double powerPercent){
-        if (powerPercent > 100) powerPercent = 100;
-        if (powerPercent < 0) powerPercent = 0;
-
-        double power = 12 * powerPercent / 100;
-        if(angle > Constants.GroundIntake.lowbound) angle = Constants.GroundIntake.lowbound;
-        if(angle < Constants.GroundIntake.highbound) angle = Constants.GroundIntake.highbound;
-        double error = (angle - get_position_degrees())/(Constants.GroundIntake.lowbound - Constants.GroundIntake.highbound);
-        double gravity = k_GAuton * Math.sin(get_position() - Math.toRadians(25));
-        
-        if(angle < get_position_degrees()){
-            Actuator.setVoltage((k_PUp * error * power) - gravity);
+        //Calculating gravity is a little math-heavy.
+        //The entire value must be negated, as bringing the actuator closer to the arm needs negative motor power
+        // Because we want the closer the actuator is to the ground, the more power gravity will have, we use sin here.
+        // Because the angle of our actuator can go below 90 sin(90 to 180 degrees) is actually decreasing, so we scale the angle to only be between 0 and 90
+        double gravity = (-kg * Math.sin(Math.toRadians(getAngle()/GroundIntake.lowbound*90))); 
+        if (getAngle() > angle) { //If our current angle is closer to the ground than the target angle, we use extra power due to gravity
+            power += gravity;
         }
-        else{
-            Actuator.setVoltage(((k_PAuton * error)* power));
-        }
-        // SmartDashboard.putNumber("Intake Error",  (k_P * error * power));
-} 
-
-    // public void set_angle(double angle, double powerPercent, double velocityError){
-    //     if (powerPercent > 100) powerPercent = 100;
-    //     if (powerPercent < 0) powerPercent = 0;
-
-    //     double power = 12 * powerPercent / 100;
-    //     if(angle > Constants.GroundIntake.lowbound) angle = Constants.GroundIntake.lowbound;
-    //     if(angle < Constants.GroundIntake.highbound) angle = Constants.GroundIntake.highbound;
-    //     double error = (angle - get_position_degrees())/(Constants.GroundIntake.lowbound - Constants.GroundIntake.highbound);
-    //     double gravity = k_G * Math.sin(get_position() - Math.toRadians(25));
-        
-    //     if(angle < get_position_degrees()){
-    //         Actuator.setVoltage((k_PUp * error * power) - gravity);
-    //     }
-    //     else{
-    //         Actuator.setVoltage(((k_P * error + k_D * velocityError )* power));
-    //     }
-    // } 
-
-    public void set_angle(double angle, double powerPercent, double integralError, double velocityError){
-        if (powerPercent > 100) powerPercent = 100;
-        if (powerPercent < 0) powerPercent = 0;
-
-        double power = 12 * powerPercent / 100;
-        if(angle > Constants.GroundIntake.lowbound) angle = Constants.GroundIntake.lowbound;
-        if(angle < Constants.GroundIntake.highbound) angle = Constants.GroundIntake.highbound;
-        double error = (angle - get_position_degrees())/(Constants.GroundIntake.lowbound - Constants.GroundIntake.highbound);
-        
-        double gravity = k_G * Math.sin(get_position() - Math.toRadians(25));
-        
-        if(angle < get_position_degrees()){
-            Actuator.setVoltage((k_PUp * error * power) - gravity);
-        }
-        else{
-            
-            double outputVoltage = (k_P * error + k_I * integralError + k_D * velocityError- gravity) * power;
-            // SmartDashboard.putNumber("More Pain", outputVoltage );
-
-            //we slam the ground intake down if we dont limit the voltage of the motor
-            double calc = Math.max(0.5, Math.min(4, outputVoltage));
-            Actuator.setVoltage(calc);
-        }
-    } 
-
-
-    // public void setVoltageActuator(double voltage){
-    //     Actuator.setVoltage(voltage);
-    // }
-
-    /**
-     * Does not do anything useful for right now
-     */
-    // public boolean detect_collision(double[] ee_cartesian, double radius){
-    //     // double distance = Math.hypot(ee_cartesian[0] - get_xy()[0], ee_cartesian[1] - get_xy()[1]);
-
-    //     return Math.abs(distance) < radius;
-    // }
-
-    /** Keeps the ground intake up.
-     * This should be done in a command that is almost always running, like a default command,
-     * so that the ground intake does not start to droop on its own.
-     */
-    public void gravityCompensation(){
-        Actuator.set(-k_G * Math.sin(get_position() - Math.toRadians(25)));
+        motor.set(power);
+    }
+    public void idle() {
+        //Uses the gravity power from setAngle in order to not have the actuator droop down
+        motor.set(-kg * Math.sin(Math.toRadians(getAngle()/GroundIntake.lowbound * 90))); 
     }
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Ground Intake Angle", get_position_degrees());
-        // SmartDashboard.putNumber("Ground Intake Angle", get_position_degrees());
-        // SmartDashboard.putNumber("Actuator Voltage", Actuator.getMotorOutputVoltage());
-        // SmartDashboard.putNumber("Gravity", k_G * Math.sin(get_position() - Math.toRadians(25)));
-        // SmartDashboard.putNumberArray("Intake Coors", get_xy());
-        
+        //Puts values out where you can see them on the driver station, very useful for debugging!
+        SmartDashboard.putNumber("Angle of Actuator", getAngle());
+        SmartDashboard.putNumber("Scaled Angle of Actuator", getAngle() / GroundIntake.lowbound);
+        SmartDashboard.putNumber("Actutor Motor power", motor.get());
     }
 }

@@ -1,7 +1,6 @@
 package frc.robot.commands.GroundIntakeCommands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
 import frc.robot.subsystems.GroundIntake.RollerSubsystem;
 
 public class ManualRunIntakeCommand extends CommandBase {
@@ -22,23 +21,23 @@ public class ManualRunIntakeCommand extends CommandBase {
     }
     @Override
     public void execute(){
-        roller.set_intake(speed);
+        roller.setSpeed(speed);
     }
 
     @Override
     public void end(boolean interrupted){
         if(roller.objectInRoller()){
-            roller.set_intake(0.03);
+            roller.setSpeed(0.03);
         }
         else{
-            roller.set_intake(0);
+            roller.setSpeed(0);
         }
     }
 
     @Override
     public boolean isFinished(){
-        if(speed>0 && useIRGate){
-            return roller.objectInRoller();
+        if(speed>0 && useIRGate && roller.objectInRoller()){
+            return true;
         }
         return false;
     }

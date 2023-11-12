@@ -37,14 +37,12 @@ import frc.robot.commands.Drivetrain.FastBalanceCommand;
 import frc.robot.commands.Drivetrain.TunableBalanceCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualRunIntakeCommand;
 import frc.robot.commands.GroundIntakeCommands.ManualSetAngle;
-import frc.robot.commands.GroundIntakeCommands.ManualSetAngleDriver;
 import frc.robot.commands.WheelIntake.RunWheelExtakeCommand;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.WheelIntake.WheelIntake;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
 import frc.robot.subsystems.GroundIntake.RollerSubsystem;
-import frc.robot.util.server.PoseEstimator;
 
 public class AutonSequences {
 
@@ -598,15 +596,15 @@ public class AutonSequences {
           Map.ofEntries(
           Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, intake, 1)),
           Map.entry("Arm Neutral", new ArmZeroCommand(m_armSubsystem)),
-          Map.entry("Intake Front", new ManualSetAngleDriver(actuator, 95)),
+          Map.entry("Intake Front", new ManualSetAngle(actuator, 95)),
           Map.entry("Run Rollers", new ManualRunIntakeCommand(rollers, 0.7)),
-          Map.entry("Zero Intake", new ManualSetAngleDriver(actuator, 10)),
+          Map.entry("Zero Intake", new ManualSetAngle(actuator, 10)),
           Map.entry("Zero Roller Speed", new ManualRunIntakeCommand(rollers, 0.0)),
           Map.entry("Score Low", new ManualRunIntakeCommand(rollers, -0.7)),
           Map.entry("Arm is Neutral", new ArmZeroCommand(m_armSubsystem)),
           // Map.entry("Down Intake", new ManualSetAngleDriver(actuator, 95)),
           Map.entry("Running Rollers", new ManualRunIntakeCommand(rollers, 0.7)),
-          Map.entry("Intake Up", new ManualSetAngleDriver(actuator, 10)),
+          Map.entry("Intake Up", new ManualSetAngle(actuator, 10)),
           Map.entry("Stop Rollers",  new ManualRunIntakeCommand(rollers, 0.0) )
           )
        );
@@ -648,9 +646,9 @@ public class AutonSequences {
           Map.ofEntries(
           Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, intake, 1)),
           Map.entry("Arm Neutral", new ArmZeroCommand(m_armSubsystem)),
-          Map.entry("Intake Front", new ManualSetAngleDriver(actuator, 95)),
+          Map.entry("Intake Front", new ManualSetAngle(actuator, 95)),
           Map.entry("Run Rollers", new ManualRunIntakeCommand(rollers, 0.7)),
-          Map.entry("Zero Intake", new ManualSetAngleDriver(actuator, 10)),
+          Map.entry("Zero Intake", new ManualSetAngle(actuator, 10)),
           Map.entry("Zero Roller Speed", new ManualRunIntakeCommand(rollers, 0.0)),
           Map.entry("Score Low", new ManualRunIntakeCommand(rollers, -1)),
           Map.entry("Roller Zero", new ManualRunIntakeCommand(rollers, 0)),
@@ -683,15 +681,15 @@ public class AutonSequences {
           Map.ofEntries(
             Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, intake, 1)),
             Map.entry("Arm Zero Command", new ArmZeroCommand(m_armSubsystem)),
-            Map.entry("Intake Front", new ManualSetAngleDriver(actuator, 95)),
+            Map.entry("Intake Front", new ManualSetAngle(actuator, 95)),
             Map.entry("Run Rollers", new ManualRunIntakeCommand(rollers, 0.7)),
-            Map.entry("Zero Intake", new ManualSetAngleDriver(actuator, 10)),
+            Map.entry("Zero Intake", new ManualSetAngle(actuator, 10)),
             Map.entry("Zero Roller Speed", new ManualRunIntakeCommand(rollers, 0.0)),
             Map.entry("Score Low", new ManualRunIntakeCommand(rollers, -1)),
             Map.entry("Roller Zero", new ManualRunIntakeCommand(rollers, 0)),
-            Map.entry("Front Intake", new ManualSetAngleDriver(actuator, 95)),
+            Map.entry("Front Intake", new ManualSetAngle(actuator, 95)),
             Map.entry("Rollers Run", new ManualRunIntakeCommand(rollers, 0.7)),
-            Map.entry("Intake Up", new ManualSetAngleDriver(actuator, 95)),
+            Map.entry("Intake Up", new ManualSetAngle(actuator, 95)),
             Map.entry("Zero Rollers", new ManualRunIntakeCommand(rollers, -0.7)),
             // Map.entry("Arm Neutral Command", new ArmZeroCommand(m_armSubsystem)),
             // Map.entry("Low Score Backwards", ArmSequences.lowScoreNoRetract(m_armSubsystem, intake, 1)),
