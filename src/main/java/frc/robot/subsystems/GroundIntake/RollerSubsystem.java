@@ -8,11 +8,6 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.GroundIntake;
 public class RollerSubsystem extends SubsystemBase {
-    // Coordinate-Angle System
-    // 0 --> Vertical Actuator
-    // 90 --> Actuator Horizontal away from the arm
-    // Higher angle --> Closer to the ground! Keep this in mind.
-
     //Current Limits as a failsafe
     SupplyCurrentLimitConfiguration IntakeLimit = new SupplyCurrentLimitConfiguration(
             true, 
