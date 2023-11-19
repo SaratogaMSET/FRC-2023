@@ -3,12 +3,16 @@ package frc.robot.commands.Drivetrain;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
+import frc.robot.subsystems.Vision.PoseSmoothingFilter;
 
 public class ZeroGyroCommand extends CommandBase {
     private DrivetrainSubsystem m_drivetrainSubsystem;
-    public ZeroGyroCommand(DrivetrainSubsystem dt) {
+    private PoseSmoothingFilter m_poseSmoothingFilter;
+    public ZeroGyroCommand(DrivetrainSubsystem dt, PoseSmoothingFilter m_poseSmoothingFilter) {
         this.m_drivetrainSubsystem = dt;
-        addRequirements(m_drivetrainSubsystem);
+        this.m_poseSmoothingFilter = m_poseSmoothingFilter;
+
+        addRequirements(m_drivetrainSubsystem, m_poseSmoothingFilter);
     }
     public ZeroGyroCommand(DrivetrainSubsystem dt, String path){
         this.m_drivetrainSubsystem = dt;
@@ -16,21 +20,7 @@ public class ZeroGyroCommand extends CommandBase {
     @Override
     public void execute() {
         m_drivetrainSubsystem.zeroGyroscope();
-        // if(path.equals(null)){
-        // m_drivetrainSubsystem.zeroGyroscope();
-        // }
-        // else if(path.equals("Left")){
-        //     m_drivetrainSubsystem.zeroGyroscopeAutonLeft();
-        // }
-        // else if(path.equals("Middle")){
-        //     m_drivetrainSubsystem.zeroGyroscopeAutonMiddle();
-        // }
-        // else if(path.equals("Right")){
-        //     m_drivetrainSubsystem.zeroGyroscopeAutonRight();
-        // }
-        // else{
-        //     m_drivetrainSubsystem.zeroGyroscope();
-        // }
+        m_poseSmoothingFilter.resetOdometry(m_poseSmoothingFilter.getPose());
     }
 
     @Override

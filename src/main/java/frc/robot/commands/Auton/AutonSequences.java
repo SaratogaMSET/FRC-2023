@@ -44,11 +44,12 @@ import frc.robot.subsystems.WheelIntake.WheelIntake;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
 import frc.robot.subsystems.GroundIntake.RollerSubsystem;
+import frc.robot.subsystems.Vision.PoseSmoothingFilter;
 import frc.robot.util.server.PoseEstimator;
 
 public class AutonSequences {
 
-    public static SequentialCommandGroup getTwoPieceAndBalanceBottomCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, WheelIntake intake){
+    public static SequentialCommandGroup getTwoPieceAndBalanceBottomCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, WheelIntake intake, PoseSmoothingFilter m_poseSmoothingFilter){
         PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("Bottom Path Part 1", new PathConstraints(2, 1.5));
         PathPlannerTrajectory trajectory2 = PathPlanner.loadPath("Bottom Path Part 2", new PathConstraints(2, 3));
         PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
@@ -66,7 +67,7 @@ public class AutonSequences {
     
         PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
           trajectory1, 
-          m_drivetrainSubsystem::getPose,
+          m_poseSmoothingFilter::getPose,
           Constants.Drivetrain.m_kinematics2,
           xController,
           yController,
@@ -78,7 +79,7 @@ public class AutonSequences {
         
         PPSwerveControllerCommandA swerveTrajectoryFollower1 = new PPSwerveControllerCommandA(
           trajectory2, 
-          m_drivetrainSubsystem::getPose,
+          m_poseSmoothingFilter::getPose,
           Constants.Drivetrain.m_kinematics2,
           xController,
           yController,
@@ -91,7 +92,7 @@ public class AutonSequences {
         return new SequentialCommandGroup(
           new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
           new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
-          new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
+          new InstantCommand(()-> m_poseSmoothingFilter.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           new SequentialCommandGroup(
@@ -122,7 +123,7 @@ public class AutonSequences {
     
     }
     
-      public static SequentialCommandGroup getOnePieceAndBalanceBottomCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, WheelIntake intake){
+      public static SequentialCommandGroup getOnePieceAndBalanceBottomCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, WheelIntake intake, PoseSmoothingFilter m_poseSmoothingFilter){
           PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("Bottom Path", new PathConstraints(2, 1.5));
           PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
       
@@ -139,7 +140,7 @@ public class AutonSequences {
       
           PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
             trajectory1, 
-            m_drivetrainSubsystem::getPose,
+            m_poseSmoothingFilter::getPose,
             Constants.Drivetrain.m_kinematics2,
             xController,
             yController,
@@ -153,7 +154,7 @@ public class AutonSequences {
           return new SequentialCommandGroup(
             new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
             new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
-            new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
+            new InstantCommand(()-> m_poseSmoothingFilter.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
             // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
             // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
             new SequentialCommandGroup(
@@ -177,7 +178,7 @@ public class AutonSequences {
           );
     
       }
-      public static SequentialCommandGroup getOnePieceAndBalanceCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, WheelIntake intake){
+      public static SequentialCommandGroup getOnePieceAndBalanceCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, WheelIntake intake, PoseSmoothingFilter m_poseSmoothingFilter){
         PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("Middle Path", 2, 1); // 2 3
         PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
     
@@ -194,7 +195,7 @@ public class AutonSequences {
     
         PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
           trajectory1, 
-          m_drivetrainSubsystem::getPose,
+          m_poseSmoothingFilter::getPose,
           Constants.Drivetrain.m_kinematics2,
           xController,
           yController,
@@ -208,7 +209,7 @@ public class AutonSequences {
         return new SequentialCommandGroup(
           new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
           new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
-          new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
+          new InstantCommand(()-> m_poseSmoothingFilter.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           new SequentialCommandGroup(
@@ -233,7 +234,7 @@ public class AutonSequences {
         );
       }
     
-      public static SequentialCommandGroup getOnePieceAndBalanceBringArmBackCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, WheelIntake intake){
+      public static SequentialCommandGroup getOnePieceAndBalanceBringArmBackCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, WheelIntake intake, PoseSmoothingFilter m_poseSmoothingFilter){
         PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("Middle Path", 2, 1); // 2 3 
         PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
     
@@ -250,7 +251,7 @@ public class AutonSequences {
     
         PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
           trajectory1, 
-          m_drivetrainSubsystem::getPose,
+          m_poseSmoothingFilter::getPose,
           Constants.Drivetrain.m_kinematics2,
           xController,
           yController,
@@ -264,7 +265,7 @@ public class AutonSequences {
         return new SequentialCommandGroup(
           new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
           new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
-          new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
+          new InstantCommand(()-> m_poseSmoothingFilter.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           new SequentialCommandGroup(
@@ -291,7 +292,7 @@ public class AutonSequences {
         );
       }
 
-      public static Command getOnePieceBalanceMobilityBonus(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers,WheelIntake intake){
+      public static Command getOnePieceBalanceMobilityBonus(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers,WheelIntake intake, PoseSmoothingFilter m_poseSmoothingFilter ){
 
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
@@ -310,8 +311,8 @@ public class AutonSequences {
         
         // 1.0676
         BetterSwerveAutoBuilder swerveAutoBuilder = new BetterSwerveAutoBuilder(
-          m_drivetrainSubsystem::getPose, 
-          m_drivetrainSubsystem::resetOdometry, 
+          m_poseSmoothingFilter::getPose, 
+          m_poseSmoothingFilter::resetOdometry, 
           new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
           new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
           new PIDConstants(Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory),
@@ -327,7 +328,7 @@ public class AutonSequences {
 
       }
 
-      public static Command getOnePieceBalanceMobilityBonusNoPickup(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers,WheelIntake intake){
+      public static Command getOnePieceBalanceMobilityBonusNoPickup(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers,WheelIntake intake, PoseSmoothingFilter m_poseSmoothingFilter ){
         BetterSwerveAutoBuilder swerveAutoBuilder;
 
         final HashMap<String, Command> eventMap = new HashMap<>(
@@ -347,8 +348,8 @@ public class AutonSequences {
         // if(localizer != null){
         // 1.0676
         swerveAutoBuilder = new BetterSwerveAutoBuilder(
-          m_drivetrainSubsystem::getPose, 
-          m_drivetrainSubsystem::resetOdometry, 
+          m_poseSmoothingFilter::getPose, 
+          m_poseSmoothingFilter::resetOdometry, 
           new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
           new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
           new PIDConstants(Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory),
@@ -359,8 +360,8 @@ public class AutonSequences {
         // }
         // else{
           swerveAutoBuilder = new BetterSwerveAutoBuilder(
-          m_drivetrainSubsystem::getPose, 
-          m_drivetrainSubsystem::resetOdometry, 
+          m_poseSmoothingFilter::getPose, 
+          m_poseSmoothingFilter::resetOdometry, 
           new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
           new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
           new PIDConstants(Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory),
@@ -376,7 +377,7 @@ public class AutonSequences {
         }
       
     
-      public static Command getBottomOneAndHalfPieceBalance(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers, WheelIntake intake){
+      public static Command getBottomOneAndHalfPieceBalance(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers, WheelIntake intake, PoseSmoothingFilter m_poseSmoothingFilter ){
 
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
@@ -395,8 +396,8 @@ public class AutonSequences {
         
         // 1.0676
         BetterSwerveAutoBuilder swerveAutoBuilder = new BetterSwerveAutoBuilder(
-          m_drivetrainSubsystem::getPose, 
-          m_drivetrainSubsystem::resetOdometry, 
+          m_poseSmoothingFilter::getPose, 
+          m_poseSmoothingFilter::resetOdometry, 
           new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
           new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
           new PIDConstants(Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory),
@@ -411,7 +412,7 @@ public class AutonSequences {
 
       }
 
-      public static Command getBottomTwoPiece(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers, WheelIntake intake){
+      public static Command getBottomTwoPiece(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuatorSubsystem, RollerSubsystem rollers, WheelIntake intake, PoseSmoothingFilter m_poseSmoothingFilter ){
 
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
@@ -431,8 +432,8 @@ public class AutonSequences {
         
         // 1.0676
         BetterSwerveAutoBuilder swerveAutoBuilder = new BetterSwerveAutoBuilder(
-          m_drivetrainSubsystem::getPose, 
-          m_drivetrainSubsystem::resetOdometry, 
+          m_poseSmoothingFilter::getPose, 
+          m_poseSmoothingFilter::resetOdometry, 
           new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
           new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
           new PIDConstants(Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory),
@@ -448,7 +449,7 @@ public class AutonSequences {
 
       }
 
-      public static SequentialCommandGroup getOnePieceCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, WheelIntake intake){
+      public static SequentialCommandGroup getOnePieceCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, WheelIntake intake, PoseSmoothingFilter m_poseSmoothingFilter ){
         PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("One Piece", 4, 1);
         PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
     
@@ -465,7 +466,7 @@ public class AutonSequences {
     
         PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
           trajectory1, 
-          m_drivetrainSubsystem::getPose,
+          m_poseSmoothingFilter::getPose,
           Constants.Drivetrain.m_kinematics2,
           xController,
           yController,
@@ -479,7 +480,7 @@ public class AutonSequences {
         return new SequentialCommandGroup(
           new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
           new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
-          new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
+          new InstantCommand(()-> m_poseSmoothingFilter.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
             ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, intake, 1),
@@ -499,7 +500,7 @@ public class AutonSequences {
           );
       }
 
-      public static SequentialCommandGroup getOnePieceCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, WheelIntake intake, Supplier<Pose2d> pose){
+      public static SequentialCommandGroup getOnePieceCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, WheelIntake intake, Supplier<Pose2d> pose, PoseSmoothingFilter m_poseSmoothingFilter ){
         PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("One Piece", 4, 1);
         PathPlannerState adjustedState = PathPlannerTrajectory.transformStateForAlliance(trajectory1.getInitialState(), DriverStation.getAlliance());
     
@@ -516,7 +517,7 @@ public class AutonSequences {
     
         PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
           trajectory1, 
-          m_drivetrainSubsystem::getPose,
+          m_poseSmoothingFilter::getPose,
           Constants.Drivetrain.m_kinematics2,
           xController,
           yController,
@@ -530,7 +531,7 @@ public class AutonSequences {
         return new SequentialCommandGroup(
           new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
           new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
-          new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
+          new InstantCommand(()-> m_poseSmoothingFilter.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           new SequentialCommandGroup(
@@ -555,7 +556,7 @@ public class AutonSequences {
         );
       }
 
-      public static Command getThreePieceAutoBuilder(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuator, RollerSubsystem rollers, WheelIntake intake){
+      public static Command getThreePieceAutoBuilder(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuator, RollerSubsystem rollers, WheelIntake intake, PoseSmoothingFilter m_poseSmoothingFilter ){
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
           Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, intake, 1)),
@@ -577,8 +578,8 @@ public class AutonSequences {
         
         // 1.0676
         BetterSwerveAutoBuilder swerveAutoBuilder = new BetterSwerveAutoBuilder(
-          m_drivetrainSubsystem::getPose, 
-          m_drivetrainSubsystem::resetOdometry, 
+          m_poseSmoothingFilter::getPose, 
+          m_poseSmoothingFilter::resetOdometry, 
           new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
           new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
           new PIDConstants(Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory),
@@ -592,7 +593,7 @@ public class AutonSequences {
         return build; //.andThen(new BalanceCommand(m_drivetrainSubsystem)); //.andThen(new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.5, 0, 0).withTimeout(0.35));
       }
 
-      public static Command getTwoPieceNoBalance(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuator, RollerSubsystem rollers, WheelIntake intake){
+      public static Command getTwoPieceNoBalance(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuator, RollerSubsystem rollers, WheelIntake intake, PoseSmoothingFilter m_poseSmoothingFilter ){
         BetterSwerveAutoBuilder swerveAutoBuilder;
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
@@ -627,8 +628,8 @@ public class AutonSequences {
         //   }
           // else{
             swerveAutoBuilder = new BetterSwerveAutoBuilder(
-            m_drivetrainSubsystem::getPose, 
-            m_drivetrainSubsystem::resetOdometry, 
+            m_poseSmoothingFilter::getPose, 
+            m_poseSmoothingFilter::resetOdometry, 
             new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
             new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
             new PIDConstants(Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory),
@@ -643,7 +644,7 @@ public class AutonSequences {
         return build; //.andThen(new BalanceCommand(m_drivetrainSubsystem)).andThen(new AutoRunCommand(m_drivetrainSubsystem, (6 * 0.1524)/1.5, 0, 0).withTimeout(0.35));
       }
 
-      public static Command getTwoPieceBalanceAutoBuilder(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuator, RollerSubsystem rollers, WheelIntake intake){
+      public static Command getTwoPieceBalanceAutoBuilder(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuator, RollerSubsystem rollers, WheelIntake intake, PoseSmoothingFilter m_poseSmoothingFilter ){
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
           Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, intake, 1)),
@@ -663,8 +664,8 @@ public class AutonSequences {
         
         // 1.0676
         BetterSwerveAutoBuilder swerveAutoBuilder = new BetterSwerveAutoBuilder(
-          m_drivetrainSubsystem::getPose, 
-          m_drivetrainSubsystem::resetOdometry, 
+          m_poseSmoothingFilter::getPose, 
+          m_poseSmoothingFilter::resetOdometry, 
           new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
           new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
           new PIDConstants(Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory),
@@ -678,7 +679,7 @@ public class AutonSequences {
         return build.andThen(new AutoRunCommand(m_drivetrainSubsystem, ChassisSpeeds.fromFieldRelativeSpeeds(0, -((Drivetrain.balanceXVelocity)), 0, m_drivetrainSubsystem.getRotation2d())).withTimeout(Drivetrain.balanceTimeout)).andThen(new InstantCommand(()-> m_drivetrainSubsystem.setX()));
       }
 
-      public static Command getTwoAndAHalfPieceBalanceAutoBuilder(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuator, RollerSubsystem rollers, WheelIntake intake){
+      public static Command getTwoAndAHalfPieceBalanceAutoBuilder(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, ActuatorSubsystem actuator, RollerSubsystem rollers, WheelIntake intake, PoseSmoothingFilter m_poseSmoothingFilter ){
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
             Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, intake, 1)),
@@ -702,8 +703,8 @@ public class AutonSequences {
         
         // 1.0676
         BetterSwerveAutoBuilder swerveAutoBuilder = new BetterSwerveAutoBuilder(
-          m_drivetrainSubsystem::getPose, 
-          m_drivetrainSubsystem::resetOdometry, 
+          m_poseSmoothingFilter::getPose, 
+          m_poseSmoothingFilter::resetOdometry, 
           new PIDConstants(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0), 
           new PIDConstants(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0),
           new PIDConstants(Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory),
@@ -734,7 +735,7 @@ public class AutonSequences {
     
         // PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
         //   trajectory1, 
-        //   m_drivetrainSubsystem::getPose,
+        //   m_poseSmoothingFilter::getPose,
         //   Constants.Drivetrain.m_kinematics2,
         //   xController,
         //   yController,
@@ -771,7 +772,7 @@ public class AutonSequences {
         );
       }
     
-      public static SequentialCommandGroup getTwoPieceTopCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, WheelIntake intake){
+      public static SequentialCommandGroup getTwoPieceTopCommand(DrivetrainSubsystem m_drivetrainSubsystem, ArmSubsystem m_armSubsystem, WheelIntake intake, PoseSmoothingFilter m_poseSmoothingFilter ){
         PathPlannerTrajectory trajectory1 = PathPlanner.loadPath("Top Path Part 1", 2, 3);
         PathPlannerTrajectory trajectory2 = PathPlanner.loadPath("Top Path Part 2", 2, 3);
     
@@ -790,7 +791,7 @@ public class AutonSequences {
     
         PPSwerveControllerCommandA swerveTrajectoryFollower = new PPSwerveControllerCommandA(
           trajectory1, 
-          m_drivetrainSubsystem::getPose,
+          m_poseSmoothingFilter::getPose,
           Constants.Drivetrain.m_kinematics2,
           xController,
           yController,
@@ -801,7 +802,7 @@ public class AutonSequences {
         );
         PPSwerveControllerCommandA swerveTrajectoryFollower1 = new PPSwerveControllerCommandA(
           trajectory2, 
-          m_drivetrainSubsystem::getPose,
+          m_poseSmoothingFilter::getPose,
           Constants.Drivetrain.m_kinematics2,
           xController,
           yController,
@@ -816,7 +817,7 @@ public class AutonSequences {
         return new SequentialCommandGroup(
           new InstantCommand(() -> m_drivetrainSubsystem.zeroGyroscope()),
           new InstantCommand(()-> m_drivetrainSubsystem.drive(new ChassisSpeeds(0,0,0))),
-          new InstantCommand(()-> m_drivetrainSubsystem.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
+          new InstantCommand(()-> m_poseSmoothingFilter.resetOdometry(new Pose2d(adjustedState.poseMeters.getTranslation(), adjustedState.holonomicRotation))),
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           new SequentialCommandGroup(
@@ -836,7 +837,7 @@ public class AutonSequences {
           )
         );
       }
-      public static Command ChoreoCommand(DrivetrainSubsystem m_drivetrainSubsystem){
+      public static Command ChoreoCommand(DrivetrainSubsystem m_drivetrainSubsystem, PoseSmoothingFilter m_poseSmoothingFilter){
         PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0);
         PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);
         PIDController thetaController = new PIDController(
@@ -846,7 +847,7 @@ public class AutonSequences {
       ChoreoSwerveControllerCommand swerveControllerCommand =
           new ChoreoSwerveControllerCommand(
             trajectory,
-              m_drivetrainSubsystem::getPose, // Functional interface to feed supplier
+              m_poseSmoothingFilter::getPose, // Functional interface to feed supplier
               xController,
               yController,
               thetaController,
@@ -855,11 +856,11 @@ public class AutonSequences {
               m_drivetrainSubsystem);
 
       // Reset odometry to the starting pose of the trajectory.
-      m_drivetrainSubsystem.resetOdometry(trajectory.getInitialPose());
+      m_poseSmoothingFilter.resetOdometry(trajectory.getInitialPose());
 
       // Run path following command, then stop at the end.
       return Commands.sequence(
-          Commands.runOnce(()->m_drivetrainSubsystem.resetOdometry(trajectory.getInitialPose())),
+          Commands.runOnce(()->m_poseSmoothingFilter.resetOdometry(trajectory.getInitialPose())),
           swerveControllerCommand,
           Commands.runOnce(() -> m_drivetrainSubsystem.drive(new ChassisSpeeds(0, 0, 0)))
       );

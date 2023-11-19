@@ -18,6 +18,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.math.GeomUtil;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
+import frc.robot.subsystems.Vision.PoseSmoothingFilter;
 
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -25,6 +26,7 @@ import frc.robot.Constants;
 
 public class DriveToPose extends CommandBase {
   private final DrivetrainSubsystem drivetrainSubsystem;
+  private final PoseSmoothingFilter m_poseSmoothingFilter;
   private final Supplier<Pose2d> poseSupplier;
 
   private boolean running = false;
@@ -85,14 +87,15 @@ public class DriveToPose extends CommandBase {
   // }
 
   /** Drives to the specified pose under full software control. */
-  public DriveToPose(DrivetrainSubsystem drive, Pose2d pose) {
-    this(drive, () -> pose);
+  public DriveToPose(DrivetrainSubsystem drive, Pose2d pose, PoseSmoothingFilter m_poseSmoothingFilter) {
+    this(drive, () -> pose, m_poseSmoothingFilter);
   }
 
   /** Drives to the specified pose under full software control. */
-  public DriveToPose(DrivetrainSubsystem drive, Supplier<Pose2d> poseSupplier) {
+  public DriveToPose(DrivetrainSubsystem drive, Supplier<Pose2d> poseSupplier, PoseSmoothingFilter m_poseSmoothingFilter) {
     this.drivetrainSubsystem = drive;
     this.poseSupplier = poseSupplier;
+    this.m_poseSmoothingFilter = m_poseSmoothingFilter;
     addRequirements(drive);
     // basically finds the allows the pid to not spin like 350 degrees to get to a point when it could just spin 10. 
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
@@ -101,7 +104,7 @@ public class DriveToPose extends CommandBase {
   @Override
   public void initialize() {
     // Reset all controllers
-    var currentPose = drivetrainSubsystem.getPose();
+    var currentPose = m_poseSmoothingFilter.getPose();
     driveController.reset(
         currentPose.getTranslation().getDistance(poseSupplier.get().getTranslation()),
         Math.min(
@@ -111,12 +114,12 @@ public class DriveToPose extends CommandBase {
                     poseSupplier
                         .get()
                         .getTranslation()
-                        .minus(drivetrainSubsystem.getPose().getTranslation())
+                        .minus(m_poseSmoothingFilter.getPose().getTranslation())
                         .getAngle()
                         .unaryMinus())
                 .getX()));
     thetaController.reset(currentPose.getRotation().getRadians(), drivetrainSubsystem.getFieldVelocity().dtheta);
-    lastSetpointTranslation = drivetrainSubsystem.getPose().getTranslation();
+    lastSetpointTranslation = m_poseSmoothingFilter.getPose().getTranslation();
   }
 
   @Override
@@ -141,7 +144,7 @@ public class DriveToPose extends CommandBase {
     // }
 
     // Get current and target pose
-    var currentPose = drivetrainSubsystem.getPose();
+    var currentPose = m_poseSmoothingFilter.getPose();
     var targetPose = poseSupplier.get();
 
     // Calculate drive speed

@@ -53,6 +53,7 @@ import frc.robot.subsystems.Drivetrain.SwerveModuleIOFalcon;
 import frc.robot.subsystems.Drivetrain.SwerveModuleIOSim;
 import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
 import frc.robot.subsystems.GroundIntake.RollerSubsystem;
+import frc.robot.subsystems.Vision.PoseSmoothingFilter;
 import frc.robot.subsystems.Vision.VisionSubsystem;
 import frc.robot.subsystems.WheelIntake.WheelIntake;
 
@@ -100,7 +101,10 @@ public class RobotContainer {
             new SwerveModuleIOSim(2, Constants.Drivetrain.Mod2.constants),
             new SwerveModuleIOSim(3, Constants.Drivetrain.Mod3.constants)
           },
-      Robot.isReal() ? new GyroIONavx() : new GyroIOSim());  
+      Robot.isReal() ? new GyroIONavx() : new GyroIOSim());
+
+  public static final PoseSmoothingFilter m_poseSmothingFilterSubsystem = new PoseSmoothingFilter(m_drivetrainSubsystem::getModulePositions,
+    m_drivetrainSubsystem::getRotation2d, m_visionSubsystem::getBotPose2d, m_visionSubsystem::getTimestamp);  
   private final CANdleSubsystem m_ledSubsystem = new CANdleSubsystem();
   private final ActuatorSubsystem actuatorSubsystem = new ActuatorSubsystem();
   private final RollerSubsystem rollers = new RollerSubsystem();
@@ -172,7 +176,7 @@ public class RobotContainer {
     new SequentialCommandGroup( 
         new WaitCommand(1),
         new InstantCommand(() -> m_drivetrainSubsystem.drive(new ChassisSpeeds(0.0, 0.0, 0.0))),
-        new InstantCommand(() -> m_drivetrainSubsystem.resetOdometry(new Pose2d()))
+        new InstantCommand(() -> m_poseSmothingFilterSubsystem.resetOdometry(new Pose2d()))
     ).schedule();
     
     m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
@@ -201,8 +205,8 @@ public class RobotContainer {
     
     m_driverController.x().onTrue(new InstantCommand(()->m_drivetrainSubsystem.setX(), m_drivetrainSubsystem));
 
-    m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
-    m_driverController.leftTrigger().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem));
+    m_driverController.y().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem, m_poseSmothingFilterSubsystem));
+    m_driverController.leftTrigger().onTrue(new ZeroGyroCommand(m_drivetrainSubsystem, m_poseSmothingFilterSubsystem));
     
     actuatorSubsystem.setDefaultCommand(new ActuatorDefaultCommand(actuatorSubsystem));
   
@@ -344,31 +348,31 @@ public class RobotContainer {
     String selected = m_autoSwitcher.getSelected();
     switch(selected){
       case OnePiece:
-        return AutonSequences.getOnePieceCommand(m_drivetrainSubsystem, m_armSubsystem, intake);
+        return AutonSequences.getOnePieceCommand(m_drivetrainSubsystem, m_armSubsystem, intake, m_poseSmothingFilterSubsystem);
       case OneAndBalance:
-        return AutonSequences.getOnePieceAndBalanceBringArmBackCommand(m_drivetrainSubsystem, m_armSubsystem, intake);
+        return AutonSequences.getOnePieceAndBalanceBringArmBackCommand(m_drivetrainSubsystem, m_armSubsystem, intake, m_poseSmothingFilterSubsystem);
       case OneAndBalanceBottom:
-        return AutonSequences.getOnePieceAndBalanceBottomCommand(m_drivetrainSubsystem, m_armSubsystem, intake);
+        return AutonSequences.getOnePieceAndBalanceBottomCommand(m_drivetrainSubsystem, m_armSubsystem, intake, m_poseSmothingFilterSubsystem);
       case OnePlusHalf:
-        return AutonSequences.getBottomOneAndHalfPieceBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
+        return AutonSequences.getBottomOneAndHalfPieceBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake, m_poseSmothingFilterSubsystem);
       case OneAndNothing:
         return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, intake);
       case BalanceMobilityBonusNoPickup:
-        return AutonSequences.getOnePieceBalanceMobilityBonusNoPickup(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
+        return AutonSequences.getOnePieceBalanceMobilityBonusNoPickup(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake, m_poseSmothingFilterSubsystem);
       case BalanceMobilityBonus:
-        return AutonSequences.getOnePieceBalanceMobilityBonus(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
+        return AutonSequences.getOnePieceBalanceMobilityBonus(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake, m_poseSmothingFilterSubsystem);
       // case PhyscoBehavior:
       //     return AutonSequences.getTwoPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
       case TwoPieceNoBalance:
-        return AutonSequences.getTwoPieceNoBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers ,intake);
+        return AutonSequences.getTwoPieceNoBalance(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers ,intake, m_poseSmothingFilterSubsystem);
       // case ThreePiece:
       //   return AutonSequences.getThreePieceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
       case TwoAndAHalfBalanceBarrier:
-        return AutonSequences.getTwoAndAHalfPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
+        return AutonSequences.getTwoAndAHalfPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake, m_poseSmothingFilterSubsystem);
       case BottomTwoPiece:
-        return AutonSequences.getBottomTwoPiece(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
+        return AutonSequences.getBottomTwoPiece(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake, m_poseSmothingFilterSubsystem);
       case ChoreoTrajectory:
-        return AutonSequences.ChoreoCommand(m_drivetrainSubsystem); 
+        return AutonSequences.ChoreoCommand(m_drivetrainSubsystem, m_poseSmothingFilterSubsystem); 
       default:
         return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, intake);
     }
