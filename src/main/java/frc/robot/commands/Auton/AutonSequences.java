@@ -268,7 +268,7 @@ public class AutonSequences {
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           // build.withTimeout(15).andThen(new InstantCommand(()->m_drivetrainSubsystem.setX()))
           new SequentialCommandGroup(
-            ArmSequences.scoreConeHighNoRetractHighToleranceAutonMiddle(m_armSubsystem, intake, 1),
+            ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, intake, 1),
             // new WaitCommand(0.65),
             // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
             // new RunCommand(()->intake.openIntake(), intake).withTimeout(0.5)
@@ -295,7 +295,7 @@ public class AutonSequences {
 
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
-          Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAutonMiddle(m_armSubsystem, intake, 1)),
+          Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, intake, 1)),
           // Map.entry("Arm Low Score Backwards", ArmSequences.lowScoreNoRetract(m_armSubsystem, intake, 1)),
           Map.entry("Arm Zero Command", new ArmZeroAutoCommand(m_armSubsystem)), 
           Map.entry("Intake Front", new ManualSetAngle(actuatorSubsystem, 95)),
@@ -332,7 +332,7 @@ public class AutonSequences {
 
         final HashMap<String, Command> eventMap = new HashMap<>(
           Map.ofEntries(
-          Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAutonMiddle(m_armSubsystem, intake, 1)),
+          Map.entry("Score Cone High Backwards", ArmSequences.scoreConeHighNoRetractHighToleranceAuton(m_armSubsystem, intake, 1)),
           // Map.entry("Arm Low Score Backwards", ArmSequences.lowScoreNoRetract(m_armSubsystem, intake, 1)),
           Map.entry("Arm Zero Command", new ArmZeroAutoCommand(m_armSubsystem)), 
           Map.entry("Intake Front", new ManualSetAngle(actuatorSubsystem, 95)),
@@ -486,7 +486,7 @@ public class AutonSequences {
             // new InstantCommand(()->SmartDashboard.putBoolean("Arm Scoring", true)),
             // new RunCommand(()->intake.openIntake(), intake).withTimeout(0.5)
             // new InstantCommand(()->SmartDashboard.putBoolean("Claw Opened", false)),
-            swerveTrajectoryFollower.alongWith(new ArmZeroCommand(m_armSubsystem))
+            swerveTrajectoryFollower
             // ArmSequences.lowScoreNoRetract(m_armSubsystem, intake, 0),
             // new ParallelCommandGroup(
             // new ArmZeroCommand(m_armSubsystem),
@@ -837,29 +837,29 @@ public class AutonSequences {
         );
       }
       public static Command ChoreoCommand(DrivetrainSubsystem m_drivetrainSubsystem){
-        TrajectoryManager.getInstance().LoadTrajectories();
-        ChoreoTrajectory traj = TrajectoryManager.getInstance().getTrajectory("ChoreoTestPath.json");
         PIDController xController = new PIDController(Constants.Drivetrain.kPXController, Constants.Drivetrain.kIXController, 0);
         PIDController yController = new PIDController(Constants.Drivetrain.kPYController, Constants.Drivetrain.kIYController, 0);
         PIDController thetaController = new PIDController(
               Constants.Drivetrain.kPThetaControllerTrajectory, 0, Constants.Drivetrain.kDThetaControllerTrajectory);
-
+      TrajectoryManager.getInstance().LoadTrajectories();
+      ChoreoTrajectory trajectory = TrajectoryManager.getInstance().getTrajectory("NewPath.json");
       ChoreoSwerveControllerCommand swerveControllerCommand =
           new ChoreoSwerveControllerCommand(
-              TrajectoryManager.getInstance().getTrajectory("ChoreoTestPath.json"),
+            trajectory,
               m_drivetrainSubsystem::getPose, // Functional interface to feed supplier
               xController,
               yController,
               thetaController,
               m_drivetrainSubsystem::drive,
+              true,
               m_drivetrainSubsystem);
 
       // Reset odometry to the starting pose of the trajectory.
-      m_drivetrainSubsystem.resetOdometry(traj.getInitialPose());
+      m_drivetrainSubsystem.resetOdometry(trajectory.getInitialPose());
 
       // Run path following command, then stop at the end.
       return Commands.sequence(
-          Commands.runOnce(()->m_drivetrainSubsystem.resetOdometry(traj.getInitialPose())),
+          Commands.runOnce(()->m_drivetrainSubsystem.resetOdometry(trajectory.getInitialPose())),
           swerveControllerCommand,
           Commands.runOnce(() -> m_drivetrainSubsystem.drive(new ChassisSpeeds(0, 0, 0)))
       );

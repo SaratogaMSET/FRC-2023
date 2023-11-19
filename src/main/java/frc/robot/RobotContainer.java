@@ -47,6 +47,10 @@ import frc.robot.commands.WheelIntake.RunWheelExtakeCommand;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.CANdle.CANdleSubsystem;
 import frc.robot.subsystems.Drivetrain.DrivetrainSubsystem;
+import frc.robot.subsystems.Drivetrain.GyroIONavx;
+import frc.robot.subsystems.Drivetrain.GyroIOSim;
+import frc.robot.subsystems.Drivetrain.SwerveModuleIOFalcon;
+import frc.robot.subsystems.Drivetrain.SwerveModuleIOSim;
 import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
 import frc.robot.subsystems.GroundIntake.RollerSubsystem;
 import frc.robot.subsystems.Vision.VisionSubsystem;
@@ -75,13 +79,28 @@ public class RobotContainer {
   public static final String BalanceMobilityBonusNoPickup = "Middle Balance + Mobility NO PICKUP";
   public static final String TwoAndAHalfBalanceBarrier = "Barrier Side 2 Piece + Pickup";
   public static final String BottomTwoPiece = "Bump Side Two Piece";
-  // public static final String ChoreoTrajectory = "Choreo Trajectory";
+  public static final String ChoreoTrajectory = "Choreo Trajectory";
   public static Boolean cone = false;
   
   public final static WheelIntake intake = new WheelIntake();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   public final static VisionSubsystem m_visionSubsystem = new VisionSubsystem();
-  public static DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();  
+  public static DrivetrainSubsystem m_drivetrainSubsystem = 
+  new DrivetrainSubsystem(
+      Robot.isReal()
+          ? new SwerveModuleIOFalcon[] {
+            new SwerveModuleIOFalcon(0, Constants.Drivetrain.Mod0.constants),
+            new SwerveModuleIOFalcon(1, Constants.Drivetrain.Mod1.constants),
+            new SwerveModuleIOFalcon(2, Constants.Drivetrain.Mod2.constants),
+            new SwerveModuleIOFalcon(3, Constants.Drivetrain.Mod3.constants)
+          }
+          : new SwerveModuleIOSim[] {
+            new SwerveModuleIOSim(0, Constants.Drivetrain.Mod0.constants),
+            new SwerveModuleIOSim(1, Constants.Drivetrain.Mod1.constants),
+            new SwerveModuleIOSim(2, Constants.Drivetrain.Mod2.constants),
+            new SwerveModuleIOSim(3, Constants.Drivetrain.Mod3.constants)
+          },
+      Robot.isReal() ? new GyroIONavx() : new GyroIOSim());  
   private final CANdleSubsystem m_ledSubsystem = new CANdleSubsystem();
   private final ActuatorSubsystem actuatorSubsystem = new ActuatorSubsystem();
   private final RollerSubsystem rollers = new RollerSubsystem();
@@ -130,7 +149,7 @@ public class RobotContainer {
     m_autoSwitcher.addOption(TwoAndAHalfBalanceBarrier,TwoAndAHalfBalanceBarrier);
     
     // m_autoSwitcher.addOption(PhyscoBehavior, PhyscoBehavior);
-    // m_autoSwitcher.addOption(ChoreoTrajectory, ChoreoTrajectory);
+    m_autoSwitcher.addOption(ChoreoTrajectory, ChoreoTrajectory);
     // m_autoSwitcher.addOption(ThreePiece, ThreePiece);
   
 
@@ -348,8 +367,8 @@ public class RobotContainer {
         return AutonSequences.getTwoAndAHalfPieceBalanceAutoBuilder(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
       case BottomTwoPiece:
         return AutonSequences.getBottomTwoPiece(m_drivetrainSubsystem, m_armSubsystem, actuatorSubsystem, rollers, intake);
-      // case ChoreoTrajectory:
-      //   return AutonSequences.ChoreoCommand(m_drivetrainSubsystem); 
+      case ChoreoTrajectory:
+        return AutonSequences.ChoreoCommand(m_drivetrainSubsystem); 
       default:
         return AutonSequences.getOnePieceCommandOnly(m_drivetrainSubsystem, m_armSubsystem, intake);
     }

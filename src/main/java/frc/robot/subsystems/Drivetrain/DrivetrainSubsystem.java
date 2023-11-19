@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
@@ -43,10 +44,9 @@ import frc.robot.Constants.Drivetrain;
 import frc.robot.subsystems.SwerveModule;
 
 public class DrivetrainSubsystem extends SubsystemBase {
-    private BetterSwerveModuleState[] currentDesiredState = new BetterSwerveModuleState[4];
-    private BetterSwerveModuleState[] previousDesiredState = new BetterSwerveModuleState[4];
+    private SwerveModuleState[] currentDesiredState = new SwerveModuleState[4];
+    private SwerveModuleState[] previousDesiredState = new SwerveModuleState[4];
 
-    public final AHRS m_navx = new AHRS(SPI.Port.kMXP, (byte) 200);
     public double offset = 0;
     private Rotation2d lastRotation = new Rotation2d();
     private final PIDController driftCorrectionPID = new PIDController(0.1, 0.00, 0.000);
@@ -62,30 +62,42 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private final Matrix<N3, N1> stateSTD = new Matrix<>(Nat.N3(), Nat.N1());
     private final Matrix<N3, N1> visDataSTD = new Matrix<>(Nat.N3(), Nat.N1());
 
+    public GyroIO gyroIO;
+    public GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+    public double simHeading = 0.0;
 
-    private final SwerveModuleIOInputsAutoLogged[] moduleInputs = new SwerveModuleIOInputsAutoLogged[] {new SwerveModuleIOInputsAutoLogged(), new SwerveModuleIOInputsAutoLogged(), new SwerveModuleIOInputsAutoLogged(), new SwerveModuleIOInputsAutoLogged()};
+    public SwerveModuleIOInputsAutoLogged[] inputs;
+
     double pXY = 0;
     double desiredHeading;
     Pose2d lastPose;
 
-    public SwerveModule[] mSwerveMods = new SwerveModule[] {
-        new SwerveModule(0, Constants.Drivetrain.Mod0.constants),
-        new SwerveModule(1, Constants.Drivetrain.Mod1.constants),
-        new SwerveModule(2, Constants.Drivetrain.Mod2.constants),
-        new SwerveModule(3, Constants.Drivetrain.Mod3.constants)
-    };
+    public SwerveModuleIO[] mSwerveMods; 
+    // new SwerveModuleIO[] {
+    //     new SwerveModule(0, Constants.Drivetrain.Mod0.constants),
+    //     new SwerveModule(1, Constants.Drivetrain.Mod1.constants),
+    //     new SwerveModule(2, Constants.Drivetrain.Mod2.constants),
+    //     new SwerveModule(3, Constants.Drivetrain.Mod3.constants)
+    // };
     
-    public DrivetrainSubsystem() {  
-        m_navx.zeroYaw();
+    public DrivetrainSubsystem(SwerveModuleIO[] swerveIO, GyroIO gyroIO) {  
+        this.gyroIO = gyroIO;
+        // m_navx.zeroYaw();
         //zeroGyroscope();  
-        resetModulesToAbsolute();    
         visionData = NetworkTableInstance.getDefault().getTable("limelight-three");
 
 
         stateSTD.set(0, 0, 0.20); stateSTD.set(1, 0, 0.2); stateSTD.set(2, 0, 0.2); //Tune Values
         visDataSTD.set(0, 0, 0.80); visDataSTD.set(1, 0, 0.8); visDataSTD.set(2, 0, 0.8);
-
-        this.odomFiltered = new SwerveDrivePoseEstimator(Constants.Drivetrain.m_kinematics2, getRotation2d(), getModulePositions(), new Pose2d(), stateSTD, visDataSTD);
+        mSwerveMods = swerveIO;
+        inputs = new SwerveModuleIOInputsAutoLogged[] {
+            new SwerveModuleIOInputsAutoLogged(),
+            new SwerveModuleIOInputsAutoLogged(),
+            new SwerveModuleIOInputsAutoLogged(),
+            new SwerveModuleIOInputsAutoLogged()
+          };
+        resetModulesToAbsolute();    
+        this.odomFiltered = new SwerveDrivePoseEstimator(Constants.Drivetrain.m_kinematics1, getRotation2d(), getModulePositions(), new Pose2d(), stateSTD, visDataSTD);
         //swerveOdometry = new SwerveDriveOdometry(Constants.Drivetrain.m_kinematics, getRotation2d(), getModulePositions());   
     }
 
@@ -106,14 +118,19 @@ public class DrivetrainSubsystem extends SubsystemBase {
     
     public Rotation2d getRotation2d() {
         // if(gyroInputs.connected){
-            return Rotation2d.fromDegrees(-Math.toDegrees(getNavHeading()));
+            if (Robot.isReal()) {
+                return (Constants.Drivetrain.invertGyro)
+                    ? Rotation2d.fromDegrees(360 - gyroIO.getHeading().getDegrees())
+                    : Rotation2d.fromDegrees(gyroIO.getHeading().getDegrees());
+              }
+              return Rotation2d.fromDegrees(simHeading);
         // }
         // else {
         //     return Rotation2d.fromRadians(m_chassisSpeeds.omegaRadiansPerSecond * 0.02 + lastRotation.getRadians());
         // }
     }
     public double getNavHeading(){
-        double angle = m_navx.getYaw() + 180 - offset;
+        double angle = (gyroIO.getHeading()).getDegrees() + 180 - offset;
         angle = angle + 90 + 360;
         angle = angle % 360;
         return Math.toRadians(angle);
@@ -130,7 +147,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
         // chassisSpeeds.vyMetersPerSecond += IpD * omega * (Math.sin(theta)*Math.cos(deltaTheta) + Math.cos(theta)*Math.sin(deltaTheta));
         
         // chassisSpeeds = driftCorrection(chassisSpeeds);
-        m_chassisSpeeds = chassisSpeeds;
+        Pose2d velPose = new Pose2d(new Translation2d(chassisSpeeds.vxMetersPerSecond * 0.02, chassisSpeeds.vyMetersPerSecond*0.02), new Rotation2d(chassisSpeeds.omegaRadiansPerSecond * 0.02));
+        Twist2d velTwist = new Pose2d().log(velPose);
+        ChassisSpeeds arcVelocity = new ChassisSpeeds( velTwist.dx / 0.02,
+        velTwist.dy / 0.02,
+        velTwist.dtheta / 0.02);
+        m_chassisSpeeds = arcVelocity;
       }    
 
       public ChassisSpeeds driftCorrection(ChassisSpeeds speeds){
@@ -147,14 +169,19 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void setModuleStates(ChassisSpeeds chassisSpeeds) {
 
         BetterSwerveModuleState[] desiredStates = Constants.Drivetrain.m_kinematics2.toSwerveModuleStates(chassisSpeeds);
-        for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(desiredStates[mod.moduleNumber], false);
+        for(SwerveModuleIO mod : mSwerveMods){
+            mod.setDesiredState(desiredStates[mod.getModuleNumber()], false);
         }
     }    
 
     public void setModuleStates(BetterSwerveModuleState[] desiredStates) {
-        for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(desiredStates[mod.moduleNumber], false);
+        for(SwerveModuleIO mod : mSwerveMods){
+            mod.setDesiredState(desiredStates[mod.getModuleNumber()], false);
+        }
+    }
+    public void setModuleStates(SwerveModuleState[] desiredStates) {
+        for(SwerveModuleIO mod : mSwerveMods){
+            mod.setDesiredState(desiredStates[mod.getModuleNumber()], false);
         }
     }
 
@@ -239,7 +266,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     public void zeroGyroscope(){
         //Pose2d pose = new Pose2d(getPose().getX(), getPose().getY(), new Rotation2d());
-        m_navx.zeroYaw();
+        gyroIO.resetHeading();
+        simHeading = 0.0;
         resetOdometry(getPose());
       
     }
@@ -253,11 +281,23 @@ public class DrivetrainSubsystem extends SubsystemBase {
       }
 
     public Rotation2d getYaw() {
-        return (Constants.Drivetrain.invertGyro) ? Rotation2d.fromDegrees(360 - m_navx.getYaw()) : Rotation2d.fromDegrees(m_navx.getYaw());
+        return (Constants.Drivetrain.invertGyro) ? Rotation2d.fromDegrees(360 - gyroIO.getHeading().getDegrees()) : (gyroIO.getHeading());
+    }
+
+    public Rotation2d getRoll(){
+        return gyroIO.getRoll();
+    }
+
+    public Rotation2d getPitch(){
+        return gyroIO.getPitch();
+    }
+
+    public double getWorldLinearAccelX(){
+        return gyroIO.getWorldLinearAccelX();
     }
 
     public void resetModulesToAbsolute(){
-        for(SwerveModule mod : mSwerveMods){
+        for(SwerveModuleIO mod : mSwerveMods){
             mod.resetToAbsolute();
         }
     }
@@ -284,6 +324,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     @Override
     public void periodic(){
+        for (int i = 0; i < mSwerveMods.length; i++) {
+            inputs[i] = mSwerveMods[i].updateInputs();
+            Logger.getInstance().processInputs("Swerve Module " + i, inputs[i]);
+          }
+      
+          gyroInputs = gyroIO.updateInputs();
+          Logger.getInstance().processInputs("Gyro", gyroInputs);
+          simHeading += Units.radiansToDegrees(m_chassisSpeeds.omegaRadiansPerSecond);
 
         Logger.getInstance().recordOutput("CurrentSwerveModuleStates", getModuleStates());
 
@@ -303,8 +351,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         //Logger.getInstance().recordOutput("After Correction", Drivetrain.m_kinematics.toSwerveModuleStates(speeds));
 
         previousDesiredState = currentDesiredState;
-        currentDesiredState = Constants.Drivetrain.m_kinematics2.toSwerveModuleStates(m_chassisSpeeds);
-        SwerveDriveKinematics2.desaturateWheelSpeeds(currentDesiredState, Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND);
+        currentDesiredState = Constants.Drivetrain.m_kinematics1.toSwerveModuleStates(m_chassisSpeeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(currentDesiredState, Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND);
 
         if(previousDesiredState[0] == null || previousDesiredState[1] == null || previousDesiredState[2] == null || previousDesiredState[3] == null){
             previousDesiredState = currentDesiredState;
@@ -336,8 +384,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         //Logger.getInstance().recordOutput("Gyro Rotation2d", new Pose2d(new Translation2d(0,0),m_navx.getRotation2d()));
         //Logger.getInstance().recordOutput("Gyro Yaw", m_navx.getYaw());
 
-        // odomFiltered.update(getRotation2d(), new Rotation2d(m_navx.getPitch()), new Rotation2d(m_navx.getRoll()), getModulePositions());
-        odomFiltered.update(getRotation2d(), getModulePositions());
+
 
         // double[] pos = new double[]{odomFiltered.getEstimatedPosition().getX(), odomFiltered.getEstimatedPosition().getY(), odomFiltered.getEstimatedPosition().getRotation().getDegrees()};
         // SmartDashboard.putNumberArray("Odom", pos);
@@ -347,6 +394,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
             double timestamp = Timer.getFPGATimestamp() - (visionData.getEntry("tl").getDouble(0) + 11) / 1000;
             odomFiltered.addVisionMeasurement(pose, timestamp);
         }
+        if (Robot.isReal()) {
+            pose = odomFiltered.update(getYaw(), getModulePositions());
+          } else {
+            pose = odomFiltered.update(Rotation2d.fromDegrees(simHeading), getModulePositions());
+          }
+        odomFiltered.update(getRotation2d(), getModulePositions());
 
         //swerveOdometry.update(getRotation2d(), getModulePositions());  
         Logger.getInstance().recordOutput("UKF Odometry", odomFiltered.getEstimatedPosition());

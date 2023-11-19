@@ -15,7 +15,7 @@ import frc.lib.util.SwerveModuleConstants;
 import frc.robot.Constants;
 import frc.robot.Robot;
 
-public class SwerveModuleIOFalcon implements SwerveModuleIONew {
+public class SwerveModuleIOFalcon implements SwerveModuleIO {
   private int moduleNumber;
   private Rotation2d angleOffset;
 
@@ -45,7 +45,8 @@ public class SwerveModuleIOFalcon implements SwerveModuleIONew {
   }
 
   @Override
-  public void updateInputs(SwerveModuleIOInputs inputs) {
+  public SwerveModuleIOInputsAutoLogged updateInputs() {
+    var inputs = new SwerveModuleIOInputsAutoLogged();
     inputs.moduleNumber = moduleNumber;
 
     inputs.drivePositionRotations = driveMotor.getSelectedSensorPosition() / 2048;
@@ -61,6 +62,7 @@ public class SwerveModuleIOFalcon implements SwerveModuleIONew {
     inputs.steerPercentOut = steerMotor.getMotorOutputPercent();
     inputs.steerCurrentAmps = steerMotor.getStatorCurrent();
     inputs.steerTemparature = steerMotor.getTemperature();
+    return inputs;
   }
 
   @Override

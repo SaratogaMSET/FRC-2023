@@ -303,6 +303,18 @@ public final class Constants {
                                 new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180))
                         })
         );
+
+        public static final double simDriveKP = 0;
+
+        public static final double simDriveKS = 0;
+
+        public static final double simDriveKV = 0;
+
+        public static final double simDriveKA = 0;
+
+        public static final double simAngleKP = 0;
+
+        public static final double simAngleKD = 0;
     }
 
     public static class ClawConstants {
