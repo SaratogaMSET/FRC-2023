@@ -395,11 +395,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
             odomFiltered.addVisionMeasurement(pose, timestamp);
         }
         if (Robot.isReal()) {
-            pose = odomFiltered.update(getYaw(), getModulePositions());
-          } else {
-            pose = odomFiltered.update(Rotation2d.fromDegrees(simHeading), getModulePositions());
-          }
-        odomFiltered.update(getRotation2d(), getModulePositions());
+            odomFiltered.update(getYaw(), getModulePositions());
+           } else {
+             odomFiltered.update(Rotation2d.fromDegrees(simHeading), getModulePositions());
+           }
+        // odomFiltered.update(getRotation2d(), getModulePositions());
 
         //swerveOdometry.update(getRotation2d(), getModulePositions());  
         Logger.getInstance().recordOutput("UKF Odometry", odomFiltered.getEstimatedPosition());
