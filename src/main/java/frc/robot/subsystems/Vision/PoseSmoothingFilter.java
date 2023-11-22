@@ -163,6 +163,11 @@ public class PoseSmoothingFilter extends SubsystemBase {
         SmartDashboard.putNumberArray("Delta to VisionLess Odom", test3);
         SmartDashboard.putNumberArray("Delta to  VisionLess Odom", test4);
 
+        Logger.getInstance().recordOutput("UKF Odometry", odomFiltered.getEstimatedPosition());
+        Logger.getInstance().recordOutput("Visionless Odometry", odometry.getPoseMeters());
+ 
+ 
+
         SmartDashboard.putData(m_field);
     }
 }

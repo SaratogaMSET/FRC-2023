@@ -79,6 +79,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         // m_navx.zeroYaw();
         //zeroGyroscope();  
 
+        mSwerveMods = swerveIO;
         inputs = new SwerveModuleIOInputsAutoLogged[] {
             new SwerveModuleIOInputsAutoLogged(),
             new SwerveModuleIOInputsAutoLogged(),

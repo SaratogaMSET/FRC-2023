@@ -396,8 +396,8 @@ public static class WheelIntakeConstants{
     public static class Vision {
         
         // TODO replace with actual values
-        public static final Matrix<N3, N1> stateSTD = VecBuilder.fill(0.23, 0.19, 0.05);
-        public static final Matrix<N3, N1> visDataSTD = VecBuilder.fill(0.77, 0.81, 0.95);
+        public static final Matrix<N3, N1> stateSTD = VecBuilder.fill(0.23, 0.19, 0.005);
+        public static final Matrix<N3, N1> visDataSTD = VecBuilder.fill(0.77, 0.81, 0.995);
 
         public static final Pose3d apriltag7 = new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(108.19), Units.inchesToMeters(18.22), new Rotation3d());  
         // Where 0 starts from the corresponding alliance color's right side
