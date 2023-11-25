@@ -48,6 +48,7 @@ public class VisionSubsystem extends SubsystemBase {
         return new Pose2d();
     }
 
+    // Optional denotes that it can be null! Maps the limelight field coordinates to the robot field coordinates(they have different origin points)
     public Optional<Pose2d> getBotPose2d() {
         double[] arr = getTable().getEntry("botpose").getDoubleArray(new double[8]);
         
@@ -114,21 +115,25 @@ public class VisionSubsystem extends SubsystemBase {
         return getTable().getEntry("getpipe").getInteger(0);
     }
 
+    // Calculates timestamp for pose filtering according to limelight docs(FPGA - tl - cl)
     public double getTimestamp(){
 
-        double timestamp = Timer.getFPGATimestamp() - (getTable().getEntry("tl").getDouble(1) + 11) / 1000;
+        double timestamp = Timer.getFPGATimestamp() - (getTable().getEntry("tl").getDouble(1) / 1000  - getTable().getEntry("cv").getDouble(1)) / 1000;
         return timestamp;
     }
 
+    // Returns true if the robot can see a target
     public boolean hasTargets() {
         return getTable().getEntry("tv").getInteger(0) == 1;
     }
 
+    // Returns id of most visible tag. 
     public int getTagID(){
         if (getPipeline() != 0) return -1;
         return (int) getTable().getEntry("tid").getInteger(-1);
     }
 
+    // Read docs. (target in degrees from center point of camera vision)
     public double getTX(){
         return getTable().getEntry("tx").getDouble(0.0);
     }
@@ -146,6 +151,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     /* START OF ATREY'S APRILTAG CODE; USING OLD FUNCTIONS; RETURNS TX, TY, CAMERA-RELATIVE ANGLE TO APRILTAG */
+    // o7 
 
     /* campose but using network tables */
     private double[] getCamTranOld() {
@@ -155,18 +161,7 @@ public class VisionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
-        // Logger.getInstance().recordOutput("Smart Targeting X", 100*Math.hypot(getCamTranOld()[0], getCamTranOld()[2])); //get X stuff for verification
-        // SmartDashboard.putNumberArray("Botpose 2d", getLatestResults().targetingResults.botpose);
-        // SmartDashboard.putNumberArray("Distances", getDistances());
-
-        // SmartDashboard.putNumber("Raw Angle", getLatestResults().targetingResults.getBotPose2d().getRotation().getDegrees());
-
-        // SmartDashboard.putNumber("LL to AprilTag",Math.hypot(getCamTranOld()[0], getCamTranOld()[2]));
         NetworkTableInstance.getDefault().flush();
-        //meters to inches: 1m = 39.3701 in
-
-        // SmartDashboard.putNumber("LL to AprilTag (Inches)",39.3701*(Math.hypot(getCamTranOld()[0], getCamTranOld()[2])));
-        // SmartDashboard.putNumber("getTX", getTX());
     }
 
     @Override
