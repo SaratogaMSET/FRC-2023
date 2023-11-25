@@ -1,6 +1,8 @@
 package frc.robot.subsystems.Drivetrain;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -21,6 +23,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
@@ -56,11 +59,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
     ChassisSpeeds speeds = new ChassisSpeeds(0.0,0.0,0.0);
     private Field2d m_field = new Field2d();
 
-    private NetworkTable visionData;
+    private Supplier<Optional<Pose2d>> visionPoseData;   
+    private Supplier<Double> timestampSupplier;
 
-    private SwerveDrivePoseEstimator odomFiltered;
-    private final Matrix<N3, N1> stateSTD = new Matrix<>(Nat.N3(), Nat.N1());
-    private final Matrix<N3, N1> visDataSTD = new Matrix<>(Nat.N3(), Nat.N1());
+    private final SwerveDrivePoseEstimator odomFiltered;
+    private final SwerveDriveOdometry odometry;
+    private boolean seeded;
+    
 
     public GyroIO gyroIO;
     public GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -80,15 +85,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
     //     new SwerveModule(3, Constants.Drivetrain.Mod3.constants)
     // };
     
-    public DrivetrainSubsystem(SwerveModuleIO[] swerveIO, GyroIO gyroIO) {  
+    public DrivetrainSubsystem(SwerveModuleIO[] swerveIO, GyroIO gyroIO, Supplier<Optional<Pose2d>> visionPoseData, Supplier<Double> timestampSupplier) {  
         this.gyroIO = gyroIO;
         // m_navx.zeroYaw();
         //zeroGyroscope();  
-        visionData = NetworkTableInstance.getDefault().getTable("limelight-three");
 
-
-        stateSTD.set(0, 0, 0.20); stateSTD.set(1, 0, 0.2); stateSTD.set(2, 0, 0.2); //Tune Values
-        visDataSTD.set(0, 0, 0.80); visDataSTD.set(1, 0, 0.8); visDataSTD.set(2, 0, 0.8);
         mSwerveMods = swerveIO;
         inputs = new SwerveModuleIOInputsAutoLogged[] {
             new SwerveModuleIOInputsAutoLogged(),
@@ -97,24 +98,23 @@ public class DrivetrainSubsystem extends SubsystemBase {
             new SwerveModuleIOInputsAutoLogged()
           };
         resetModulesToAbsolute();    
-        this.odomFiltered = new SwerveDrivePoseEstimator(Constants.Drivetrain.m_kinematics1, getRotation2d(), getModulePositions(), new Pose2d(), stateSTD, visDataSTD);
+
+
+        // Vision Section
+        this.visionPoseData = visionPoseData;
+        this.odomFiltered = new SwerveDrivePoseEstimator(Constants.Drivetrain.m_kinematics1,
+            getRotation2d(), 
+            getModulePositions(),
+            new Pose2d(),
+            Constants.Vision.stateSTD, 
+            Constants.Vision.visDataSTD);
+
+        this.odometry = new SwerveDriveOdometry(Constants.Drivetrain.m_kinematics1, getRotation2d(), getModulePositions());
+        this.seeded = false;
+        this.timestampSupplier = timestampSupplier;
+
         //swerveOdometry = new SwerveDriveOdometry(Constants.Drivetrain.m_kinematics, getRotation2d(), getModulePositions());   
     }
-
-    public Pose2d getVisionPose2d(){
-        try{
-        visionData = RobotContainer.m_visionSubsystem.getTable();
-        }
-        catch(Exception e){
-            System.out.println(e);
-        }
-        double[] arr = visionData.getEntry("botpose").getDoubleArray(new double[8]);
-        
-        if (visionData.getEntry("tv").getDouble(0) == 0) return null;
-        else return new Pose2d(new Translation2d(arr[0] + (8.24), arr[1] + 4.065), Rotation2d.fromDegrees(arr[5]));
-    }
-
-    
     
     public Rotation2d getRotation2d() {
         // if(gyroInputs.connected){
@@ -386,31 +386,59 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
 
 
-        // double[] pos = new double[]{odomFiltered.getEstimatedPosition().getX(), odomFiltered.getEstimatedPosition().getY(), odomFiltered.getEstimatedPosition().getRotation().getDegrees()};
-        // SmartDashboard.putNumberArray("Odom", pos);
-        lastPose = odomFiltered.getEstimatedPosition();
-        Pose2d pose = getVisionPose2d();
-        if (pose != null && DriverStation.isTeleop()){
-            double timestamp = Timer.getFPGATimestamp() - (visionData.getEntry("tl").getDouble(0) + 11) / 1000;
-            odomFiltered.addVisionMeasurement(pose, timestamp);
-        }
-        if (Robot.isReal()) {
-            odomFiltered.update(getYaw(), getModulePositions());
-           } else {
-             odomFiltered.update(Rotation2d.fromDegrees(simHeading), getModulePositions());
-           }
-        // odomFiltered.update(getRotation2d(), getModulePositions());
-
-        //swerveOdometry.update(getRotation2d(), getModulePositions());  
-        Logger.getInstance().recordOutput("UKF Odometry", odomFiltered.getEstimatedPosition());
-        // var asdf = odomFiltered.getEstimatedPosition();
-        // SmartDashboard.putNumberArray("UKF Coords", new double[]{asdf.getX(), asdf.getY(), asdf.getRotation().getRadians()});
-        //lastRotation = new Rotation2d(-gyroInputs.yawPositionRad);
-        m_field.setRobotPose(odomFiltered.getEstimatedPosition());
-        //if (pose != null) visionPoseEstimates.setRobotPose(pose);
-        // SmartDashboard.putData("Field", m_field);
-        // SmartDashboard.putNumber("Nav Heading", getNavHeading());
-        //SmartDashboard.putData("visionEstimate", visionPoseEstimates);
+        var pose = visionPoseData.get();
         
+        if (seeded == false && pose.isPresent()){
+            seeded = true;
+            odomFiltered.resetPosition(getRotation2d(), getModulePositions(), pose.get());
+            odometry.resetPosition(getRotation2d(), getModulePositions(), pose.get());
+            SmartDashboard.putNumberArray("Seed Pose", new double[]{pose.get().getX(), pose.get().getY()});
+        } else {
+
+            if (pose.isPresent() && DriverStation.isTeleop() && 
+                getPose().getTranslation().getDistance(pose.get().getTranslation()) < 0.5){
+                    double time = this.timestampSupplier.get();
+                    var data = pose.get();
+                    odomFiltered.addVisionMeasurement(data, time);
+                    SmartDashboard.putNumberArray("Vision Poses", new double[]{data.getX(), data.getY()});
+            } 
+            
+        }
+
+        odomFiltered.update(getRotation2d(), getModulePositions());
+        odometry.update(getRotation2d(), getModulePositions());
+
+        var dummyVar = getPose();   
+        
+        SmartDashboard.putNumberArray("Raw Localizer pose", new double[]{
+            dummyVar.getX(), dummyVar.getY(), dummyVar.getRotation().getRadians()
+        });
+
+        //m_field.setRobotPose(position.getX(), position.getY(), position.getRotation());
+
+        m_field.setRobotPose(odomFiltered.getEstimatedPosition());
+
+        var delta = odomFiltered.getEstimatedPosition().getTranslation().minus(Constants.Vision.apriltag7.getTranslation().toTranslation2d());
+        var delta2 = odometry.getPoseMeters().getTranslation().minus(Constants.Vision.apriltag7.getTranslation().toTranslation2d());
+
+        double[] test = new double[]{Units.metersToInches(delta.getX()), Units.metersToInches(delta.getY())};
+        double[] test1 = new double[]{delta.getX(), delta.getY()};
+
+        double[] test3 = new double[]{Units.metersToInches(delta2.getX()), Units.metersToInches(delta2.getY())};
+        double[] test4 = new double[]{delta2.getX(), delta2.getY()};
+        
+
+        SmartDashboard.putNumberArray("Delta to Pose", test);
+        SmartDashboard.putNumberArray("Delta to Pose(meters)", test1);
+
+        SmartDashboard.putNumberArray("Delta to VisionLess Odom", test3);
+        SmartDashboard.putNumberArray("Delta to  VisionLess Odom", test4);
+
+        Logger.getInstance().recordOutput("UKF Odometry", odomFiltered.getEstimatedPosition());
+        Logger.getInstance().recordOutput("Visionless Odometry", odometry.getPoseMeters());
+ 
+ 
+
+        SmartDashboard.putData(m_field);
     }
 }

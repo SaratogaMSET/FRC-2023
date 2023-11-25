@@ -1,10 +1,14 @@
 package frc.robot.subsystems.Vision;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -43,6 +47,14 @@ public class VisionSubsystem extends SubsystemBase {
 
         return new Pose2d();
     }
+
+    public Optional<Pose2d> getBotPose2d() {
+        double[] arr = getTable().getEntry("botpose").getDoubleArray(new double[8]);
+        
+        if (getTable().getEntry("tv").getDouble(0) == 0) return Optional.empty();
+        else return Optional.of(new Pose2d(new Translation2d(arr[0] + (8.24), arr[1] + 4.065), Rotation2d.fromDegrees(arr[5])));
+    }
+
 
     /* This is mostly for tuning the accuracy of the pipeline, the robot doesn't really use theses values well. Reports the 
     of the camera in meters from each apriltag based on id(array index 0 is apriltag 1) */ 
@@ -100,6 +112,12 @@ public class VisionSubsystem extends SubsystemBase {
   
     public long getPipeline(){
         return getTable().getEntry("getpipe").getInteger(0);
+    }
+
+    public double getTimestamp(){
+
+        double timestamp = Timer.getFPGATimestamp() - (getTable().getEntry("tl").getDouble(1) + 11) / 1000;
+        return timestamp;
     }
 
     public boolean hasTargets() {

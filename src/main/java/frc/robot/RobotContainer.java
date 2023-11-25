@@ -100,7 +100,9 @@ public class RobotContainer {
             new SwerveModuleIOSim(2, Constants.Drivetrain.Mod2.constants),
             new SwerveModuleIOSim(3, Constants.Drivetrain.Mod3.constants)
           },
-      Robot.isReal() ? new GyroIONavx() : new GyroIOSim());  
+      Robot.isReal() ? new GyroIONavx() : new GyroIOSim(), 
+      m_visionSubsystem::getBotPose2d, 
+      m_visionSubsystem::getTimestamp);  
   private final CANdleSubsystem m_ledSubsystem = new CANdleSubsystem();
   private final ActuatorSubsystem actuatorSubsystem = new ActuatorSubsystem();
   private final RollerSubsystem rollers = new RollerSubsystem();
