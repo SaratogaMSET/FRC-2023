@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.EstimatedRobotPose;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.PathConstraints;
@@ -15,6 +16,7 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommandA;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -59,8 +61,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
     ChassisSpeeds speeds = new ChassisSpeeds(0.0,0.0,0.0);
     private Field2d m_field = new Field2d();
 
-    private Supplier<Optional<Pose2d>> visionPoseData;   
+    private Supplier<Optional<EstimatedRobotPose>> visionPoseData;   
     private Supplier<Double> timestampSupplier;
+    private Supplier<Vector<N3>> stdDevsSupplier;
 
     private final SwerveDrivePoseEstimator odomFiltered;
     private final SwerveDriveOdometry odometry;
@@ -78,18 +81,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
     Pose2d lastPose;
 
     public SwerveModuleIO[] mSwerveMods; 
-    // new SwerveModuleIO[] {
-    //     new SwerveModule(0, Constants.Drivetrain.Mod0.constants),
-    //     new SwerveModule(1, Constants.Drivetrain.Mod1.constants),
-    //     new SwerveModule(2, Constants.Drivetrain.Mod2.constants),
-    //     new SwerveModule(3, Constants.Drivetrain.Mod3.constants)
-    // };
     
-    public DrivetrainSubsystem(SwerveModuleIO[] swerveIO, GyroIO gyroIO, Supplier<Optional<Pose2d>> visionPoseData, Supplier<Double> timestampSupplier) {  
+    public DrivetrainSubsystem(SwerveModuleIO[] swerveIO, GyroIO gyroIO, Supplier<Optional<EstimatedRobotPose>> visionPoseData, Supplier<Double> timestampSupplier, Supplier<Vector<N3>> stddevs) {  
         this.gyroIO = gyroIO;
         // m_navx.zeroYaw();
         //zeroGyroscope();  
-
         mSwerveMods = swerveIO;
         inputs = new SwerveModuleIOInputsAutoLogged[] {
             new SwerveModuleIOInputsAutoLogged(),
@@ -112,6 +108,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         this.odometry = new SwerveDriveOdometry(Constants.Drivetrain.m_kinematics1, getRotation2d(), getModulePositions());
         this.seeded = false;
         this.timestampSupplier = timestampSupplier;
+        this.stdDevsSupplier = stddevs;
 
         //swerveOdometry = new SwerveDriveOdometry(Constants.Drivetrain.m_kinematics, getRotation2d(), getModulePositions());   
     }
@@ -154,18 +151,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
         velTwist.dtheta / 0.02);
         m_chassisSpeeds = arcVelocity;
       }    
-
-      public ChassisSpeeds driftCorrection(ChassisSpeeds speeds){
-        double xy = Math.abs(speeds.vxMetersPerSecond) + Math.abs(speeds.vyMetersPerSecond);
-        
-        if(Math.abs(speeds.omegaRadiansPerSecond) > 0.0 || pXY <= 0) desiredHeading = lastPose.getRotation().getDegrees();
-        
-        else if(xy > 0) speeds.omegaRadiansPerSecond += driftCorrectionPID.calculate(lastPose.getRotation().getDegrees(), desiredHeading);
-        
-        pXY = xy;
-        return speeds;
-        }
-
     public void setModuleStates(ChassisSpeeds chassisSpeeds) {
 
         BetterSwerveModuleState[] desiredStates = Constants.Drivetrain.m_kinematics2.toSwerveModuleStates(chassisSpeeds);
@@ -174,11 +159,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
     }    
 
-    public void setModuleStates(BetterSwerveModuleState[] desiredStates) {
-        for(SwerveModuleIO mod : mSwerveMods){
-            mod.setDesiredState(desiredStates[mod.getModuleNumber()], false);
-        }
-    }
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         for(SwerveModuleIO mod : mSwerveMods){
             mod.setDesiredState(desiredStates[mod.getModuleNumber()], false);
@@ -205,64 +185,20 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
     public SwerveModuleState[] getModuleStates(){
         SwerveModuleState[] states = new SwerveModuleState[4];
-        switch(Constants.currentMode){
-
-            case REAL:
-            for(int i =0; i < 4; i++){
-                states[i] = mSwerveMods[i].getState();
-            }
-            return states;
-
-            // case SIM:
-            //     for(int i = 0; i < 4; i++){
-            //         states[i] = new SwerveModuleState(moduleInputs[i].driveVelocityMetersPerSec, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
-            //     }
-            //     return states;
-
-            // case REPLAY:
-            //     for(int i = 0; i < 4; i++){
-            //         states[i] = new SwerveModuleState(moduleInputs[i].driveVelocityMetersPerSec, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
-            //     }
-            // return states;
-
-            default:
-            for(int i =0; i < 4; i++){
-                states[i] = mSwerveMods[i].getState();
-            }
-            return states;
-        }
+        for(int i =0; i < 4; i++){
+                    states[i] = mSwerveMods[i].getState();
+                }
+        return states;
     }
 
     public SwerveModulePosition[] getModulePositions(){
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
-        switch(Constants.currentMode){
-            case REAL:
                 for(int i = 0; i < mSwerveMods.length; i ++){
                     positions[i] = mSwerveMods[i].getPosition();
                         // positions[i] = new SwerveModulePosition(moduleInputs[i].drivePositionMeters, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
                 }
                 return positions;
-        
-            // case SIM:
-            //     for(int i = 0; i < mSwerveMods.length; i ++){
-
-            //         positions[i] = new SwerveModulePosition(moduleInputs[i].drivePositionMeters, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
-            //     }
-            //     return positions;
-            // case REPLAY:
-            //     for(int i = 0; i < mSwerveMods.length; i ++){
-                
-            //         positions[i] = new SwerveModulePosition(moduleInputs[i].drivePositionMeters, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
-            //     }
-            //     return positions;
-            default:
-            for(int i = 0; i < mSwerveMods.length; i ++){
-                positions[i] = mSwerveMods[i].getPosition();
-                    // positions[i] = new SwerveModulePosition(moduleInputs[i].drivePositionMeters, Rotation2d.fromRadians(moduleInputs[i].steerPositionRad));
-            }
-            return positions;
         }
-    }
 
     public void zeroGyroscope(){
         //Pose2d pose = new Pose2d(getPose().getX(), getPose().getY(), new Rotation2d());
@@ -342,13 +278,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
         //     // SmartDashboard.putNumber(i + "Motor Output Voltage", mSwerveMods[i].getOutputVoltage());
         //     // SmartDashboard.putNumber(i + "Velocity", mSwerveMods[i].getVelocity());
         //     // SmartDashboard.putNumber(i + "RPM" , mSwerveMods[i].getRPM());
+        // //     SmartDashboard.putNumber("Mod " + i + " Integrated", mSwerveMods[i].getPosition().angle.getDegrees());
+        // //     SmartDashboard.putNumber("Mod " + i + " Velocity", mSwerveMods[i].getState().speedMetersPerSecond);
+        // //     SmartDashboard.putNumber("Desired Module "+ i + " Angle", currentDesiredState[i].angle.getDegrees());   
+        // //     SmartDashboard.putNumber("Desired Module "+ i + " Velocity", currentDesiredState[i].speedMetersPerSecond); 
         //     // Logger.getInstance().recordOutput(i + "Motor Output Percent", mSwerveMods[i].getOutputPercent());
         //     // Logger.getInstance().recordOutput(i + "Motor Output Voltage", mSwerveMods[i].getOutputVoltage());
 
         // }
-        //Logger.getInstance().recordOutput("Before Correction", Constants.Drivetrain.m_kinematics.toSwerveModuleStates(m_chassisSpeeds));
-        //ChassisSpeeds speeds = driftCorrection(m_chassisSpeeds);
-        //Logger.getInstance().recordOutput("After Correction", Drivetrain.m_kinematics.toSwerveModuleStates(speeds));
 
         previousDesiredState = currentDesiredState;
         currentDesiredState = Constants.Drivetrain.m_kinematics1.toSwerveModuleStates(m_chassisSpeeds);
@@ -371,15 +308,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
             currentDesiredState[3].angle = previousDesiredState[3].angle;
         }
 
-        for(int i = 0; i < 4; i++){
-            SmartDashboard.putNumber("Mod " + i + " Cancoder", mSwerveMods[i].getAbsoluteRotation().getDegrees());
-        //     SmartDashboard.putNumber("Mod " + i + " Integrated", mSwerveMods[i].getPosition().angle.getDegrees());
-        //     SmartDashboard.putNumber("Mod " + i + " Velocity", mSwerveMods[i].getState().speedMetersPerSecond);
-        //     SmartDashboard.putNumber("Desired Module "+ i + " Angle", currentDesiredState[i].angle.getDegrees());   
-        //     SmartDashboard.putNumber("Desired Module "+ i + " Velocity", currentDesiredState[i].speedMetersPerSecond);     
-        }
-        
-
         setModuleStates(currentDesiredState);
         //Logger.getInstance().recordOutput("Gyro Rotation2d", new Pose2d(new Translation2d(0,0),m_navx.getRotation2d()));
         //Logger.getInstance().recordOutput("Gyro Yaw", m_navx.getYaw());
@@ -390,24 +318,28 @@ public class DrivetrainSubsystem extends SubsystemBase {
         
         if (seeded == false && pose.isPresent()){
             seeded = true;
-            odomFiltered.resetPosition(getRotation2d(), getModulePositions(), pose.get());
-            odometry.resetPosition(getRotation2d(), getModulePositions(), pose.get());
-            SmartDashboard.putNumberArray("Seed Pose", new double[]{pose.get().getX(), pose.get().getY()});
+            odomFiltered.resetPosition(getRotation2d(), getModulePositions(), pose.get().estimatedPose.toPose2d());
+            odometry.resetPosition(getRotation2d(), getModulePositions(), pose.get().estimatedPose.toPose2d());
+            SmartDashboard.putNumberArray("Seed Pose", new double[]{pose.get().estimatedPose.toPose2d().getTranslation().getX(),pose.get().estimatedPose.toPose2d().getTranslation().getY()});
         } else {
 
             if (pose.isPresent() && DriverStation.isTeleop() && 
-                getPose().getTranslation().getDistance(pose.get().getTranslation()) < 0.5){
+                getPose().getTranslation().getDistance(pose.get().estimatedPose.toPose2d().getTranslation()) < 0.5){
                     double time = this.timestampSupplier.get();
                     var data = pose.get();
-                    odomFiltered.addVisionMeasurement(data, time);
-                    SmartDashboard.putNumberArray("Vision Poses", new double[]{data.getX(), data.getY()});
+                    odomFiltered.addVisionMeasurement(data.estimatedPose.toPose2d(), time, stdDevsSupplier.get());
+                    SmartDashboard.putNumberArray("Vision Poses", new double[]{data.estimatedPose.toPose2d().getTranslation().getX(), data.estimatedPose.toPose2d().getTranslation().getY()});
             } 
             
         }
 
-        odomFiltered.update(getRotation2d(), getModulePositions());
-        odometry.update(getRotation2d(), getModulePositions());
-
+        if (Robot.isReal()) {
+            odomFiltered.update(getRotation2d(), getModulePositions());
+            odometry.update(getRotation2d(), getModulePositions());
+           } else {
+             odomFiltered.update(Rotation2d.fromDegrees(simHeading), getModulePositions());
+             odometry.update(getRotation2d(), getModulePositions());
+           }
         var dummyVar = getPose();   
         
         SmartDashboard.putNumberArray("Raw Localizer pose", new double[]{

@@ -101,8 +101,9 @@ public class RobotContainer {
             new SwerveModuleIOSim(3, Constants.Drivetrain.Mod3.constants)
           },
       Robot.isReal() ? new GyroIONavx() : new GyroIOSim(), 
-      m_visionSubsystem::getBotPose2d, 
-      m_visionSubsystem::getTimestamp);  
+      m_visionSubsystem::getEstimatedGlobalPose, 
+      m_visionSubsystem::getTimestamp,
+      m_visionSubsystem::getScaledSTDDevs);  
   private final CANdleSubsystem m_ledSubsystem = new CANdleSubsystem();
   private final ActuatorSubsystem actuatorSubsystem = new ActuatorSubsystem();
   private final RollerSubsystem rollers = new RollerSubsystem();
@@ -114,27 +115,6 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    //TODO: For SIM LATER
-    // switch(Constants.currentMode){
-    //   case REAL:
-    //   m_drivetrainSubsystem = new DrivetrainSubsystem(new GyroIONavx(), 
-    //     new SwerveModule(0, Constants.Drivetrain.Mod0.constants),
-    //     new SwerveModule(1, Constants.Drivetrain.Mod1.constants), 
-    //     new SwerveModule(2, Constants.Drivetrain.Mod2.constants), 
-    //     new SwerveModule(3, Constants.Drivetrain.Mod3.constants));
-    //   case SIM:
-    //     m_drivetrainSubsystem = new DrivetrainSubsystem(new GyroIO(), 
-    //       new SwerveModuleIOSim(), 
-    //       new SwerveModuleIOSim(), 
-    //       new SwerveModuleIOSim(), 
-    //       new SwerveModuleIOSim());
-    //   default:
-    //     m_drivetrainSubsystem = new DrivetrainSubsystem(new GyroIO(), 
-    //       new SwerveModule(0, Constants.Drivetrain.Mod0.constants),
-    //       new SwerveModule(1, Constants.Drivetrain.Mod1.constants), 
-    //       new SwerveModule(2, Constants.Drivetrain.Mod2.constants), 
-    //       new SwerveModule(3, Constants.Drivetrain.Mod3.constants));
-    //   }
 
     m_autoSwitcher.setDefaultOption(OneAndNothing, OneAndNothing);
     m_autoSwitcher.addOption(OnePiece, OnePiece);

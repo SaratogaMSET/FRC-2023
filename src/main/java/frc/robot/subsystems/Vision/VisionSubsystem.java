@@ -1,171 +1,196 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package frc.robot.subsystems.Vision;
 
-import java.util.Arrays;
-import java.util.Optional;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.VisionConstants;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.subsystems.Vision.LimelightHelpers.LimelightResults;
 import frc.robot.util.wrappers.VisionMeasurement;
 
+import frc.robot.Constants;
+import frc.robot.FieldConstants;
+import frc.robot.Constants.Vision;
+
 public class VisionSubsystem extends SubsystemBase {
 
-    /* Network tables is the method of communication between camera data  and us programmers. It's kinda like a dictionary
-    */
-    private NetworkTable ll2 = NetworkTableInstance.getDefault().getTable("limelight-two");
-    private NetworkTable ll3 = NetworkTableInstance.getDefault().getTable("limelight-three");
+    PhotonCamera ll2 = new PhotonCamera("OV5647");
+    public PhotonPoseEstimator photonPoseEstimator;
 
-    private double[] distances = new double[]{-1,-1,-1,-1,-1,-1,-1,-1};
+   
+    AprilTagFieldLayout field = null;  //TODO: fill in 
 
-    private double d1;
-    private double tx;
+    private double[] distances = new double[]{
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+    };
 
-    private double a;  // x val 
-    private double b;  // y val
-
-
-    public VisionSubsystem() {}
-
-
-    /* gets the robot pose relative to the apriltag target. 
-    Read docs: https://docs.limelightvision.io/en/latest/networktables_api.html
-    Scroll to "Apriltags and 3D Data"
-    */ 
-    private Pose2d getCamPose2d() {
-        double id = getTagID();
-        for (var v : getLatestResults().targetingResults.targets_Fiducials) {
-            if (v.fiducialID == id) return v.getRobotPose_TargetSpace2D();
-        }
-
-        return new Pose2d();
-    }
-
-    // Optional denotes that it can be null! Maps the limelight field coordinates to the robot field coordinates(they have different origin points)
-    public Optional<Pose2d> getBotPose2d() {
-        double[] arr = getTable().getEntry("botpose").getDoubleArray(new double[8]);
-        
-        if (getTable().getEntry("tv").getDouble(0) == 0) return Optional.empty();
-        else return Optional.of(new Pose2d(new Translation2d(arr[0] + (8.24), arr[1] + 4.065), Rotation2d.fromDegrees(arr[5])));
-    }
-
-
-    /* This is mostly for tuning the accuracy of the pipeline, the robot doesn't really use theses values well. Reports the 
-    of the camera in meters from each apriltag based on id(array index 0 is apriltag 1) */ 
     private double[] getDistances() {
-        Arrays.fill(distances, -1);
+        distances = new double[]{
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        };
 
-        for (var r : getLatestResults().targetingResults.targets_Fiducials) {
-            var tmp = r.getRobotPose_TargetSpace();
-            distances[(int) r.fiducialID - 1] = Math.hypot(tmp.getX(), tmp.getZ());
+        for (var r : getTargets()) {
+            var tmp = r.getBestCameraToTarget();
+            distances[(int) r.getFiducialId() - 1] = Math.hypot(tmp.getX(), tmp.getZ()); //TODO: figure out what coordinate system photonvision uses
+            // we only care about the horizontal distance not the vertical. 
         }
 
         return distances;
     }
+    
+    public VisionSubsystem(){
+        // try {
+        //     field = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile); //why does this not work man
+        // } catch (Exception e){
+        //     SmartDashboard.putNumber("ITS JOEVER", 1);
+        // }
 
-    /* Limelight helper implementation for server communication with deprecated mcl*/ 
-    public VisionMeasurement getLatestMeasurement() {
-        LimelightResults results = getLatestResults();
+        field = FieldConstants.aprilTags;
+        photonPoseEstimator = new PhotonPoseEstimator(field, PoseStrategy.MULTI_TAG_PNP, ll2, Constants.Vision.robotToCam);
+        photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        
+    }
+    // Construct PhotonPoseEstimator
+    public PhotonPipelineResult ll2_Result(){
+        return ll2.getLatestResult();
+    }
+
+    public PhotonPipelineResult getLatestResults(){
+        if (ll2_Result().hasTargets()){
+            return ll2_Result();
+        }
+        return ll2_Result();
+    }
+
+    public boolean has_targets(){
+        return ll2_Result().hasTargets();
+    }
+
+    public List<PhotonTrackedTarget> getTargets(){
+        if (has_targets()) return ll2_Result().getTargets();
+        return new ArrayList<PhotonTrackedTarget>();
+    }
+
+    /**
+     * @return the best target acquired by the camera, can return Null
+     */
+    public PhotonTrackedTarget getBestTarget(){
+        if (has_targets()) return getLatestResults().getBestTarget();
+        return null;
+        //returns null if there is no target*
+    }
+
+    public int getTagID(){
+        try {
+            return getBestTarget().getFiducialId();
+        } catch (Exception e) {
+            System.out.println("no targets");
+            return -1;
+        }
+    }
+
+    public Transform3d getCamTran(){
+        try {
+            return getBestTarget().getBestCameraToTarget();
+        } catch (Exception e) {
+            System.out.println("No Targets?");
+            return new Transform3d();
+        }
+    }
+
+    public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
+        photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+        return photonPoseEstimator.update();
+    }
+
+    
+    public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+        return photonPoseEstimator.update();
+    }
+
+    public double getLatency(){
+        return ll2_Result().getLatencyMillis();
+    }
+
+    public VisionMeasurement getLatestMeasurement(){
         return new VisionMeasurement(
-            hasTargets(),
-            results.targetingResults.latency_capture + 
-                results.targetingResults.latency_pipeline + 
-                results.targetingResults.latency_jsonParse,
+            has_targets(),
+            getLatency(),
             getTagID(),
-            results.targetingResults.getBotPose2d(),
-            getCamPose2d(),
-            getDistances()
+            photonPoseEstimator.update().get().estimatedPose.toPose2d(),
+            new Pose2d(getCamTran().getTranslation().toTranslation2d(), getCamTran().getRotation().toRotation2d()),
+            getDistances() 
+
         );
     }
 
-    // LL2 does not support the LimelightResults Helper functions. 
-    public LimelightResults getLatestResults() {
-        return LimelightHelpers.getLatestResults("limelight-three");
-    }
-
-    // Rather than trying to fuse data together from cameras, we just decided to pick based on which camera has data
-    // (Monkey solution) If both see data, ll3 is given priority. 
-    public NetworkTable getTable(){
-        if (ll3.getEntry("tv").getInteger(0) == 1){
-            SmartDashboard.putNumber("check", 1);
-            return ll3;
-        } else {
-            return ll2;
+    public Vector<N3> getScaledSTDDevs(){
+        var estimation = photonPoseEstimator.update().get();
+        double sumDistance = 0;
+        for(var target: estimation.targetsUsed){
+            var bestCamera = target.getBestCameraToTarget();
+            sumDistance += Math.sqrt(Math.pow(bestCamera.getX(), 2) + Math.pow(bestCamera.getY(), 2) + Math.pow(bestCamera.getZ(), 2));
         }
+        double targetsUsed = (double) estimation.targetsUsed.size();
+        double averageDistance = sumDistance/ targetsUsed;
+        return VecBuilder.fill(Vision.xyCoeff * averageDistance/targetsUsed, (Vision.xyCoeff * averageDistance/targetsUsed), (Vision.rotationCoeff * averageDistance/targetsUsed));
     }
 
-    public boolean isLL3(){
-        if (getTable().equals(ll3)){
-            return true; 
-        } else {
-            return false;
-        }
-    }
-
-    /* Network Table Communications: https://docs.limelightvision.io/en/latest/networktables_api.html  */
-  
-    public long getPipeline(){
-        return getTable().getEntry("getpipe").getInteger(0);
-    }
-
-    // Calculates timestamp for pose filtering according to limelight docs(FPGA - tl - cl)
     public double getTimestamp(){
-
-        double timestamp = Timer.getFPGATimestamp() - (getTable().getEntry("tl").getDouble(1) / 1000  - getTable().getEntry("cv").getDouble(1)) / 1000;
-        return timestamp;
+        return Timer.getFPGATimestamp() - getLatency();
     }
 
-    // Returns true if the robot can see a target
-    public boolean hasTargets() {
-        return getTable().getEntry("tv").getInteger(0) == 1;
+    public int getPipelineIndex(){
+        return ll2.getPipelineIndex();
     }
 
-    // Returns id of most visible tag. 
-    public int getTagID(){
-        if (getPipeline() != 0) return -1;
-        return (int) getTable().getEntry("tid").getInteger(-1);
-    }
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("pipeline INdex", getPipelineIndex());
+  }
 
-    // Read docs. (target in degrees from center point of camera vision)
-    public double getTX(){
-        return getTable().getEntry("tx").getDouble(0.0);
-    }
 
-    private double getTY(){
-        return getTable().getEntry("ty").getDouble(0.0);
-    }
-
-   /**
-     * *
-     * @param pipelineNum the pipeline number to switch to. We might need one for the high tape, one for the mid tape and one for apriltag.
-     */
-    public void setPipeline(int pipelineNum){
-        getTable().getEntry("pipeline").setNumber(pipelineNum);
-    }
-
-    /* START OF ATREY'S APRILTAG CODE; USING OLD FUNCTIONS; RETURNS TX, TY, CAMERA-RELATIVE ANGLE TO APRILTAG */
-    // o7 
-
-    /* campose but using network tables */
-    private double[] getCamTranOld() {
-        return getTable().getEntry("botpose_targetspace").getDoubleArray(new double[6]);
-    }
-
-    @Override
-    public void periodic() {
-
-        NetworkTableInstance.getDefault().flush();
-    }
-
-    @Override
-    public void simulationPeriodic() {
-        
-    }
 }

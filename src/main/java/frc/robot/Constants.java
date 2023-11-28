@@ -13,7 +13,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -42,7 +44,7 @@ import org.opencv.core.Point;
  */
 public final class Constants {
     public static final boolean competitionMode = false;
-    public static final Mode currentMode = Mode.REAL;
+    public static final Mode currentMode = Mode.SIM;
     public static final boolean tuningMode = true;
     public static final double loopPeriodSecs = 0.02;
 
@@ -396,7 +398,8 @@ public static class WheelIntakeConstants{
     public static class Vision {
         
         // TODO replace with actual values
-
+        public static final Transform3d robotToCam = new Transform3d(new Translation3d(0.5, 0.0, 0.5), 
+        new Rotation3d(0,0,0)); //Cam mounted facing forward, half a meter forward of center, half a meter up from center.
         public static final Matrix<N3, N1> stateSTD = VecBuilder.fill(0.23, 0.19, 0.005);
         public static final Matrix<N3, N1> visDataSTD = VecBuilder.fill(0.77, 0.81, 0.995);
 
@@ -446,6 +449,8 @@ public static class WheelIntakeConstants{
                         new Pose2d(new Translation2d(14.6546, 4.4362), new Rotation2d(Math.PI))
                 )
         );
+        public static double xyCoeff = 0.01; // TODO: FIX, THESE VALUES ARE NOT TUNED
+        public static double rotationCoeff = 0.01; // TODO: FIX, THESE VALUES ARE NOT TUNED
 
         public static class Field {
                 public static final float FIELD_WIDTH = 16.54175f;
