@@ -168,15 +168,20 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public Vector<N3> getScaledSTDDevs(){
-        var estimation = photonPoseEstimator.update().get();
-        double sumDistance = 0;
-        for(var target: estimation.targetsUsed){
-            var bestCamera = target.getBestCameraToTarget();
-            sumDistance += Math.sqrt(Math.pow(bestCamera.getX(), 2) + Math.pow(bestCamera.getY(), 2) + Math.pow(bestCamera.getZ(), 2));
+        if(photonPoseEstimator.update().isPresent()){
+            var estimation = photonPoseEstimator.update().get();
+            double sumDistance = 0;
+            for(var target: estimation.targetsUsed){
+                var bestCamera = target.getBestCameraToTarget();
+                sumDistance += Math.sqrt(Math.pow(bestCamera.getX(), 2) + Math.pow(bestCamera.getY(), 2) + Math.pow(bestCamera.getZ(), 2));
+            }
+            double targetsUsed = (double) estimation.targetsUsed.size();
+            double averageDistance = sumDistance/ targetsUsed;
+            return VecBuilder.fill((Vision.xyCoeff * averageDistance)/targetsUsed, (Vision.xyCoeff * averageDistance/targetsUsed), (Vision.rotationCoeff * averageDistance/targetsUsed));
         }
-        double targetsUsed = (double) estimation.targetsUsed.size();
-        double averageDistance = sumDistance/ targetsUsed;
-        return VecBuilder.fill(Vision.xyCoeff * averageDistance/targetsUsed, (Vision.xyCoeff * averageDistance/targetsUsed), (Vision.rotationCoeff * averageDistance/targetsUsed));
+        else{
+            return VecBuilder.fill(Vision.xyCoeff,Vision.xyCoeff,Vision.rotationCoeff);
+        }
     }
 
     public double getTimestamp(){
