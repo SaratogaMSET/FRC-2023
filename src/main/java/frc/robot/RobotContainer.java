@@ -182,7 +182,7 @@ public class RobotContainer {
             () -> modifyAxis(-m_driverController.getRightX()/1.1) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
             () -> -modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
             () -> m_armSubsystem.getYPosition(),
-            () -> actuatorSubsystem.get_position_degrees()
+            () -> actuatorSubsystem.getDegrees()
     ));
 
     m_armSubsystem.setDefaultCommand(
@@ -215,7 +215,7 @@ public class RobotContainer {
             () -> modifyAxis(-m_driverController.getRightX()/2.25) * Constants.Drivetrain.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
             () -> modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
             ()-> m_armSubsystem.getYPosition(),
-            ()-> actuatorSubsystem.get_position_degrees()     
+            ()-> actuatorSubsystem.getDegrees()     
     )));
 
     // m_driverController.rightTrigger().onTrue(new AlignCommand(m_drivetrainSubsystem));
@@ -226,7 +226,7 @@ public class RobotContainer {
       () -> modifyAxis(m_driverController.getLeftX()* 1.35) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
       () -> modifyAxis(-m_driverController.getLeftY()*1.35) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
       () -> m_armSubsystem.getYPosition(),
-      () -> actuatorSubsystem.get_position_degrees(),
+      () -> actuatorSubsystem.getDegrees(),
       () -> -modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND
     ));
 
@@ -273,7 +273,7 @@ public class RobotContainer {
     // () -> modifyAxis(m_driverController.getLeftX() * 1.3) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND, //1.2 or 2
     // () -> modifyAxis(-m_driverController.getLeftY() * 1.3) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND, //1.2 or 2
     // () -> m_armSubsystem.getYPosition(),
-    // () -> actuatorSubsystem.get_position_degrees(),
+    // () -> actuatorSubsystem.getDegrees(),
     // ()-> -modifyAxis(m_gunner1.getX(), 0.1) * Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND));
     // // m_gunner1.button(11).and(m_gunner1.button(1)).onTrue((ArmSequences.groundIntakeCone(m_armSubsystem, intake,  1)));
 

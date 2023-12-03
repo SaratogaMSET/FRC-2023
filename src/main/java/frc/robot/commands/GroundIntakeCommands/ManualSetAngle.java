@@ -7,26 +7,26 @@ import frc.robot.subsystems.GroundIntake.ActuatorSubsystem;
 
 public class ManualSetAngle extends CommandBase {
     
-    ActuatorSubsystem gIntakeSubsystem;
+    ActuatorSubsystem IntakeSubsystem;
     double angle =0;
     boolean hold = false;
-    public ManualSetAngle(ActuatorSubsystem gIntakeSubsystem, double angle, boolean hold){
-        this.gIntakeSubsystem = gIntakeSubsystem;
+    public ManualSetAngle(ActuatorSubsystem IntakeSubsystem, double angle, boolean hold){
+        this.IntakeSubsystem = IntakeSubsystem;
         this.angle = angle;
         this.hold = hold;
-        addRequirements(gIntakeSubsystem);
+        addRequirements(IntakeSubsystem);
     }
 
     public ManualSetAngle(ActuatorSubsystem gIntakeSubsystem, double angle){
-        this.gIntakeSubsystem = gIntakeSubsystem;
+        this.IntakeSubsystem = gIntakeSubsystem;
         this.angle = angle;
-        addRequirements(gIntakeSubsystem);
+        addRequirements(IntakeSubsystem);
     }
 
     @Override
     public void execute(){
         // else{
-            gIntakeSubsystem.set_angle(angle, 100);
+            IntakeSubsystem.setDegrees(angle, 100);
             // SmartDashboard.putBoolean("Command running", true);
         // }
     }

@@ -21,7 +21,7 @@ public class ActuatorDefaultCommand extends CommandBase{
         //     actuator.setVoltageActuator(0);
         // }
         // else{
-            actuator.gravityCompensation();
+            actuator.stationary();
         // }
     }
 }
