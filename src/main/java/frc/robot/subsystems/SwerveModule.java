@@ -156,7 +156,7 @@ public class SwerveModule{
                 Constants.Drivetrain.angleGearRatio));
     }
 
-    public Rotation2d getCanCoder() {
+    public Rotation2d getAbsoluteRotation() {
         return Rotation2d.fromDegrees(angleEncoder.getAbsolutePosition());
     }
 
@@ -165,7 +165,7 @@ public class SwerveModule{
     }
 
     public void resetToAbsolute() {
-        double absolutePosition = Conversions.degreesToFalcon(getCanCoder().getDegrees() - angleOffset.getDegrees(),
+        double absolutePosition = Conversions.degreesToFalcon(getAbsoluteRotation().getDegrees() - angleOffset.getDegrees(),
                 Constants.Drivetrain.angleGearRatio);
         mAngleMotor.setSelectedSensorPosition(absolutePosition);
 

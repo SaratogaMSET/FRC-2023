@@ -37,8 +37,8 @@ public class ArmInterface {
 
     public ArmMassControl ArmControl = new ArmMassControl(proximal, distal);
     public ArmKinematics Arm = new ArmKinematics(proximal, distal);
-    double proximal_kVG = 1.20;
-    double distal_kVG = 0.66;
+    final double proximal_kVG = 1.20 * 16.6 / 13.6;
+    final double distal_kVG = 0.52 * 8.6 / 5.6;
 
     public ArmInterface(){
         Proximal_Left.configNeutralDeadband(0.03);
@@ -239,25 +239,29 @@ public class ArmInterface {
     }
 
     public void showState(){
-        // double radians_to_degrees = 180 / Math.PI;
-        // String raw_values = "Arm Raw Encoders/";
-        // boolean show_raw_values = false;
-        // if(show_raw_values){
-        //     SmartDashboard.putNumber(raw_values + "Proximal Left", Encoder_Proximal_Left.getAbsolutePosition()/360);
-        //     SmartDashboard.putNumber(raw_values + "Proximal Right", Encoder_Proximal_Right.getAbsolutePosition()/360);
-        //     SmartDashboard.putNumber(raw_values + "Distal Left", Encoder_Distal_Left.getAbsolutePosition()/360);
-        //     SmartDashboard.putNumber(raw_values + "Distal Right", Encoder_Distal_Right.getAbsolutePosition()/360);
-        // }
+        double radians_to_degrees = 180 / Math.PI;
+        String raw_values = "Arm Raw Encoders/";
+        boolean show_raw_values = true;
+        if(show_raw_values){
+            SmartDashboard.putNumber(raw_values + "Proximal Left", Encoder_Proximal_Left.getAbsolutePosition()/360);
+            SmartDashboard.putNumber(raw_values + "Proximal Right", Encoder_Proximal_Right.getAbsolutePosition()/360);
+            SmartDashboard.putNumber(raw_values + "Distal Left", Encoder_Distal_Left.getAbsolutePosition()/360);
+            SmartDashboard.putNumber(raw_values + "Distal Right", Encoder_Distal_Right.getAbsolutePosition()/360);
+        }
 
-        // String encoder_values = "Arm External Encoders/";
-        // boolean show_encoder_values = true;
-        // if(show_encoder_values){
-        //     SmartDashboard.putNumber(encoder_values + "Proximal Left", getEncoderProximalLeft());
-        //     SmartDashboard.putNumber(encoder_values + "Proximal Right", getEncoderProximalRight());
-        //     SmartDashboard.putNumber(encoder_values + "Distal Left", getEncoderDistalLeft());
-        //     SmartDashboard.putNumber(encoder_values + "Distal Right", getEncoderDistalRight());
-        // }
+        String encoder_values = "Arm External Encoders/";
+        boolean show_encoder_values = true;
+        if(show_encoder_values){
+            SmartDashboard.putNumber(encoder_values + "Proximal Left", getEncoderProximalLeft());
+            SmartDashboard.putNumber(encoder_values + "Proximal Right", getEncoderProximalRight());
+            SmartDashboard.putNumber(encoder_values + "Distal Left", getEncoderDistalLeft());
+            SmartDashboard.putNumber(encoder_values + "Distal Right", getEncoderDistalRight());
+        }
 
+            SmartDashboard.putNumber("Arm Proximal", getPositionProximal());
+            SmartDashboard.putNumber("Arm Distal", getPositionDistal());
+            SmartDashboard.putNumber("Arm x", Arm.forwardKinematics(getPositionProximal(), getPositionDistal())[0]);
+            SmartDashboard.putNumber("Arm y", Arm.forwardKinematics(getPositionProximal(), getPositionDistal())[1]);
         // String motor_encoder_values = "Arm Motor Encoders/";
         // boolean show_motor_encoder_values = false;
         // if(show_motor_encoder_values){
@@ -371,9 +375,9 @@ public class ArmInterface {
         double voltage_ff_prox = Math.cos(getPositionProximal()) * proximal_kVG;
         double voltage_ff_dist = Math.cos(getPositionDistal()) * distal_kVG;
 
-        if(controlVoltageProxima == 0 && controlVoltageDistal == 0){
+        // if(controlVoltageProxima == 0 && controlVoltageDistal == 0){
 
-        }
+        // }
 
         Proximal_Left.setVoltage(controlVoltageProxima + voltage_ff_prox);
         Proximal_Right.setVoltage(controlVoltageProxima + voltage_ff_prox);
@@ -405,11 +409,13 @@ public class ArmInterface {
             System.out.println("Feedforward Error Distal");
         }
 
-        Proximal_Left.setVoltage(controlVoltageProxima + voltage_ff_prox);
-        Proximal_Right.setVoltage(controlVoltageProxima + voltage_ff_prox);
+        double finalVoltageProximal = (controlVoltageProxima + voltage_ff_prox) * Constants.ArmParameters.voltage_shift_proximal;
+        Proximal_Left.setVoltage(finalVoltageProximal);
+        Proximal_Right.setVoltage(finalVoltageProximal);
 
-        Distal_Left.setVoltage(controlVoltageDistal + voltage_ff_dist);
-        Distal_Right.setVoltage(controlVoltageDistal + voltage_ff_dist);
+        double finalVoltageDistal = (controlVoltageProxima + voltage_ff_prox) * Constants.ArmParameters.voltage_shift_distal;
+        Distal_Left.setVoltage(finalVoltageDistal);
+        Distal_Right.setVoltage(finalVoltageDistal);
     }
     /*
     public void rawVoltageMotors(double controlVoltageProxima, double controlVoltageDistal){

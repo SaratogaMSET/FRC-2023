@@ -1,38 +1,45 @@
-// package frc.robot.subsystems.Drivetrain;
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-// import org.littletonrobotics.junction.AutoLog;
-// import frc.lib.swerve.BetterSwerveModuleState;
+package frc.robot.subsystems.Drivetrain;
 
-// /** Not used to sim software yet**/
-// public interface SwerveModuleIO {
-//     @AutoLog
-//     class SwerveModuleIOInputs {
-//         public double drivePositionMeters = 0.0;
-//         public double driveVelocityMetersPerSec = 0.0;
-//         public double driveAppliedVolts = 0.0;
-//         public double driveCurrentAmps = 0.0;
-//         public double driveTempCelcius = 0.0;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import org.littletonrobotics.junction.AutoLog;
 
-//         public double steerAbsolutePositionRad = 0.0;
-//         public double steerAbsoluteVelocityRadPerSec = 0.0;
-//         public double steerPositionRad = 0.0;
-//         public double steerVelocityRadPerSec = 0.0;
-//         public double steerAppliedVolts = 0.0;
-//         public double steerCurrentAmps = 0.0;
-//         public double steerTempCelcius = 0.0;
-//     }
+public interface SwerveModuleIO {
+  @AutoLog
+  public static class SwerveModuleIOInputs {
+    public long moduleNumber = -1;
 
-//     default void updateInputs(SwerveModuleIOInputs inputs) {}
+    public double drivePositionRotations = 0.0;
+    public double driveSpeedRPS = 0.0;
+    public double drivePercentOut = 0.0;
+    public double driveCurrentAmps = 0.0;
+    public double driveTemparature = 0.0;
 
-//     default void setDriveVoltage(double voltage) {}
+    public double absoluteEncoderRotations = 0.0;
 
-//     default void setSteerVoltage(double voltage) {}
-    
-//     default void setDesiredState(BetterSwerveModuleState state, boolean isOpenLoop) {}
+    public double steerPositionRotations = 0.0;
+    public double steerSpeedRPS = 0.0;
+    public double steerPercentOut = 0.0;
+    public double steerCurrentAmps = 0.0;
+    public double steerTemparature = 0.0;
+  }
 
-//     default void stopMotors() {}
+  public abstract SwerveModuleIOInputsAutoLogged updateInputs();
 
-//     default void setDriveBrakeMode(boolean enable) {}
+  public abstract void setDesiredState(SwerveModuleState state, boolean isOpenLoop);
 
-//     default void setSteerBrakeMode(boolean enable) {}
-// }
+  public abstract Rotation2d getAbsoluteRotation();
+
+  public abstract void resetToAbsolute();
+
+  public abstract SwerveModuleState getState();
+
+  public abstract SwerveModulePosition getPosition();
+
+  public abstract int getModuleNumber();
+}

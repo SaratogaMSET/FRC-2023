@@ -46,11 +46,11 @@ public class FastBalanceCommand extends CommandBase {
     // Uncomment the line below this to simulate the gyroscope axis with a controller joystick
       // Double currentAngle = -1 * Robot.controller.getRawAxis(Constants.LEFT_VERTICAL_JOYSTICK_AXIS) * 45;
 
-    driveRoll = new Rotation2d(m_DriveSubsystem.m_navx.getRoll());  
-    drivePitch = new Rotation2d(m_DriveSubsystem.m_navx.getPitch());
+    driveRoll = m_DriveSubsystem.getRoll();  
+    drivePitch =m_DriveSubsystem.getPitch();
     driveYaw = m_DriveSubsystem.getRotation2d();
     LinearFilter xAccelFilter = LinearFilter.movingAverage(5);
-    currAcc = m_DriveSubsystem.m_navx.getWorldLinearAccelX();
+    currAcc = m_DriveSubsystem.getWorldLinearAccelX();
 
     currAcc = xAccelFilter.calculate(currAcc);
     currAcc = 180 * Math.asin(currAcc/9.81)/Math.PI;

@@ -6,22 +6,22 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.controls.ArmInterface;
 public class ArmSubsystem extends SubsystemBase {
     int side = 0;
-    double proxKp = 9.75; //10.2
-    double distKp = 9.2; //9.5
+    double proxKp = 9.75 * 16.6 / 13.6; //10.2
+    double distKp = 9.5 * 8.6 / 5.6; //9.5
 
 
-    double proxKd = 0.042; //0.035
-    double distKd = 0.02; 
+    double proxKd = 0.042 * 16.6 / 13.6; //0.035
+    double distKd = 0.02 * 8.6 / 5.6; 
 
     // double proxKpMiddle = 9.5; //10.2
-    double distKpMiddle = 9.0;
-    double distKdMiddle = 0.065; 
+    double distKpMiddle = 7;
+    double distKdMiddle = 0.2; 
 
-    double proxKf = 0.80;
-    double distKf = 1.30;
+    final double proxKf = 0.80 * 16.6 / 13.6;
+    final double distKf = 1.10;// * 8.6 / 5.6;
     double armTolerance = 0.03;
 
-    double maxVoltPerVelocity = 2.5000254;
+    double maxVoltPerVelocity = 2.250254;
     double max_voltage = 6.5;
     
     public ArmInterface armInterface = new ArmInterface();
@@ -124,10 +124,10 @@ public class ArmSubsystem extends SubsystemBase {
         // }
 
         if(Math.abs(error.get(0)) < armTolerance){
-            voltageProximal = proxKp * error.get(0);
+            voltageProximal = 0.8 * error.get(0) * proxKp + 6 * error.get(2) * proxKd;
         }
         if(Math.abs(error.get(1)) < armTolerance){
-            voltageDistal = distKp * error.get(1);
+            voltageDistal = 0.8 * error.get(1) * distKpMiddle + 6 * error.get(3) * distKdMiddle;
         }
 
         if(Math.abs(voltageProximal) > max_voltage){
@@ -177,10 +177,10 @@ public class ArmSubsystem extends SubsystemBase {
         // }
 
         if(Math.abs(error.get(0)) < armTolerance){
-            voltageProximal = proxKp * error.get(0);
+            voltageProximal = 0.8 * proxKp * error.get(0) + 6 * error.get(2) * proxKd;
         }
         if(Math.abs(error.get(1)) < armTolerance){
-            voltageDistal = distKp * error.get(1);
+            voltageDistal = 0.8 * distKp * error.get(1) + 6 * error.get(3) * distKd;
         }
 
         if(Math.abs(voltageProximal) > max_voltage){
@@ -201,6 +201,7 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
     public void periodic() {
         updateState();
+        armInterface.showState();
         // SmartDashboard.putNumber("Side", side);
         armVisualizer.update(armInterface.getPositionProximal(), armInterface.getPositionDistal());
         // armVisualizer.logRectangles("Arm Bounds", armInterface.Bounds, new Color8Bit(Color.kGreen));

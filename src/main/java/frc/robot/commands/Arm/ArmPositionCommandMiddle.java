@@ -41,14 +41,7 @@ public class ArmPositionCommandMiddle extends CommandBase{
     @Override
     public void execute(){
         double[] iK = armSubsystem.inverseKinematics(tX, tY);
-        double x_err = tX - armSubsystem.forwardKinematics()[0];
-        double y_err = tY - armSubsystem.forwardKinematics()[1];
-        if(hold && Math.abs(x_err) < tolerance + 0.02 && Math.abs(y_err) < tolerance){
-            armSubsystem.voltageMotors(0, 0);
-        }
-        else{
-            armSubsystem.PIDtoAnglesMiddle(iK[0], iK[1]);
-        }
+        armSubsystem.PIDtoAnglesMiddle(iK[0], iK[1]);
         SmartDashboard.putNumber("Arm Position Command Error X", tX - armSubsystem.forwardKinematics()[0]);
         SmartDashboard.putNumber("Arm Position Command Error Y",tY - armSubsystem.forwardKinematics()[1]);
     }

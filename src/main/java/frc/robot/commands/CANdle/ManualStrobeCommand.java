@@ -19,7 +19,7 @@ public class ManualStrobeCommand extends CommandBase {
     private boolean alreadyFlashed = false;
     private boolean previousObjectDetected = false;
 
-    // private final Color color;
+//     // private final Color color;
     public ManualStrobeCommand(CANdleSubsystem ledSubsystem){
         this.candle = ledSubsystem;
         addRequirements(ledSubsystem);
@@ -37,15 +37,11 @@ public class ManualStrobeCommand extends CommandBase {
     private void toggleGunnerButton() {
         SmartDashboard.putBoolean("LED/Previous Gunner Boolean", previousGunnerValue);
         SmartDashboard.putBoolean("LED/Cone Boolean", RobotContainer.cone);
-        if (!previousGunnerValue && RobotContainer.m_gunner1.button(4).getAsBoolean()){  // If previous gunner value is not the current value
+        if (!previousGunnerValue && RobotContainer.m_gunner1.button(3).getAsBoolean()){  // If previous gunner value is not the current value
             RobotContainer.cone = !RobotContainer.cone; // Set the current value to the new value (opposite of previous value)
         }
-        previousGunnerValue = RobotContainer.m_gunner1.button(4).getAsBoolean();
+        previousGunnerValue = RobotContainer.m_gunner1.button(3).getAsBoolean();
     }
-    // public StrobeCommand(CANdleSubsystem ledSubsystem){
-    //     this.candle = ledSubsystem;
-    //     addRequirements(ledSubsystem);
-    // }
     @Override
     public void initialize(){
         // toggleGunnerButton();
@@ -105,8 +101,8 @@ public class ManualStrobeCommand extends CommandBase {
         // }
 
         toggleGunnerButton();
-        setTimerStarted(RobotContainer.m_claw.hasAcquiredGamePiece());
-        if(RobotContainer.m_claw.hasAcquiredGamePiece() && !twoSecondsFlashed(previousTimeStarted)){
+        setTimerStarted(RobotContainer.intake.isGamePieceAcquired());
+        if(RobotContainer.intake.isGamePieceAcquired() && !twoSecondsFlashed(previousTimeStarted)){
             if(RobotContainer.cone){
                 candle.indicateConeStrobe();
             }
@@ -122,7 +118,7 @@ public class ManualStrobeCommand extends CommandBase {
                 candle.indicateCubeNoStrobe();
             }
         }
-        previousObjectDetected = RobotContainer.m_claw.hasAcquiredGamePiece();
+        previousObjectDetected = RobotContainer.intake.isGamePieceAcquired();
         //Print Statements for Debugging:
         SmartDashboard.putNumber("Time since last flash", Timer.getFPGATimestamp() - previousTimeStarted);
     }

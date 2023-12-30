@@ -9,12 +9,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.math.Conversions;
+import frc.lib.swerve.BetterSwerveModuleState;
 import frc.lib.util.CTREModuleState;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.Constants;
 import frc.robot.Robot;
 
-public class SwerveModuleIOFalcon implements SwerveModuleIONew {
+public class SwerveModuleIOFalcon implements SwerveModuleIO {
   private int moduleNumber;
   private Rotation2d angleOffset;
 
@@ -44,7 +45,8 @@ public class SwerveModuleIOFalcon implements SwerveModuleIONew {
   }
 
   @Override
-  public void updateInputs(SwerveModuleIOInputs inputs) {
+  public SwerveModuleIOInputsAutoLogged updateInputs() {
+    var inputs = new SwerveModuleIOInputsAutoLogged();
     inputs.moduleNumber = moduleNumber;
 
     inputs.drivePositionRotations = driveMotor.getSelectedSensorPosition() / 2048;
@@ -60,6 +62,7 @@ public class SwerveModuleIOFalcon implements SwerveModuleIONew {
     inputs.steerPercentOut = steerMotor.getMotorOutputPercent();
     inputs.steerCurrentAmps = steerMotor.getStatorCurrent();
     inputs.steerTemparature = steerMotor.getTemperature();
+    return inputs;
   }
 
   @Override
@@ -69,6 +72,31 @@ public class SwerveModuleIOFalcon implements SwerveModuleIONew {
     setAngle(desiredState);
     setSpeed(desiredState, isOpenLoop);
   }
+  
+  public void setDesiredState(BetterSwerveModuleState desiredState, boolean isOpenLoop) {
+    /*
+     * This is a custom optimize function, since default WPILib optimize assumes
+     * continuous controller which CTRE and Rev onboard is not
+     */
+
+    desiredState = CTREModuleState.optimize(desiredState, getState().angle, 0);
+    setAngle(desiredState);
+    setSpeed(desiredState, isOpenLoop);
+}
+
+  private void setSpeed(BetterSwerveModuleState desiredState, boolean isOpenLoop) {
+    if (isOpenLoop) {
+        double percentOutput = desiredState.speedMetersPerSecond
+                / Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND;
+                driveMotor.set(ControlMode.PercentOutput, percentOutput);
+    } else {
+        double velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond,
+                Constants.Drivetrain.wheelCircumference, Constants.Drivetrain.driveGearRatio);
+                driveMotor.set(ControlMode.Velocity, velocity, DemandType.ArbitraryFeedForward,
+                feedforward.calculate(desiredState.speedMetersPerSecond));
+    }
+  }
+
 
   private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
     if (isOpenLoop) {
@@ -87,6 +115,16 @@ public class SwerveModuleIOFalcon implements SwerveModuleIONew {
           feedforward.calculate(desiredState.speedMetersPerSecond));
     }
   }
+
+  public void setAngle(BetterSwerveModuleState desiredState) {
+    Rotation2d angle = (Math
+            .abs(desiredState.speedMetersPerSecond) <= (Constants.Drivetrain.MAX_VELOCITY_METERS_PER_SECOND * 0.01))
+                    ? getAngle()
+                    : desiredState.angle; // Prevent rotating module if speed is less then 1%. Prevents Jittering.
+
+                    steerMotor.set(ControlMode.Position,
+            Conversions.degreesToFalcon(angle.getDegrees(), Constants.Drivetrain.angleGearRatio));
+}
 
   private void setAngle(SwerveModuleState desiredState) {
     // Prevent rotating module if speed is less then 1%. Prevents Jittering.

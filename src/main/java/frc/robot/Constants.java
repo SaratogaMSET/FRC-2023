@@ -154,7 +154,7 @@ public final class Constants {
             public static final int driveMotorID = 36;
             public static final int angleMotorID = 37;
             public static final int canCoderID = 47;
-            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(-82.177));
+            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(-82.177 -0.1));
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -164,7 +164,7 @@ public final class Constants {
             public static final int driveMotorID = 32;
             public static final int angleMotorID = 33;
             public static final int canCoderID = 43;
-            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(-146.43));
+            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(-146.43+0.55));
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -174,7 +174,7 @@ public final class Constants {
             public static final int driveMotorID = 30;
             public static final int angleMotorID = 31;
             public static final int canCoderID = 41;
-            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(322.91 - 180));
+            public static final Rotation2d angleOffset = Rotation2d.fromRadians(Math.toRadians(322.91 - 180-3.26));
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
@@ -303,6 +303,18 @@ public final class Constants {
                                 new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180))
                         })
         );
+
+        public static final double simDriveKP = 0;
+
+        public static final double simDriveKS = 0;
+
+        public static final double simDriveKV = 0;
+
+        public static final double simDriveKA = 0;
+
+        public static final double simAngleKP = 0;
+
+        public static final double simAngleKD = 0;
     }
 
     public static class ClawConstants {
@@ -312,6 +324,19 @@ public final class Constants {
         public static final double CONE_MEDIUM_BOUND = 60.83; //56.83
 }
 
+public static class WheelIntakeConstants{
+        public static final int IntakeId = 21;
+        public static final double CONE_HOLD_VOLTAGE= 2; //TODO: FIX
+        public static final double CUBE_HOLD_VOLTAGE = 1; //TODO: FIX
+        public static final double CONE_STALL_CURRENT = 4; //TODO: fix
+        public static final double CUBE_STALL_CURRENT = 4; //TODO: FIX
+        public static final double stopVelocity = 0.2; //TODO: fix
+        public static final double reduction = 8;       
+        public static final double holdVolts = 1.5;
+        public static final double intakeVelocityWaitStart = 0.3;
+        public static final double intakeVelocityWaitStop = 0.6;
+      }
+
     public final class GroundIntake{
         public static final int actuator_ID = 57;
         public static final int intake_ID = 22;
@@ -320,7 +345,7 @@ public final class Constants {
 
         public static final int IR_GATE = 1;
         
-        public static final double encoder_offset = 166.03 ; //223.506
+        public static final double encoder_offset = 34 ; //223.506
 
         public static final double x_offset = 0.26;
         public static final double y_offset = 0.4;
@@ -469,14 +494,17 @@ public final class Constants {
         public static final int encoder_distal_left_ID = 13;
         public static final int encoder_distal_right_ID = 10;
     
-        public static final double encoder_proximal_left_offset = 0.67;
-        public static final double encoder_proximal_right_offset = 0.227;
-        public static final double encoder_distal_left_offset = 0.513;
-        public static final double encoder_distal_right_offset = 0.75;
+        public static final double encoder_proximal_left_offset = 0.193;
+        public static final double encoder_proximal_right_offset = 0.5585;
+        public static final double encoder_distal_left_offset = 0.238;
+        public static final double encoder_distal_right_offset = 0.615;
     
         public static final double gear_reduction_proximal = (68.0 / 16) * (68.0 / 8) * (48.0 / 14);
         public static final double gear_reduction_distal = (68.0 / 16) * (68.0 / 8) * (48.0 / 16);
-    
+
+        public static final double voltage_shift_proximal = (34.0 / 10) / (48.0 / 14);
+        public static final double voltage_shift_distal = (34.0 / 10) / (48.0 / 16);
+        
         public static final double motor_encoder_ticks_per_revolution = 2048;
     
         public static final double proximal_highbound = 140 * (Math.PI / 180);
@@ -493,7 +521,7 @@ public final class Constants {
         public static final double proximal_inertia = 2*2961.95 * lbs_sqinches_to_kg_sqmeters;
         public static final double proximal_com = 22.80 * inches_to_meters;
     
-        public static final double distal_length = 33 * inches_to_meters;
+        public static final double distal_length = 32 * inches_to_meters;
         public static final double distal_mass = 2.8*2 * pounds_to_kilograms;
         public static final double distal_inertia = 2*866.840 * lbs_sqinches_to_kg_sqmeters;
         public static final double distal_com = 13.56 * inches_to_meters;
@@ -504,17 +532,17 @@ public final class Constants {
         public static final double ready_highcone_score_y = 1.14; 
 
         // public static double[] ready_midcone_score = new double[]{0.97, 0.65};
-        public static final double ready_midcone_score_x = 0.96 +.1525-0.08 - (3* 0.0254);
-        public static final double ready_midcone_score_y = 0.66 +.1525 + (2 * 0.0254);
+        public static final double ready_midcone_score_x = 0.96 + 0.15 - (4 * 0.0254);
+        public static final double ready_midcone_score_y = 0.66 + 0.2;
 
-        public double[] ready_highcube_score = new double[]{1.38, 0.96};
-        public static final double ready_highcube_score_x = 1.38;
+        public double[] ready_highcube_score = new double[]{1.33, 0.96};
+        public static final double ready_highcube_score_x = 1.33;
         public static final double ready_highcube_score_y = 0.96;
         
-        public double[] ready_midcube_score = new double[]{0.97, 0.65};
+        public double[] ready_midcube_score = new double[]{0.94, 0.59};
         
-        public static final double ready_midcube_score_x = 0.97;
-        public static final double ready_midcube_score_y = 0.65;
+        public static final double ready_midcube_score_x = 0.94;
+        public static final double ready_midcube_score_y = 0.59;
 
         public final double[] ready_low_score = new double[]{0.59, 0};
         public static final double ready_low_score_x  = 0.59;
