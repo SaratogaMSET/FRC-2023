@@ -4,7 +4,6 @@ import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.controls.ArmInterface;
-
 public class ArmSubsystem extends SubsystemBase {
     int side = 0;
     double proxKp = 9.75; //10.2
