@@ -85,6 +85,7 @@ public class RobotContainer {
   public final static WheelIntake intake = new WheelIntake();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   public final static VisionSubsystem m_visionSubsystem = new VisionSubsystem();
+  public final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
   public static DrivetrainSubsystem m_drivetrainSubsystem = 
   new DrivetrainSubsystem(
       Robot.isReal()
